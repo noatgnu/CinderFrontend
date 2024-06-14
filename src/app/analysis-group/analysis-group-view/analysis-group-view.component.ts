@@ -19,6 +19,7 @@ import {
 import {ComparisonMatrix} from "../../comparison-matrix";
 import {Project} from "../../project/project";
 import {SearchModalComponent} from "../../search-modal/search-modal.component";
+import {FileExtraDataModalComponent} from "../file-extra-data-modal/file-extra-data-modal.component";
 
 @Component({
   selector: 'app-analysis-group-view',
@@ -79,6 +80,8 @@ export class AnalysisGroupViewComponent {
     name: new FormControl(),
     description: new FormControl()
   })
+
+
 
   constructor(private fb: FormBuilder, private web: WebService, private matDialog: MatDialog) {
 
@@ -156,5 +159,22 @@ export class AnalysisGroupViewComponent {
   openSearchModal() {
     const ref = this.matDialog.open(SearchModalComponent)
     ref.componentInstance.analysisGroupIDs = [this.analysisGroup!.id]
+  }
+
+  openExtraDataModal(file: ProjectFile) {
+    const ref = this.matDialog.open(FileExtraDataModalComponent)
+    ref.componentInstance.file = file
+    ref.afterClosed().subscribe((data) => {
+      if (data) {
+        console.log(data)
+        this.web.updateProjectFileExtraData(file.id, data.extra_data).subscribe(() => {
+          if (file.file_category === "df") {
+            this.analysisGroupDF = file
+          } else {
+            this.analysisGroupSearched = file
+          }
+        })
+      }
+    })
   }
 }

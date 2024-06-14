@@ -58,7 +58,14 @@ export class SelectedResultViewComponent {
                   const pValueColumnIndex = this.getCMIndex(m.p_value_col)
                   let comparisonColumnIndex = -1
                   let comparisonLabel = m.comparison_label
-
+                  let geneNameColumnIndex = -1
+                  let primaryIdColumnIndex = -1
+                  if (this.analysisGroupDF?.extra_data["primary_id_col"]) {
+                    primaryIdColumnIndex = this.getCMIndex(this.analysisGroupDF.extra_data["primary_id_col"])
+                  }
+                  if (this.analysisGroupDF?.extra_data["gene_name_col"]) {
+                    geneNameColumnIndex = this.getCMIndex(this.analysisGroupDF.extra_data["gene_name_col"])
+                  }
                   if (m.comparison_col) {
                     comparisonColumnIndex = this.getCMIndex(m.comparison_col)
                   }
@@ -70,13 +77,33 @@ export class SelectedResultViewComponent {
                       if (comparisonColumnIndex !== -1) {
                         const label = row.context[comparisonColumnIndex]
                         if (label) {
-                          this.differentialData.push({line: line, foldChange: foldChange, pValue: pValue, comparisonLabel: `${label}(${comparisonLabel})`, condition_A: m.condition_A, condition_B: m.condition_B})
+                          this.differentialData.push(
+                            {
+                              line: line,
+                              foldChange: foldChange,
+                              pValue: pValue,
+                              comparisonLabel: `${label}(${comparisonLabel})`,
+                              condition_A: m.condition_A,
+                              condition_B: m.condition_B,
+                              gene_name: geneNameColumnIndex !== -1 ? row.context[geneNameColumnIndex] : null,
+                              primary_id: primaryIdColumnIndex !== -1 ? row.context[primaryIdColumnIndex] : null
+                            })
 
                           if (label === comparisonLabel) {
                             }
                         }
                       } else {
-                        this.differentialData.push({line: line, foldChange: foldChange, pValue: pValue, comparisonLabel: comparisonLabel, condition_A: m.condition_A, condition_B: m.condition_B})
+                        this.differentialData.push(
+                          {
+                            line: line,
+                            foldChange: foldChange,
+                            pValue: pValue,
+                            comparisonLabel: comparisonLabel,
+                            condition_A: m.condition_A,
+                            condition_B: m.condition_B,
+                            gene_name: geneNameColumnIndex !== -1 ? row.context[geneNameColumnIndex] : null,
+                            primary_id: primaryIdColumnIndex !== -1 ? row.context[primaryIdColumnIndex] : null
+                          })
                       }
 
                     }
@@ -108,7 +135,7 @@ export class SelectedResultViewComponent {
   sampleAnnotations: SampleAnnotation|undefined = undefined
   comparisonMatrix: ComparisonMatrix|undefined = undefined
 
-  differentialData: {line: number, foldChange: number, pValue: number, comparisonLabel: string, condition_A: string, condition_B: string}[] = []
+  differentialData: {line: number, foldChange: number, pValue: number, comparisonLabel: string, condition_A: string, condition_B: string, gene_name: string|null, primary_id: string|null}[] = []
 
   constructor(private web: WebService, private fb: FormBuilder) {
   }

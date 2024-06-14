@@ -69,10 +69,17 @@ export class WebService {
   }
 
   bindUploadedFile(analysis_group_id: number, file_type: string, file_category: string, file_name: string, upload_id: string) {
-    return this.http.post<ProjectFile>(
+    return this.http.post<any>(
       `${this.baseURL}/api/project_files/bind_uploaded_file/`,
       {file_name: file_name, analysis_group: analysis_group_id, file_type: file_type, file_category: file_category, upload_id: upload_id},
       {responseType: 'json', observe: 'body'}
+    ).pipe<ProjectFile>(
+      map((data) => {
+        if (data.extra_data) {
+          data.extra_data = JSON.parse(data.extra_data)
+        }
+        return data
+      })
     )
   }
 
@@ -180,9 +187,18 @@ export class WebService {
   }
 
   getAnalysisGroupFiles(analysis_group_id: number) {
-    return this.http.get<ProjectFile[]>(
+    return this.http.get<any[]>(
       `${this.baseURL}/api/analysis_groups/${analysis_group_id}/files/`,
       {responseType: 'json', observe: 'body'}
+    ).pipe<ProjectFile[]>(
+      map((data) => {
+        return data.map((file) => {
+          if (file.extra_data) {
+            file.extra_data = JSON.parse(file.extra_data)
+          }
+          return file
+        })
+      })
     )
   }
 
@@ -376,6 +392,21 @@ export class WebService {
           result.search_results = JSON.parse(result.search_results)
           return result
         })
+      })
+    )
+  }
+
+  updateProjectFileExtraData(file_id: number, extra_data: any) {
+    return this.http.put<any>(
+      `${this.baseURL}/api/project_files/${file_id}/`,
+      {extra_data: extra_data},
+      {responseType: 'json', observe: 'body'}
+    ).pipe<ProjectFile>(
+      map((data) => {
+        if (data.extra_data) {
+          data.extra_data = JSON.parse(data.extra_data)
+        }
+        return data
       })
     )
   }

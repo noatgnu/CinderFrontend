@@ -19,14 +19,20 @@
           <span>Differential Analysis File @if(analysisGroupDF) {: {{analysisGroupDF.name}}}</span>
         </div>
         <app-upload-file (fileUploaded)="handleFileUploaded($event, 'df')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'df'"></app-upload-file>
+        @if (analysisGroupDF) {
+          <button mat-raised-button color="primary" (click)="openExtraDataModal(analysisGroupDF)">Extra Data</button>
+        }
       </div>
       <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
         <div>
           <span>Searched File @if(analysisGroupSearched) {: {{analysisGroupSearched.name}}}</span>
         </div>
         <app-upload-file (fileUploaded)="handleFileUploaded($event, 'searched')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'searched'"></app-upload-file>
+        @if (analysisGroupSearched) {
+          <button mat-raised-button color="primary" (click)="openExtraDataModal(analysisGroupSearched)">Extra Data</button>
+        }
       </div>
-      <div style="display: flex; flex-direction: row; gap: 20px">
+      <div style="display: flex; flex-direction: row; gap: 20px; padding: 20px">
         @if (analysisGroupSearched) {
           <button mat-raised-button color="primary" (click)="setAnnotationModal(analysisGroupSearched)">Sample Annotation @if(sampleAnnotations) {({{sampleAnnotations.annotations.length}})}</button>
         }

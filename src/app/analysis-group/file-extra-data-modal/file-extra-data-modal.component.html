@@ -1,0 +1,49 @@
+<h2 mat-dialog-title>File Extra Data</h2>
+<div mat-dialog-content>
+  @if (file) {
+    @if (file.file_category === 'df') {
+      <form [formGroup]="formDFColumn" style="display: flex; flex-direction: column; gap: 10px">
+        <mat-form-field>
+          <mat-select formControlName="primary_id_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>Primary ID Column</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="gene_name_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>Gene Name Column</mat-label>
+        </mat-form-field>
+      </form>
+    } @else if (file.file_category === 'searched') {
+      <form [formGroup]="formSearchedColumn" style="display: flex; flex-direction: column; gap: 10px">
+        <mat-form-field>
+          <mat-select formControlName="primary_id_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>Primary ID Column</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="gene_name_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>Gene Name Column</mat-label>
+        </mat-form-field>
+      </form>
+    }
+  }
+
+</div>
+<mat-dialog-actions>
+  <button mat-button (click)="save()">Submit</button>
+  <button mat-button (click)="cancel()">Close</button>
+</mat-dialog-actions>

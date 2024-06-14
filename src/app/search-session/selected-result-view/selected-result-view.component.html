@@ -18,6 +18,12 @@
                   {{d.condition_A}} - {{d.condition_B}}
                 </span>
                 <p matListItemLine>
+                  @if (d.gene_name) {
+                    <b>Gene Name</b>: {{d.gene_name}}<br>
+                  }
+                  @if (d.primary_id) {
+                    <b>Primary ID</b>: {{d.primary_id}}<br>
+                  }
                   <b>Fold Change</b>: {{d.foldChange}}<br>
                   <b>P-Value</b>: {{d.pValue}}<br>
                   <b>Comparison</b>: {{d.comparisonLabel}}<br>

@@ -7,6 +7,9 @@ export interface ProjectFile {
   load_file_content: boolean;
   created_at: Date;
   updated_at: Date;
+  primary_id_col: string;
+  gene_name_col: string;
+  extra_data: any;
 }
 
 export interface ProjectFileQuery {
