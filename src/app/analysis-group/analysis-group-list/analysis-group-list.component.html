@@ -1,0 +1,13 @@
+@if (analysisGroupQuery) {
+  <mat-selection-list [multiple]="false">
+    @for (ag of analysisGroupQuery.results; track ag.id) {
+      <mat-list-option [value]="ag">
+        <span matListItemTitle>
+          <b>{{ag.name}}</b>
+        </span>
+      </mat-list-option>
+      <mat-divider></mat-divider>
+    }
+  </mat-selection-list>
+}
+

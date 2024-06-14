@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>Login</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" style="display: flex; flex-direction: column">
+    <mat-form-field>
+      <input matInput type="text" class="form-control" formControlName="username" id="username">
+      <mat-label>Username</mat-label>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="password" class="form-control" formControlName="password" id="password">
+      <mat-label>Password</mat-label>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="login()">Login</button>
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

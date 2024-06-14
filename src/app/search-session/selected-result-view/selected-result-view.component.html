@@ -1,0 +1,34 @@
+<mat-toolbar [color]="'accent'">
+  <mat-toolbar-row>
+    <span>Result Details</span>
+  </mat-toolbar-row>
+</mat-toolbar>
+@if (searchResult) {
+  <div style="display: flex; flex-direction: column; gap:2px; padding: 10px; height: calc(100vh - 64px*4); overflow: auto">
+    <div>
+      <p>
+        <b>Found Term:</b> {{searchResult.search_term}}
+      </p>
+      @if (searchResult.file.file_category === 'df' && comparisonMatrix) {
+        <mat-list>
+          @for (data of comparisonMatrix.matrix; track data) {
+            <mat-list-item>
+              @for (d of differentialData; track differentialData) {
+                <span matListItemTitle>
+                  {{d.condition_A}} - {{d.condition_B}}
+                </span>
+                <p matListItemLine>
+                  <b>Fold Change</b>: {{d.foldChange}}<br>
+                  <b>P-Value</b>: {{d.pValue}}<br>
+                  <b>Comparison</b>: {{d.comparisonLabel}}<br>
+                </p>
+              }
+            </mat-list-item>
+          }
+        </mat-list>
+      }
+
+    </div>
+  </div>
+}
+

@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>Create Project</h2>
+<div mat-dialog-content>
+  <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 10px">
+    <mat-form-field>
+      <input matInput formControlName="name" placeholder="Project Name">
+      <mat-label>Project Name</mat-label>
+    </mat-form-field>
+
+    <mat-form-field>
+      <textarea matInput formControlName="description" placeholder="Project Description"></textarea>
+      <mat-label>Project Description</mat-label>
+    </mat-form-field>
+  </form>
+</div>
+<mat-dialog-actions>
+  <button mat-button (click)="close()">Close</button>
+  <button mat-button (click)="submit()">Create</button>
+</mat-dialog-actions>

@@ -1,0 +1,31 @@
+<mat-toolbar>
+  <mat-toolbar-row >
+    <a href="/#/home"><span style="color:#ba0000"><b>C|nder</b></span></a>
+    <span class="spacer"></span>
+
+    @if (accounts.loggedIn) {
+      <button mat-icon-button style="color: rgb(172,110,110)" [matMenuTriggerFor]="menu" aria-label="View Project or Analysis Group">
+        <mat-icon>view_list</mat-icon>
+      </button>
+      <button mat-icon-button style="color: rgb(172,110,110)" aria-label="Upload Project Files">
+        <mat-icon>file_upload</mat-icon>
+      </button>
+      <button mat-icon-button style="color: rgb(186,104,166)" aria-label="Logout" (click)="accounts.logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    } @else {
+      <button mat-icon-button style="color: rgb(172,110,110)" aria-label="Login" (click)="openLoginDialog()">
+        <mat-icon>login</mat-icon>
+      </button>
+    }
+
+  </mat-toolbar-row>
+</mat-toolbar>
+<mat-menu #menu="matMenu">
+  <a mat-menu-item href="/#/project">
+    <span>Project</span>
+  </a>
+  <a mat-menu-item href="/#/analysis-group">
+    <span>Analysis Group</span>
+  </a>
+</mat-menu>

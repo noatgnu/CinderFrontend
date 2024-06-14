@@ -1,0 +1,4 @@
+<form>
+  <button mat-icon-button type="button" (click)="file.click()"><mat-icon>upload</mat-icon></button>
+  <input type="file" hidden #file (change)="uploadData($event)">
+</form>

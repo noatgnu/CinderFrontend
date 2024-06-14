@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Create Analysis Group</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 1px">
+    @if (project) {
+      <mat-list>
+        <mat-list-item>
+          <span matListItemTitle><b>Selected project: {{project.name}}</b></span>
+
+        </mat-list-item>
+      </mat-list>
+    } @else {
+      <mat-selection-list>
+
+      </mat-selection-list>
+    }
+
+
+    <mat-form-field>
+      <input matInput formControlName="name" type="text" placeholder="Analysis Group Name">
+      <mat-label>Analysis Group Name</mat-label>
+    </mat-form-field>
+    <mat-form-field>
+      <textarea matInput formControlName="description" placeholder="Analysis Group Description"></textarea>
+      <mat-label>Analysis Group Description</mat-label>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="submit()">Create</button>
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

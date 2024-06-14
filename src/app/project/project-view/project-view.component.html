@@ -1,0 +1,50 @@
+<div style="display: flex; flex-direction: row; justify-content: center; padding: 50px">
+  <div style="width: 100%">
+    @if (project) {
+      <form (ngSubmit)="updateProject()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
+        <mat-form-field style="width: 100%">
+          <input matInput formControlName="name" type="text" placeholder="Project Name">
+          <mat-label>Project Name</mat-label>
+        </mat-form-field>
+        <mat-form-field style="width: 100%">
+          <textarea matInput formControlName="description" placeholder="Project Description"></textarea>
+          <mat-label>Project Description</mat-label>
+        </mat-form-field>
+        <div style="display: flex; flex-direction: row; gap: 20px">
+          <button mat-raised-button color="primary" type="submit">Update</button>
+          <button mat-raised-button color="accent" (click)="openAnalysisGroupCreateModal()"><mat-icon>add</mat-icon> Analysis Group</button>
+          <button mat-raised-button color="warn" (click)="deleteProject()">Delete</button>
+        </div>
+      </form>
+      @if (analysisGroupQuery) {
+        <div style="padding: 20px">
+          <b>Associated Analysis Group</b>
+          @if (analysisGroupQuery.results.length >0) {
+            <mat-list>
+              @for (ag of analysisGroupQuery.results; track ag.id) {
+                <mat-list-item>
+                  <a matListItemTitle href="/#/analysis-group/{{ag.id}}" target="_blank">{{ag.name}}</a>
+                  <hr>
+                </mat-list-item>
+              }
+            </mat-list>
+          } @else {
+            <p>No analysis groups found.</p>
+          }
+          <mat-paginator #paginator
+                         (page)="handlePageChange($event)"
+                         [length]="analysisGroupQuery.count"
+                         [pageSize]="pageSize"
+                         [showFirstLastButtons]="true"
+                         [hidePageSize]="true"
+                         [pageIndex]="currentPage"
+                         aria-label="Select page">
+          </mat-paginator>
+
+        </div>
+      }
+
+    }
+
+  </div>
+</div>

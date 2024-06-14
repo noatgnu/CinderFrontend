@@ -1,0 +1,34 @@
+<div style="display: flex; flex-direction: row; justify-content: center">
+  <div style="width: 100%; padding: 50px">
+    <form [formGroup]="form">
+      <mat-form-field>
+        <mat-select formControlName="file_category">
+          <mat-option [value]="'df'">Differential Analysis</mat-option>
+          <mat-option [value]="'searched'">MS Searched File</mat-option>
+        </mat-select>
+        <mat-label>File Category</mat-label>
+      </mat-form-field>
+
+    </form>
+    @if (searchResultQuery) {
+      <app-search-result-list [searchResultQuery]="searchResultQuery" (selected)="handleSelectedResult($event)"></app-search-result-list>
+      <mat-paginator  #paginator
+                      (page)="handlePageEvent($event)"
+                      [length]="searchResultQuery.count"
+                      [pageSize]="pageSize"
+                      [showFirstLastButtons]="true"
+                      [hidePageSize]="true"
+                      [pageIndex]="pageIndex"
+                      aria-label="Select page">>
+
+      </mat-paginator>
+    }
+  </div>
+  @if (selectedSearchResult) {
+    <div class="selected-result">
+      <app-selected-result-view [searchResult]="selectedSearchResult"></app-selected-result-view>
+    </div>
+
+  }
+</div>
+

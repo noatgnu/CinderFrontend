@@ -1,0 +1,16 @@
+@if (searchResultQuery) {
+  <mat-selection-list [multiple]="false" (selectionChange)="handleSelection($event)">
+    @for (ag of searchResultQuery.results; track ag.id) {
+      <mat-list-option [value]="ag">
+        <span matListItemTitle>
+          <b>{{ag.search_term}}</b>
+        </span>
+        <p matListItemLine>
+          <small>{{ag.created_at|date: "short"}} - {{ag.file.name}} - {{ag.file.file_category}}</small>
+        </p>
+      </mat-list-option>
+      <mat-divider></mat-divider>
+    }
+  </mat-selection-list>
+}
+

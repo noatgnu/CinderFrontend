@@ -1,0 +1,93 @@
+<h2 mat-dialog-title>Analysis Group Comparison Matrix</h2>
+<div mat-dialog-content>
+  @if (form.length > 0) {
+    <mat-tab-group mat-stretch-tabs="false">
+      @for (f of form; track f; let i = $index) {
+        @if (f.value.comparison_label) {
+          <mat-tab [label]="f.value.comparison_label">
+            <div>
+              <form [formGroup]="f" style="display: flex; flex-direction: column; gap:10px">
+                <div>
+                  <mat-form-field>
+                    <mat-select formControlName="condition_A">
+                      @for(c of conditions; track c) {
+                        <mat-option [value]="c">{{c}}</mat-option>
+                      }
+                    </mat-select>
+                    <mat-label>Condition A</mat-label>
+                  </mat-form-field>
+                </div>
+                <div>
+                  <mat-form-field>
+                    <mat-select formControlName="condition_B">
+                      @for(c of conditions; track c) {
+                        <mat-option [value]="c">{{c}}</mat-option>
+                      }
+                    </mat-select>
+                    <mat-label>Condition B</mat-label>
+                  </mat-form-field>
+                </div>
+                <div>
+                  <mat-form-field>
+                    <mat-select formControlName="fold_change_col">
+                      @for(c of columns; track c) {
+                        <mat-option [value]="c">{{c}}</mat-option>
+                      }
+                    </mat-select>
+                    <mat-label>Fold Change Column</mat-label>
+                  </mat-form-field>
+                </div>
+                <div>
+                  <mat-form-field>
+                    <mat-select formControlName="p_value_col">
+                      @for(c of columns; track c) {
+                        <mat-option [value]="c">{{c}}</mat-option>
+                      }
+                    </mat-select>
+                    <mat-label>P-Value Column</mat-label>
+                  </mat-form-field>
+                </div>
+                <div>
+                  <mat-form-field>
+                    <mat-select formControlName="comparison_col">
+                      @for(c of columns; track c) {
+                        <mat-option [value]="c">{{c}}</mat-option>
+                      }
+                    </mat-select>
+                    <mat-label>Comparison Column</mat-label>
+                  </mat-form-field>
+                </div>
+                <div>
+                  <mat-form-field>
+                    <input matInput type="text" formControlName="comparison_label">
+                    <mat-label>Comparison Label</mat-label>
+                  </mat-form-field>
+                </div>
+              </form>
+            </div>
+            <div style="display: flex; flex-direction: row; gap: 10px">
+              <button mat-icon-button color="warn" (click)="copyComparison(f)">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="removeComparison(i)">
+                <mat-icon>remove</mat-icon>
+              </button>
+            </div>
+
+          </mat-tab>
+        }
+      }
+    </mat-tab-group>
+  }
+</div>
+<mat-dialog-actions>
+  <button mat-button (click)="addComparison()">
+    Add Comparison
+  </button>
+  <button mat-button (click)="save()">
+    Submit
+  </button>
+  <button mat-button (click)="cancel()">
+    Close
+  </button>
+</mat-dialog-actions>
