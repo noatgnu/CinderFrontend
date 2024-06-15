@@ -29,7 +29,6 @@ export class SelectedResultViewComponent {
   private _searchResult: SearchResult|undefined = undefined
   @Input() set searchResult(value: SearchResult) {
     this._searchResult = value
-    console.log(value.search_results)
     this.web.getSearchResultRelated(value.id).subscribe((data) => {
       this.relatedResult = data[0]
     })
@@ -70,7 +69,7 @@ export class SelectedResultViewComponent {
                     comparisonColumnIndex = this.getCMIndex(m.comparison_col)
                   }
                   if (foldChangeColumnIndex !== -1 && pValueColumnIndex !== -1) {
-                    for (const row of this.searchResult.search_results) {
+                    /*for (const row of this.searchResult.search_results) {
                       const line = row.line
                       const foldChange = parseFloat(row.context[foldChangeColumnIndex])
                       const pValue = parseFloat(row.context[pValueColumnIndex])
@@ -106,7 +105,7 @@ export class SelectedResultViewComponent {
                           })
                       }
 
-                    }
+                    }*/
                   }
                 }
               }

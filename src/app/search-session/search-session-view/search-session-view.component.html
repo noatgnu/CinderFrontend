@@ -11,7 +11,7 @@
 
     </form>
     @if (searchResultQuery) {
-      <app-search-result-list [searchResultQuery]="searchResultQuery" (selected)="handleSelectedResult($event)"></app-search-result-list>
+      <app-search-result-list [searchResultQuery]="searchResultQuery" (selected)="handleSelectedResult($event)" (sortChange)="handleSort($event)"></app-search-result-list>
       <mat-paginator  #paginator
                       (page)="handlePageEvent($event)"
                       [length]="searchResultQuery.count"

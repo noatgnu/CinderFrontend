@@ -302,10 +302,26 @@ export class WebService {
       {responseType: 'json', observe: 'body'}
     )
   }
-  createSearch(analysis_groups: number[], search_term: string, session_id: string|null = null) {
+  createSearch(
+    analysis_groups: number[],
+    search_term: string,
+    session_id: string|null = null,
+    fc_cutoff: number = 0.6,
+    p_value_cutoff: number = 1.31,
+    search_mode: "full"|"pi"|"gene"|"uniprot" = "full"
+  ) {
     let payload: any = {analysis_groups: analysis_groups, search_term: search_term}
     if (session_id) {
       payload["session_id"] = session_id
+    }
+    if (fc_cutoff) {
+      payload["fc_cutoff"] = fc_cutoff
+    }
+    if (p_value_cutoff) {
+      payload["p_value_cutoff"] = p_value_cutoff
+    }
+    if (search_mode) {
+      payload["search_mode"] = search_mode
     }
     return this.http.post<SearchSession>(
       `${this.baseURL}/api/search/`,
@@ -361,7 +377,7 @@ export class WebService {
     )
   }
 
-  getSearchResults(search_id: number, limit: number = 10, offset: number = 0, file_category: string = "df") {
+  getSearchResults(search_id: number, limit: number = 10, offset: number = 0, file_category: string = "df", sort: string = "", direction: string = "desc") {
     let params = new HttpParams()
     if (limit) {
       params = params.append('limit', limit.toString())
@@ -369,31 +385,27 @@ export class WebService {
     if (offset) {
       params = params.append('offset', offset.toString())
     }
+    if (sort && sort !== "") {
+      if (direction && direction !== "") {
+        if (direction === "asc") {
+          params = params.append('ordering', sort)
+        } else if (direction === "desc") {
+          params = params.append('ordering', `-${sort}`)
+        }
+      }
+    }
+
     params = params.append('file_category', file_category)
     params = params.append('search_id', search_id.toString())
-    params = params.append('ordering', '-created_at')
-    return this.http.get<any>(
+    //params = params.append('ordering', '-created_at')
+    return this.http.get<SearchResultQuery>(
       `${this.baseURL}/api/search_results/`,
       {responseType: 'json', observe: 'body', params: params}
-    ).pipe<SearchResultQuery>(
-      map((data) => {
-        data.results.forEach((result: any) => {
-          result.search_results = JSON.parse(result.search_results)
-        })
-        return data
-      })
     )
   }
 
   getSearchResultRelated(search_result_id: number) {
-    return this.http.get<any[]>(`${this.baseURL}/api/search_results/${search_result_id}/get_related/`, {responseType: 'json', observe: 'body'}).pipe<SearchResult[]>(
-      map((data) => {
-        return data.map((result: any) => {
-          result.search_results = JSON.parse(result.search_results)
-          return result
-        })
-      })
-    )
+    return this.http.get<SearchResult[]>(`${this.baseURL}/api/search_results/${search_result_id}/get_related/`, {responseType: 'json', observe: 'body'})
   }
 
   updateProjectFileExtraData(file_id: number, extra_data: any) {

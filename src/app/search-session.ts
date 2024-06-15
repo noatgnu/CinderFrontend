@@ -18,13 +18,20 @@ export interface SearchSessionQuery {
 export interface SearchResult {
   id: number
   search_term: string
-  search_results: {line: number, context: string[], term: string}[]
-  search_count: number
   created_at: Date
   updated_at: Date
   session: number
   analysis_group: {id: number, name: string}
   file: {id: number, name: string, file_type: string, file_category: string}
+  condition_A: string
+  condition_B: string
+  comparison_label: string
+  log2_fc: number
+  log10_p: number
+  searched_data: {Sample: string, Condition: string, Value: number}[]
+  primary_id: string|null
+  gene_name: string|null
+  uniprot_id: string|null
 }
 
 export interface SearchResultQuery {

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {FormBuilder, FormControl, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {ProjectFile} from "../../project-file";
 import {WebService} from "../../web.service";
@@ -33,9 +33,11 @@ export class FileExtraDataModalComponent {
       if (value.file_category === "df") {
         this.formDFColumn.controls.primary_id_col.setValue(value.extra_data.primary_id_col)
         this.formDFColumn.controls.gene_name_col.setValue(value.extra_data.gene_name_col)
+        this.formDFColumn.controls.uniprot_id_col.setValue(value.extra_data.uniprot_id_col)
       } else if (value.file_category === "searched") {
         this.formSearchedColumn.controls.primary_id_col.setValue(value.extra_data.primary_id_col)
         this.formSearchedColumn.controls.gene_name_col.setValue(value.extra_data.gene_name_col)
+        this.formSearchedColumn.controls.uniprot_id_col.setValue(value.extra_data.uniprot_id_col)
       }
     }
     this.web.getProjectFileColumns(value.id).subscribe((data) => {
@@ -48,13 +50,15 @@ export class FileExtraDataModalComponent {
   }
 
   formDFColumn = this.fb.group({
-    primary_id_col: new FormControl(""),
+    primary_id_col: new FormControl("", Validators.required),
     gene_name_col: new FormControl(""),
+    uniprot_id_col: new FormControl(""),
   })
 
   formSearchedColumn = this.fb.group({
-    primary_id_col: new FormControl(""),
+    primary_id_col: new FormControl("", Validators.required),
     gene_name_col: new FormControl(""),
+    uniprot_id_col: new FormControl(""),
   })
 
   columns: string[] = []
@@ -65,11 +69,25 @@ export class FileExtraDataModalComponent {
   save() {
     const payload: any = {file_category: this.file.file_category, extra_data: {}}
     if (this.file.file_category === "df") {
-      payload["extra_data"]["primary_id_col"] = this.formDFColumn.controls.primary_id_col.value
-      payload["extra_data"]["gene_name_col"] = this.formDFColumn.controls.gene_name_col.value
+      if (this.formDFColumn.controls.uniprot_id_col.value){
+        payload["extra_data"]["uniprot_id_col"] = this.formDFColumn.controls.uniprot_id_col.value
+      }
+      if (this.formDFColumn.controls.primary_id_col.value){
+        payload["extra_data"]["primary_id_col"] = this.formDFColumn.controls.primary_id_col.value
+      }
+      if (this.formDFColumn.controls.gene_name_col.value){
+        payload["extra_data"]["gene_name_col"] = this.formDFColumn.controls.gene_name_col.value
+      }
     } else if (this.file.file_category === "searched") {
-      payload["extra_data"]["primary_id_col"] = this.formSearchedColumn.controls.primary_id_col.value
-      payload["extra_data"]["gene_name_col"] = this.formSearchedColumn.controls.gene_name_col.value
+      if (this.formSearchedColumn.controls.uniprot_id_col.value){
+        payload["extra_data"]["uniprot_id_col"] = this.formSearchedColumn.controls.uniprot_id_col.value
+      }
+      if (this.formSearchedColumn.controls.primary_id_col.value){
+        payload["extra_data"]["primary_id_col"] = this.formSearchedColumn.controls.primary_id_col.value
+      }
+      if (this.formSearchedColumn.controls.gene_name_col.value){
+        payload["extra_data"]["gene_name_col"] = this.formSearchedColumn.controls.gene_name_col.value
+      }
     }
     this.matDialogRef.close(payload)
   }

@@ -19,6 +19,14 @@
           </mat-select>
           <mat-label>Gene Name Column</mat-label>
         </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="uniprot_id_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>UniProt Accession ID Column</mat-label>
+        </mat-form-field>
       </form>
     } @else if (file.file_category === 'searched') {
       <form [formGroup]="formSearchedColumn" style="display: flex; flex-direction: column; gap: 10px">
@@ -37,6 +45,14 @@
             }
           </mat-select>
           <mat-label>Gene Name Column</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="uniprot_id_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>UniProt Accession ID Column</mat-label>
         </mat-form-field>
       </form>
     }

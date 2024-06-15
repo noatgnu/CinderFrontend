@@ -6,6 +6,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {WebsocketService} from "../websocket.service";
+import {MatOption, MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-search-modal',
@@ -18,7 +19,9 @@ import {WebsocketService} from "../websocket.service";
     MatFormField,
     ReactiveFormsModule,
     MatDialogActions,
-    MatButton
+    MatButton,
+    MatSelect,
+    MatOption
   ],
   templateUrl: './search-modal.component.html',
   styleUrl: './search-modal.component.scss'
@@ -28,7 +31,10 @@ export class SearchModalComponent {
 
 
   form = this.fb.group({
-    search: new FormControl<string>("", Validators.required)
+    search: new FormControl<string>("", Validators.required),
+    searchMode: new FormControl<"full"|"pi"|"gene"|"uniprot">("full", Validators.required),
+    foldChange: new FormControl<number>(0.6, Validators.required),
+    pValue: new FormControl<number>(1.31, Validators.required),
   })
 
   constructor(private fb: FormBuilder, private dialogRef: MatDialogRef<SearchModalComponent>, private web: WebService, private ws: WebsocketService) {
@@ -47,8 +53,8 @@ export class SearchModalComponent {
     if (this.form.invalid) {
       return
     }
-    if (this.form.value.search) {
-      this.web.createSearch(this.analysisGroupIDs, this.form.value.search, this.web.searchSessionID).subscribe((data) => {
+    if (this.form.value.search && this.form.value.foldChange && this.form.value.pValue && this.form.value.searchMode) {
+      this.web.createSearch(this.analysisGroupIDs, this.form.value.search, this.web.searchSessionID, this.form.value.foldChange, this.form.value.pValue, this.form.value.searchMode).subscribe((data) => {
         console.log(data)
       })
     }

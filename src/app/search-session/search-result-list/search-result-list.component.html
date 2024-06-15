@@ -1,16 +1,53 @@
 @if (searchResultQuery) {
-  <mat-selection-list [multiple]="false" (selectionChange)="handleSelection($event)">
-    @for (ag of searchResultQuery.results; track ag.id) {
-      <mat-list-option [value]="ag">
-        <span matListItemTitle>
-          <b>{{ag.search_term}}</b>
-        </span>
-        <p matListItemLine>
-          <small>{{ag.created_at|date: "short"}} - {{ag.file.name}} - {{ag.file.file_category}}</small>
-        </p>
-      </mat-list-option>
-      <mat-divider></mat-divider>
-    }
-  </mat-selection-list>
+  @if (searchResultQuery.results.length === 0) {
+    <div class="no-results">
+      <h2>No results found</h2>
+    </div>
+  } @else {
+    <table mat-table [dataSource]="searchResultQuery.results" #table matSort (matSortChange)="handleSortChange($event)">
+      <ng-container matColumnDef="primary_id">
+        <th mat-header-cell *matHeaderCellDef> Primary ID </th>
+        <td mat-cell *matCellDef="let element"> {{element.primary_id}} </td>
+      </ng-container>
+      <ng-container matColumnDef="uniprot_id">
+        <th mat-header-cell *matHeaderCellDef> UniProt Accession ID </th>
+        <td mat-cell *matCellDef="let element"> {{element.uniprot_id}} </td>
+      </ng-container>
+      <ng-container matColumnDef="gene_name">
+        <th mat-header-cell *matHeaderCellDef> Gene name </th>
+        <td mat-cell *matCellDef="let element"> {{element.gene_name}} </td>
+      </ng-container>
+      <ng-container matColumnDef="log2_fc">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Log2 FC </th>
+        <td mat-cell *matCellDef="let element"> {{element.log2_fc}} </td>
+      </ng-container>
+      <ng-container matColumnDef="log10_p">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> -Log10(P-Value) </th>
+        <td mat-cell *matCellDef="let element"> {{element.log10_p}} </td>
+      </ng-container>
+      <ng-container matColumnDef="comparison_label">
+        <th mat-header-cell *matHeaderCellDef> Comparison </th>
+        <td mat-cell *matCellDef="let element"> {{element.comparison_label}} </td>
+      </ng-container>
+      <ng-container matColumnDef="search_term">
+        <th mat-header-cell *matHeaderCellDef> Search term </th>
+        <td mat-cell *matCellDef="let element"> {{element.search_term}} </td>
+      </ng-container>
+      <ng-container matColumnDef="condition_A">
+        <th mat-header-cell *matHeaderCellDef> Condition A </th>
+        <td mat-cell *matCellDef="let element"> {{element.condition_A}}</td>
+      </ng-container>
+      <ng-container matColumnDef="condition_B">
+        <th mat-header-cell *matHeaderCellDef> Condition B </th>
+        <td mat-cell *matCellDef="let element"> {{element.condition_A}}</td>
+      </ng-container>
+      <ng-container matColumnDef="file">
+        <th mat-header-cell *matHeaderCellDef> File </th>
+        <td mat-cell *matCellDef="let element"> {{element.file.name}} </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="handleSelection(row)"></tr>
+    </table>
+  }
 }
 
