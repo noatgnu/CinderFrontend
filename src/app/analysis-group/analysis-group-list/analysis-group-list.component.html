@@ -1,7 +1,7 @@
 @if (analysisGroupQuery) {
   <mat-selection-list [multiple]="false">
     @for (ag of analysisGroupQuery.results; track ag.id) {
-      <mat-list-option [value]="ag">
+      <mat-list-option [value]="ag" (click)="selectAnalysisGroup(ag)">
         <span matListItemTitle>
           <b>{{ag.name}}</b>
         </span>

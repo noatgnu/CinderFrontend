@@ -19,7 +19,7 @@
       @if (analysisGroupQuery) {
         @if (analysisGroupQuery.count > 0) {
           <div style="height: calc(100vh - 64px*4 - 20px); overflow: auto">
-            <app-analysis-group-list [analysisGroupQuery]="analysisGroupQuery"></app-analysis-group-list>
+            <app-analysis-group-list (selectedAnalysisGroup)="selectedAnalysisGroup=$event" [analysisGroupQuery]="analysisGroupQuery"></app-analysis-group-list>
           </div>
           <mat-paginator #paginator
                          (page)="handlePageEvent($event)"

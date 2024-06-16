@@ -1,5 +1,5 @@
-import {Component, Input} from '@angular/core';
-import {AnalysisGroupQuery} from "../analysis-group";
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {AnalysisGroup, AnalysisGroupQuery} from "../analysis-group";
 import {MatDivider} from "@angular/material/divider";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
 
@@ -17,4 +17,12 @@ import {MatListOption, MatSelectionList} from "@angular/material/list";
 export class AnalysisGroupListComponent {
   @Input() analysisGroupQuery?: AnalysisGroupQuery
 
+  @Output() selectedAnalysisGroup: EventEmitter<AnalysisGroup> = new EventEmitter<AnalysisGroup>()
+
+  constructor() {
+  }
+
+  selectAnalysisGroup(analysisGroup: AnalysisGroup) {
+    this.selectedAnalysisGroup.emit(analysisGroup)
+  }
 }

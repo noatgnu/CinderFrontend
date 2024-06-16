@@ -150,7 +150,7 @@ export class WebService {
     if (project) {
       params = params.append('project', project.toString())
     }
-    params.append('ordering', '-created_at')
+    params = params.append('ordering', '-created_at')
     return this.http.get<AnalysisGroupQuery>(
       `${this.baseURL}/api/analysis_groups/`,
       {responseType: 'json', observe: 'body', params: params}
