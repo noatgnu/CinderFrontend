@@ -1,3 +1,3 @@
 export const environment = {
-  baseURL: "http://localhost",
+  baseURL: "https://cinderbackend.caprover.yottsu.xyz",
 };
