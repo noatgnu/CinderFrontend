@@ -1,11 +1,36 @@
 <h2 mat-dialog-title>Create Analysis Group</h2>
 <mat-dialog-content>
+  @if (enableProjectSelection) {
+    <form [formGroup]="formProjectSearch">
+      <mat-form-field style="width: 100%">
+        <input matInput formControlName="searchTerm" placeholder="Project Search" type="search">
+        <mat-label>Project Search Term</mat-label>
+      </mat-form-field>
+      @if (projectQuery) {
+        @if (projectQuery.results.length > 0) {
+          <mat-selection-list [multiple]="false" formControlName="selectedProject">
+            @for (p of projectQuery.results; track p.id) {
+              <mat-list-option [value]="p">
+                {{p.name}}
+              </mat-list-option>
+            }
+          </mat-selection-list>
+          <mat-paginator
+            [pageSize]="projectPageLimit"
+            [length]="projectQuery.count"
+            [pageIndex]="projectPageIndex"
+            (page)="handlePageEvent($event)">
+          </mat-paginator>
+        }
+      }
+
+    </form>
+  }
   <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 1px">
     @if (project) {
       <mat-list>
         <mat-list-item>
           <span matListItemTitle><b>Selected project: {{project.name}}</b></span>
-
         </mat-list-item>
       </mat-list>
     } @else {

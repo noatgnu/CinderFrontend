@@ -150,6 +150,7 @@ export class WebService {
     if (project) {
       params = params.append('project', project.toString())
     }
+    params.append('ordering', '-created_at')
     return this.http.get<AnalysisGroupQuery>(
       `${this.baseURL}/api/analysis_groups/`,
       {responseType: 'json', observe: 'body', params: params}
@@ -420,6 +421,20 @@ export class WebService {
         }
         return data
       })
+    )
+  }
+
+  getProjectCount() {
+    return this.http.get<{count: number}>(
+      `${this.baseURL}/api/projects/get_count/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getAnalysisGroupCount() {
+    return this.http.get<{count: number}>(
+      `${this.baseURL}/api/analysis_groups/get_count/`,
+      {responseType: 'json', observe: 'body'}
     )
   }
 }

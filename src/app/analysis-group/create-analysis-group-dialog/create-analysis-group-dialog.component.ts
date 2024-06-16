@@ -5,8 +5,10 @@ import {WebService} from "../../web.service";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
-import {Project} from "../../project/project";
+import {Project, ProjectQuery} from "../../project/project";
 import {MatList, MatListItem, MatListItemTitle, MatListOption, MatSelectionList} from "@angular/material/list";
+import {MatPaginator, PageEvent} from "@angular/material/paginator";
+import {MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-create-analysis-group-dialog',
@@ -24,12 +26,16 @@ import {MatList, MatListItem, MatListItemTitle, MatListOption, MatSelectionList}
     MatList,
     MatListItem,
     MatLabel,
-    MatListItemTitle
+    MatListItemTitle,
+    MatSelect,
+    MatPaginator
   ],
   templateUrl: './create-analysis-group-dialog.component.html',
   styleUrl: './create-analysis-group-dialog.component.scss'
 })
 export class CreateAnalysisGroupDialogComponent {
+  @Input() enableProjectSelection: boolean = false
+
   private _project?: Project
   @Input() set project(value: Project) {
     this._project = value
@@ -48,8 +54,27 @@ export class CreateAnalysisGroupDialogComponent {
     project_id: new FormControl(0, Validators.required)
   })
 
-  constructor(private web: WebService, private fb: FormBuilder, private matDialogRef: MatDialogRef<CreateAnalysisGroupDialogComponent>) {
+  formProjectSearch = this.fb.group({
+    searchTerm: new FormControl(""),
+    selectedProject: new FormControl<Project[]|undefined>(undefined)
+  })
 
+  projectPageLimit = 5
+  projectPageIndex = 0
+  projectQuery: ProjectQuery|undefined = undefined
+
+  constructor(private web: WebService, private fb: FormBuilder, private matDialogRef: MatDialogRef<CreateAnalysisGroupDialogComponent>) {
+    this.formProjectSearch.controls.selectedProject.valueChanges.subscribe((value: Project[]|undefined|null) => {
+      if (value) {
+        this.project = value[0]
+      }
+    })
+    this.formProjectSearch.controls.searchTerm.valueChanges.subscribe((value: string|null) => {
+      // @ts-ignore
+      this.web.getProjects(undefined, this.projectPageLimit, 0, value).subscribe((data) => {
+        this.projectQuery = data
+      })
+    })
   }
 
   close() {
@@ -67,7 +92,20 @@ export class CreateAnalysisGroupDialogComponent {
         }
       )
     }
-
   }
+
+  getProjects(offset?: number, limit?: number) {
+    // @ts-ignore
+    this.web.getProjects(undefined, limit, offset, this.formProjectSearch.value.searchTerm).subscribe((data) => {
+      this.projectQuery = data
+    })
+  }
+
+  handlePageEvent(e: PageEvent) {
+    this.projectPageIndex = e.pageIndex
+    const offset = e.pageIndex * e.pageSize
+    this.getProjects(offset, this.projectPageLimit)
+  }
+
 
 }
