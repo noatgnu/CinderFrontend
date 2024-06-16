@@ -1,6 +1,5 @@
-<mat-toolbar [color]="'accent'">
-  <mat-toolbar-row>
-    <span>Result Details</span>
-  </mat-toolbar-row>
-</mat-toolbar>
-
+<div style="display: flex; flex-direction: row; justify-content: center">
+  @if (relatedResult) {
+    <app-vertical-bar-chart [comparedConditions]="[searchResult.condition_A, searchResult.condition_B]" [annotationData]="relatedResult.searched_data"></app-vertical-bar-chart>
+  }
+</div>

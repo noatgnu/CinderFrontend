@@ -405,8 +405,13 @@ export class WebService {
     )
   }
 
-  getSearchResultRelated(search_result_id: number) {
-    return this.http.get<SearchResult[]>(`${this.baseURL}/api/search_results/${search_result_id}/get_related/`, {responseType: 'json', observe: 'body'})
+  getSearchResultRelated(search_result_id: number, file_category: string = "df", primary_id: string|null = null) {
+    let params = new HttpParams()
+    params = params.append('file_category', file_category)
+    if (primary_id) {
+      params = params.append('primary_id', primary_id)
+    }
+    return this.http.get<SearchResult[]>(`${this.baseURL}/api/search_results/${search_result_id}/get_related/`, {responseType: 'json', observe: 'body', params: params})
   }
 
   updateProjectFileExtraData(file_id: number, extra_data: any) {
@@ -434,6 +439,13 @@ export class WebService {
   getAnalysisGroupCount() {
     return this.http.get<{count: number}>(
       `${this.baseURL}/api/analysis_groups/get_count/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  deleteSearchSession(id: number) {
+    return this.http.delete(
+      `${this.baseURL}/api/search/${id}/`,
       {responseType: 'json', observe: 'body'}
     )
   }

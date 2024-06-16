@@ -91,4 +91,10 @@ export class SearchSessionComponent {
     }
 
   }
+  deleteSearchSession(id: number) {
+    this.web.deleteSearchSession(id).subscribe((data) => {
+      this.searchSession = undefined
+      this.searchSessionQuery?.results?.splice(this.searchSessionQuery.results.findIndex((value) => value.id === id), 1)
+    })
+  }
 }

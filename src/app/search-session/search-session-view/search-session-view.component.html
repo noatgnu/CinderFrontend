@@ -1,13 +1,18 @@
 <div style="display: flex; flex-direction: row; justify-content: center">
   <div style="width: 100%; padding: 50px">
+    @if (selectedSearchResult) {
+      <div>
+        <app-selected-result-view [searchResult]="selectedSearchResult"></app-selected-result-view>
+      </div>
+    }
     <form [formGroup]="form">
-      <mat-form-field>
+<!--      <mat-form-field>
         <mat-select formControlName="file_category">
           <mat-option [value]="'df'">Differential Analysis</mat-option>
           <mat-option [value]="'searched'">MS Searched File</mat-option>
         </mat-select>
         <mat-label>File Category</mat-label>
-      </mat-form-field>
+      </mat-form-field>-->
 
     </form>
     @if (searchResultQuery) {
@@ -24,11 +29,6 @@
       </mat-paginator>
     }
   </div>
-  @if (selectedSearchResult) {
-    <div class="selected-result">
-      <app-selected-result-view [searchResult]="selectedSearchResult"></app-selected-result-view>
-    </div>
 
-  }
 </div>
 

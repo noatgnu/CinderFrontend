@@ -38,11 +38,18 @@
   <div class="search-session-main-content">
     <mat-toolbar>
       <mat-toolbar-row>
-        @if (searchSession) {
-          <a href="/#/search-session/{{searchSession.id}}"><span style="color:#ba0000"><b>{{searchSession.search_term}}</b></span></a>
-        } @else {
-          Select Search Session
-        }
+        <div>
+          @if (searchSession) {
+            <a href="/#/search-session/{{searchSession.id}}"><span style="color:#ba0000"><b>{{searchSession.search_term}}</b></span></a>
+            <button mat-icon-button color="accent" (click)="deleteSearchSession(searchSession.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          } @else {
+            Select Search Session
+          }
+        </div>
+
+
       </mat-toolbar-row>
     </mat-toolbar>
     <div style="height: calc(100vh - 64px*2 - 20px); overflow: auto">

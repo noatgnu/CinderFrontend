@@ -8,7 +8,14 @@ import {WebSocketSubject} from "rxjs/internal/observable/dom/WebSocketSubject";
 })
 export class WebsocketService {
   baseURL = environment.baseURL.replace("http", "ws")
-  searchWSConnection?: WebSocketSubject<any>
+  searchWSConnection?: WebSocketSubject<{
+    "type": string,
+    "status": "in_progress"|"complete"|"error"|"started",
+    "id": string,
+    "found_files": number,
+    "current_progress": number,
+    "error": string
+  }>
 
 
   constructor(private accounts: AccountsService) { }

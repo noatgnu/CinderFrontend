@@ -159,6 +159,11 @@ export class AnalysisGroupViewComponent {
   openSearchModal() {
     const ref = this.matDialog.open(SearchModalComponent)
     ref.componentInstance.analysisGroupIDs = [this.analysisGroup!.id]
+    ref.afterClosed().subscribe((data) => {
+      if (data) {
+        window.open(`/#/search-ession/${data.id}`, "_blank")
+      }
+    })
   }
 
   openExtraDataModal(file: ProjectFile) {

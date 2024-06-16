@@ -7,6 +7,7 @@ import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {WebsocketService} from "../websocket.service";
 import {MatOption, MatSelect} from "@angular/material/select";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-search-modal',
@@ -37,12 +38,23 @@ export class SearchModalComponent {
     pValue: new FormControl<number>(1.31, Validators.required),
   })
 
-  constructor(private fb: FormBuilder, private dialogRef: MatDialogRef<SearchModalComponent>, private web: WebService, private ws: WebsocketService) {
+  constructor(private fb: FormBuilder, private dialogRef: MatDialogRef<SearchModalComponent>, private web: WebService, private ws: WebsocketService, private sb: MatSnackBar) {
     this.ws.searchWSConnection?.subscribe((data) => {
       if (data) {
         if (data["type"] === "search_status") {
-          if (data["status"] === "complete") {
-            this.dialogRef.close(data["id"])
+
+          switch (data["status"]) {
+            case "complete":
+              this.dialogRef.close(data["id"])
+              break
+            case "error":
+              this.sb.open("Search failed", "Dismiss", {duration: 2000})
+              break
+            case "started":
+              this.sb.open("Search started", "Dismiss", {duration: 2000})
+              break
+            case "in_progress":
+              this.sb.open(`Search in progress: ${data["current_progress"]}/${data["found_files"]}`, "Dismiss", {duration: 2000})
           }
         }
       }
@@ -55,7 +67,7 @@ export class SearchModalComponent {
     }
     if (this.form.value.search && this.form.value.foldChange && this.form.value.pValue && this.form.value.searchMode) {
       this.web.createSearch(this.analysisGroupIDs, this.form.value.search, this.web.searchSessionID, this.form.value.foldChange, this.form.value.pValue, this.form.value.searchMode).subscribe((data) => {
-        console.log(data)
+        this.sb.open("Search queued", "Dismiss", {duration: 2000})
       })
     }
   }

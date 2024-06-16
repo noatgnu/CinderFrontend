@@ -29,7 +29,7 @@ export class SearchSessionViewComponent {
   private _searchSession: SearchSession|undefined = undefined
   @Input() set searchSession(value: SearchSession) {
     this._searchSession = value
-    if (value) {
+    if (value && !value.failed) {
       if (this.form.controls.file_category.value) {
         this.web.getSearchResults(value.id, this.pageSize, 0, this.form.controls.file_category.value, this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
           this.searchResultQuery = data
@@ -54,7 +54,7 @@ export class SearchSessionViewComponent {
   currentSort: Sort|undefined = undefined
   constructor(private web: WebService, private fb: FormBuilder) {
     this.form.controls.file_category.valueChanges.subscribe((value: string|null) => {
-      if (this.searchSession && value) {
+      if (!this.searchSession.failed && value) {
         this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, value, this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
           this.searchResultQuery = data
         })

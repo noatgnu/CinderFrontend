@@ -1,8 +1,8 @@
 @if (searchSessionQuery) {
   <mat-selection-list [multiple]="false">
     @for (ag of searchSessionQuery.results; track ag.id) {
-      <mat-list-option [value]="ag" (click)="searchSessionSelected.emit(ag)">
-        <div >
+      <mat-list-option [value]="ag" (click)="searchSessionSelected.emit(ag)" [disabled]="ag.failed">
+        <div>
           <div><b>{{ag.search_term}}</b></div>
           <small>{{ag.created_at|date: "short"}}</small>
         </div>

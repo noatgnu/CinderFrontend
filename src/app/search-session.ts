@@ -6,6 +6,7 @@ export interface SearchSession {
   analysis_groups: number[]
   user: string|null
   session_id: string|null
+  failed: boolean
 }
 
 export interface SearchSessionQuery {

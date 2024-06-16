@@ -7,9 +7,6 @@
       <button mat-icon-button style="color: rgb(172,110,110)" [matMenuTriggerFor]="menu" aria-label="View Project or Analysis Group">
         <mat-icon>view_list</mat-icon>
       </button>
-      <button mat-icon-button style="color: rgb(172,110,110)" aria-label="Upload Project Files">
-        <mat-icon>file_upload</mat-icon>
-      </button>
       <button mat-icon-button style="color: rgb(186,104,166)" aria-label="Logout" (click)="accounts.logout()">
         <mat-icon>logout</mat-icon>
       </button>
@@ -27,5 +24,8 @@
   </a>
   <a mat-menu-item href="/#/analysis-group">
     <span>Analysis Group</span>
+  </a>
+  <a mat-menu-item href="/#/search-session">
+    <span>Search Session</span>
   </a>
 </mat-menu>

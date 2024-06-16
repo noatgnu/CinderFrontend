@@ -9,6 +9,7 @@ import {AnalysisGroup} from "../../analysis-group/analysis-group";
 import {ProjectFile} from "../../project-file";
 import {MatTable} from "@angular/material/table";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
+import {VerticalBarChartComponent} from "./vertical-bar-chart/vertical-bar-chart.component";
 
 @Component({
   selector: 'app-selected-result-view',
@@ -20,7 +21,8 @@ import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/
     MatList,
     MatListItem,
     MatListItemTitle,
-    MatListItemLine
+    MatListItemLine,
+    VerticalBarChartComponent
   ],
   templateUrl: './selected-result-view.component.html',
   styleUrl: './selected-result-view.component.scss'
@@ -29,7 +31,8 @@ export class SelectedResultViewComponent {
   private _searchResult: SearchResult|undefined = undefined
   @Input() set searchResult(value: SearchResult) {
     this._searchResult = value
-    this.web.getSearchResultRelated(value.id).subscribe((data) => {
+
+    this.web.getSearchResultRelated(value.id, value.file.file_category, value.primary_id).subscribe((data) => {
       this.relatedResult = data[0]
     })
     this.web.getAnalysisGroup(value.analysis_group.id).subscribe((d) => {
@@ -69,43 +72,7 @@ export class SelectedResultViewComponent {
                     comparisonColumnIndex = this.getCMIndex(m.comparison_col)
                   }
                   if (foldChangeColumnIndex !== -1 && pValueColumnIndex !== -1) {
-                    /*for (const row of this.searchResult.search_results) {
-                      const line = row.line
-                      const foldChange = parseFloat(row.context[foldChangeColumnIndex])
-                      const pValue = parseFloat(row.context[pValueColumnIndex])
-                      if (comparisonColumnIndex !== -1) {
-                        const label = row.context[comparisonColumnIndex]
-                        if (label) {
-                          this.differentialData.push(
-                            {
-                              line: line,
-                              foldChange: foldChange,
-                              pValue: pValue,
-                              comparisonLabel: `${label}(${comparisonLabel})`,
-                              condition_A: m.condition_A,
-                              condition_B: m.condition_B,
-                              gene_name: geneNameColumnIndex !== -1 ? row.context[geneNameColumnIndex] : null,
-                              primary_id: primaryIdColumnIndex !== -1 ? row.context[primaryIdColumnIndex] : null
-                            })
 
-                          if (label === comparisonLabel) {
-                            }
-                        }
-                      } else {
-                        this.differentialData.push(
-                          {
-                            line: line,
-                            foldChange: foldChange,
-                            pValue: pValue,
-                            comparisonLabel: comparisonLabel,
-                            condition_A: m.condition_A,
-                            condition_B: m.condition_B,
-                            gene_name: geneNameColumnIndex !== -1 ? row.context[geneNameColumnIndex] : null,
-                            primary_id: primaryIdColumnIndex !== -1 ? row.context[primaryIdColumnIndex] : null
-                          })
-                      }
-
-                    }*/
                   }
                 }
               }
@@ -133,8 +100,6 @@ export class SelectedResultViewComponent {
   analysisGroupSearchedColumns: string[] = []
   sampleAnnotations: SampleAnnotation|undefined = undefined
   comparisonMatrix: ComparisonMatrix|undefined = undefined
-
-  differentialData: {line: number, foldChange: number, pValue: number, comparisonLabel: string, condition_A: string, condition_B: string, gene_name: string|null, primary_id: string|null}[] = []
 
   constructor(private web: WebService, private fb: FormBuilder) {
   }
