@@ -49,6 +49,7 @@ export class AnalysisGroupViewComponent {
       })
       this.form.controls.name.setValue(value.name)
       this.form.controls.description.setValue(value.description)
+      this.form.controls.curtain_link.setValue(value.curtain_link)
       this.web.getAnalysisGroupFiles(value.id).subscribe((data) => {
         this.analysisGroupDF = data.find((file) => file.file_category === "df")
         this.analysisGroupSearched = data.find((file) => file.file_category === "searched")
@@ -79,7 +80,8 @@ export class AnalysisGroupViewComponent {
 
   form = this.fb.group({
     name: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]}),
-    description: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]})
+    description: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]}),
+    curtain_link: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]})
   })
 
   constructor(private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService) {
