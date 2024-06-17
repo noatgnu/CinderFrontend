@@ -11,8 +11,7 @@ import {ComparisonMatrix} from "./comparison-matrix";
 import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from "./search-session";
 import {Projects} from "@angular/cli/lib/config/workspace-schema";
 
-class ChunkUploadResponse {
-}
+
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +32,9 @@ export class WebService {
     //headers.append('Content-Disposition', `attachment; filename=${filename}`)
     console.log(headers)
     if (url !== "") {
+      if (url.startsWith("http://")) {
+        url = url.replace("http://", "https://")
+      }
       return this.http.put<ChunkUpload>(
         url,
         form,
@@ -52,6 +54,9 @@ export class WebService {
   uploadDataChunkComplete(url: string = "", md5: string, file?: File, filename?: string) {
     const form = new FormData()
     form.append('sha256', md5)
+    if (url.startsWith("http://")) {
+      url = url.replace("http://", "https://")
+    }
     if (file && filename) {
       form.append('file', file)
       form.append('filename', filename)
