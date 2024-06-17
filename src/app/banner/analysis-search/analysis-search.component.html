@@ -1,0 +1,22 @@
+<form [formGroup]="formAnalysisGroupSearch" style="display: flex; flex-direction: column; gap: 10px">
+  <mat-form-field>
+    <input matInput formControlName="searchTerm" placeholder="Search Analysis Group Name" type="search">
+    <mat-label>Search For Specific Analysis Groups</mat-label>
+  </mat-form-field>
+  @if (analysisGroupQuery) {
+    @if (analysisGroupQuery.results.length >0) {
+      <mat-selection-list formControlName="selectedAnalysisGroups" [multiple]="false">
+        @for (ag of analysisGroupQuery.results; track ag.id) {
+          <mat-list-option [value]="ag">{{ag.name}}</mat-list-option>
+        }
+      </mat-selection-list>
+    }
+    <mat-paginator
+      [pageSize]="this.analysisGroupPageSize"
+      [length]="analysisGroupQuery.count"
+      [pageIndex]="this.analysisGroupPageIndex"
+      (page)="handlePageEvent($event)"
+    ></mat-paginator>
+  }
+</form>
+

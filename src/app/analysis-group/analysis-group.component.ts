@@ -78,6 +78,7 @@ export class AnalysisGroupComponent {
 
   openCreateAnalysisGroupDialog() {
     const ref = this.dialog.open(CreateAnalysisGroupDialogComponent)
+    ref.componentInstance.enableProjectSelection = true
     ref.afterClosed().subscribe((data) => {
       if (data){
         this.web.createAnalysisGroup(data.name, data.description, data.project_id).subscribe((data) => {

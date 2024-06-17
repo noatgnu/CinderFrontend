@@ -5,6 +5,7 @@ import {MatButton} from "@angular/material/button";
 import {AccountsService} from "./accounts/accounts.service";
 import {WebsocketService} from "./websocket.service";
 import {WebService} from "./web.service";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,7 @@ export class AppComponent {
 
   ready: boolean = false;
 
-  constructor(private web: WebService, private accounts: AccountsService, private ws: WebsocketService) {
+  constructor(private web: WebService, private accounts: AccountsService, private ws: WebsocketService, private sb: MatSnackBar) {
     this.accounts.loadLastVisited()
     this.accounts.loadAuthFromStorage()
     this.web.searchSessionID = localStorage.getItem("cinderSearchSessionID")
@@ -30,7 +31,19 @@ export class AppComponent {
         this.web.searchSessionID = data
         this.ws.searchWSConnection?.subscribe((data) => {
           if (data) {
-            console.log(data)
+            if (data["type"] === "search_status") {
+
+              switch (data["status"]) {
+                case "error":
+                  this.sb.open("Search failed", "Dismiss", {duration: 2000})
+                  break
+                case "started":
+                  this.sb.open("Search started", "Dismiss", {duration: 2000})
+                  break
+                case "in_progress":
+                  this.sb.open(`Search in progress: ${data["current_progress"]}/${data["found_files"]}`, "Dismiss", {duration: 2000})
+              }
+            }
           }
         })
       })

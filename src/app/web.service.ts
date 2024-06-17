@@ -9,6 +9,7 @@ import {SampleAnnotation} from "./sample-annotation";
 import {map} from "rxjs";
 import {ComparisonMatrix} from "./comparison-matrix";
 import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from "./search-session";
+import {Projects} from "@angular/cli/lib/config/workspace-schema";
 
 class ChunkUploadResponse {
 }
@@ -447,6 +448,13 @@ export class WebService {
     return this.http.delete(
       `${this.baseURL}/api/search/${id}/`,
       {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getAnalysisGroupsFromProjects(projects: Project[]) {
+    return this.http.post<AnalysisGroup[]>(
+      `${this.baseURL}/api/search/get_analysis_groups_from_projects/`,
+      {projects: projects.map((p) => p.id)},
     )
   }
 }

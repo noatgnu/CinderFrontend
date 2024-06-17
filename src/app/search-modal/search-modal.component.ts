@@ -47,14 +47,6 @@ export class SearchModalComponent {
             case "complete":
               this.dialogRef.close(data["id"])
               break
-            case "error":
-              this.sb.open("Search failed", "Dismiss", {duration: 2000})
-              break
-            case "started":
-              this.sb.open("Search started", "Dismiss", {duration: 2000})
-              break
-            case "in_progress":
-              this.sb.open(`Search in progress: ${data["current_progress"]}/${data["found_files"]}`, "Dismiss", {duration: 2000})
           }
         }
       }
