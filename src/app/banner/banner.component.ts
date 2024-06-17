@@ -33,6 +33,7 @@ import {
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {WebsocketService} from "../websocket.service";
 import {AnalysisSearchComponent} from "./analysis-search/analysis-search.component";
+import {AnalysisGroup} from "../analysis-group/analysis-group";
 
 @Component({
   selector: 'app-banner',
@@ -156,6 +157,12 @@ export class BannerComponent {
       })
     }
 
+  }
+
+  handleAGSelection(e: AnalysisGroup[]) {
+    if (e.length >0) {
+      window.open(`/#/analysis-group/${e[0].id}`, "_blank")
+    }
   }
 
 }

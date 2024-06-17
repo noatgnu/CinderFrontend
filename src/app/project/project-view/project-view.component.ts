@@ -13,6 +13,7 @@ import {
 import {AnalysisGroupQuery} from "../../analysis-group/analysis-group";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatList, MatListItem, MatListItemTitle} from "@angular/material/list";
+import {AccountsService} from "../../accounts/accounts.service";
 
 @Component({
   selector: 'app-project-view',
@@ -51,8 +52,8 @@ export class ProjectViewComponent {
   }
 
   form = this.fb.group({
-    name: new FormControl("", Validators.required),
-    description: new FormControl("", Validators.required)
+    name: new FormControl({value: "", disabled: !this.accounts.loggedIn}, Validators.required),
+    description: new FormControl({value: "", disabled: !this.accounts.loggedIn}, Validators.required)
   })
 
   @Output() deleted: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -63,7 +64,7 @@ export class ProjectViewComponent {
   pageSize = 10
   currentPage = 0
 
-  constructor(private fb: FormBuilder, private web: WebService, private dialog: MatDialog) {
+  constructor(private fb: FormBuilder, private web: WebService, private dialog: MatDialog, public accounts: AccountsService) {
   }
 
   updateProject() {

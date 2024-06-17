@@ -36,7 +36,7 @@
         <p>
           # of Analysis Groups: {{analysisGroupCount}}
         </p>
-        <app-analysis-search></app-analysis-search>
+        <app-analysis-search (selectedAnalysisGroups)="handleAGSelection($event)"></app-analysis-search>
       </mat-card-content>
       @if (accounts.loggedIn) {
         <mat-card-actions>

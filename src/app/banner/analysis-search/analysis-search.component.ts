@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Project, ProjectQuery} from "../../project/project";
-import {AnalysisGroupQuery} from "../../analysis-group/analysis-group";
+import {AnalysisGroup, AnalysisGroupQuery} from "../../analysis-group/analysis-group";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {WebService} from "../../web.service";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
@@ -26,12 +26,13 @@ import {MatInput} from "@angular/material/input";
 export class AnalysisSearchComponent {
   formAnalysisGroupSearch = this.fb.group({
     searchTerm: new FormControl<string>("", Validators.required),
-    selectedAnalysisGroup: new FormControl<Project[]|null>([])
+    selectedAnalysisGroups: new FormControl<AnalysisGroup[]|null>([])
   })
 
   analysisGroupPageSize = 5
   analysisGroupPageIndex = 0
   analysisGroupQuery: AnalysisGroupQuery|undefined = undefined
+  @Output() selectedAnalysisGroups: EventEmitter<AnalysisGroup[]> = new EventEmitter<AnalysisGroup[]>()
   constructor(private fb: FormBuilder, private web: WebService) {
     this.formAnalysisGroupSearch.controls.searchTerm.valueChanges.subscribe((value: string|null) => {
       if (value) {
@@ -40,6 +41,12 @@ export class AnalysisSearchComponent {
         })
       }
     })
+    this.formAnalysisGroupSearch.controls.selectedAnalysisGroups.valueChanges.subscribe((value: AnalysisGroup[]|null) => {
+      if (value) {
+        this.selectedAnalysisGroups.emit(value)
+      }
+    })
+
     this.web.getAnalysisGroups(undefined, this.analysisGroupPageSize, 0).subscribe((data) => {
       this.analysisGroupQuery = data
     })

@@ -12,6 +12,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {ProjectViewComponent} from "./project-view/project-view.component";
+import {AccountsService} from "../accounts/accounts.service";
 
 @Component({
   selector: 'app-project',
@@ -61,7 +62,7 @@ export class ProjectComponent {
     return this._projectID!
   }
 
-  constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder) {
+  constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private accounts: AccountsService) {
     this.web.getProjects(undefined, this.limit, this.offset).subscribe((data: any) => {
       this.projectQuery = data
     })
@@ -77,7 +78,8 @@ export class ProjectComponent {
   openCreateProjectDialog() {
     const ref = this.dialog.open(CreateProjectDialogComponent)
     ref.afterClosed().subscribe((data) => {
-      if (data){
+      if (data && this.accounts.loggedIn) {
+
         this.web.createProject(data.name, data.description).subscribe((data) => {
           this.selectedProject = data
           this.web.getProjects(undefined, this.limit, this.offset).subscribe((data: any) => {

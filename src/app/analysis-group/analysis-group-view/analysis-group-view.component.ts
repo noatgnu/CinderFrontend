@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AnalysisGroup} from "../analysis-group";
-import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
@@ -20,6 +20,7 @@ import {ComparisonMatrix} from "../../comparison-matrix";
 import {Project} from "../../project/project";
 import {SearchModalComponent} from "../../search-modal/search-modal.component";
 import {FileExtraDataModalComponent} from "../file-extra-data-modal/file-extra-data-modal.component";
+import {AccountsService} from "../../accounts/accounts.service";
 
 @Component({
   selector: 'app-analysis-group-view',
@@ -77,13 +78,11 @@ export class AnalysisGroupViewComponent {
   @Output() updated: EventEmitter<AnalysisGroup> = new EventEmitter<AnalysisGroup>()
 
   form = this.fb.group({
-    name: new FormControl(),
-    description: new FormControl()
+    name: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]}),
+    description: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]})
   })
 
-
-
-  constructor(private fb: FormBuilder, private web: WebService, private matDialog: MatDialog) {
+  constructor(private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService) {
 
   }
 
@@ -91,6 +90,7 @@ export class AnalysisGroupViewComponent {
     if (this.form.invalid) {
       return
     }
+    // @ts-ignore
     this.web.updateAnalysisGroup(this.analysisGroup!.id, this.form.value.name, this.form.value.description).subscribe((data) => {
       this.updated.emit(data)
     })

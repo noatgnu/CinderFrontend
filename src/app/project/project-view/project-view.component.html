@@ -11,9 +11,9 @@
           <mat-label>Project Description</mat-label>
         </mat-form-field>
         <div style="display: flex; flex-direction: row; gap: 20px">
-          <button mat-raised-button color="primary" type="submit">Update</button>
-          <button mat-raised-button color="accent" (click)="openAnalysisGroupCreateModal()"><mat-icon>add</mat-icon> Analysis Group</button>
-          <button mat-raised-button color="warn" (click)="deleteProject()">Delete</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="!accounts.loggedIn">Update</button>
+          <button mat-raised-button color="accent" [disabled]="!accounts.loggedIn" (click)="openAnalysisGroupCreateModal()"><mat-icon>add</mat-icon> Analysis Group</button>
+          <button mat-raised-button color="warn" [disabled]="!accounts.loggedIn" (click)="deleteProject()">Delete</button>
         </div>
       </form>
       @if (analysisGroupQuery) {

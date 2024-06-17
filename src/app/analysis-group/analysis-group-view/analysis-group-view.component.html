@@ -18,29 +18,33 @@
         <div>
           <span>Differential Analysis File @if(analysisGroupDF) {: {{analysisGroupDF.name}}}</span>
         </div>
-        <app-upload-file (fileUploaded)="handleFileUploaded($event, 'df')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'df'"></app-upload-file>
+        @if (accounts.loggedIn) {
+          <app-upload-file (fileUploaded)="handleFileUploaded($event, 'df')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'df'"></app-upload-file>
+        }
         @if (analysisGroupDF) {
-          <button mat-raised-button color="primary" (click)="openExtraDataModal(analysisGroupDF)">Extra Data</button>
+          <button mat-raised-button color="primary" (click)="openExtraDataModal(analysisGroupDF)" [disabled]="!accounts.loggedIn">Extra Data</button>
         }
       </div>
       <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
         <div>
           <span>Searched File @if(analysisGroupSearched) {: {{analysisGroupSearched.name}}}</span>
         </div>
-        <app-upload-file (fileUploaded)="handleFileUploaded($event, 'searched')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'searched'"></app-upload-file>
+        @if (accounts.loggedIn) {
+          <app-upload-file (fileUploaded)="handleFileUploaded($event, 'searched')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'searched'"></app-upload-file>
+        }
         @if (analysisGroupSearched) {
-          <button mat-raised-button color="primary" (click)="openExtraDataModal(analysisGroupSearched)">Extra Data</button>
+          <button mat-raised-button color="primary" (click)="openExtraDataModal(analysisGroupSearched)" [disabled]="!accounts.loggedIn">Extra Data</button>
         }
       </div>
       <div style="display: flex; flex-direction: row; gap: 20px; padding: 20px">
         @if (analysisGroupSearched) {
-          <button mat-raised-button color="primary" (click)="setAnnotationModal(analysisGroupSearched)">Sample Annotation @if(sampleAnnotations) {({{sampleAnnotations.annotations.length}})}</button>
+          <button mat-raised-button color="primary" [disabled]="!accounts.loggedIn" (click)="setAnnotationModal(analysisGroupSearched)">Sample Annotation @if(sampleAnnotations) {({{sampleAnnotations.annotations.length}})}</button>
         }
         @if (sampleAnnotations && analysisGroupSearched && analysisGroupDF) {
-          <button mat-raised-button color="primary" (click)="setComparisonMatrixModal(sampleAnnotations, analysisGroupSearched, analysisGroupDF)">Comparison Matrix @if(comparisonMatrix) {({{comparisonMatrix.matrix.length}})}</button>
+          <button mat-raised-button color="primary" [disabled]="!accounts.loggedIn" (click)="setComparisonMatrixModal(sampleAnnotations, analysisGroupSearched, analysisGroupDF)">Comparison Matrix @if(comparisonMatrix) {({{comparisonMatrix.matrix.length}})}</button>
         }
-        <button mat-raised-button color="accent" (click)="openSearchModal()">Search</button>
-        <button mat-raised-button color="primary" (click)="deleteAnalysisGroup()">Delete</button>
+        <button mat-raised-button color="accent" [disabled]="!accounts.loggedIn" (click)="openSearchModal()">Search</button>
+        <button mat-raised-button color="primary" [disabled]="!accounts.loggedIn" (click)="deleteAnalysisGroup()">Delete</button>
       </div>
     }
   </div>
