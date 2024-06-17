@@ -109,9 +109,7 @@ export class AnalysisGroupSampleAnnotationModalComponent {
   lastSelection: string[] = []
 
   onSelectionChange(event: MatSelectChange) {
-    console.log(event)
     const matSelect = event.source;
-    console.log(matSelect)
     let selectedIndex = -1
     const selectedOption = matSelect.selected as MatOption[]
     let selected: MatOption|undefined = undefined
@@ -121,7 +119,6 @@ export class AnalysisGroupSampleAnnotationModalComponent {
         break
       }
     }
-    console.log(selected?.value)
     const availableOptions = matSelect.options.toArray();
     selectedIndex = availableOptions.indexOf(selected as MatOption);
 

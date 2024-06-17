@@ -112,7 +112,8 @@ export class AnalysisGroupViewComponent {
     }
     ref.afterClosed().subscribe((data) => {
       if (data) {
-        if (this.sampleAnnotations) {
+        console.log(this.sampleAnnotations)
+        if (!this.sampleAnnotations) {
           // @ts-ignore
           this.web.createSampleAnnotation(this.analysisGroup!.id, this.analysisGroup?.name + " sample annotation", data, this.analysisGroupSearched.id).subscribe((data) => {
             this.sampleAnnotations = data
