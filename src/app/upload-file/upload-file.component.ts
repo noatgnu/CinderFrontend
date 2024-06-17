@@ -6,6 +6,8 @@ import {MatInput} from "@angular/material/input";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {ProjectFile} from "../project-file";
+import {MatProgressBar} from "@angular/material/progress-bar";
+import {ReactiveFormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-upload-file',
@@ -15,7 +17,9 @@ import {ProjectFile} from "../project-file";
     MatInput,
     MatLabel,
     MatIconButton,
-    MatIcon
+    MatIcon,
+    MatProgressBar,
+    ReactiveFormsModule
   ],
   templateUrl: './upload-file.component.html',
   styleUrl: './upload-file.component.scss'
@@ -73,6 +77,7 @@ export class UploadFileComponent {
       this.fileProgressMap[file.name].progress = fileSize;
       if (result?.completed_at) {
         this.web.bindUploadedFile(this.analysisGroupId, this.fileType, this.fileCategory, file.name, result?.id).subscribe((data) => {
+
           this.fileUploaded.emit(data)
         })
       }
@@ -102,6 +107,7 @@ export class UploadFileComponent {
         const result = await this.web.uploadDataChunkComplete(currentURL, hashDigest).toPromise()
         if (result?.completed_at) {
           this.web.bindUploadedFile(this.analysisGroupId, this.fileType, this.fileCategory, file.name, result?.id).subscribe((data) => {
+            this.fileProgressMap[file.name].progress = fileSize;
             this.fileUploaded.emit(data)
           })
         }

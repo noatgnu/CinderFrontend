@@ -2,3 +2,6 @@
   <button mat-icon-button type="button" (click)="file.click()"><mat-icon>upload</mat-icon></button>
   <input type="file" hidden #file (change)="uploadData($event)">
 </form>
+@for (f of fileList; track f.name) {
+  <mat-progress-bar [value]="fileProgressMap[f.name].progress/fileProgressMap[f.name].total*100" [mode]="'determinate'"></mat-progress-bar>
+}
