@@ -81,7 +81,7 @@ export class AnalysisGroupViewComponent {
   form = this.fb.group({
     name: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]}),
     description: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]}),
-    curtain_link: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]})
+    curtain_link: new FormControl({value: "", disabled: !this.accounts.loggedIn})
   })
 
   constructor(private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService) {
