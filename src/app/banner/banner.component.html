@@ -46,66 +46,69 @@
     </mat-card>
   </div>
   <div style="display: flex; flex-direction: row; justify-content: center">
-    <mat-card style="width: 1000px" appearance="outlined">
-      <mat-card-header>
-        <mat-card-title>
-          <span style="color:#ba0000"><mat-icon>lock_open</mat-icon></span>
-          <a href="/#/home"><span style="color:#ba0000">Search</span></a>
-        </mat-card-title>
-        <mat-card-subtitle>
-          Search through the Cinder Database
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 5px">
-          <mat-form-field>
-            <input matInput formControlName="search" placeholder="Search" type="search">
-            <mat-label>Database Search Term</mat-label>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-select formControlName="searchMode">
-              <mat-option [value]="'full'">
-                Full Text
-              </mat-option>
-              <mat-option [value]="'uniprot'">
-                UniProt Accession ID
-              </mat-option>
-              <mat-option [value]="'gene'">
-                Gene Names
-              </mat-option>
-              <mat-option [value]="'pi'">
-                Primary IDs
-              </mat-option>
-            </mat-select>
-            <mat-label>Search Mode</mat-label>
-          </mat-form-field>
-          <mat-form-field>
-            <input matInput formControlName="foldChange" type="number" placeholder="Log2 Fold Change">
-            <mat-label>Log2 Fold Change Cutoff</mat-label>
-          </mat-form-field>
-          <mat-form-field>
-            <input matInput formControlName="pValue" type="number" placeholder="P-Value">
-            <mat-label>-Log10(P-Value) Cutoff</mat-label>
-          </mat-form-field>
-        </form>
-        <mat-accordion>
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                Filter by Project
-              </mat-panel-title>
-              <mat-panel-description>
-                Optional
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            <app-project-search [multipleSelection]="true" (selectedProjects)="handleMultipleProjectSelection($event)"></app-project-search>
-          </mat-expansion-panel>
-        </mat-accordion>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button type="button" (click)="searchDatabase()">Search</button>
-      </mat-card-actions>
-    </mat-card>
+    <div>
+      <mat-card style="min-width: 500px; width: 100%" appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>
+            <span style="color:#ba0000"><mat-icon>lock_open</mat-icon></span>
+            <a href="/#/home"><span style="color:#ba0000">Search</span></a>
+          </mat-card-title>
+          <mat-card-subtitle>
+            Search through the Cinder Database
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 5px">
+            <mat-form-field>
+              <input matInput formControlName="search" placeholder="Search" type="search">
+              <mat-label>Database Search Term</mat-label>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-select formControlName="searchMode">
+                <mat-option [value]="'full'">
+                  Full Text
+                </mat-option>
+                <mat-option [value]="'uniprot'">
+                  UniProt Accession ID
+                </mat-option>
+                <mat-option [value]="'gene'">
+                  Gene Names
+                </mat-option>
+                <mat-option [value]="'pi'">
+                  Primary IDs
+                </mat-option>
+              </mat-select>
+              <mat-label>Search Mode</mat-label>
+            </mat-form-field>
+            <mat-form-field>
+              <input matInput formControlName="foldChange" type="number" placeholder="Log2 Fold Change">
+              <mat-label>Log2 Fold Change Cutoff</mat-label>
+            </mat-form-field>
+            <mat-form-field>
+              <input matInput formControlName="pValue" type="number" placeholder="P-Value">
+              <mat-label>-Log10(P-Value) Cutoff</mat-label>
+            </mat-form-field>
+          </form>
+          <mat-accordion>
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  Filter by Project
+                </mat-panel-title>
+                <mat-panel-description>
+                  Optional
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <app-project-search [multipleSelection]="true" (selectedProjects)="handleMultipleProjectSelection($event)"></app-project-search>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button type="button" (click)="searchDatabase()">Search</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
   </div>
 </div>
 
