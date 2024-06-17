@@ -32,7 +32,7 @@ export class WebService {
     //headers.append('Content-Disposition', `attachment; filename=${filename}`)
     console.log(headers)
     if (url !== "") {
-      if (url.startsWith("http://")) {
+      if (url.startsWith("http://") && !url.startsWith("http://localhost")) {
         url = url.replace("http://", "https://")
       }
       return this.http.put<ChunkUpload>(
@@ -54,7 +54,7 @@ export class WebService {
   uploadDataChunkComplete(url: string = "", md5: string, file?: File, filename?: string) {
     const form = new FormData()
     form.append('sha256', md5)
-    if (url.startsWith("http://")) {
+    if (url.startsWith("http://") && !url.startsWith("http://localhost")) {
       url = url.replace("http://", "https://")
     }
     if (file && filename) {
