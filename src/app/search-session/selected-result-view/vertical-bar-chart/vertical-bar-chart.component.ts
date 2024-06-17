@@ -12,6 +12,8 @@ PlotlyModule.plotlyjs = PlotlyJS;
   styleUrl: './vertical-bar-chart.component.scss'
 })
 export class VerticalBarChartComponent {
+  @Input() title: string = ''
+
   @Input() comparedConditions: string[] = []
 
   private _annotationData: {Sample: string, Condition: string, Value: number}[] = []
@@ -88,6 +90,9 @@ export class VerticalBarChartComponent {
     this.graphData = graphData
     this.graphLayout.xaxis.tickvals = tickvals
     this.graphLayout.xaxis.ticktext = ticktext
+    if (this.title) {
+      this.graphLayout.title = this.title
+    }
     this.graphLayout.width = this.graphLayout.margin.l + this.graphLayout.margin.r + this.barSize * currentSampleNumber
     this.revision += 1
   }

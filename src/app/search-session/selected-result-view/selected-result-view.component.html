@@ -1,5 +1,5 @@
 <div style="display: flex; flex-direction: row; justify-content: center">
   @if (relatedResult) {
-    <app-vertical-bar-chart [comparedConditions]="[searchResult.condition_A, searchResult.condition_B]" [annotationData]="relatedResult.searched_data"></app-vertical-bar-chart>
+    <app-vertical-bar-chart [title]="searchResult.condition_A +'-'+searchResult.condition_B + ' ' + searchResult.gene_name + '('+searchResult.primary_id+')'" [comparedConditions]="[searchResult.condition_A, searchResult.condition_B]" [annotationData]="relatedResult.searched_data"></app-vertical-bar-chart>
   }
 </div>
