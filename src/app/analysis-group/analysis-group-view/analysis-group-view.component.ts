@@ -162,7 +162,7 @@ export class AnalysisGroupViewComponent {
     ref.componentInstance.analysisGroupIDs = [this.analysisGroup!.id]
     ref.afterClosed().subscribe((data) => {
       if (data) {
-        window.open(`/#/search-session/${data.id}`, "_blank")
+        window.open(`/#/search-session/${data}`, "_blank")
       }
     })
   }
