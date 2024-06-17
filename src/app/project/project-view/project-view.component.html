@@ -10,6 +10,34 @@
           <textarea matInput formControlName="description" placeholder="Project Description"></textarea>
           <mat-label>Project Description</mat-label>
         </mat-form-field>
+        <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">
+          <mat-form-field style="width: 100%">
+            <input matInput formControlName="species_name" placeholder="Species Name" type="search">
+            <mat-label>Species Name Search</mat-label>
+          </mat-form-field>
+          @if (speciesEditable) {
+            <button mat-icon-button (click)="changeSpeciesEditableState()">
+              <mat-icon>lock_open</mat-icon>
+            </button>
+          } @else {
+            <button mat-icon-button (click)="changeSpeciesEditableState()">
+              <mat-icon>lock</mat-icon>
+            </button>
+          }
+        </div>
+
+        @if (speciesQuery && speciesEditable) {
+          @if (speciesQuery.results.length > 0) {
+            <mat-selection-list formControlName="species" [multiple]="false" style="max-height: 200px; overflow: auto">
+              @for (species of speciesQuery.results; track species.id) {
+                <mat-list-option [value]="species">
+                  {{species.official_name}}
+                </mat-list-option>
+              }
+            </mat-selection-list>
+          }
+        }
+
         <div style="display: flex; flex-direction: row; gap: 20px">
           <button mat-raised-button color="primary" type="submit" [disabled]="!accounts.loggedIn">Update</button>
           <button mat-raised-button color="accent" [disabled]="!accounts.loggedIn" (click)="openAnalysisGroupCreateModal()"><mat-icon>add</mat-icon> Analysis Group</button>

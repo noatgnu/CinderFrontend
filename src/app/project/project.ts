@@ -8,6 +8,7 @@ export interface Project {
   temporary: boolean;
   user: number;
   encrypted: boolean;
+  species: number;
 }
 
 export interface ProjectQuery {

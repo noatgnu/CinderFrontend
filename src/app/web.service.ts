@@ -10,6 +10,7 @@ import {map} from "rxjs";
 import {ComparisonMatrix} from "./comparison-matrix";
 import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from "./search-session";
 import {Projects} from "@angular/cli/lib/config/workspace-schema";
+import {Species, SpeciesQuery} from "./species";
 
 
 
@@ -113,10 +114,10 @@ export class WebService {
     )
   }
 
-  updateProject(project_id: number, name: string, description: string) {
+  updateProject(project_id: number, name: string, description: string, species: number|null = null) {
     return this.http.put<Project>(
       `${this.baseURL}/api/projects/${project_id}/`,
-      {name: name, description: description},
+      {name: name, description: description, species: species},
       {responseType: 'json', observe: 'body'}
     )
   }
@@ -460,6 +461,34 @@ export class WebService {
     return this.http.post<AnalysisGroup[]>(
       `${this.baseURL}/api/search/get_analysis_groups_from_projects/`,
       {projects: projects.map((p) => p.id)},
+    )
+  }
+
+  getSpecies(url?: string, limit: number = 10, offset: number = 0, search?: string) {
+    if (url) {
+      return this.http.get<SpeciesQuery>(url, {responseType: 'json', observe: 'body'})
+    }
+    let params = new HttpParams()
+    if (limit) {
+      params = params.append('limit', limit.toString())
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString())
+    }
+    if (search && search !== "") {
+      params = params.append('search', search)
+    }
+    params = params.append('ordering', 'official_name')
+    return this.http.get<SpeciesQuery>(
+      `${this.baseURL}/api/species/`,
+      {responseType: 'json', observe: 'body', params: params}
+    )
+  }
+
+  getSpeciesByID(id: number) {
+    return this.http.get<Species>(
+      `${this.baseURL}/api/species/${id}/`,
+      {responseType: 'json', observe: 'body'}
     )
   }
 }
