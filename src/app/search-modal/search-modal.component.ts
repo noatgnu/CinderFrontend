@@ -45,7 +45,7 @@ export class SearchModalComponent {
 
           switch (data["status"]) {
             case "complete":
-              this.sb.open(`<a href=/#/search-session/${data["id"]}>Search complete</a>`, "Dismiss", {duration: 10000})
+              this.sb.open(`${location.host}/#/search-session/${data["id"]}`, "Dismiss", {duration: 10000})
               this.dialogRef.close(data["id"])
               break
           }
