@@ -6,6 +6,7 @@ import {AccountsService} from "../accounts/accounts.service";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {LoginDialogComponent} from "../accounts/login-dialog/login-dialog.component";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {NgOptimizedImage} from "@angular/common";
 
 @Component({
   selector: 'app-navbar',
@@ -16,7 +17,8 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
     MatIcon,
     MatMenu,
     MatMenuItem,
-    MatMenuTrigger
+    MatMenuTrigger,
+    NgOptimizedImage
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
