@@ -52,6 +52,9 @@ export class AppComponent {
       this.ws.searchWSConnection?.subscribe((data) => {
         if (data) {
           console.log(data)
+          if (data.type === "logout") {
+            this.accounts.logout()
+          }
         }
       })
     }
