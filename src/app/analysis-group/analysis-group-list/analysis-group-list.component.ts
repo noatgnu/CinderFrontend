@@ -1,7 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AnalysisGroup, AnalysisGroupQuery} from "../analysis-group";
 import {MatDivider} from "@angular/material/divider";
-import {MatListOption, MatSelectionList} from "@angular/material/list";
+import {MatListItemLine, MatListOption, MatSelectionList} from "@angular/material/list";
+import {DataService} from "../../data.service";
 
 @Component({
   selector: 'app-analysis-group-list',
@@ -9,7 +10,8 @@ import {MatListOption, MatSelectionList} from "@angular/material/list";
   imports: [
     MatDivider,
     MatListOption,
-    MatSelectionList
+    MatSelectionList,
+    MatListItemLine
   ],
   templateUrl: './analysis-group-list.component.html',
   styleUrl: './analysis-group-list.component.scss'
@@ -19,7 +21,7 @@ export class AnalysisGroupListComponent {
 
   @Output() selectedAnalysisGroup: EventEmitter<AnalysisGroup> = new EventEmitter<AnalysisGroup>()
 
-  constructor() {
+  constructor(public dataService: DataService) {
   }
 
   selectAnalysisGroup(analysisGroup: AnalysisGroup) {

@@ -15,6 +15,7 @@ import {
 } from "./create-analysis-group-dialog/create-analysis-group-dialog.component";
 import {AnalysisGroupListComponent} from "./analysis-group-list/analysis-group-list.component";
 import {AnalysisGroupViewComponent} from "./analysis-group-view/analysis-group-view.component";
+import {DataService} from "../data.service";
 
 @Component({
   selector: 'app-analysis-group',
@@ -63,7 +64,7 @@ export class AnalysisGroupComponent {
     return this._analysisGroupID
   }
 
-  constructor(private fb: FormBuilder, private dialog: MatDialog, private web: WebService) {
+  constructor(public dataService: DataService, private fb: FormBuilder, private dialog: MatDialog, private web: WebService) {
     this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
       this.analysisGroupQuery = data
     })

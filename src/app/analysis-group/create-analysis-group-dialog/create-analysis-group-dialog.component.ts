@@ -54,7 +54,7 @@ export class CreateAnalysisGroupDialogComponent {
     description: new FormControl('', Validators.required),
     project_name: new FormControl('', Validators.required),
     project_id: new FormControl(0, Validators.required),
-    analysis_group_type: new FormControl('', Validators.required),
+    analysis_group_type: new FormControl('proteomics', Validators.required),
   })
 
   formProjectSearch = this.fb.group({

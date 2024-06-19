@@ -44,7 +44,7 @@
           <button mat-icon-button (click)="toggleSidePanel()"><mat-icon>menu</mat-icon></button>
           <span>
             @if (selectedAnalysisGroup) {
-              {{selectedAnalysisGroup.name}}
+              {{selectedAnalysisGroup.name}} ({{dataService.getAnalysisGroupTypeLabel(selectedAnalysisGroup.analysis_group_type)}})
             } @else {
               Select Analysis Group
             }

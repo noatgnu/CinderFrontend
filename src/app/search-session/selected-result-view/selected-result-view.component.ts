@@ -10,6 +10,7 @@ import {ProjectFile} from "../../project-file";
 import {MatTable} from "@angular/material/table";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 import {VerticalBarChartComponent} from "./vertical-bar-chart/vertical-bar-chart.component";
+import {MatButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-selected-result-view',
@@ -22,12 +23,14 @@ import {VerticalBarChartComponent} from "./vertical-bar-chart/vertical-bar-chart
     MatListItem,
     MatListItemTitle,
     MatListItemLine,
-    VerticalBarChartComponent
+    VerticalBarChartComponent,
+    MatButton
   ],
   templateUrl: './selected-result-view.component.html',
   styleUrl: './selected-result-view.component.scss'
 })
 export class SelectedResultViewComponent {
+
   private _searchResult: SearchResult|undefined = undefined
   @Input() set searchResult(value: SearchResult) {
     this._searchResult = value
@@ -100,6 +103,4 @@ export class SelectedResultViewComponent {
     }
     return -1
   }
-
-
 }

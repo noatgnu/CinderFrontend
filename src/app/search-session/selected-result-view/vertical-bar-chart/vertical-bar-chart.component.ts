@@ -2,16 +2,18 @@ import {Component, Input} from '@angular/core';
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 import {GraphService} from "../../../graph.service";
+import {MatButton} from "@angular/material/button";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @Component({
   selector: 'app-vertical-bar-chart',
   standalone: true,
-  imports: [PlotlyModule],
+  imports: [PlotlyModule, MatButton],
   templateUrl: './vertical-bar-chart.component.html',
   styleUrl: './vertical-bar-chart.component.scss'
 })
 export class VerticalBarChartComponent {
+  showOtherConditions = false
   @Input() title: string = ''
 
   @Input() comparedConditions: string[] = []
@@ -79,8 +81,10 @@ export class VerticalBarChartComponent {
     const graphData = []
     let currentSampleNumber = 0
     for (const key in temp) {
-      if (this.comparedConditions.length > 0 && !this.comparedConditions.includes(key)) {
-        continue
+      if (!this.showOtherConditions) {
+        if (this.comparedConditions.length > 0 && !this.comparedConditions.includes(key)) {
+          continue
+        }
       }
       currentSampleNumber = currentSampleNumber + temp[key].x.length
       tickvals.push(temp[key].x[Math.round(temp[key].x.length/2)-1])
@@ -96,5 +100,8 @@ export class VerticalBarChartComponent {
     this.graphLayout.width = this.graphLayout.margin.l + this.graphLayout.margin.r + this.barSize * currentSampleNumber
     this.revision += 1
   }
-
+  toggleOtherConditions() {
+    this.showOtherConditions = !this.showOtherConditions
+    this.drawVerticalBarChart()
+  }
 }

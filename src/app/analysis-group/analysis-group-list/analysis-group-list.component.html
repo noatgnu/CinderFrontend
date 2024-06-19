@@ -5,6 +5,9 @@
         <span matListItemTitle>
           <b>{{ag.name}}</b>
         </span>
+        <span matListItemLine>
+          {{dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type)}}
+        </span>
       </mat-list-option>
       <mat-divider></mat-divider>
     }

@@ -14,4 +14,14 @@ export class DataService {
     {value: "glycoproteomics", label: "Glycoproteomics"},
   ]
   constructor() { }
+
+  getAnalysisGroupTypeLabel(value: string): string|undefined {
+    let label: string|undefined = undefined
+    this.analysisGroupChoices.forEach((choice) => {
+      if (choice.value === value) {
+        label = choice.label
+      }
+    })
+    return label
+  }
 }

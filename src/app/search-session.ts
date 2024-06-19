@@ -22,7 +22,7 @@ export interface SearchResult {
   created_at: Date
   updated_at: Date
   session: number
-  analysis_group: {id: number, name: string}
+  analysis_group: {id: number, name: string, analysis_group_type: string}
   file: {id: number, name: string, file_type: string, file_category: string}
   condition_A: string
   condition_B: string

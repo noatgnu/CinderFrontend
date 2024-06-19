@@ -22,6 +22,7 @@ import {SearchModalComponent} from "../../search-modal/search-modal.component";
 import {FileExtraDataModalComponent} from "../file-extra-data-modal/file-extra-data-modal.component";
 import {AccountsService} from "../../accounts/accounts.service";
 import {Title} from "@angular/platform-browser";
+import {DataService} from "../../data.service";
 
 @Component({
   selector: 'app-analysis-group-view',
@@ -43,9 +44,15 @@ import {Title} from "@angular/platform-browser";
 export class AnalysisGroupViewComponent {
   associatedProject?: Project|undefined
   private _analysisGroup: AnalysisGroup|undefined
+  analysisType: string = "proteomics"
   @Input() set analysisGroup(value: AnalysisGroup|undefined) {
     this._analysisGroup = value
     if (value) {
+      this.dataService.analysisGroupChoices.forEach((choice) => {
+        if (choice.value === value.analysis_group_type) {
+          this.analysisType = choice.label
+        }
+      })
       this.titleService.setTitle(`AG - ${value.name}`)
       this.web.getProject(value.project).subscribe((data) => {
         this.associatedProject = data
@@ -88,7 +95,7 @@ export class AnalysisGroupViewComponent {
     curtain_link: new FormControl({value: "", disabled: !this.accounts.loggedIn})
   })
 
-  constructor(private titleService: Title, private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService) {
+  constructor(private dataService: DataService, private titleService: Title, private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService) {
 
   }
 
