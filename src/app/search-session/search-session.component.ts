@@ -39,6 +39,7 @@ import {SearchSessionViewComponent} from "./search-session-view/search-session-v
   styleUrl: './search-session.component.scss'
 })
 export class SearchSessionComponent {
+  sidebarOpen = true
   private _searchSession: SearchSession|undefined = undefined
   private _searchID: number = 0
   @Input() set searchID(value: number) {
@@ -96,5 +97,9 @@ export class SearchSessionComponent {
       this.searchSession = undefined
       this.searchSessionQuery?.results?.splice(this.searchSessionQuery.results.findIndex((value) => value.id === id), 1)
     })
+  }
+
+  toggleSidePanel() {
+    this.sidebarOpen = !this.sidebarOpen
   }
 }

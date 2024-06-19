@@ -1,49 +1,55 @@
 <div style="display: flex; flex-direction: row">
-  <div class="project-side-nav">
-    <mat-toolbar>
-      <mat-toolbar-row>
-        <span>Project</span>
-        <button mat-icon-button (click)="openCreateProjectDialog()">
-          <mat-icon>create_new_folder</mat-icon>
-        </button>
-      </mat-toolbar-row>
-    </mat-toolbar>
+  @if(sidebarOpen) {
+    <div class="project-side-nav">
+      <mat-toolbar>
+        <mat-toolbar-row>
+          <span>Project</span>
+          <button mat-icon-button (click)="openCreateProjectDialog()">
+            <mat-icon>create_new_folder</mat-icon>
+          </button>
+        </mat-toolbar-row>
+      </mat-toolbar>
 
-    <div style="display: flex; flex-direction: column; padding: 5px">
-      <form [formGroup]="form">
-        <mat-form-field style="width: 100%">
-          <input matInput formControlName="name" type="search" placeholder="Search Project">
-          <mat-label>Search Project</mat-label>
-        </mat-form-field>
-      </form>
-      @if (projectQuery) {
-        @if (projectQuery.count > 0) {
-          <div style="height: calc(100vh - 64px*4 - 20px); overflow: auto">
-            <app-project-list [projectQuery]="projectQuery" (projectSelected)="handleProjectSelect($event)"></app-project-list>
-          </div>
-          <mat-paginator #paginator
-                         (page)="handlePageEvent($event)"
-                         [length]="projectQuery.count"
-                         [pageSize]="limit"
-                         [showFirstLastButtons]="true"
-                         [hidePageSize]="true"
-                         [pageIndex]="pageIndex"
-                         aria-label="Select page">
-          </mat-paginator>
-        } @else {
-          <p>No projects found.</p>
+      <div style="display: flex; flex-direction: column; padding: 5px">
+        <form [formGroup]="form">
+          <mat-form-field style="width: 100%">
+            <input matInput formControlName="name" type="search" placeholder="Search Project">
+            <mat-label>Search Project</mat-label>
+          </mat-form-field>
+        </form>
+        @if (projectQuery) {
+          @if (projectQuery.count > 0) {
+            <div style="height: calc(100vh - 64px*4 - 20px); overflow: auto">
+              <app-project-list [projectQuery]="projectQuery" (projectSelected)="handleProjectSelect($event)"></app-project-list>
+            </div>
+            <mat-paginator #paginator
+                           (page)="handlePageEvent($event)"
+                           [length]="projectQuery.count"
+                           [pageSize]="limit"
+                           [showFirstLastButtons]="true"
+                           [hidePageSize]="true"
+                           [pageIndex]="pageIndex"
+                           aria-label="Select page">
+            </mat-paginator>
+          } @else {
+            <p>No projects found.</p>
+          }
         }
-      }
+      </div>
     </div>
-  </div>
+  }
+
   <div class="project-main-content">
     <mat-toolbar>
       <mat-toolbar-row>
-        <span>@if (selectedProject) {
-          {{selectedProject.name}}
-        } @else {
-          Select Project
-        }</span>
+        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center">
+          <button mat-icon-button (click)="toggleSidePanel()"><mat-icon>menu</mat-icon></button>
+          <span>@if (selectedProject) {
+            {{selectedProject.name}}
+          } @else {
+            Select Project
+          }</span>
+        </div>
       </mat-toolbar-row>
     </mat-toolbar>
     <div style="height: calc(100vh - 64px*2 - 20px); overflow: auto">

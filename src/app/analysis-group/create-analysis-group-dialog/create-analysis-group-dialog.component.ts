@@ -8,7 +8,8 @@ import {MatButton} from "@angular/material/button";
 import {Project, ProjectQuery} from "../../project/project";
 import {MatList, MatListItem, MatListItemTitle, MatListOption, MatSelectionList} from "@angular/material/list";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
-import {MatSelect} from "@angular/material/select";
+import {MatOption, MatSelect} from "@angular/material/select";
+import {DataService} from "../../data.service";
 
 @Component({
   selector: 'app-create-analysis-group-dialog',
@@ -28,7 +29,8 @@ import {MatSelect} from "@angular/material/select";
     MatLabel,
     MatListItemTitle,
     MatSelect,
-    MatPaginator
+    MatPaginator,
+    MatOption
   ],
   templateUrl: './create-analysis-group-dialog.component.html',
   styleUrl: './create-analysis-group-dialog.component.scss'
@@ -52,6 +54,7 @@ export class CreateAnalysisGroupDialogComponent {
     description: new FormControl('', Validators.required),
     project_name: new FormControl('', Validators.required),
     project_id: new FormControl(0, Validators.required),
+    analysis_group_type: new FormControl('', Validators.required),
   })
 
   formProjectSearch = this.fb.group({
@@ -62,8 +65,10 @@ export class CreateAnalysisGroupDialogComponent {
   projectPageLimit = 5
   projectPageIndex = 0
   projectQuery: ProjectQuery|undefined = undefined
-
-  constructor(private web: WebService, private fb: FormBuilder, private matDialogRef: MatDialogRef<CreateAnalysisGroupDialogComponent>) {
+  analysisGroupTypeChoices = [
+    ""
+  ]
+  constructor(public dataService: DataService, private web: WebService, private fb: FormBuilder, private matDialogRef: MatDialogRef<CreateAnalysisGroupDialogComponent>) {
     this.formProjectSearch.controls.selectedProject.valueChanges.subscribe((value: Project[]|undefined|null) => {
       if (value) {
         this.project = value[0]
@@ -82,8 +87,8 @@ export class CreateAnalysisGroupDialogComponent {
   }
 
   submit() {
-    if (this.form.valid && this.project && this.form.value.name && this.form.value.description && this.form.value.project_id) {
-      this.web.createAnalysisGroup(this.form.value.name, this.form.value.description, this.form.value.project_id).subscribe(
+    if (this.form.valid && this.project && this.form.value.name && this.form.value.description && this.form.value.project_id && this.form.value.analysis_group_type) {
+      this.web.createAnalysisGroup(this.form.value.name, this.form.value.description, this.form.value.project_id, this.form.value.analysis_group_type).subscribe(
         (data) => {
           this.matDialogRef.close(data)
         },

@@ -34,7 +34,7 @@ import {AccountsService} from "../accounts/accounts.service";
   styleUrl: './project.component.scss'
 })
 export class ProjectComponent {
-
+  sidebarOpen = true
   projectQuery?: ProjectQuery
   pageIndex = 0
   limit = 15
@@ -127,5 +127,9 @@ export class ProjectComponent {
       }
       return value
     })
+  }
+
+  toggleSidePanel() {
+    this.sidebarOpen = !this.sidebarOpen
   }
 }

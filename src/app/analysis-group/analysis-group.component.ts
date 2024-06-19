@@ -37,7 +37,7 @@ import {AnalysisGroupViewComponent} from "./analysis-group-view/analysis-group-v
   styleUrl: './analysis-group.component.scss'
 })
 export class AnalysisGroupComponent {
-
+  sidebarOpen = true
   analysisGroupQuery?: AnalysisGroupQuery
   pageIndex = 0
   limit = 15
@@ -81,10 +81,8 @@ export class AnalysisGroupComponent {
     ref.componentInstance.enableProjectSelection = true
     ref.afterClosed().subscribe((data) => {
       if (data){
-        this.web.createAnalysisGroup(data.name, data.description, data.project_id).subscribe((data) => {
-          this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
-            this.analysisGroupQuery = data
-          })
+        this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
+          this.analysisGroupQuery = data
         })
       }
     })
@@ -120,4 +118,7 @@ export class AnalysisGroupComponent {
     })
   }
 
+  toggleSidePanel() {
+    this.sidebarOpen = !this.sidebarOpen
+  }
 }

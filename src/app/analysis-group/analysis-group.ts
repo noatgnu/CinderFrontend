@@ -3,7 +3,7 @@ export interface AnalysisGroup {
   name: string;
   description: string;
   project: number;
-  ptm: boolean;
+  analysis_group_type: string;
   created_at: Date;
   curtain_link: string;
 }

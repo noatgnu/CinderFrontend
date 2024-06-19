@@ -33,13 +33,7 @@
           <span matListItemTitle><b>Selected project: {{project.name}}</b></span>
         </mat-list-item>
       </mat-list>
-    } @else {
-      <mat-selection-list>
-
-      </mat-selection-list>
     }
-
-
     <mat-form-field>
       <input matInput formControlName="name" type="text" placeholder="Analysis Group Name">
       <mat-label>Analysis Group Name</mat-label>
@@ -47,6 +41,16 @@
     <mat-form-field>
       <textarea matInput formControlName="description" placeholder="Analysis Group Description"></textarea>
       <mat-label>Analysis Group Description</mat-label>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select formControlName="analysis_group_type">
+        @for (ag of dataService.analysisGroupChoices; track ag.value) {
+          <mat-option [value]="ag.value">
+            {{ag.label}}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-label>Analysis Group Type</mat-label>
     </mat-form-field>
   </form>
 </mat-dialog-content>

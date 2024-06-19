@@ -1,55 +1,57 @@
 <div style="display: flex; flex-direction: row">
-  <div class="search-session-side-nav">
-    <mat-toolbar>
-      <mat-toolbar-row>
-        <span>Search Session</span>
-      </mat-toolbar-row>
-    </mat-toolbar>
+  @if (sidebarOpen) {
+    <div class="search-session-side-nav">
+      <mat-toolbar>
+        <mat-toolbar-row>
+          <span>Search Session</span>
+        </mat-toolbar-row>
+      </mat-toolbar>
 
-    <div style="display: flex; flex-direction: column; padding: 5px">
-      <form [formGroup]="form">
-        <mat-form-field style="width: 100%">
-          <input matInput formControlName="search" type="search" placeholder="Find Search Session">
-          <mat-label>Find Search Sessions</mat-label>
-        </mat-form-field>
-      </form>
-      @if (searchSessionQuery) {
-        @if (searchSessionQuery.count > 0) {
-          <div style="height: calc(100vh - 64px*4 - 20px); overflow: auto">
-            <app-search-session-list [searchSessionQuery]="searchSessionQuery" (searchSessionSelected)="searchSession=$event"></app-search-session-list>
-          </div>
-          <mat-paginator #paginator
-                         (page)="handlePageEvent($event)"
-                         [length]="searchSessionQuery.count"
-                         [pageSize]="pageSize"
-                         [showFirstLastButtons]="true"
-                         [hidePageSize]="true"
-                         [pageIndex]="pageIndex"
-                         aria-label="Select page">
-          </mat-paginator>
-        } @else {
-          <p>No search sessions found.</p>
+      <div style="display: flex; flex-direction: column; padding: 5px">
+        <form [formGroup]="form">
+          <mat-form-field style="width: 100%">
+            <input matInput formControlName="search" type="search" placeholder="Find Search Session">
+            <mat-label>Find Search Sessions</mat-label>
+          </mat-form-field>
+        </form>
+        @if (searchSessionQuery) {
+          @if (searchSessionQuery.count > 0) {
+            <div style="height: calc(100vh - 64px*4 - 20px); overflow: auto">
+              <app-search-session-list [searchSessionQuery]="searchSessionQuery" (searchSessionSelected)="searchSession=$event"></app-search-session-list>
+            </div>
+            <mat-paginator #paginator
+                           (page)="handlePageEvent($event)"
+                           [length]="searchSessionQuery.count"
+                           [pageSize]="pageSize"
+                           [showFirstLastButtons]="true"
+                           [hidePageSize]="true"
+                           [pageIndex]="pageIndex"
+                           aria-label="Select page">
+            </mat-paginator>
+          } @else {
+            <p>No search sessions found.</p>
+          }
         }
-      }
-
-
+      </div>
     </div>
-  </div>
+  }
   <div class="search-session-main-content">
     <mat-toolbar>
       <mat-toolbar-row>
+        <button mat-icon-button (click)="toggleSidePanel()"><mat-icon>menu</mat-icon></button>
         <div>
           @if (searchSession) {
             <a href="/#/search-session/{{searchSession.id}}"><span style="color:#ba0000"><b>{{searchSession.search_term}}</b></span></a>
-            <button mat-icon-button color="accent" (click)="deleteSearchSession(searchSession.id)">
-              <mat-icon>delete</mat-icon>
-            </button>
           } @else {
             Select Search Session
           }
         </div>
-
-
+        <div class="spacer"></div>
+        @if (searchSession) {
+          <button mat-icon-button color="accent" (click)="deleteSearchSession(searchSession.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        }
       </mat-toolbar-row>
     </mat-toolbar>
     <div style="height: calc(100vh - 64px*2 - 20px); overflow: auto">

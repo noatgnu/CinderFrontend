@@ -164,10 +164,10 @@ export class WebService {
     )
   }
 
-  createAnalysisGroup(name: string, description: string, project: number) {
+  createAnalysisGroup(name: string, description: string, project: number, analysis_group_type: string) {
     return this.http.post<AnalysisGroup>(
       `${this.baseURL}/api/analysis_groups/`,
-      {name: name, description: description, project: project},
+      {name: name, description: description, project: project, analysis_group_type: analysis_group_type},
       {responseType: 'json', observe: 'body'}
     )
   }
