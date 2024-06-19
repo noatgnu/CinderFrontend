@@ -33,7 +33,13 @@ export class SelectedResultViewComponent {
     this._searchResult = value
 
     this.web.getSearchResultRelated(value.id, value.file.file_category, value.primary_id).subscribe((data) => {
-      this.relatedResult = data[0]
+      for (const d of data) {
+        if (d.file.file_category === "copy_number") {
+          this.relatedResultCopyNumber = d
+        } else if (d.file.file_category === "searched") {
+          this.relatedResultSearched = d
+        }
+      }
     })
     this.web.getAnalysisGroup(value.analysis_group.id).subscribe((d) => {
       this.analysisGroup = d
@@ -54,29 +60,6 @@ export class SelectedResultViewComponent {
             // @ts-ignore
             this.web.getProjectFileComparisonMatrix(this.analysisGroupDF.id).subscribe((data) => {
               this.comparisonMatrix = data
-              if (this.searchResult.file.file_category === "df") {
-                for (const m of this.comparisonMatrix.matrix) {
-                  const foldChangeColumnIndex = this.getCMIndex(m.fold_change_col)
-                  const pValueColumnIndex = this.getCMIndex(m.p_value_col)
-                  let comparisonColumnIndex = -1
-                  let comparisonLabel = m.comparison_label
-                  let geneNameColumnIndex = -1
-                  let primaryIdColumnIndex = -1
-                  if (this.analysisGroupDF?.extra_data["primary_id_col"]) {
-                    primaryIdColumnIndex = this.getCMIndex(this.analysisGroupDF.extra_data["primary_id_col"])
-                  }
-                  if (this.analysisGroupDF?.extra_data["gene_name_col"]) {
-                    geneNameColumnIndex = this.getCMIndex(this.analysisGroupDF.extra_data["gene_name_col"])
-                  }
-                  if (m.comparison_col) {
-                    comparisonColumnIndex = this.getCMIndex(m.comparison_col)
-                  }
-                  if (foldChangeColumnIndex !== -1 && pValueColumnIndex !== -1) {
-
-                  }
-                }
-              }
-
             })
           })
 
@@ -91,8 +74,8 @@ export class SelectedResultViewComponent {
     return this._searchResult!
   }
 
-  relatedResult: SearchResult|undefined = undefined
-
+  relatedResultSearched: SearchResult|undefined = undefined
+  relatedResultCopyNumber: SearchResult|undefined = undefined
   analysisGroup: AnalysisGroup|undefined = undefined
   analysisGroupDF: ProjectFile|undefined = undefined
   analysisGroupDFColumns: string[] = []

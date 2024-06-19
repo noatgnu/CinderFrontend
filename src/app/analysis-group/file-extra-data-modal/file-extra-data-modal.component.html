@@ -55,6 +55,49 @@
           <mat-label>UniProt Accession ID Column</mat-label>
         </mat-form-field>
       </form>
+    } @else if (file.file_category === "copy_number") {
+      <form [formGroup]="formSearchedColumn" style="display: flex; flex-direction: column; gap: 10px">
+        <mat-form-field>
+          <mat-select formControlName="primary_id_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>Primary ID Column</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="gene_name_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>Gene Name Column</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="uniprot_id_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>UniProt Accession ID Column</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="rank_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>Copy Number Rank Column</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="copy_number_col">
+            @for (c of columns; track c) {
+              <mat-option [value]="c">{{c}}</mat-option>
+            }
+          </mat-select>
+          <mat-label>Copy Number Column</mat-label>
+        </mat-form-field>
+      </form>
     }
   }
 

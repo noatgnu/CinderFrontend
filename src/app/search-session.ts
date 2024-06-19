@@ -33,6 +33,8 @@ export interface SearchResult {
   primary_id: string|null
   gene_name: string|null
   uniprot_id: string|null
+  copy_number: number|null
+  rank: number|null
 }
 
 export interface SearchResultQuery {

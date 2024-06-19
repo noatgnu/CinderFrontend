@@ -40,6 +40,17 @@
           <button mat-raised-button color="primary" (click)="openExtraDataModal(analysisGroupSearched)" [disabled]="!accounts.loggedIn">Extra Data</button>
         }
       </div>
+      <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
+        <div>
+          <span>Copy Number File @if(analysisGroupCopyNumber) {: {{analysisGroupCopyNumber.name}}}</span>
+        </div>
+        @if (accounts.loggedIn) {
+          <app-upload-file (fileUploaded)="handleFileUploaded($event, 'copy_number')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'copy_number'"></app-upload-file>
+        }
+        @if (analysisGroupCopyNumber) {
+          <button mat-raised-button color="primary" (click)="openExtraDataModal(analysisGroupCopyNumber)" [disabled]="!accounts.loggedIn">Extra Data</button>
+        }
+      </div>
       <div style="display: flex; flex-direction: row; gap: 20px; padding: 20px">
         @if (analysisGroupSearched) {
           <button mat-raised-button color="primary" [disabled]="!accounts.loggedIn" (click)="setAnnotationModal(analysisGroupSearched)">Sample Annotation @if(sampleAnnotations) {({{sampleAnnotations.annotations.length}})}</button>
@@ -47,8 +58,8 @@
         @if (sampleAnnotations && analysisGroupSearched && analysisGroupDF) {
           <button mat-raised-button color="primary" [disabled]="!accounts.loggedIn" (click)="setComparisonMatrixModal(sampleAnnotations, analysisGroupSearched, analysisGroupDF)">Comparison Matrix @if(comparisonMatrix) {({{comparisonMatrix.matrix.length}})}</button>
         }
-        <button mat-raised-button color="accent" [disabled]="!accounts.loggedIn" (click)="openSearchModal()">Search</button>
-        <button mat-raised-button color="primary" [disabled]="!accounts.loggedIn" (click)="deleteAnalysisGroup()">Delete</button>
+        <button mat-raised-button color="accent" (click)="openSearchModal()">Search</button>
+        <button mat-icon-button color="accent" [disabled]="!accounts.loggedIn" (click)="deleteAnalysisGroup()"><mat-icon>delete</mat-icon></button>
       </div>
     }
   </div>

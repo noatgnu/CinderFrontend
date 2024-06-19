@@ -16,6 +16,7 @@ import {MatList, MatListItem, MatListItemTitle, MatListOption, MatSelectionList}
 import {AccountsService} from "../../accounts/accounts.service";
 import {Species, SpeciesQuery} from "../../species";
 import {MatSelect} from "@angular/material/select";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-project-view',
@@ -46,6 +47,7 @@ export class ProjectViewComponent {
     if (!value) {
       return
     }
+    this.titleService.setTitle(`Project - ${value.name}`)
     this.form.controls.name.setValue(value.name)
     this.form.controls.description.setValue(value.description)
     this.web.getAnalysisGroups(undefined, this.pageSize, 0, undefined, value.id).subscribe((data) => {
@@ -86,7 +88,7 @@ export class ProjectViewComponent {
   speciesQuery?: SpeciesQuery|undefined
 
 
-  constructor(private fb: FormBuilder, private web: WebService, private dialog: MatDialog, public accounts: AccountsService) {
+  constructor(private titleService: Title, private fb: FormBuilder, private web: WebService, private dialog: MatDialog, public accounts: AccountsService) {
     this.form.controls.species_name.valueChanges.subscribe((data) => {
       if (data) {
         this.web.getSpecies(undefined, 20, 0, data).subscribe((data) => {

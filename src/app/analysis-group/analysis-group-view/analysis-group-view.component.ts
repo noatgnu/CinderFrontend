@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AnalysisGroup} from "../analysis-group";
 import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
@@ -21,6 +21,7 @@ import {Project} from "../../project/project";
 import {SearchModalComponent} from "../../search-modal/search-modal.component";
 import {FileExtraDataModalComponent} from "../file-extra-data-modal/file-extra-data-modal.component";
 import {AccountsService} from "../../accounts/accounts.service";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-analysis-group-view',
@@ -33,7 +34,8 @@ import {AccountsService} from "../../accounts/accounts.service";
     MatInput,
     MatLabel,
     ReactiveFormsModule,
-    UploadFileComponent
+    UploadFileComponent,
+    MatIconButton
   ],
   templateUrl: './analysis-group-view.component.html',
   styleUrl: './analysis-group-view.component.scss'
@@ -44,6 +46,7 @@ export class AnalysisGroupViewComponent {
   @Input() set analysisGroup(value: AnalysisGroup|undefined) {
     this._analysisGroup = value
     if (value) {
+      this.titleService.setTitle(`AG - ${value.name}`)
       this.web.getProject(value.project).subscribe((data) => {
         this.associatedProject = data
       })
@@ -73,6 +76,7 @@ export class AnalysisGroupViewComponent {
 
   analysisGroupDF?: ProjectFile|undefined
   analysisGroupSearched?: ProjectFile|undefined
+  analysisGroupCopyNumber?: ProjectFile|undefined
   sampleAnnotations?: SampleAnnotation|undefined
   comparisonMatrix?: ComparisonMatrix|undefined
   @Output() deleted: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -84,7 +88,7 @@ export class AnalysisGroupViewComponent {
     curtain_link: new FormControl({value: "", disabled: !this.accounts.loggedIn})
   })
 
-  constructor(private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService) {
+  constructor(private titleService: Title, private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService) {
 
   }
 
@@ -98,11 +102,13 @@ export class AnalysisGroupViewComponent {
     })
   }
 
-  handleFileUploaded(file: ProjectFile, file_category: "searched"| "df") {
+  handleFileUploaded(file: ProjectFile, file_category: "searched"| "df"|"copy_number"){
     if (file_category === "searched") {
       this.analysisGroupSearched = file
-    } else {
+    } else if (file_category === "df"){
       this.analysisGroupDF = file
+    } else if (file_category === "copy_number") {
+      this.analysisGroupCopyNumber = file
     }
   }
 
@@ -178,8 +184,10 @@ export class AnalysisGroupViewComponent {
         this.web.updateProjectFileExtraData(file.id, data.extra_data).subscribe(() => {
           if (file.file_category === "df") {
             this.analysisGroupDF = file
-          } else {
+          } else if (file.file_category === "searched"){
             this.analysisGroupSearched = file
+          } else if (file.file_category === "copy_number") {
+            this.analysisGroupCopyNumber = file
           }
         })
       }

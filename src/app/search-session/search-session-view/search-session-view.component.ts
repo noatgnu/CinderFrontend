@@ -8,6 +8,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {SelectedResultViewComponent} from "../selected-result-view/selected-result-view.component";
 import {Sort} from "@angular/material/sort";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-search-session-view',
@@ -29,6 +30,7 @@ export class SearchSessionViewComponent {
   private _searchSession: SearchSession|undefined = undefined
   @Input() set searchSession(value: SearchSession) {
     this._searchSession = value
+    this.titleService.setTitle(`Search - ${value.search_term}`)
     if (value && !value.failed) {
       if (this.form.controls.file_category.value) {
         this.web.getSearchResults(value.id, this.pageSize, 0, this.form.controls.file_category.value, this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
@@ -52,7 +54,7 @@ export class SearchSessionViewComponent {
     file_category: new FormControl<string>("df", Validators.required),
   })
   currentSort: Sort|undefined = undefined
-  constructor(private web: WebService, private fb: FormBuilder) {
+  constructor(private titleService: Title, private web: WebService, private fb: FormBuilder) {
     this.form.controls.file_category.valueChanges.subscribe((value: string|null) => {
       if (!this.searchSession.failed && value) {
         this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, value, this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
