@@ -17,6 +17,13 @@ export class WebsocketService {
     "error": string
   }>
 
+  curtainWSConnection?: WebSocketSubject<{
+    "type": string,
+    "status": "in_progress"|"complete"|"error"|"started",
+    "analysis_group_id": number,
+    "error": string
+  }>
+
 
   constructor(private accounts: AccountsService) { }
 
@@ -36,9 +43,31 @@ export class WebsocketService {
     })
   }
 
+  connectCurtainWS(sessionID: string) {
+    this.curtainWSConnection = new WebSocketSubject({
+      url: `${this.baseURL}/ws/curtain/${sessionID}/?token=${this.accounts.token}`,
+      openObserver: {
+        next: () => {
+          console.log("Connected to curtain websocket")
+        }
+      },
+      closeObserver: {
+        next: () => {
+          console.log("Closed connection to curtain websocket")
+        }
+      }
+    })
+  }
+
   closeSearchWS() {
     if (this.searchWSConnection) {
       this.searchWSConnection.unsubscribe()
+    }
+  }
+
+  closeCurtainWS() {
+    if (this.curtainWSConnection) {
+      this.curtainWSConnection.unsubscribe()
     }
   }
 }

@@ -30,6 +30,7 @@ export class FileExtraDataModalComponent {
   @Input() set file(value: ProjectFile) {
     this._file = value
     if (value.extra_data) {
+      console.log(value.extra_data)
       if (value.file_category === "df") {
         this.formDFColumn.controls.primary_id_col.setValue(value.extra_data.primary_id_col)
         this.formDFColumn.controls.gene_name_col.setValue(value.extra_data.gene_name_col)
@@ -38,6 +39,7 @@ export class FileExtraDataModalComponent {
         this.formDFColumn.controls.modification_position_in_peptide_col.setValue(value.extra_data.modification_position_in_peptide_col)
         this.formDFColumn.controls.modification_position_in_protein_col.setValue(value.extra_data.modification_position_in_protein_col)
         this.formDFColumn.controls.localization_prob_col.setValue(value.extra_data.localization_prob_col)
+        console.log(this.formDFColumn.value)
       } else if (value.file_category === "searched") {
         this.formSearchedColumn.controls.primary_id_col.setValue(value.extra_data.primary_id_col)
         this.formSearchedColumn.controls.gene_name_col.setValue(value.extra_data.gene_name_col)

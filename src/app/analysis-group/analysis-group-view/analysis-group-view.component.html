@@ -1,10 +1,15 @@
+@if (curtainData) {
+  <div style="display: flex; flex-direction: row; justify-content: center">
+    <app-volcano-plot [curtainData]="curtainData"></app-volcano-plot>
+  </div>
+}
 <div style="display: flex; flex-direction: row; justify-content: center; padding: 50px">
   <div style="width: 100%">
     @if (analysisGroup) {
       @if (associatedProject) {
         <b>Associated Project</b> : <a href="/#/project/{{analysisGroup.project}}" target="_blank">{{associatedProject.name}}</a>
       }
-      <form (ngSubmit)="updateAnalysisGroup()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
+      <form (ngSubmit)="updateAnalysisGroup()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
         <mat-form-field style="width: 100%">
           <input matInput formControlName="name" type="text" placeholder="Analysis Group Name">
           <mat-label>Analysis Group Name</mat-label>
@@ -13,10 +18,19 @@
           <textarea matInput formControlName="description" placeholder="Analysis Group Description"></textarea>
           <mat-label>Analysis Group Description</mat-label>
         </mat-form-field>
-        <mat-form-field style="width: 100%">
-          <input matInput formControlName="curtain_link" type="text" placeholder="Curtain Link">
-          <mat-label>Curtain Link</mat-label>
-        </mat-form-field>
+        <div style="display: flex; flex-direction: row; gap: 10px">
+          <mat-form-field style="width: 100%">
+            <input matInput formControlName="curtain_link" type="text" placeholder="Curtain Link">
+            <mat-label>Curtain Link</mat-label>
+          </mat-form-field>
+          <button mat-icon-button (click)="refreshCurtainLink()">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+
+        <div>
+          <button mat-raised-button color="primary" type="submit">Update Analysis Group</button>
+        </div>
       </form>
       <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
         <div>

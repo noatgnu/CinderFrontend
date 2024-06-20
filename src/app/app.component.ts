@@ -46,6 +46,10 @@ export class AppComponent {
             }
           }
         })
+        this.ws.connectSearchWS(data)
+        this.ws.curtainWSConnection?.subscribe((data) => {
+          if (data) {}
+        })
       })
     } else {
       this.ws.connectSearchWS(this.web.searchSessionID)
@@ -56,6 +60,10 @@ export class AppComponent {
             this.accounts.logout()
           }
         }
+      })
+      this.ws.connectCurtainWS(this.web.searchSessionID)
+      this.ws.curtainWSConnection?.subscribe((data) => {
+        if (data) {}
       })
     }
 

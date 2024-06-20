@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {AnalysisGroup} from "../analysis-group";
+import {AnalysisGroup, CurtainData} from "../analysis-group";
 import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
@@ -23,6 +23,9 @@ import {FileExtraDataModalComponent} from "../file-extra-data-modal/file-extra-d
 import {AccountsService} from "../../accounts/accounts.service";
 import {Title} from "@angular/platform-browser";
 import {DataService} from "../../data.service";
+import {WebsocketService} from "../../websocket.service";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {VolcanoPlotComponent} from "../volcano-plot/volcano-plot.component";
 
 @Component({
   selector: 'app-analysis-group-view',
@@ -36,7 +39,8 @@ import {DataService} from "../../data.service";
     MatLabel,
     ReactiveFormsModule,
     UploadFileComponent,
-    MatIconButton
+    MatIconButton,
+    VolcanoPlotComponent
   ],
   templateUrl: './analysis-group-view.component.html',
   styleUrl: './analysis-group-view.component.scss'
@@ -48,6 +52,9 @@ export class AnalysisGroupViewComponent {
   @Input() set analysisGroup(value: AnalysisGroup|undefined) {
     this._analysisGroup = value
     if (value) {
+
+
+      this.getCurtainData()
       this.dataService.analysisGroupChoices.forEach((choice) => {
         if (choice.value === value.analysis_group_type) {
           this.analysisType = choice.label
@@ -95,8 +102,22 @@ export class AnalysisGroupViewComponent {
     curtain_link: new FormControl({value: "", disabled: !this.accounts.loggedIn})
   })
 
-  constructor(private dataService: DataService, private titleService: Title, private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService) {
+  curtainData?: CurtainData
 
+  constructor(private sb: MatSnackBar, private dataService: DataService, private titleService: Title, private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService, private ws: WebsocketService) {
+    this.ws.curtainWSConnection?.subscribe((data) => {
+      if (data.analysis_group_id === this.analysisGroup?.id) {
+        switch (data.status) {
+          case "started":
+            this.sb.open("Curtain link retrieval started", "Dismiss", {duration: 5000})
+            break
+          case "complete":
+            this.sb.open("Curtain link retrieval complete", "Dismiss", {duration: 5000})
+            this.getCurtainData()
+            break
+        }
+      }
+    })
   }
 
   updateAnalysisGroup() {
@@ -104,9 +125,17 @@ export class AnalysisGroupViewComponent {
       return
     }
     // @ts-ignore
-    this.web.updateAnalysisGroup(this.analysisGroup!.id, this.form.value.name, this.form.value.description).subscribe((data) => {
+    this.web.updateAnalysisGroup(this.analysisGroup!.id, this.form.value.name, this.form.value.description, this.form.value.curtain_link, this.web.searchSessionID).subscribe((data) => {
       this.updated.emit(data)
     })
+  }
+
+  getCurtainData() {
+    if (this.analysisGroup) {
+      this.web.getCurtainLinkData(this.analysisGroup.id).subscribe((data) => {
+        this.curtainData = data
+      })
+    }
   }
 
   handleFileUploaded(file: ProjectFile, file_category: "searched"| "df"|"copy_number"){
@@ -188,16 +217,25 @@ export class AnalysisGroupViewComponent {
     ref.afterClosed().subscribe((data) => {
       if (data) {
         console.log(data)
-        this.web.updateProjectFileExtraData(file.id, data.extra_data).subscribe(() => {
+        this.web.updateProjectFileExtraData(file.id, data.extra_data).subscribe((new_file_data) => {
           if (file.file_category === "df") {
-            this.analysisGroupDF = file
+            this.analysisGroupDF = new_file_data
           } else if (file.file_category === "searched"){
-            this.analysisGroupSearched = file
+            this.analysisGroupSearched = new_file_data
           } else if (file.file_category === "copy_number") {
-            this.analysisGroupCopyNumber = file
+            this.analysisGroupCopyNumber = new_file_data
           }
         })
       }
     })
+  }
+
+  refreshCurtainLink() {
+    if (this.analysisGroup && this.web.searchSessionID) {
+      this.web.refreshCurtainLink(this.analysisGroup.id, this.web.searchSessionID).subscribe((data) => {
+        this.analysisGroup = data
+      })
+    }
+
   }
 }

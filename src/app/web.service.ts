@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {environment} from "../environments/environment";
 import {ChunkUpload} from "./upload-file/chunk-upload";
 import {Project, ProjectQuery} from "./project/project";
-import {AnalysisGroup, AnalysisGroupQuery} from "./analysis-group/analysis-group";
+import {AnalysisGroup, AnalysisGroupQuery, CurtainData} from "./analysis-group/analysis-group";
 import {ProjectFile} from "./project-file";
 import {SampleAnnotation} from "./sample-annotation";
 import {map} from "rxjs";
@@ -186,10 +186,32 @@ export class WebService {
     )
   }
 
-  updateAnalysisGroup(id: number, name: string, description: string) {
+  updateAnalysisGroup(id: number, name: string, description: string, curtain_link: string|null = null, session_id: string) {
+    const payload: any = {name: name, description: description}
+    if (curtain_link) {
+      payload["curtain_link"] = curtain_link
+    }
+    if (session_id) {
+      payload["session_id"] = session_id
+    }
     return this.http.put<AnalysisGroup>(
       `${this.baseURL}/api/analysis_groups/${id}/`,
-      {name: name, description: description},
+      payload,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  refreshCurtainLink(analysis_group_id: number, session_id: string) {
+    return this.http.post<AnalysisGroup>(
+      `${this.baseURL}/api/analysis_groups/${analysis_group_id}/refresh_curtain_data/`,
+      {session_id: session_id},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getCurtainLinkData(analysis_group_id: number) {
+    return this.http.get<CurtainData>(
+      `${this.baseURL}/api/analysis_groups/${analysis_group_id}/get_curtain_data/`,
       {responseType: 'json', observe: 'body'}
     )
   }

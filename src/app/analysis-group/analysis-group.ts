@@ -14,3 +14,28 @@ export interface AnalysisGroupQuery {
   previous: string;
   results: AnalysisGroup[];
 }
+
+export interface CurtainData {
+  id: number;
+  data: {"Primary ID": string, "Gene Names": string|null, "Entry": string, "Fold Change": number, "P-value": number }[];
+  host: string;
+  link_id: string;
+  created_at: Date;
+  analysis_group: number;
+  updated_at: Date;
+  annotations: {
+    arrowhead: number,
+    font: {
+      size: number,
+    },
+    showarrow: boolean,
+    text: string,
+    x: number,
+    xref: string,
+    y: number,
+    yref: string,
+  }[];
+  settings: any;
+  selections: string[];
+  selection_map: {[key: string]: {[key: string]: boolean}};
+}
