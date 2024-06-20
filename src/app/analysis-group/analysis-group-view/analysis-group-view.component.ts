@@ -236,6 +236,15 @@ export class AnalysisGroupViewComponent {
         this.analysisGroup = data
       })
     }
+  }
 
+  handleVolcanoSelection(selected: {
+    "Primary ID": string,
+    "Gene Names": string | null,
+    "Entry": string,
+    "Fold Change": number,
+    "P-value": number
+  }[]) {
+    console.log(selected)
   }
 }

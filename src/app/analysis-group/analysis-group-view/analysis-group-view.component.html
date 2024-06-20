@@ -1,6 +1,6 @@
 @if (curtainData) {
-  <div style="display: flex; flex-direction: row; justify-content: center">
-    <app-volcano-plot [curtainData]="curtainData"></app-volcano-plot>
+  <div style="display: flex; flex-direction: row; justify-content: center; flex-wrap: wrap">
+    <app-volcano-plot [curtainData]="curtainData" (selected)="handleVolcanoSelection($event)"></app-volcano-plot>
   </div>
 }
 <div style="display: flex; flex-direction: row; justify-content: center; padding: 50px">

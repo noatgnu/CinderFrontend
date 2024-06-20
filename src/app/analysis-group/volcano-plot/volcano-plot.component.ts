@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CurtainData} from "../analysis-group";
 
 import * as PlotlyJS from 'plotly.js-dist-min';
@@ -14,6 +14,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
   styleUrl: './volcano-plot.component.scss'
 })
 export class VolcanoPlotComponent {
+  @Output() selected: EventEmitter<{"Primary ID": string, "Gene Names": string|null, "Entry": string, "Fold Change": number, "P-value": number }[]> = new EventEmitter<{"Primary ID": string, "Gene Names": string|null, "Entry": string, "Fold Change": number, "P-value": number }[]>()
   private _curtainData: CurtainData|undefined = undefined
   @Input() set curtainData(value: CurtainData) {
     this._curtainData = value
@@ -314,5 +315,15 @@ export class VolcanoPlotComponent {
     }
 
     return [groups.join(";"), position]
+  }
+
+  selectData(e: any) {
+    if ("points" in e) {
+      const selected: any[] = []
+      for (const p of e["points"]) {
+        selected.push(p.data.data[p.pointIndex])
+      }
+      this.selected.emit(selected)
+    }
   }
 }

@@ -6,6 +6,14 @@
   @if (projectQuery) {
     @if (multipleSelection) {
       Selected Projects: {{selectedMultipleProjects.length}}
+      <mat-chip-set>
+        @for (p of selectedMultipleProjects; track p.id) {
+          <mat-chip (click)="removeProject(p)">
+            {{p.name}}
+          </mat-chip>
+        }
+      </mat-chip-set>
+
     }
     @if (projectQuery.results.length > 0) {
       <mat-selection-list formControlName="selectedProjects" [multiple]="false">
@@ -23,6 +31,7 @@
     </mat-paginator>
   }
 </form>
+
 
 
 

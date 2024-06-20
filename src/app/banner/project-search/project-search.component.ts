@@ -6,6 +6,9 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
+import {MatChip, MatChipGrid, MatChipRow, MatChipSet} from "@angular/material/chips";
+import {MatIcon} from "@angular/material/icon";
+import {MatIconButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-project-search',
@@ -17,7 +20,13 @@ import {MatInput} from "@angular/material/input";
     MatFormField,
     MatInput,
     MatLabel,
-    MatPaginator
+    MatPaginator,
+    MatChipGrid,
+    MatChipRow,
+    MatIcon,
+    MatIconButton,
+    MatChip,
+    MatChipSet
   ],
   templateUrl: './project-search.component.html',
   styleUrl: './project-search.component.scss'
@@ -69,5 +78,10 @@ export class ProjectSearchComponent {
     this.web.getProjects(undefined, e.pageSize, offset, this.formProjectSearch.controls.searchTerm.value).subscribe((data) => {
       this.projectQuery = data
     })
+  }
+
+  removeProject(project: Project) {
+    this.selectedMultipleProjects = this.selectedMultipleProjects.filter((value) => value !== project)
+    this.selectedProjects.emit(this.selectedMultipleProjects)
   }
 }

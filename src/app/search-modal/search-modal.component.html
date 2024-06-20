@@ -5,6 +5,10 @@
       <input matInput formControlName="search" id="search" type="text" placeholder="Search Term">
       <mat-label>Search Term</mat-label>
     </mat-form-field>
+    <p>
+      <b>Search Multiple Terms</b><br>
+      In order to search with multiple terms, enclose each term in single quotes and separate them with <b>OR</b>.
+    </p>
     <mat-form-field>
       <mat-select formControlName="searchMode" >
         <mat-option value="gene">Gene Name</mat-option>
@@ -23,6 +27,26 @@
       <mat-label>-Log10(P-Value)</mat-label>
     </mat-form-field>
   </form>
+  <hr>
+  <p>
+    <b>Or search by currently selected analysis groups or by selected projects below</b><br>
+    By selecting the one or more projects below, the currently selected analysis groups will be ignored.
+
+  </p>
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Filter by Project
+        </mat-panel-title>
+        <mat-panel-description>
+          Optional
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <app-project-search [multipleSelection]="true" (selectedProjects)="handleMultipleProjectSelection($event)"></app-project-search>
+    </mat-expansion-panel>
+  </mat-accordion>
+  <hr>
 </div>
 <mat-dialog-actions>
   <button mat-button (click)="search()">Search</button>
