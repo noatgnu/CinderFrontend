@@ -14,6 +14,7 @@ import {MatToolbar, MatToolbarRow} from "@angular/material/toolbar";
 import {SearchSessionListComponent} from "./search-session-list/search-session-list.component";
 import {AccountsService} from "../accounts/accounts.service";
 import {SearchSessionViewComponent} from "./search-session-view/search-session-view.component";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-search-session',
@@ -71,7 +72,7 @@ export class SearchSessionComponent {
     search: new FormControl(""),
   })
 
-  constructor(private web: WebService, private fb: FormBuilder, private accounts: AccountsService) {
+  constructor(private router: Router, private web: WebService, private fb: FormBuilder, private accounts: AccountsService) {
     this.web.getSearchSessions(undefined, this.pageSize, 0, undefined, this.accounts.loggedIn, this.web.searchSessionID).subscribe((data) => {
       this.searchSessionQuery = data
     })
@@ -101,5 +102,9 @@ export class SearchSessionComponent {
 
   toggleSidePanel() {
     this.sidebarOpen = !this.sidebarOpen
+  }
+
+  onSearchSessionSelected(event: SearchSession) {
+    this.router.navigate([`/search-session`, event.id])
   }
 }

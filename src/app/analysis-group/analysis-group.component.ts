@@ -16,6 +16,8 @@ import {
 import {AnalysisGroupListComponent} from "./analysis-group-list/analysis-group-list.component";
 import {AnalysisGroupViewComponent} from "./analysis-group-view/analysis-group-view.component";
 import {DataService} from "../data.service";
+import {SearchSession} from "../search-session";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-analysis-group',
@@ -64,7 +66,7 @@ export class AnalysisGroupComponent {
     return this._analysisGroupID
   }
 
-  constructor(public dataService: DataService, private fb: FormBuilder, private dialog: MatDialog, private web: WebService) {
+  constructor(private router: Router, public dataService: DataService, private fb: FormBuilder, private dialog: MatDialog, private web: WebService) {
     this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
       this.analysisGroupQuery = data
     })
@@ -121,5 +123,8 @@ export class AnalysisGroupComponent {
 
   toggleSidePanel() {
     this.sidebarOpen = !this.sidebarOpen
+  }
+  onAnalysisGroupSelected(event: AnalysisGroup) {
+    this.router.navigate([`/analysis-group`, event.id])
   }
 }

@@ -407,7 +407,7 @@ export class WebService {
     )
   }
 
-  getSearchResults(search_id: number, limit: number = 10, offset: number = 0, file_category: string = "df", sort: string = "", direction: string = "desc") {
+  getSearchResults(search_id: number, limit: number = 10, offset: number = 0, file_category: string = "df", sort: string = "", direction: string = "desc", search_term: string = "") {
     let params = new HttpParams()
     if (limit) {
       params = params.append('limit', limit.toString())
@@ -423,6 +423,9 @@ export class WebService {
           params = params.append('ordering', `-${sort}`)
         }
       }
+    }
+    if (search_term && search_term !== "") {
+      params = params.append('search', search_term)
     }
 
     params = params.append('file_category', file_category)

@@ -17,7 +17,7 @@
         @if (searchSessionQuery) {
           @if (searchSessionQuery.count > 0) {
             <div style="height: calc(100vh - 64px*4 - 20px); overflow: auto">
-              <app-search-session-list [searchSessionQuery]="searchSessionQuery" (searchSessionSelected)="searchSession=$event"></app-search-session-list>
+              <app-search-session-list [searchSessionQuery]="searchSessionQuery" (searchSessionSelected)="onSearchSessionSelected($event)"></app-search-session-list>
             </div>
             <mat-paginator #paginator
                            (page)="handlePageEvent($event)"

@@ -6,14 +6,10 @@
       </div>
     }
     <form [formGroup]="form">
-<!--      <mat-form-field>
-        <mat-select formControlName="file_category">
-          <mat-option [value]="'df'">Differential Analysis</mat-option>
-          <mat-option [value]="'searched'">MS Searched File</mat-option>
-        </mat-select>
-        <mat-label>File Category</mat-label>
-      </mat-form-field>-->
-
+      <mat-form-field>
+        <input matInput formControlName="searchTerm" type="search" placeholder="Search Term">
+        <mat-label>Filter Results Term</mat-label>
+      </mat-form-field>
     </form>
     @if (searchResultQuery) {
       <app-search-result-list [searchResultQuery]="searchResultQuery" (selected)="handleSelectedResult($event)" (sortChange)="handleSort($event)"></app-search-result-list>

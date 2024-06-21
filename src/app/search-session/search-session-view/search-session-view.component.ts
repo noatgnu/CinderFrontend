@@ -9,6 +9,7 @@ import {MatOption, MatSelect} from "@angular/material/select";
 import {SelectedResultViewComponent} from "../selected-result-view/selected-result-view.component";
 import {Sort} from "@angular/material/sort";
 import {Title} from "@angular/platform-browser";
+import {MatInput} from "@angular/material/input";
 
 @Component({
   selector: 'app-search-session-view',
@@ -21,7 +22,8 @@ import {Title} from "@angular/platform-browser";
     MatSelect,
     MatOption,
     MatLabel,
-    SelectedResultViewComponent
+    SelectedResultViewComponent,
+    MatInput
   ],
   templateUrl: './search-session-view.component.html',
   styleUrl: './search-session-view.component.scss'
@@ -31,12 +33,11 @@ export class SearchSessionViewComponent {
   @Input() set searchSession(value: SearchSession) {
     this._searchSession = value
     this.titleService.setTitle(`Search - ${value.search_term}`)
+    this.searchResultQuery = undefined
     if (value && !value.failed) {
-      if (this.form.controls.file_category.value) {
-        this.web.getSearchResults(value.id, this.pageSize, 0, this.form.controls.file_category.value, this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
-          this.searchResultQuery = data
-        })
-      }
+      this.web.getSearchResults(value.id, this.pageSize, 0, 'df', this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
+        this.searchResultQuery = data
+      })
     }
   }
 
@@ -51,13 +52,13 @@ export class SearchSessionViewComponent {
   selectedSearchResult: SearchResult|undefined = undefined
 
   form = this.fb.group({
-    file_category: new FormControl<string>("df", Validators.required),
+    searchTerm: new FormControl<string>(""),
   })
   currentSort: Sort|undefined = undefined
   constructor(private titleService: Title, private web: WebService, private fb: FormBuilder) {
-    this.form.controls.file_category.valueChanges.subscribe((value: string|null) => {
+    this.form.controls.searchTerm.valueChanges.subscribe((value: string|null) => {
       if (!this.searchSession.failed && value) {
-        this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, value, this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
+        this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, "df", this.currentSort?.active, this.currentSort?.direction, value).subscribe((data) => {
           this.searchResultQuery = data
         })
       }
@@ -67,8 +68,12 @@ export class SearchSessionViewComponent {
   handlePageEvent(event: PageEvent) {
     const offset = event.pageIndex * event.pageSize
     this.pageSize = event.pageSize
-    if (this.form.controls.file_category.value) {
-      this.web.getSearchResults(this.searchSession.id, this.pageSize, offset, this.form.controls.file_category.value, this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
+    if (this.form.controls.searchTerm.value) {
+      this.web.getSearchResults(this.searchSession.id, this.pageSize, offset, "df", this.currentSort?.active, this.currentSort?.direction, this.form.controls.searchTerm.value).subscribe((data) => {
+        this.searchResultQuery = data
+      })
+    } else {
+      this.web.getSearchResults(this.searchSession.id, this.pageSize, offset, "df", this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
         this.searchResultQuery = data
       })
     }
@@ -83,8 +88,12 @@ export class SearchSessionViewComponent {
   handleSort(event: Sort) {
     this.currentSort = event
     if (this.searchResultQuery) {
-      if (this.form.controls.file_category.value) {
-        this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, this.form.controls.file_category.value, event.active, event.direction).subscribe((data) => {
+      if (this.form.controls.searchTerm.value) {
+        this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, "df", event.active, event.direction, this.form.controls.searchTerm.value).subscribe((data) => {
+          this.searchResultQuery = data
+        })
+      } else {
+        this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, "df", event.active, event.direction).subscribe((data) => {
           this.searchResultQuery = data
         })
       }

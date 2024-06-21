@@ -13,6 +13,7 @@ import {MatInput} from "@angular/material/input";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {ProjectViewComponent} from "./project-view/project-view.component";
 import {AccountsService} from "../accounts/accounts.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-project',
@@ -62,7 +63,7 @@ export class ProjectComponent {
     return this._projectID!
   }
 
-  constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private accounts: AccountsService) {
+  constructor(private router: Router, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private accounts: AccountsService) {
     this.web.getProjects(undefined, this.limit, this.offset).subscribe((data: any) => {
       this.projectQuery = data
     })
@@ -105,7 +106,7 @@ export class ProjectComponent {
   }
 
   handleProjectSelect(event: Project) {
-    this.selectedProject = event
+    this.router.navigate([`/project`, event.id])
   }
 
   refreshData() {
@@ -132,4 +133,5 @@ export class ProjectComponent {
   toggleSidePanel() {
     this.sidebarOpen = !this.sidebarOpen
   }
+
 }
