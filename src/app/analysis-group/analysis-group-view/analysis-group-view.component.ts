@@ -51,9 +51,8 @@ export class AnalysisGroupViewComponent {
   analysisType: string = "proteomics"
   @Input() set analysisGroup(value: AnalysisGroup|undefined) {
     this._analysisGroup = value
+    this.curtainData = undefined
     if (value) {
-
-
       this.getCurtainData()
       this.dataService.analysisGroupChoices.forEach((choice) => {
         if (choice.value === value.analysis_group_type) {
