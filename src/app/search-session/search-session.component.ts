@@ -44,7 +44,6 @@ export class SearchSessionComponent {
   private _searchSession: SearchSession|undefined = undefined
   private _searchID: number = 0
   @Input() set searchID(value: number) {
-    this.searchSessionQuery = undefined
     if (value) {
       this._searchID = value
       this.web.getSearchSession(value).subscribe((data) => {
