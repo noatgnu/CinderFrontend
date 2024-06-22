@@ -1,6 +1,6 @@
 
 <div style="display: flex; flex-direction: row; justify-content: center">
-  @if (relatedResultSearched) {
-    <app-vertical-bar-chart [title]="searchResult.condition_A +'-'+searchResult.condition_B + ' ' + searchResult.gene_name + '('+searchResult.primary_id+')'" [comparedConditions]="[searchResult.condition_A, searchResult.condition_B]" [annotationData]="relatedResultSearched.searched_data"></app-vertical-bar-chart>
+  @if (searchResult.searched_data) {
+    <app-vertical-bar-chart [title]="searchResult.condition_A +'-'+searchResult.condition_B + ' ' + searchResult.gene_name + '('+searchResult.primary_id+')'" [comparedConditions]="[searchResult.condition_A, searchResult.condition_B]" [annotationData]="searchResult.searched_data"></app-vertical-bar-chart>
   }
 </div>

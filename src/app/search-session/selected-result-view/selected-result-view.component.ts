@@ -35,7 +35,7 @@ export class SelectedResultViewComponent {
   @Input() set searchResult(value: SearchResult) {
     this._searchResult = value
 
-    this.web.getSearchResultRelated(value.id, value.file.file_category, value.primary_id).subscribe((data) => {
+    /*this.web.getSearchResultRelated(value.id, value.file.file_category, value.primary_id).subscribe((data) => {
       for (const d of data) {
         if (d.file.file_category === "copy_number") {
           this.relatedResultCopyNumber = d
@@ -43,8 +43,8 @@ export class SelectedResultViewComponent {
           this.relatedResultSearched = d
         }
       }
-    })
-    this.web.getAnalysisGroup(value.analysis_group.id).subscribe((d) => {
+    })*/
+    /*this.web.getAnalysisGroup(value.analysis_group.id).subscribe((d) => {
       this.analysisGroup = d
       this.web.getAnalysisGroupFiles(d.id).subscribe((data) => {
         this.analysisGroupDF = data.find((file) => file.file_category === "df")
@@ -69,7 +69,7 @@ export class SelectedResultViewComponent {
 
         }
       })
-    })
+    })*/
 
   }
 
