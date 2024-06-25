@@ -57,11 +57,23 @@
                     <mat-label>Comparison Column</mat-label>
                   </mat-form-field>
                 </div>
+                If the comparison column has been selected, please select the comparison label column below. If not, please write the comparison label in the text box below.
                 <div>
-                  <mat-form-field>
-                    <input matInput type="text" formControlName="comparison_label">
-                    <mat-label>Comparison Label</mat-label>
-                  </mat-form-field>
+                  @if (f.value.comparison_col) {
+                    <mat-form-field>
+                      <mat-select formControlName="comparison_label">
+                        @for (c of comparison_labels; track c) {
+                          <mat-option [value]="c">{{c}}</mat-option>
+                        }
+                      </mat-select>
+                      <mat-label>Comparison Label</mat-label>
+                    </mat-form-field>
+                  } @else {
+                    <mat-form-field>
+                      <input matInput type="text" formControlName="comparison_label">
+                      <mat-label>Comparison Label</mat-label>
+                    </mat-form-field>
+                  }
                 </div>
               </form>
             </div>

@@ -51,8 +51,22 @@ export class AnalysisGroupComparisonMatrixModalComponent {
       comparison_label: new FormControl<string|null>(comparison.comparison_label, Validators.required),
       comparison_col: new FormControl<string|null>(comparison.comparison_col),
     }))
+    for (const f of this.form) {
+      if (f.controls.comparison_col.value) {
+        this.web.getUniqueComparisonLabel(value.file, f.controls.comparison_col.value).subscribe((labels) => {
+          this.comparison_labels = labels
+        })
+      }
+      f.controls.comparison_col.valueChanges.subscribe((data) => {
+        if (data) {
+          this.web.getUniqueComparisonLabel(value.file, data).subscribe((labels) => {
+            this.comparison_labels = labels
+          })
+        }
+      })
+    }
   }
-
+  comparison_labels: string[] = []
   columns: string[] = []
   private _projectFile: ProjectFile|undefined
   @Input() set projectFile(value: ProjectFile) {

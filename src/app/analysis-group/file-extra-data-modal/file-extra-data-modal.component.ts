@@ -89,6 +89,7 @@ export class FileExtraDataModalComponent {
   columns: string[] = []
 
   constructor(private fb: FormBuilder, private matDialogRef: MatDialogRef<FileExtraDataModalComponent>, private web: WebService) {
+
   }
 
   save() {

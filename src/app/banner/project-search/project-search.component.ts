@@ -66,7 +66,6 @@ export class ProjectSearchComponent {
         } else {
           this.selectedProjects.emit(value)
         }
-
       }
     })
   }

@@ -516,4 +516,11 @@ export class WebService {
       {responseType: 'json', observe: 'body'}
     )
   }
+
+  getUniqueComparisonLabel(file_id: number, column: string) {
+    return this.http.get<string[]>(
+      `${this.baseURL}/api/project_files/${file_id}/get_unique_comparison_label/`,
+      {responseType: 'json', observe: 'body', params: new HttpParams().append('column', column)}
+    )
+  }
 }

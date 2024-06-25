@@ -1,5 +1,34 @@
 /* You can add global styles to this file, and also import other style files */
-@import '@angular/material/prebuilt-themes/azure-blue.css';
+@use "../m3-theme" as m3;
+@use "@angular/material" as mat;
+
+@include mat.core();
+
+mat-sidenav {
+  border-radius: 0 !important;
+}
+
+.light-theme {
+  @include mat.all-component-themes(m3.$light-theme);
+  @include mat.system-level-colors(m3.$light-theme);
+  @include mat.system-level-typography(m3.$light-theme);
+  background: mat.get-theme-color(m3.$light-theme, background);
+
+}
+
+.dark-theme {
+  @include mat.all-component-themes(m3.$dark-theme);
+  @include mat.system-level-colors(m3.$dark-theme);
+  @include mat.system-level-typography(m3.$dark-theme);
+  background: mat.get-theme-color(m3.$dark-theme, background);
+  p {
+    @if m3.$dark-theme {
+      color: white;
+    }
+  }
+}
+
+
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
