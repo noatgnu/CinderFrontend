@@ -327,6 +327,7 @@ export class VolcanoPlotComponent {
       }
       for (const a of this.graphLayout.annotations) {
         a.font.color = "white"
+        a.arrowcolor = "white"
       }
     } else {
       this.graphLayout.plot_bgcolor = "#FFFFFF";
