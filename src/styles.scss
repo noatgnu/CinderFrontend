@@ -34,6 +34,13 @@ mat-sidenav {
       color: mat.get-theme-color(m3.$dark-theme, tertiary);
     }
   }
+
+  a {
+    color: mat.get-theme-color(m3.$dark-theme, primary);
+  }
+  a:visited {
+    color: mat.get-theme-color(m3.$dark-theme, tertiary);
+  }
 }
 
 
