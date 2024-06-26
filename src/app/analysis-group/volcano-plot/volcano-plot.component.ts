@@ -36,6 +36,10 @@ export class VolcanoPlotComponent {
       ticklen: 5,
       showgrid: false,
       visible: true,
+      tickfont: {
+        size: 14,
+        color: "black",
+      }
       //zerolinecolor: "#ffffff"
     },
     yaxis: {
@@ -46,6 +50,10 @@ export class VolcanoPlotComponent {
       visible: true,
       showticklabels: true,
       zeroline: true,
+      tickfont: {
+        size: 14,
+        color: "black",
+      }
     },
     annotations: [],
     showlegend: true, legend: {
@@ -55,7 +63,8 @@ export class VolcanoPlotComponent {
       text: "",
       font: {
         size: 24,
-        family: "Arial, sans-serif"
+        family: "Arial, sans-serif",
+        color: "black"
       },
     }
   }
@@ -77,28 +86,7 @@ export class VolcanoPlotComponent {
   }
 
   drawVolcanoPlot() {
-    let element = document.getElementsByTagName("body")[0]
-    let style = window.getComputedStyle(element)
-    let backgroundColor = style.backgroundColor
-    if (this.accounts.userAccount.darkMode) {
-      this.graphLayout.shapes[0].line.color = "white"
-      this.graphLayout.shapes[1].line.color = "white"
-      this.graphLayout.plot_bgcolor = backgroundColor;
-      this.graphLayout.paper_bgcolor = backgroundColor;
-      this.graphLayout.font = {
-        color: "white",
-        size: 14
-      };
-    } else {
-      this.graphLayout.shapes[0].line.color = "black"
-      this.graphLayout.shapes[1].line.color = "black"
-      this.graphLayout.plot_bgcolor = "#FFFFFF";
-      this.graphLayout.paper_bgcolor = "#FFFFFF";
-      this.graphLayout.font = {
-        color: "black",
-        size: 14
-      };
-    }
+
     this.graphLayout.title.text = this.curtainData.settings["title"]
     this.colorMap = this.curtainData.settings.colorMap
     const allColorLabels = Object.keys(this.colorMap)
@@ -316,6 +304,39 @@ export class VolcanoPlotComponent {
         margin: this.graphLayout.margin
       }
     }
+    let element = document.getElementsByTagName("body")[0]
+    let style = window.getComputedStyle(element)
+    let backgroundColor = style.backgroundColor
+    if (this.accounts.userAccount.darkMode) {
+      this.graphLayout.plot_bgcolor = backgroundColor;
+      this.graphLayout.paper_bgcolor = backgroundColor;
+      this.graphLayout.font = {
+        color: "white",
+        size: 14
+      };
+      this.graphLayout.xaxis.tickfont.color = "white"
+      this.graphLayout.yaxis.tickfont.color = "white"
+      for (const s of this.graphLayout.shapes) {
+        s.line.color = "white"
+      }
+      if (this.graphLayout.yaxis.showgrid) {
+        this.graphLayout.yaxis.gridcolor = "white"
+      }
+      if (this.graphLayout.xaxis.showgrid) {
+        this.graphLayout.xaxis.gridcolor = "white"
+      }
+      for (const a of this.graphLayout.annotations) {
+        a.font.color = "white"
+      }
+    } else {
+      this.graphLayout.plot_bgcolor = "#FFFFFF";
+      this.graphLayout.paper_bgcolor = "#FFFFFF";
+      this.graphLayout.font = {
+        color: "black",
+        size: 14
+      };
+    }
+
     this.revision += 1
     console.log("cutoff", cutOff)
   }

@@ -9,9 +9,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   req = req.clone({
     setHeaders: {"X-Cinder-Instance-Id": webService.cinderInstanceID}
   })
-  if (accountService.token) {
+  if (accountService.userAccount.token) {
     req = req.clone({
-      setHeaders: { Authorization: `Token ${accountService.token}` }
+      setHeaders: { Authorization: `Token ${accountService.userAccount.token}` }
     });
   }
 

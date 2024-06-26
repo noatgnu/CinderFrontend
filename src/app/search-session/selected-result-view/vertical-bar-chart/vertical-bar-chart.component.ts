@@ -42,7 +42,11 @@ export class VerticalBarChartComponent {
       ticktext: []
     },
     yaxis: {
-      title: 'Value'
+      title: 'Value',
+      tickfont: {
+        size: 17,
+        color: "black",
+      },
     },
     margin: {r: 40, l: 100, b: 120, t: 100},
     width: 1000,
@@ -50,6 +54,7 @@ export class VerticalBarChartComponent {
   barSize = 50
   revision = 0
   currentColor = 0
+  colorMap: any = {}
   constructor(private graph: GraphService, private accounts: AccountsService) {
   }
 
@@ -58,17 +63,16 @@ export class VerticalBarChartComponent {
     let style = window.getComputedStyle(element)
     let backgroundColor = style.backgroundColor
     if (this.accounts.userAccount.darkMode) {
-      this.graphLayout.shapes[0].line.color = "white"
-      this.graphLayout.shapes[1].line.color = "white"
       this.graphLayout.plot_bgcolor = backgroundColor;
       this.graphLayout.paper_bgcolor = backgroundColor;
       this.graphLayout.font = {
         color: "white",
         size: 14
       };
+      // set title color to white
+      this.graphLayout.xaxis.tickfont.color = "white"
+      this.graphLayout.yaxis.tickfont.color = "white"
     } else {
-      this.graphLayout.shapes[0].line.color = "black"
-      this.graphLayout.shapes[1].line.color = "black"
       this.graphLayout.plot_bgcolor = "#FFFFFF";
       this.graphLayout.paper_bgcolor = "#FFFFFF";
       this.graphLayout.font = {
@@ -83,12 +87,15 @@ export class VerticalBarChartComponent {
     for (const d of data) {
 
       if (!temp[d.Condition]) {
+        if (!this.colorMap[d.Condition]) {
+          this.colorMap[d.Condition] = this.graph.defaultColorList[this.currentColor]
+        }
         temp[d.Condition] = {
           x: [],
           y: [],
           type: 'bar',
           marker: {
-            color: this.graph.defaultColorList[this.currentColor]
+            color: this.colorMap[d.Condition]
           },
           showlegend: false,
           name: d.Condition
