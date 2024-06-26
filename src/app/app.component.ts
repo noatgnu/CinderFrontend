@@ -20,7 +20,6 @@ export class AppComponent {
   ready: boolean = false;
 
   constructor(private web: WebService, private accounts: AccountsService, private ws: WebsocketService, private sb: MatSnackBar) {
-    this.accounts.loadLastVisited()
     this.accounts.loadAuthFromStorage()
     this.web.searchSessionID = localStorage.getItem("cinderSearchSessionID")
     console.log(this.web.searchSessionID)

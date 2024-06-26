@@ -3,9 +3,7 @@
     <mat-selection-list [multiple]="false" #projectSelection (selectionChange)="selectProject($event)">
       @for (project of projectQuery.results; track project.id) {
         <mat-list-option [value]="project">
-          <span matListItemTitle>
-            {{project.name}}
-          </span>
+          {{project.name}}
         </mat-list-option>
         <mat-divider></mat-divider>
       }

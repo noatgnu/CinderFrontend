@@ -7,6 +7,7 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {LoginDialogComponent} from "../accounts/login-dialog/login-dialog.component";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {NgOptimizedImage} from "@angular/common";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
 
 @Component({
   selector: 'app-navbar',
@@ -18,17 +19,33 @@ import {NgOptimizedImage} from "@angular/common";
     MatMenu,
     MatMenuItem,
     MatMenuTrigger,
-    NgOptimizedImage
+    NgOptimizedImage,
+    MatSlideToggle
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {
   constructor(public accounts: AccountsService, private dialog: MatDialog) {
+
   }
 
   openLoginDialog() {
     const ref = this.dialog.open(LoginDialogComponent)
+  }
+
+  switchDarkMode() {
+    const body = document.getElementsByTagName('body')[0]
+    console.log(this.accounts.userAccount.darkMode)
+    if (this.accounts.userAccount.darkMode) {
+      body.classList.remove('dark-theme')
+      body.classList.add('light-theme')
+    } else {
+      body.classList.add('dark-theme')
+      body.classList.remove('light-theme')
+    }
+    this.accounts.userAccount.darkMode = !this.accounts.userAccount.darkMode
+    this.accounts.saveToStorage()
   }
 
 }

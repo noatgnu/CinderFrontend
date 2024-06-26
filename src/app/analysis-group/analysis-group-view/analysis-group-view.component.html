@@ -7,7 +7,10 @@
   <div style="width: 100%">
     @if (analysisGroup) {
       @if (associatedProject) {
-        <b>Associated Project</b> : <a href="/#/project/{{analysisGroup.project}}" target="_blank">{{associatedProject.name}}</a>
+        <p>
+          Associated Project: <a href="/#/project/{{analysisGroup.project}}" target="_blank">{{associatedProject.name}}</a>
+        </p>
+
       }
       <form (ngSubmit)="updateAnalysisGroup()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
         <mat-form-field style="width: 100%">
@@ -34,7 +37,7 @@
       </form>
       <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
         <div>
-          <span>Differential Analysis File @if(analysisGroupDF) {: {{analysisGroupDF.name}}}</span>
+          <p>Differential Analysis File @if(analysisGroupDF) {: {{analysisGroupDF.name}}}</p>
         </div>
         @if (accounts.loggedIn) {
           <app-upload-file (fileUploaded)="handleFileUploaded($event, 'df')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'df'"></app-upload-file>
@@ -45,7 +48,7 @@
       </div>
       <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
         <div>
-          <span>Searched File @if(analysisGroupSearched) {: {{analysisGroupSearched.name}}}</span>
+          <p>Searched File @if(analysisGroupSearched) {: {{analysisGroupSearched.name}}}</p>
         </div>
         @if (accounts.loggedIn) {
           <app-upload-file (fileUploaded)="handleFileUploaded($event, 'searched')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'searched'"></app-upload-file>
@@ -56,7 +59,7 @@
       </div>
       <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
         <div>
-          <span>Copy Number File @if(analysisGroupCopyNumber) {: {{analysisGroupCopyNumber.name}}}</span>
+          <p>Copy Number File @if(analysisGroupCopyNumber) {: {{analysisGroupCopyNumber.name}}}</p>
         </div>
         @if (accounts.loggedIn) {
           <app-upload-file (fileUploaded)="handleFileUploaded($event, 'copy_number')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'copy_number'"></app-upload-file>
@@ -73,7 +76,7 @@
           <button mat-raised-button color="primary" [disabled]="!accounts.loggedIn" (click)="setComparisonMatrixModal(sampleAnnotations, analysisGroupSearched, analysisGroupDF)">Comparison Matrix @if(comparisonMatrix) {({{comparisonMatrix.matrix.length}})}</button>
         }
         <button mat-raised-button color="accent" (click)="openSearchModal()">Search</button>
-        <button mat-icon-button color="accent" [disabled]="!accounts.loggedIn" (click)="deleteAnalysisGroup()"><mat-icon>delete</mat-icon></button>
+        <button mat-icon-button [disabled]="!accounts.loggedIn" (click)="deleteAnalysisGroup()"><mat-icon>delete</mat-icon></button>
       </div>
     }
   </div>

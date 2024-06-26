@@ -2,9 +2,7 @@
   <mat-selection-list [multiple]="false">
     @for (ag of analysisGroupQuery.results; track ag.id) {
       <mat-list-option [value]="ag" (click)="selectAnalysisGroup(ag)">
-        <span matListItemTitle>
-          <b>{{ag.name}}</b>
-        </span>
+        <b>{{ag.name}}</b>
         <span matListItemLine>
           {{dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type)}}
         </span>

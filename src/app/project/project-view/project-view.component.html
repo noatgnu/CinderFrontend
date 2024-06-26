@@ -46,7 +46,7 @@
       </form>
       @if (analysisGroupQuery) {
         <div style="padding: 20px">
-          <b>Associated Analysis Group</b>
+          <p>Associated Analysis Group</p>
           @if (analysisGroupQuery.results.length >0) {
             <mat-list>
               @for (ag of analysisGroupQuery.results; track ag.id) {

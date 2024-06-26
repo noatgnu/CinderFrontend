@@ -4,6 +4,14 @@
       <img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'"> <a href="/#/home"><span style="color:#ba0000"><b>C|nder</b></span></a>
     </div>
     <span class="spacer"></span>
+    <mat-slide-toggle
+      class="example-margin"
+      [color]="'primary'"
+      [checked]="accounts.userAccount.darkMode"
+      (change)="switchDarkMode()"
+    >
+      <mat-icon>lightbulb</mat-icon>
+    </mat-slide-toggle>
     <button mat-icon-button style="color: rgb(172,110,110)" [matMenuTriggerFor]="menu" aria-label="View Project or Analysis Group">
       <mat-icon>view_list</mat-icon>
     </button>

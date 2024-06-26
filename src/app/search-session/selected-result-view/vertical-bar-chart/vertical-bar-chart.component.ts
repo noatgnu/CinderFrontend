@@ -3,6 +3,7 @@ import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 import {GraphService} from "../../../graph.service";
 import {MatButton} from "@angular/material/button";
+import {AccountsService} from "../../../accounts/accounts.service";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @Component({
@@ -49,10 +50,32 @@ export class VerticalBarChartComponent {
   barSize = 50
   revision = 0
   currentColor = 0
-  constructor(private graph: GraphService) {
+  constructor(private graph: GraphService, private accounts: AccountsService) {
   }
 
   drawVerticalBarChart() {
+    let element = document.getElementsByTagName("body")[0]
+    let style = window.getComputedStyle(element)
+    let backgroundColor = style.backgroundColor
+    if (this.accounts.userAccount.darkMode) {
+      this.graphLayout.shapes[0].line.color = "white"
+      this.graphLayout.shapes[1].line.color = "white"
+      this.graphLayout.plot_bgcolor = backgroundColor;
+      this.graphLayout.paper_bgcolor = backgroundColor;
+      this.graphLayout.font = {
+        color: "white",
+        size: 14
+      };
+    } else {
+      this.graphLayout.shapes[0].line.color = "black"
+      this.graphLayout.shapes[1].line.color = "black"
+      this.graphLayout.plot_bgcolor = "#FFFFFF";
+      this.graphLayout.paper_bgcolor = "#FFFFFF";
+      this.graphLayout.font = {
+        color: "black",
+        size: 14
+      };
+    }
     let data = this.annotationData
     const temp: any = {}
     const ticktext = []

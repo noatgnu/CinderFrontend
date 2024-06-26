@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {environment} from "../../environments/environment";
 import {Observable, Subject} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {UserAccount} from "./user-account";
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class AccountsService {
   baseURL: string = environment.baseURL;
   username: string = ""
   lastVisited: Date = new Date()
+  userAccount: UserAccount = {token: "", username: "", darkMode: false, lastVisited: new Date()}
   triggerLoginSubject: Subject<boolean> = new Subject<boolean>()
   is_staff: boolean = false
 
@@ -36,34 +38,41 @@ export class AccountsService {
     localStorage.removeItem("cinderUsername")
   }
 
-  loadLastVisited() {
-    const current = new Date()
-    const lastVisited = localStorage.getItem("cinderLastVisited")
-    if (lastVisited) {
-      this.lastVisited = new Date(JSON.parse(lastVisited))
-      this.saveDate(current)
-    } else{
-      this.lastVisited = current
-      this.saveDate(current)
-    }
-  }
+
 
   loadAuthFromStorage() {
     const token = localStorage.getItem("cinderToken")
     const username = localStorage.getItem("cinderUsername")
+    const lastVisited = localStorage.getItem("cinderLastVisited")
     if (token && username) {
-      this.token = token
-      this.username = username
+      this.userAccount.token = token
+      this.userAccount.username = username
+      this.loggedIn = true
+      localStorage.removeItem("cinderToken")
+      localStorage.removeItem("cinderUsername")
+      localStorage.setItem("cinderUserAccount", JSON.stringify(this.userAccount))
+    }
+    if (lastVisited) {
+      this.userAccount.lastVisited = new Date(JSON.parse(lastVisited))
+    }
+
+    const userAccount = localStorage.getItem("cinderUserAccount")
+    if (userAccount) {
+      this.userAccount = JSON.parse(userAccount)
       this.loggedIn = true
     }
+    const body = document.getElementsByTagName('body')[0]
+    if (this.userAccount.darkMode) {
+      body.classList.add('dark-theme')
+      body.classList.remove('light-theme')
+    } else {
+      body.classList.remove('dark-theme')
+      body.classList.add('light-theme')
+    }
+    console.log(this.userAccount)
   }
 
   saveToStorage() {
-    localStorage.setItem("cinderToken", this.token)
-    localStorage.setItem("cinderUsername", this.username)
-  }
-
-  saveDate(date: Date) {
-    localStorage.setItem("cinderLastVisited", JSON.stringify(date))
+    localStorage.setItem("cinderUserAccount", JSON.stringify(this.userAccount))
   }
 }

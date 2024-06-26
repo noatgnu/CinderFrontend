@@ -3,6 +3,7 @@ import {CurtainData} from "../analysis-group";
 
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
+import {AccountsService} from "../../accounts/accounts.service";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -72,7 +73,32 @@ export class VolcanoPlotComponent {
 
   colorMap: any = {}
 
+  constructor(private accounts: AccountsService) {
+  }
+
   drawVolcanoPlot() {
+    let element = document.getElementsByTagName("body")[0]
+    let style = window.getComputedStyle(element)
+    let backgroundColor = style.backgroundColor
+    if (this.accounts.userAccount.darkMode) {
+      this.graphLayout.shapes[0].line.color = "white"
+      this.graphLayout.shapes[1].line.color = "white"
+      this.graphLayout.plot_bgcolor = backgroundColor;
+      this.graphLayout.paper_bgcolor = backgroundColor;
+      this.graphLayout.font = {
+        color: "white",
+        size: 14
+      };
+    } else {
+      this.graphLayout.shapes[0].line.color = "black"
+      this.graphLayout.shapes[1].line.color = "black"
+      this.graphLayout.plot_bgcolor = "#FFFFFF";
+      this.graphLayout.paper_bgcolor = "#FFFFFF";
+      this.graphLayout.font = {
+        color: "black",
+        size: 14
+      };
+    }
     this.graphLayout.title.text = this.curtainData.settings["title"]
     this.colorMap = this.curtainData.settings.colorMap
     const allColorLabels = Object.keys(this.colorMap)

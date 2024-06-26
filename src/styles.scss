@@ -13,6 +13,10 @@ mat-sidenav {
   @include mat.system-level-colors(m3.$light-theme);
   @include mat.system-level-typography(m3.$light-theme);
   background: mat.get-theme-color(m3.$light-theme, background);
+  .header-container {
+    background: mat.get-theme-color(m3.$light-theme, background);
+    color: mat.get-theme-color(m3.$light-theme, primary);
+  }
 
 }
 
@@ -21,9 +25,13 @@ mat-sidenav {
   @include mat.system-level-colors(m3.$dark-theme);
   @include mat.system-level-typography(m3.$dark-theme);
   background: mat.get-theme-color(m3.$dark-theme, background);
+  .header-container {
+    background: mat.get-theme-color(m3.$dark-theme, background);
+    color: mat.get-theme-color(m3.$dark-theme, primary);
+  }
   p {
     @if m3.$dark-theme {
-      color: white;
+      color: mat.get-theme-color(m3.$dark-theme, tertiary);
     }
   }
 }
