@@ -13,6 +13,7 @@ import {MatInput} from "@angular/material/input";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {MatAutocomplete} from "@angular/material/autocomplete";
 import {ComparisonMatrix} from "../../comparison-matrix";
+import {NgTemplateOutlet} from "@angular/common";
 
 @Component({
   selector: 'app-analysis-group-comparison-matrix-modal',
@@ -34,7 +35,8 @@ import {ComparisonMatrix} from "../../comparison-matrix";
     MatTab,
     MatDialogActions,
     MatButton,
-    MatAutocomplete
+    MatAutocomplete,
+    NgTemplateOutlet
   ],
   templateUrl: './analysis-group-comparison-matrix-modal.component.html',
   styleUrl: './analysis-group-comparison-matrix-modal.component.scss'
@@ -43,12 +45,13 @@ export class AnalysisGroupComparisonMatrixModalComponent {
   private _comparisonMatrix: ComparisonMatrix|undefined
   @Input() set comparisonMatrix(value: ComparisonMatrix) {
     this._comparisonMatrix = value
+    // @ts-ignore
     this.form = value.matrix.map((comparison) => this.fb.group({
       condition_A: new FormControl<string|null>(comparison.condition_A, Validators.required),
       condition_B: new FormControl<string|null>(comparison.condition_B, Validators.required),
       fold_change_col: new FormControl<string|null>(comparison.fold_change_col, Validators.required),
       p_value_col: new FormControl<string|null>(comparison.p_value_col, Validators.required),
-      comparison_label: new FormControl<string|null>(comparison.comparison_label, Validators.required),
+      comparison_label: new FormControl<string>(comparison.comparison_label, Validators.required),
       comparison_col: new FormControl<string|null>(comparison.comparison_col),
     }))
     for (const f of this.form) {
@@ -62,6 +65,11 @@ export class AnalysisGroupComparisonMatrixModalComponent {
           this.web.getUniqueComparisonLabel(value.file, data).subscribe((labels) => {
             this.comparison_labels = labels
           })
+        }
+      })
+      f.controls.comparison_label.valueChanges.subscribe((data) => {
+        if (!data) {
+          f.controls.comparison_label.setValue("temp_title")
         }
       })
     }
@@ -108,7 +116,7 @@ export class AnalysisGroupComparisonMatrixModalComponent {
     condition_B: FormControl<string|null>,
     fold_change_col: FormControl<string|null>,
     p_value_col: FormControl<string|null>,
-    comparison_label: FormControl<string|null>,
+    comparison_label: FormControl<string>,
     comparison_col: FormControl<string|null>,
   }>[] =[]
 
@@ -117,14 +125,29 @@ export class AnalysisGroupComparisonMatrixModalComponent {
   }
 
   addComparison() {
-    this.form.push(this.fb.group({
+
+    const form = this.fb.group({
       condition_A: new FormControl<string|null>(null, Validators.required),
       condition_B: new FormControl<string|null>(null, Validators.required),
       fold_change_col: new FormControl<string|null>(null, Validators.required),
       p_value_col: new FormControl<string|null>(null, Validators.required),
-      comparison_label: new FormControl<string|null>(`comparison_${this.form.length+1}`, Validators.required),
+      comparison_label: new FormControl<string>(`comparison_${this.form.length+1}`, Validators.required),
       comparison_col: new FormControl<string|null>(null),
-    }))
+    })
+    // @ts-ignore
+    this.form.push(form)
+    form.controls.comparison_col.valueChanges.subscribe((data) => {
+      if (data) {
+        this.web.getUniqueComparisonLabel(this.comparisonMatrix.file, data).subscribe((labels) => {
+          this.comparison_labels = labels
+        })
+      }
+    })
+    form.controls.comparison_label.valueChanges.subscribe((data) => {
+      if (!data) {
+        form.controls.comparison_label.setValue("temp_title")
+      }
+    })
   }
 
   removeComparison(index: number) {
@@ -132,14 +155,29 @@ export class AnalysisGroupComparisonMatrixModalComponent {
   }
 
   copyComparison(f: FormGroup) {
-    this.form.push(this.fb.group({
+
+    const form = this.fb.group({
       condition_A: new FormControl<string|null>(f.value.condition_A, Validators.required),
       condition_B: new FormControl<string|null>(f.value.condition_B, Validators.required),
       fold_change_col: new FormControl<string|null>(f.value.fold_change_col, Validators.required),
       p_value_col: new FormControl<string|null>(f.value.p_value_col, Validators.required),
-      comparison_label: new FormControl<string|null>(`comparison_${this.form.length+1}`, Validators.required),
+      comparison_label: new FormControl<string>(`comparison_${this.form.length+1}`, Validators.required),
       comparison_col: new FormControl<string|null>(f.value.comparison_col),
-    }))
+    })
+    // @ts-ignore
+    this.form.push(form)
+    form.controls.comparison_col.valueChanges.subscribe((data) => {
+      if (data) {
+        this.web.getUniqueComparisonLabel(this.comparisonMatrix.file, data).subscribe((labels) => {
+          this.comparison_labels = labels
+        })
+      }
+    })
+    form.controls.comparison_label.valueChanges.subscribe((data) => {
+      if (!data) {
+        form.controls.comparison_label.setValue("temp_title")
+      }
+    })
   }
 
   save() {

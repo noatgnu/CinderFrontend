@@ -5,87 +5,88 @@
       @for (f of form; track f; let i = $index) {
         @if (f.value.comparison_label) {
           <mat-tab [label]="f.value.comparison_label">
-            <div>
-              <form [formGroup]="f" style="display: flex; flex-direction: column; gap:10px">
-                <div>
-                  <mat-form-field>
-                    <mat-select formControlName="condition_A">
-                      @for(c of conditions; track c) {
-                        <mat-option [value]="c">{{c}}</mat-option>
-                      }
-                    </mat-select>
-                    <mat-label>Condition A</mat-label>
-                  </mat-form-field>
-                </div>
-                <div>
-                  <mat-form-field>
-                    <mat-select formControlName="condition_B">
-                      @for(c of conditions; track c) {
-                        <mat-option [value]="c">{{c}}</mat-option>
-                      }
-                    </mat-select>
-                    <mat-label>Condition B</mat-label>
-                  </mat-form-field>
-                </div>
-                <div>
-                  <mat-form-field>
-                    <mat-select formControlName="fold_change_col">
-                      @for(c of columns; track c) {
-                        <mat-option [value]="c">{{c}}</mat-option>
-                      }
-                    </mat-select>
-                    <mat-label>Fold Change Column</mat-label>
-                  </mat-form-field>
-                </div>
-                <div>
-                  <mat-form-field>
-                    <mat-select formControlName="p_value_col">
-                      @for(c of columns; track c) {
-                        <mat-option [value]="c">{{c}}</mat-option>
-                      }
-                    </mat-select>
-                    <mat-label>P-Value Column</mat-label>
-                  </mat-form-field>
-                </div>
-                <div>
-                  <mat-form-field>
-                    <mat-select formControlName="comparison_col">
-                      @for(c of columns; track c) {
-                        <mat-option [value]="c">{{c}}</mat-option>
-                      }
-                    </mat-select>
-                    <mat-label>Comparison Column</mat-label>
-                  </mat-form-field>
-                </div>
-                If the comparison column has been selected, please select the comparison label column below. If not, please write the comparison label in the text box below.
-                <div>
-                  @if (f.value.comparison_col) {
+            <ng-container>
+              <div>
+                <form [formGroup]="f" style="display: flex; flex-direction: column; gap:10px; overflow-y:hidden">
+                  <div>
                     <mat-form-field>
-                      <mat-select formControlName="comparison_label">
-                        @for (c of comparison_labels; track c) {
+                      <mat-select formControlName="condition_A">
+                        @for(c of conditions; track c) {
                           <mat-option [value]="c">{{c}}</mat-option>
                         }
                       </mat-select>
-                      <mat-label>Comparison Label</mat-label>
+                      <mat-label>Condition A</mat-label>
                     </mat-form-field>
-                  } @else {
+                  </div>
+                  <div>
                     <mat-form-field>
-                      <input matInput type="text" formControlName="comparison_label">
-                      <mat-label>Comparison Label</mat-label>
+                      <mat-select formControlName="condition_B">
+                        @for(c of conditions; track c) {
+                          <mat-option [value]="c">{{c}}</mat-option>
+                        }
+                      </mat-select>
+                      <mat-label>Condition B</mat-label>
                     </mat-form-field>
-                  }
-                </div>
-              </form>
-            </div>
-            <div style="display: flex; flex-direction: row; gap: 10px">
-              <button mat-icon-button color="warn" (click)="copyComparison(f)">
-                <mat-icon>content_copy</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="removeComparison(i)">
-                <mat-icon>remove</mat-icon>
-              </button>
-            </div>
-
+                  </div>
+                  <div>
+                    <mat-form-field>
+                      <mat-select formControlName="fold_change_col">
+                        @for(c of columns; track c) {
+                          <mat-option [value]="c">{{c}}</mat-option>
+                        }
+                      </mat-select>
+                      <mat-label>Fold Change Column</mat-label>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <mat-form-field>
+                      <mat-select formControlName="p_value_col">
+                        @for(c of columns; track c) {
+                          <mat-option [value]="c">{{c}}</mat-option>
+                        }
+                      </mat-select>
+                      <mat-label>P-Value Column</mat-label>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <mat-form-field>
+                      <mat-select formControlName="comparison_col">
+                        @for(c of columns; track c) {
+                          <mat-option [value]="c">{{c}}</mat-option>
+                        }
+                      </mat-select>
+                      <mat-label>Comparison Column</mat-label>
+                    </mat-form-field>
+                  </div>
+                  If the comparison column has been selected, please select the comparison label column below. If not, please write the comparison label in the text box below.
+                  <div>
+                    @if (f.value.comparison_col) {
+                      <mat-form-field>
+                        <mat-select formControlName="comparison_label">
+                          @for (c of comparison_labels; track c) {
+                            <mat-option [value]="c">{{c}}</mat-option>
+                          }
+                        </mat-select>
+                        <mat-label>Comparison Label</mat-label>
+                      </mat-form-field>
+                    } @else {
+                      <mat-form-field>
+                        <input matInput type="text" formControlName="comparison_label">
+                        <mat-label>Comparison Label</mat-label>
+                      </mat-form-field>
+                    }
+                  </div>
+                </form>
+              </div>
+              <div style="display: flex; flex-direction: row; gap: 10px">
+                <button mat-icon-button color="warn" (click)="copyComparison(f)">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="removeComparison(i)">
+                  <mat-icon>remove</mat-icon>
+                </button>
+              </div>
+            </ng-container>
           </mat-tab>
         }
       }

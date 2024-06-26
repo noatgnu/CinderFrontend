@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {SearchResult, SearchResultQuery} from "../../search-session";
-import {DatePipe} from "@angular/common";
+import {DatePipe, NgClass} from "@angular/common";
 import {MatDivider} from "@angular/material/divider";
 import {
   MatListItemLine,
@@ -41,7 +41,8 @@ import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
     MatRowDef,
     MatHeaderRowDef,
     MatSort,
-    MatSortHeader
+    MatSortHeader,
+    NgClass
   ],
   templateUrl: './search-result-list.component.html',
   styleUrl: './search-result-list.component.scss'
@@ -50,7 +51,7 @@ export class SearchResultListComponent {
   displayedColumns: string[] = ['primary_id', 'gene_name', 'uniprot_id', 'search_term', 'condition_A', 'condition_B', 'log2_fc', 'log10_p', 'file','comparison_label', 'analysis_group']
   private _searchResultQuery: SearchResultQuery|undefined = undefined
   @ViewChild('table') table!: MatTable<SearchResult>
-
+  selectedRow: SearchResult|undefined = undefined
   @Input() set searchResultQuery(value: SearchResultQuery) {
     this._searchResultQuery = value
     if (this.table) {
@@ -70,6 +71,7 @@ export class SearchResultListComponent {
 
   handleSelection(event: SearchResult) {
     this.selected.emit(event)
+    this.selectedRow = event
     //this.selected.emit(event.source.selectedOptions.selected[0].value)
   }
 
