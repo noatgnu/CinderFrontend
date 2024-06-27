@@ -26,7 +26,7 @@
             <input matInput formControlName="curtain_link" type="text" placeholder="Curtain Link">
             <mat-label>Curtain Link</mat-label>
           </mat-form-field>
-          <button mat-icon-button (click)="refreshCurtainLink()" [disabled]="!accounts.loggedIn">
+          <button mat-icon-button (click)="refreshCurtainLink()" [disabled]="!accounts.loggedIn" type="button">
             <mat-icon>refresh</mat-icon>
           </button>
         </div>
@@ -38,9 +38,8 @@
         <div style="display: flex; flex-direction: row; gap:10px">
           <button mat-flat-button color="primary" type="submit" [disabled]="!accounts.loggedIn">Update Analysis Group</button>
           @if (analysisGroup.curtain_link) {
-            <button mat-flat-button color="primary" (click)="composeDataFromCurtain()" [disabled]="!accounts.loggedIn">Use Curtain Link For Data</button>
+            <button mat-flat-button color="primary" type="button" (click)="composeDataFromCurtain()" [disabled]="!accounts.loggedIn">Use Curtain Link For Data</button>
           }
-
         </div>
       </form>
       <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">
