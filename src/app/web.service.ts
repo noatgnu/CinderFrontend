@@ -531,4 +531,11 @@ export class WebService {
       {responseType: 'json', observe: 'body'}
     )
   }
+
+  deleteProjectFile(file_id: number) {
+    return this.http.delete(
+      `${this.baseURL}/api/project_files/${file_id}/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
 }

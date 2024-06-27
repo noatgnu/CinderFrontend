@@ -173,6 +173,7 @@ export class AnalysisGroupViewComponent {
         this.sb.open("Curtain visualization retrieved", "Dismiss", {duration: 5000})
       }, (error) => {
         this.sb.open("Error retrieving curtain visualization", "Dismiss", {duration: 5000})
+        this.curtainData = undefined
       })
     }
   }
@@ -180,10 +181,13 @@ export class AnalysisGroupViewComponent {
   handleFileUploaded(file: ProjectFile, file_category: "searched"| "df"|"copy_number"){
     if (file_category === "searched") {
       this.analysisGroupSearched = file
+      this.sb.open("Searched File uploaded", "Dismiss", {duration: 5000})
     } else if (file_category === "df"){
       this.analysisGroupDF = file
+      this.sb.open("Differential Analysis File uploaded", "Dismiss", {duration: 5000})
     } else if (file_category === "copy_number") {
       this.analysisGroupCopyNumber = file
+      this.sb.open("Copy Number Analysis File uploaded", "Dismiss", {duration: 5000})
     }
   }
 
@@ -200,10 +204,12 @@ export class AnalysisGroupViewComponent {
           // @ts-ignore
           this.web.createSampleAnnotation(this.analysisGroup!.id, this.analysisGroup?.name + " sample annotation", data, this.analysisGroupSearched.id).subscribe((data) => {
             this.sampleAnnotations = data
+            this.sb.open("Sample annotation created", "Dismiss", {duration: 5000})
           })
         } else {
           this.web.updateSampleAnnotation(this.sampleAnnotations!.id, this.sampleAnnotations!.name, data).subscribe((data) => {
             this.sampleAnnotations = data
+            this.sb.open("Sample annotation updated", "Dismiss", {duration: 5000})
           })
         }
 
@@ -223,10 +229,12 @@ export class AnalysisGroupViewComponent {
         if (this.comparisonMatrix) {
           this.web.updateComparisonMatrix(this.comparisonMatrix.id, this.comparisonMatrix.name, data).subscribe((data) => {
             this.comparisonMatrix = data
+            this.sb.open("Comparison matrix updated", "Dismiss", {duration: 5000})
           })
         } else {
           this.web.createComparisonMatrix(this.analysisGroup!.id, this.analysisGroup?.name + " comparison matrix", data, analysisGroupDF.id).subscribe((data) => {
             this.comparisonMatrix = data
+            this.sb.open("Comparison matrix created", "Dismiss", {duration: 5000})
           })
         }
 
@@ -237,6 +245,7 @@ export class AnalysisGroupViewComponent {
   deleteAnalysisGroup() {
     this.web.deleteAnalysisGroup(this.analysisGroup!.id).subscribe(() => {
       this.deleted.emit(true)
+      this.sb.open("Analysis Group deleted", "Dismiss", {duration: 5000})
     })
   }
 
@@ -259,10 +268,13 @@ export class AnalysisGroupViewComponent {
         this.web.updateProjectFileExtraData(file.id, data.extra_data).subscribe((new_file_data) => {
           if (file.file_category === "df") {
             this.analysisGroupDF = new_file_data
+            this.sb.open("Differential Analysis extra data updated", "Dismiss", {duration: 5000})
           } else if (file.file_category === "searched"){
             this.analysisGroupSearched = new_file_data
+            this.sb.open("Searched extra data updated", "Dismiss", {duration: 5000})
           } else if (file.file_category === "copy_number") {
             this.analysisGroupCopyNumber = new_file_data
+            this.sb.open("Copy Number extra data updated", "Dismiss", {duration: 5000})
           }
         })
       }
@@ -273,6 +285,7 @@ export class AnalysisGroupViewComponent {
     if (this.analysisGroup && this.web.searchSessionID) {
       this.web.refreshCurtainLink(this.analysisGroup.id, this.web.searchSessionID).subscribe((data) => {
         this.analysisGroup = data
+        this.sb.open("Curtain data content refreshed", "Dismiss", {duration: 5000})
       })
     }
   }
@@ -302,5 +315,22 @@ export class AnalysisGroupViewComponent {
         this.sb.open("Data composition started", "Dismiss", {duration: 5000})
       })
     }
+  }
+
+  deleteFile(file: ProjectFile) {
+    this.web.deleteProjectFile(file.id).subscribe(
+      () => {
+        if (file.file_category === "df") {
+          this.analysisGroupDF = undefined
+          this.sb.open("Differential Analysis File deleted", "Dismiss", {duration: 5000})
+        } else if (file.file_category === "searched") {
+          this.analysisGroupSearched = undefined
+          this.sb.open("Searched File deleted", "Dismiss", {duration: 5000})
+        } else if (file.file_category === "copy_number") {
+          this.analysisGroupCopyNumber = undefined
+          this.sb.open("Copy Number Analysis File deleted", "Dismiss", {duration: 5000})
+        }
+      }
+    )
   }
 }
