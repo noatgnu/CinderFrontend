@@ -1,0 +1,1 @@
+import{ea as o,m as r}from"./chunk-FYJXFM5Q.js";var b=(()=>{let t=class t{constructor(){this.defaultColorList=["#fd7f6f","#7eb0d5","#b2e061","#bd7ebe","#ffb55a","#ffee65","#beb9db","#fdcce5","#8bd3c7"],this.redrawTrigger=new r}};t.\u0275fac=function(f){return new(f||t)},t.\u0275prov=o({token:t,factory:t.\u0275fac,providedIn:"root"});let e=t;return e})();export{b as a};
