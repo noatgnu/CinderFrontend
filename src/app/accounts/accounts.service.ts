@@ -44,7 +44,7 @@ export class AccountsService {
     const token = localStorage.getItem("cinderToken")
     const username = localStorage.getItem("cinderUsername")
     const lastVisited = localStorage.getItem("cinderLastVisited")
-    if (token && username) {
+    if (token && username ) {
       this.userAccount.token = token
       this.userAccount.username = username
       this.loggedIn = true
@@ -57,9 +57,12 @@ export class AccountsService {
     }
 
     const userAccount = localStorage.getItem("cinderUserAccount")
-    if (userAccount) {
+    if (userAccount ) {
       this.userAccount = JSON.parse(userAccount)
-      this.loggedIn = true
+      if (this.userAccount.token !== "" && this.userAccount.username !== "") {
+        this.loggedIn = true
+      }
+
     }
     const body = document.getElementsByTagName('body')[0]
     if (this.userAccount.darkMode) {
