@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import {Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,8 @@ export class DataService {
     {value: "glycomics", label: "Glycomics"},
     {value: "glycoproteomics", label: "Glycoproteomics"},
   ]
+
+
   constructor() { }
 
   getAnalysisGroupTypeLabel(value: string): string|undefined {

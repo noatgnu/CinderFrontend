@@ -8,6 +8,8 @@ import {LoginDialogComponent} from "../accounts/login-dialog/login-dialog.compon
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {NgOptimizedImage} from "@angular/common";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {DataService} from "../data.service";
+import {GraphService} from "../graph.service";
 
 @Component({
   selector: 'app-navbar',
@@ -26,7 +28,7 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {
-  constructor(public accounts: AccountsService, private dialog: MatDialog) {
+  constructor(public accounts: AccountsService, private dialog: MatDialog, private graphService: GraphService) {
 
   }
 
@@ -46,6 +48,7 @@ export class NavbarComponent {
     }
     this.accounts.userAccount.darkMode = !this.accounts.userAccount.darkMode
     this.accounts.saveToStorage()
+    this.graphService.redrawTrigger.next(true)
   }
 
 }

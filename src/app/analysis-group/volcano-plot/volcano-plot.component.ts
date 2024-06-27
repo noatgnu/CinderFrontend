@@ -4,6 +4,7 @@ import {CurtainData} from "../analysis-group";
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 import {AccountsService} from "../../accounts/accounts.service";
+import {GraphService} from "../../graph.service";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
@@ -82,11 +83,16 @@ export class VolcanoPlotComponent {
 
   colorMap: any = {}
 
-  constructor(private accounts: AccountsService) {
+  constructor(private accounts: AccountsService, private graph: GraphService) {
+    this.graph.redrawTrigger.subscribe(() => {
+      this.drawVolcanoPlot()
+    })
   }
 
   drawVolcanoPlot() {
-
+    if (!this.curtainData && !this.curtainData["settings"]) {
+      return
+    }
     this.graphLayout.title.text = this.curtainData.settings["title"]
     this.colorMap = this.curtainData.settings.colorMap
     const allColorLabels = Object.keys(this.colorMap)

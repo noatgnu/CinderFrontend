@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import {Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -15,5 +16,8 @@ export class GraphService {
     "#fdcce5",
     "#8bd3c7",
   ]
+
+  redrawTrigger: Subject<boolean> = new Subject<boolean>()
+
   constructor() { }
 }

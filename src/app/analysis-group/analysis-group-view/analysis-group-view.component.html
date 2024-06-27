@@ -30,9 +30,17 @@
             <mat-icon>refresh</mat-icon>
           </button>
         </div>
+        @if (composingCurtainProgress.started) {
+          <p>{{composingCurtainProgress.message}}</p>
+          <mat-progress-bar [value]="composingCurtainProgress.progress" [mode]="'determinate'" [color]="'primary'"></mat-progress-bar>
+        }
 
-        <div>
+        <div style="display: flex; flex-direction: row; gap:10px">
           <button mat-flat-button color="primary" type="submit">Update Analysis Group</button>
+          @if (analysisGroup.curtain_link) {
+            <button mat-flat-button color="primary" (click)="composeDataFromCurtain()">Use Curtain Link For Data</button>
+          }
+
         </div>
       </form>
       <div style="display: flex; flex-direction: row; gap: 20px; align-items: center">

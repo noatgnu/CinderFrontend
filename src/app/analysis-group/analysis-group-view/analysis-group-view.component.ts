@@ -26,6 +26,7 @@ import {DataService} from "../../data.service";
 import {WebsocketService} from "../../websocket.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {VolcanoPlotComponent} from "../volcano-plot/volcano-plot.component";
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
   selector: 'app-analysis-group-view',
@@ -40,7 +41,8 @@ import {VolcanoPlotComponent} from "../volcano-plot/volcano-plot.component";
     ReactiveFormsModule,
     UploadFileComponent,
     MatIconButton,
-    VolcanoPlotComponent
+    VolcanoPlotComponent,
+    MatProgressBar
   ],
   templateUrl: './analysis-group-view.component.html',
   styleUrl: './analysis-group-view.component.scss'
@@ -49,6 +51,13 @@ export class AnalysisGroupViewComponent {
   associatedProject?: Project|undefined
   private _analysisGroup: AnalysisGroup|undefined
   analysisType: string = "proteomics"
+  composingCurtainProgress: any = {
+    progress: 0,
+    message: "",
+    completed: false,
+    error: false,
+    started: false
+  }
   @Input() set analysisGroup(value: AnalysisGroup|undefined) {
     this._analysisGroup = value
     this.curtainData = undefined
@@ -66,21 +75,25 @@ export class AnalysisGroupViewComponent {
       this.form.controls.name.setValue(value.name)
       this.form.controls.description.setValue(value.description)
       this.form.controls.curtain_link.setValue(value.curtain_link)
-      this.web.getAnalysisGroupFiles(value.id).subscribe((data) => {
-        this.analysisGroupDF = data.find((file) => file.file_category === "df")
-        this.analysisGroupSearched = data.find((file) => file.file_category === "searched")
-        if (this.analysisGroupSearched) {
-          this.web.getProjectFileSampleAnnotations(this.analysisGroupSearched.id).subscribe((data) => {
-            this.sampleAnnotations = data
-          })
-        }
-        if (this.analysisGroupDF) {
-          this.web.getProjectFileComparisonMatrix(this.analysisGroupDF.id).subscribe((data) => {
-            this.comparisonMatrix = data
-          })
-        }
-      })
+      this.getFiles(value);
     }
+  }
+
+  private getFiles(value: AnalysisGroup) {
+    this.web.getAnalysisGroupFiles(value.id).subscribe((data) => {
+      this.analysisGroupDF = data.find((file) => file.file_category === "df")
+      this.analysisGroupSearched = data.find((file) => file.file_category === "searched")
+      if (this.analysisGroupSearched) {
+        this.web.getProjectFileSampleAnnotations(this.analysisGroupSearched.id).subscribe((data) => {
+          this.sampleAnnotations = data
+        })
+      }
+      if (this.analysisGroupDF) {
+        this.web.getProjectFileComparisonMatrix(this.analysisGroupDF.id).subscribe((data) => {
+          this.comparisonMatrix = data
+        })
+      }
+    })
   }
 
   get analysisGroup(): AnalysisGroup|undefined {
@@ -106,14 +119,37 @@ export class AnalysisGroupViewComponent {
   constructor(private sb: MatSnackBar, private dataService: DataService, private titleService: Title, private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService, private ws: WebsocketService) {
     this.ws.curtainWSConnection?.subscribe((data) => {
       if (data.analysis_group_id === this.analysisGroup?.id) {
-        switch (data.status) {
-          case "started":
-            this.sb.open("Curtain link retrieval started", "Dismiss", {duration: 5000})
-            break
-          case "complete":
-            this.sb.open("Curtain link retrieval complete", "Dismiss", {duration: 5000})
-            this.getCurtainData()
-            break
+        if (data.type === "curtain_status") {
+          switch (data.status) {
+            case "started":
+              this.sb.open("Curtain link retrieval started", "Dismiss", {duration: 5000})
+              break
+            case "complete":
+              this.sb.open("Curtain link retrieval complete", "Dismiss", {duration: 5000})
+              this.getCurtainData()
+              break
+          }
+        } else if (data.type === "curtain_compose_status") {
+          switch (data.status) {
+            case "started":
+              this.sb.open("Composing data from Curtain started", "Dismiss", {duration: 5000})
+              this.composingCurtainProgress.progress = 30
+              this.composingCurtainProgress.message = "Removed analysis group associated data if exist"
+              break
+            case "complete":
+              this.sb.open("Composing data from Curtain completed. Please manually set Condition A and Condition B in Comparison Matrix.", "Dismiss")
+              this.composingCurtainProgress.progress = 100
+              this.composingCurtainProgress.message = "Composing data from Curtain completed. Please manually set Condition A and Condition B in Comparison Matrix."
+              this.composingCurtainProgress.completed = true
+              this.web.getAnalysisGroup(this.analysisGroup!.id).subscribe((data) => {
+                this.analysisGroup = data
+              })
+              break
+            case "error":
+              this.sb.open("Error composing data from Curtain", "Dismiss", {duration: 5000})
+              this.composingCurtainProgress.error = true
+              break
+          }
         }
       }
     })
@@ -131,8 +167,12 @@ export class AnalysisGroupViewComponent {
 
   getCurtainData() {
     if (this.analysisGroup) {
+      this.sb.open("Retrieving curtain visualization", "Dismiss", {duration: 5000})
       this.web.getCurtainLinkData(this.analysisGroup.id).subscribe((data) => {
         this.curtainData = data
+        this.sb.open("Curtain visualization retrieved", "Dismiss", {duration: 5000})
+      }, (error) => {
+        this.sb.open("Error retrieving curtain visualization", "Dismiss", {duration: 5000})
       })
     }
   }
@@ -245,5 +285,22 @@ export class AnalysisGroupViewComponent {
     "P-value": number
   }[]) {
     console.log(selected)
+  }
+
+  composeDataFromCurtain() {
+    this.composingCurtainProgress = {
+      progress: 0,
+      message: "",
+      completed: false,
+      error: false
+    }
+    if (this.analysisGroup && this.web.searchSessionID) {
+      this.composingCurtainProgress.started = true
+      this.web.composeAnalysisGroupFilesFromCurtainData(this.analysisGroup.id, this.web.searchSessionID).subscribe((data) => {
+        this.composingCurtainProgress.progress = 10
+        this.composingCurtainProgress.message = "Data composition started"
+        this.sb.open("Data composition started", "Dismiss", {duration: 5000})
+      })
+    }
   }
 }

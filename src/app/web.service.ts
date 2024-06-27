@@ -523,4 +523,12 @@ export class WebService {
       {responseType: 'json', observe: 'body', params: new HttpParams().append('column', column)}
     )
   }
+
+  composeAnalysisGroupFilesFromCurtainData(analysis_group_id: number, session_id: string) {
+    return this.http.post<any>(
+      `${this.baseURL}/api/analysis_groups/${analysis_group_id}/compose_files_from_curtain_data/`,
+      {session_id: session_id},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
 }

@@ -56,6 +56,9 @@ export class VerticalBarChartComponent {
   currentColor = 0
   colorMap: any = {}
   constructor(private graph: GraphService, private accounts: AccountsService) {
+    this.graph.redrawTrigger.subscribe(() => {
+      this.drawVerticalBarChart()
+    })
   }
 
   drawVerticalBarChart() {

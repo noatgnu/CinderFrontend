@@ -100,6 +100,7 @@ export class AnalysisGroupComparisonMatrixModalComponent {
     if (value) {
       this.conditions = []
       value.annotations.forEach((annotation) => {
+        console.log(annotation.Condition)
         if (!this.conditions.includes(annotation.Condition)) {
           this.conditions.push(annotation.Condition)
         }
