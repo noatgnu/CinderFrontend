@@ -62,7 +62,9 @@ export class AnalysisGroupViewComponent {
     this._analysisGroup = value
     this.curtainData = undefined
     if (value) {
-      this.getCurtainData()
+      if (value.curtain_link) {
+        this.getCurtainData()
+      }
       this.dataService.analysisGroupChoices.forEach((choice) => {
         if (choice.value === value.analysis_group_type) {
           this.analysisType = choice.label
