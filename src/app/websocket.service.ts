@@ -14,7 +14,9 @@ export class WebsocketService {
     "id": string,
     "found_files": number,
     "current_progress": number,
-    "error": string
+    "error": string,
+    "file": string,
+    "instance_id": string
   }>
 
   curtainWSConnection?: WebSocketSubject<{

@@ -407,7 +407,7 @@ export class WebService {
     )
   }
 
-  getSearchResults(search_id: number, limit: number = 10, offset: number = 0, file_category: string = "df", sort: string = "", direction: string = "desc", search_term: string = "") {
+  getSearchResults(search_id: number, limit: number = 10, offset: number = 0, file_category: string = "df", sort: string = "", direction: string = "desc", search_term: string|undefined = "", log2_fc: number|undefined = 0, log10_p: number|undefined = 0) {
     let params = new HttpParams()
     if (limit) {
       params = params.append('limit', limit.toString())
@@ -426,6 +426,12 @@ export class WebService {
     }
     if (search_term && search_term !== "") {
       params = params.append('search', search_term)
+    }
+    if (log2_fc && log2_fc>0) {
+      params = params.append('log2_fc', log2_fc.toString())
+    }
+    if (log10_p && log10_p>0) {
+      params = params.append('log10_p', log10_p.toString())
     }
 
     params = params.append('file_category', file_category)
@@ -536,6 +542,21 @@ export class WebService {
     return this.http.delete(
       `${this.baseURL}/api/project_files/${file_id}/`,
       {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  exportSearchData(search_id: number, search_term: string, log2_fc: number = 0, p_value: number = 0, session_id: string) {
+    return this.http.post(
+      `${this.baseURL}/api/search/${search_id}/export_search_data/`,
+      {search_term: search_term, log2_fc: log2_fc, p_value: p_value, session_id: session_id, instance_id: this.cinderInstanceID},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  downloadTempFile(token: string) {
+    return this.http.get(
+      `${this.baseURL}/api/search/download_temp_file/`,
+      {responseType: 'blob', observe: 'body', params: new HttpParams().append('token', token)}
     )
   }
 }
