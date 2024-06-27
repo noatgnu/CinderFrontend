@@ -45,9 +45,9 @@ export class LoginDialogComponent {
       this.accounts.login(this.form.value.username, this.form.value.password).subscribe(
         (data) => {
           this.accounts.loggedIn = true
-          this.accounts.token = data.token
+          this.accounts.userAccount.token = data.token
           // @ts-ignore
-          this.accounts.username = this.form.value.username
+          this.accounts.userAccount.username = this.form.value.username
           this.accounts.saveToStorage()
           this.dialogRef.close()
         },
