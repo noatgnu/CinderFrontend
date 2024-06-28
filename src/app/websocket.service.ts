@@ -40,6 +40,7 @@ export class WebsocketService {
       closeObserver: {
         next: () => {
           console.log("Closed connection to search websocket")
+          this.reconnectSearchWS(sessionID)
         }
       }
     })
@@ -56,9 +57,24 @@ export class WebsocketService {
       closeObserver: {
         next: () => {
           console.log("Closed connection to curtain websocket")
+          this.reconnectCurtainWS(sessionID)
         }
       }
     })
+  }
+
+  reconnectSearchWS(sessionID: string) {
+    setTimeout(() => {
+      console.log("Reconnecting to search websocket")
+      this.connectSearchWS(sessionID);
+    }, 5000); // Try to reconnect every 5 seconds
+  }
+
+  reconnectCurtainWS(sessionID: string) {
+    setTimeout(() => {
+      console.log("Reconnecting to curtain websocket")
+      this.connectCurtainWS(sessionID);
+    }, 5000); // Try to reconnect every 5 seconds
   }
 
   closeSearchWS() {
