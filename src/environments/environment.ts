@@ -1,3 +1,3 @@
 export const environment = {
-  baseURL: "https://cinderbackend.caprover.yottsu.xyz",
+  baseURL: "https://cinder.proteo.info",
 };
