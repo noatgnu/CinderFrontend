@@ -335,4 +335,10 @@ export class AnalysisGroupViewComponent {
       }
     )
   }
+
+  downloadFile(file: ProjectFile) {
+    this.web.getFileDownloadToken(file.id).subscribe((data) => {
+      window.open(`${this.web.baseURL}/api/project_files/download/?token=${data.token}`)
+    })
+  }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {environment} from "../environments/environment";
 import {AccountsService} from "./accounts/accounts.service";
 import {WebSocketSubject} from "rxjs/internal/observable/dom/WebSocketSubject";
+import {Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,9 @@ export class WebsocketService {
     "analysis_group_id": number,
     "error": string
   }>
-
+  connectedWS: boolean = false
+  connectedCurtainWS: boolean = false
+  lostConnectionSubject: Subject<string> = new Subject<string>()
 
   constructor(private accounts: AccountsService) { }
 
@@ -34,13 +37,15 @@ export class WebsocketService {
       url: `${this.baseURL}/ws/search/${sessionID}/?token=${this.accounts.token}`,
       openObserver: {
         next: () => {
+          this.connectedWS = true
           console.log("Connected to search websocket")
         }
       },
       closeObserver: {
         next: () => {
           console.log("Closed connection to search websocket")
-          this.reconnectSearchWS(sessionID)
+          this.lostConnectionSubject.next("search")
+          this.connectedWS = false
         }
       }
     })
@@ -51,31 +56,20 @@ export class WebsocketService {
       url: `${this.baseURL}/ws/curtain/${sessionID}/?token=${this.accounts.token}`,
       openObserver: {
         next: () => {
+          this.connectedCurtainWS = true
           console.log("Connected to curtain websocket")
         }
       },
       closeObserver: {
         next: () => {
           console.log("Closed connection to curtain websocket")
-          this.reconnectCurtainWS(sessionID)
+          this.lostConnectionSubject.next("curtain")
+          this.connectedCurtainWS = false
         }
       }
     })
   }
 
-  reconnectSearchWS(sessionID: string) {
-    setTimeout(() => {
-      console.log("Reconnecting to search websocket")
-      this.connectSearchWS(sessionID);
-    }, 5000); // Try to reconnect every 5 seconds
-  }
-
-  reconnectCurtainWS(sessionID: string) {
-    setTimeout(() => {
-      console.log("Reconnecting to curtain websocket")
-      this.connectCurtainWS(sessionID);
-    }, 5000); // Try to reconnect every 5 seconds
-  }
 
   closeSearchWS() {
     if (this.searchWSConnection) {

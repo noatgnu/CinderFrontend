@@ -50,6 +50,7 @@
           <app-upload-file (fileUploaded)="handleFileUploaded($event, 'df')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'df'"></app-upload-file>
         }
         @if (analysisGroupDF) {
+          <button mat-icon-button (click)="downloadFile(analysisGroupDF)"><mat-icon>download</mat-icon></button>
           <button mat-icon-button (click)="deleteFile(analysisGroupDF)"><mat-icon>delete</mat-icon></button>
           <button mat-flat-button color="primary" (click)="openExtraDataModal(analysisGroupDF)" [disabled]="!accounts.loggedIn">Extra Data</button>
         }
@@ -62,6 +63,7 @@
           <app-upload-file (fileUploaded)="handleFileUploaded($event, 'searched')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'searched'"></app-upload-file>
         }
         @if (analysisGroupSearched) {
+          <button mat-icon-button (click)="downloadFile(analysisGroupSearched)"><mat-icon>download</mat-icon></button>
           <button mat-icon-button (click)="deleteFile(analysisGroupSearched)"><mat-icon>delete</mat-icon></button>
           <button mat-flat-button color="primary" (click)="openExtraDataModal(analysisGroupSearched)" [disabled]="!accounts.loggedIn">Extra Data</button>
         }
@@ -74,6 +76,7 @@
           <app-upload-file (fileUploaded)="handleFileUploaded($event, 'copy_number')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'copy_number'"></app-upload-file>
         }
         @if (analysisGroupCopyNumber) {
+          <button mat-icon-button (click)="downloadFile(analysisGroupCopyNumber)"><mat-icon>download</mat-icon></button>
           <button mat-icon-button (click)="deleteFile(analysisGroupCopyNumber)"><mat-icon>delete</mat-icon></button>
           <button mat-flat-button color="primary" (click)="openExtraDataModal(analysisGroupCopyNumber)" [disabled]="!accounts.loggedIn">Extra Data</button>
         }

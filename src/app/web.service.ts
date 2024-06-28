@@ -559,4 +559,11 @@ export class WebService {
       {responseType: 'blob', observe: 'body', params: new HttpParams().append('token', token)}
     )
   }
+
+  getFileDownloadToken(file_id: number) {
+    return this.http.get<{token: string}>(
+      `${this.baseURL}/api/project_files/${file_id}/request_download_token/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
 }
