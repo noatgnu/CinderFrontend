@@ -1,0 +1,4 @@
+FROM nginx:1.21.3
+
+RUN rm -rf /etc/nginx/user.conf.d/*
+COPY ./nginx-conf/cinder-media.conf /etc/nginx/conf.d/cinder-media.conf
