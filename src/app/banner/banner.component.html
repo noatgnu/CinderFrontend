@@ -92,6 +92,23 @@
               <input matInput formControlName="pValue" type="number" placeholder="P-Value">
               <mat-label>-Log10(P-Value) Cutoff</mat-label>
             </mat-form-field>
+            <mat-form-field>
+              <input matInput type="search" formControlName="species_name" placeholder="Species Name">
+              <mat-label>Species Name Search</mat-label>
+            </mat-form-field>
+            @if (speciesQueryBehaviorSubject.asObservable()|async; as species) {
+              @if (species.length > 0) {
+                Select an option from below:
+                <mat-selection-list [multiple]="false">
+                  @for (s of species; track s.id) {
+                    <mat-list-option [value]="s" (click)="selectSpecies(s)">
+                      {{s.official_name}} ({{s.code}})
+                    </mat-list-option>
+                  }
+                </mat-selection-list>
+              }
+            }
+
           </form>
           <mat-accordion>
             <mat-expansion-panel>
@@ -103,7 +120,7 @@
                   Optional
                 </mat-panel-description>
               </mat-expansion-panel-header>
-              <app-project-search [multipleSelection]="true" (selectedProjects)="handleMultipleProjectSelection($event)"></app-project-search>
+              <app-project-search [species]="selectedSpecies" [multipleSelection]="true" (selectedProjects)="handleMultipleProjectSelection($event)"></app-project-search>
             </mat-expansion-panel>
           </mat-accordion>
         </mat-card-content>

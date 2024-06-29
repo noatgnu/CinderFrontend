@@ -9,6 +9,7 @@ import {MatInput} from "@angular/material/input";
 import {MatChip, MatChipGrid, MatChipRow, MatChipSet} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
+import {Species} from "../../species";
 
 @Component({
   selector: 'app-project-search',
@@ -37,6 +38,19 @@ export class ProjectSearchComponent {
     searchTerm: new FormControl<string>("", Validators.required),
     selectedProjects: new FormControl<Project[]|null>([])
   })
+  private _species: Species|undefined = undefined
+  @Input() set species(value: Species|undefined) {
+    this._species = value
+    if (value) {
+      // @ts-ignore
+      this.web.getProjects(undefined, this.projectPageSize, 0, this.formProjectSearch.controls.searchTerm.value, value).subscribe((data) => {
+        this.projectQuery = data
+      })
+    }
+  }
+  get species(): Species|undefined {
+    return this._species
+  }
 
   projectPageSize = 5
   projectPageIndex = 0
@@ -44,12 +58,12 @@ export class ProjectSearchComponent {
   @Output() selectedProjects: EventEmitter<Project[]> = new EventEmitter<Project[]>()
   selectedMultipleProjects: Project[] = []
   constructor(private fb: FormBuilder, private web: WebService) {
-    this.web.getProjects(undefined, this.projectPageSize, 0).subscribe((data) => {
+    this.web.getProjects(undefined, this.projectPageSize, 0, undefined, this.species).subscribe((data) => {
       this.projectQuery = data
     })
     this.formProjectSearch.controls.searchTerm.valueChanges.subscribe((value: string|null) => {
       if (value) {
-        this.web.getProjects(undefined, this.projectPageSize, 0, value).subscribe((data) => {
+        this.web.getProjects(undefined, this.projectPageSize, 0, value, this.species).subscribe((data) => {
           this.projectQuery = data
         })
       }
@@ -74,7 +88,7 @@ export class ProjectSearchComponent {
     const offset = e.pageIndex * e.pageSize
     this.projectPageIndex = e.pageIndex
     // @ts-ignore
-    this.web.getProjects(undefined, e.pageSize, offset, this.formProjectSearch.controls.searchTerm.value).subscribe((data) => {
+    this.web.getProjects(undefined, e.pageSize, offset, this.formProjectSearch.controls.searchTerm.value, this.species).subscribe((data) => {
       this.projectQuery = data
     })
   }

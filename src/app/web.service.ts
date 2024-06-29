@@ -90,7 +90,7 @@ export class WebService {
     )
   }
 
-  getProjects(url?: string, limit: number = 10, offset: number = 0, search?: string) {
+  getProjects(url?: string, limit: number = 10, offset: number = 0, search?: string, species: Species|undefined|null = null) {
     if (url) {
       return this.http.get<ProjectQuery>(
         url,
@@ -106,6 +106,9 @@ export class WebService {
     }
     if (search && search !== "") {
       params = params.append('search', search)
+    }
+    if (species) {
+      params = params.append('species', species.id.toString())
     }
     params = params.append('ordering', '-created_at')
     return this.http.get<ProjectQuery>(
@@ -338,7 +341,8 @@ export class WebService {
     session_id: string|null = null,
     fc_cutoff: number = 0.6,
     p_value_cutoff: number = 1.31,
-    search_mode: "full"|"pi"|"gene"|"uniprot" = "full"
+    search_mode: "full"|"pi"|"gene"|"uniprot" = "full",
+    species: Species|undefined|null = undefined
   ) {
     let payload: any = {analysis_groups: analysis_groups, search_term: search_term}
     if (session_id) {
@@ -352,6 +356,9 @@ export class WebService {
     }
     if (search_mode) {
       payload["search_mode"] = search_mode
+    }
+    if (species) {
+      payload["species"] = species.id
     }
     return this.http.post<SearchSession>(
       `${this.baseURL}/api/search/`,

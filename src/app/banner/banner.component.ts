@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {NgOptimizedImage} from "@angular/common";
+import {AsyncPipe, NgOptimizedImage} from "@angular/common";
 import {
   MatCard,
   MatCardActions,
@@ -34,6 +34,10 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {WebsocketService} from "../websocket.service";
 import {AnalysisSearchComponent} from "./analysis-search/analysis-search.component";
 import {AnalysisGroup} from "../analysis-group/analysis-group";
+import {Species, SpeciesQuery} from "../species";
+import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material/autocomplete";
+import {BehaviorSubject} from "rxjs";
+import {MatListOption, MatSelectionList} from "@angular/material/list";
 
 @Component({
   selector: 'app-banner',
@@ -60,7 +64,12 @@ import {AnalysisGroup} from "../analysis-group/analysis-group";
     MatExpansionPanelTitle,
     MatExpansionPanelDescription,
     MatExpansionPanelHeader,
-    AnalysisSearchComponent
+    AnalysisSearchComponent,
+    MatAutocomplete,
+    AsyncPipe,
+    MatAutocompleteTrigger,
+    MatSelectionList,
+    MatListOption
   ],
   templateUrl: './banner.component.html',
   styleUrl: './banner.component.scss'
@@ -75,9 +84,14 @@ export class BannerComponent {
     searchMode: new FormControl<"full"|"pi"|"gene"|"uniprot">("full", Validators.required),
     foldChange: new FormControl<number>(0.6, Validators.required),
     pValue: new FormControl<number>(1.31, Validators.required),
-    projects: new FormControl<Project[]>([])
+    projects: new FormControl<Project[]>([]),
+    species_name: new FormControl<string>(""),
   })
 
+  pageSize = 10
+  currentPage = 0
+  speciesQueryBehaviorSubject = new BehaviorSubject<Species[]>([])
+  selectedSpecies: Species|undefined = undefined
 
   constructor(public accounts: AccountsService, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private sb: MatSnackBar, private ws: WebsocketService) {
     this.web.getProjectCount().subscribe((data) => {
@@ -85,6 +99,13 @@ export class BannerComponent {
     })
     this.web.getAnalysisGroupCount().subscribe((data) => {
       this.analysisGroupCount = data.count
+    })
+    this.form.controls.species_name.valueChanges.subscribe((value) => {
+      if (value) {
+        this.web.getSpecies(undefined, 20, 0, value).subscribe((data) => {
+          this.speciesQueryBehaviorSubject.next(data.results)
+        })
+      }
     })
     this.ws.searchWSConnection?.subscribe((data) => {
       if (data) {
@@ -152,7 +173,7 @@ export class BannerComponent {
       }
     }
     if (this.form.value.search && this.form.value.foldChange && this.form.value.pValue && this.form.value.searchMode) {
-      this.web.createSearch(analysisGroupIDs, this.form.value.search, this.web.searchSessionID, this.form.value.foldChange, this.form.value.pValue, this.form.value.searchMode).subscribe((data) => {
+      this.web.createSearch(analysisGroupIDs, this.form.value.search, this.web.searchSessionID, this.form.value.foldChange, this.form.value.pValue, this.form.value.searchMode, this.selectedSpecies).subscribe((data) => {
         this.sb.open("Search queued", "Dismiss", {duration: 2000})
       })
     }
@@ -163,6 +184,14 @@ export class BannerComponent {
     if (e.length >0) {
       window.open(`/#/analysis-group/${e[0].id}`, "_blank")
     }
+  }
+
+  selectSpecies(species: Species) {
+    if (this.selectedSpecies === species) {
+      this.selectedSpecies = undefined
+      return
+    }
+    this.selectedSpecies = species
   }
 
 }
