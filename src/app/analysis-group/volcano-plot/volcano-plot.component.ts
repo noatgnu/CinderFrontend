@@ -344,6 +344,12 @@ export class VolcanoPlotComponent {
       };
     }
 
+    if (this.curtainData.settings.volcanoAdditionalShapes) {
+      for (const s of this.curtainData.settings.volcanoAdditionalShapes) {
+        this.graphLayout.shapes.push(s)
+      }
+    }
+
     this.revision += 1
     console.log("cutoff", cutOff)
   }
