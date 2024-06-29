@@ -98,7 +98,10 @@
             </mat-form-field>
             @if (speciesQueryBehaviorSubject.asObservable()|async; as species) {
               @if (species.length > 0) {
-                Select an option from below:
+                <p>
+                  Select an option from below:
+                </p>
+
                 <mat-selection-list [multiple]="false">
                   @for (s of species; track s.id) {
                     <mat-list-option [value]="s" (click)="selectSpecies(s)">
