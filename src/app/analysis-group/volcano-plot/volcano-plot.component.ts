@@ -96,10 +96,12 @@ export class VolcanoPlotComponent {
     this.graphLayout.title.text = this.curtainData.settings["title"]
     this.colorMap = this.curtainData.settings.colorMap
     const allColorLabels = Object.keys(this.colorMap)
-    const xMin = Math.min(...this.curtainData.data.map((d) => d["Fold Change"]))
-    const xMax = Math.max(...this.curtainData.data.map((d) => d["Fold Change"]))
+    const filteredFC = this.curtainData.data.filter(item => item["Fold Change"] !== null && item["Fold Change"] !== undefined && !isNaN(item["Fold Change"]));
+    const filteredP = this.curtainData.data.filter(item => item["P-value"] !== null && item["P-value"] !== undefined && !isNaN(item["P-value"]));
+    const xMin = Math.min(...filteredFC.map((d) => d["Fold Change"]))
+    const xMax = Math.max(...filteredFC.map((d) => d["Fold Change"]))
     const yMin = 0
-    const yMax = Math.max(...this.curtainData.data.map((d) => d["P-value"]))
+    const yMax = Math.max(...filteredP.map((d) => d["P-value"]))
     this.graphLayout.xaxis.range = [xMin - 0.5, xMax + 0.5]
     this.graphLayout.yaxis.range = [yMin, yMax - yMin * 0.5]
     const volcanoAxis = this.curtainData.settings.volcanoAxis
