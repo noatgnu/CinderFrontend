@@ -93,7 +93,7 @@ export class VolcanoPlotComponent {
     if (!this.curtainData && !this.curtainData["settings"]) {
       return
     }
-    console.log(this.curtainData.settings)
+    console.log(this.curtainData)
     this.graphLayout.title.text = this.curtainData.settings["title"]
     this.colorMap = this.curtainData.settings.colorMap
     const allColorLabels = Object.keys(this.colorMap)
