@@ -354,6 +354,7 @@ export class VolcanoPlotComponent {
 
     this.revision += 1
     console.log("cutoff", cutOff)
+    console.log(this.graphData)
   }
 
   significantGroup(x: number, y: number) {
