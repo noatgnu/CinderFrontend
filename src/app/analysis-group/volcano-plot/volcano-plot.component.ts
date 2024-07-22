@@ -144,7 +144,7 @@ export class VolcanoPlotComponent {
         x: [],
         y: [],
         mode: 'markers',
-        type: 'scatter',
+        type: 'scattergl',
         name: selectionName,
         text: [],
         data: [],
