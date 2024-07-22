@@ -17,7 +17,7 @@ export interface AnalysisGroupQuery {
 
 export interface CurtainData {
   id: number;
-  data: {"Primary ID": string, "Gene Names": string|null, "Entry": string, "Fold Change": number, "P-value": number }[];
+  data: {"Primary ID": string, "Gene Names": string|null, "Entry": string, "Fold Change": number, "P-value": number , "Comparison": string}[];
   host: string;
   link_id: string;
   created_at: Date;

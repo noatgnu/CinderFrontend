@@ -155,7 +155,6 @@ export class VolcanoPlotComponent {
         }
       }
     }
-
     this.curtainData.data.forEach((d) => {
       if (d["Primary ID"] in this.curtainData.selection_map) {
         const selection = this.curtainData.selection_map[d["Primary ID"]]
@@ -175,7 +174,7 @@ export class VolcanoPlotComponent {
           temp["Background"].data.push(d)
         } else {
           const significantGroup = this.significantGroup(d["Fold Change"], d["P-value"])
-          const colorLabel = allColorLabels.find((label) => label.startsWith(significantGroup[0]))
+          const colorLabel = allColorLabels.find((label) => label.startsWith(`${significantGroup[0]} (${d["Comparison"]})`))
           if (colorLabel) {
             if (!temp[colorLabel]) {
               temp[colorLabel] = {
