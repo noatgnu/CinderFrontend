@@ -36,6 +36,7 @@ export class AccountsService {
     this.token = ""
     localStorage.removeItem("cinderToken")
     localStorage.removeItem("cinderUsername")
+    localStorage.removeItem("cinderUserAccount")
   }
 
 
