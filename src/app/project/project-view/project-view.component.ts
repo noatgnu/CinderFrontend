@@ -17,6 +17,7 @@ import {AccountsService} from "../../accounts/accounts.service";
 import {Species, SpeciesQuery} from "../../species";
 import {MatSelect} from "@angular/material/select";
 import {Title} from "@angular/platform-browser";
+import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
 
 @Component({
   selector: 'app-project-view',
@@ -124,9 +125,13 @@ export class ProjectViewComponent {
   }
 
   deleteProject() {
-    this.web.deleteProject(this.project.id).subscribe(() => {
-      this.project = undefined
-      this.deleted.emit(true)
+    this.dialog.open(AreYouSureDialogComponent).afterClosed().subscribe((data) => {
+      if (data) {
+        this.web.deleteProject(this.project.id).subscribe(() => {
+          this.project = undefined
+          this.deleted.emit(true)
+        })
+      }
     })
   }
 

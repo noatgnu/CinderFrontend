@@ -27,6 +27,7 @@ import {WebsocketService} from "../../websocket.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {VolcanoPlotComponent} from "../volcano-plot/volcano-plot.component";
 import {MatProgressBar} from "@angular/material/progress-bar";
+import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
 
 @Component({
   selector: 'app-analysis-group-view',
@@ -245,10 +246,15 @@ export class AnalysisGroupViewComponent {
   }
 
   deleteAnalysisGroup() {
-    this.web.deleteAnalysisGroup(this.analysisGroup!.id).subscribe(() => {
-      this.deleted.emit(true)
-      this.sb.open("Analysis Group deleted", "Dismiss", {duration: 5000})
+    this.matDialog.open(AreYouSureDialogComponent).afterClosed().subscribe((data) => {
+      if (data) {
+        this.web.deleteAnalysisGroup(this.analysisGroup!.id).subscribe(() => {
+          this.deleted.emit(true)
+          this.sb.open("Analysis Group deleted", "Dismiss", {duration: 5000})
+        })
+      }
     })
+
   }
 
   openSearchModal() {
@@ -320,20 +326,25 @@ export class AnalysisGroupViewComponent {
   }
 
   deleteFile(file: ProjectFile) {
-    this.web.deleteProjectFile(file.id).subscribe(
-      () => {
-        if (file.file_category === "df") {
-          this.analysisGroupDF = undefined
-          this.sb.open("Differential Analysis File deleted", "Dismiss", {duration: 5000})
-        } else if (file.file_category === "searched") {
-          this.analysisGroupSearched = undefined
-          this.sb.open("Searched File deleted", "Dismiss", {duration: 5000})
-        } else if (file.file_category === "copy_number") {
-          this.analysisGroupCopyNumber = undefined
-          this.sb.open("Copy Number Analysis File deleted", "Dismiss", {duration: 5000})
-        }
+    this.matDialog.open(AreYouSureDialogComponent).afterClosed().subscribe((data) => {
+      if (data) {
+        this.web.deleteProjectFile(file.id).subscribe(
+          () => {
+            if (file.file_category === "df") {
+              this.analysisGroupDF = undefined
+              this.sb.open("Differential Analysis File deleted", "Dismiss", {duration: 5000})
+            } else if (file.file_category === "searched") {
+              this.analysisGroupSearched = undefined
+              this.sb.open("Searched File deleted", "Dismiss", {duration: 5000})
+            } else if (file.file_category === "copy_number") {
+              this.analysisGroupCopyNumber = undefined
+              this.sb.open("Copy Number Analysis File deleted", "Dismiss", {duration: 5000})
+            }
+          }
+        )
       }
-    )
+    })
+
   }
 
   downloadFile(file: ProjectFile) {

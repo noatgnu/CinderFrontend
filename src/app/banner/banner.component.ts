@@ -38,6 +38,7 @@ import {Species, SpeciesQuery} from "../species";
 import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material/autocomplete";
 import {BehaviorSubject} from "rxjs";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-banner',
@@ -93,7 +94,7 @@ export class BannerComponent {
   speciesQueryBehaviorSubject = new BehaviorSubject<Species[]>([])
   selectedSpecies: Species|undefined = undefined
 
-  constructor(public accounts: AccountsService, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private sb: MatSnackBar, private ws: WebsocketService) {
+  constructor(private router: Router, public accounts: AccountsService, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private sb: MatSnackBar, private ws: WebsocketService) {
     this.web.getProjectCount().subscribe((data) => {
       this.projectCount = data.count
     })
@@ -113,7 +114,8 @@ export class BannerComponent {
 
           switch (data["status"]) {
             case "complete":
-              window.open(`/#/search-session/${data["id"]}`, "_blank")
+              this.router.navigate([`/search-session/${data["id"]}`]).then()
+              //window.open(`/#/search-session/${data["id"]}`, "_blank")
               break
           }
         }
@@ -152,7 +154,8 @@ export class BannerComponent {
     if (e.length === 0){
       return
     }
-    window.open(`/#/project/${e[0].id}`, "_blank")
+    this.router.navigate([`/project/${e[0].id}`]).then()
+    //window.open(`/#/project/${e[0].id}`, "_blank")
   }
 
   handleMultipleProjectSelection(e: Project[]) {
@@ -182,7 +185,8 @@ export class BannerComponent {
 
   handleAGSelection(e: AnalysisGroup[]) {
     if (e.length >0) {
-      window.open(`/#/analysis-group/${e[0].id}`, "_blank")
+      this.router.navigate([`/analysis-group/${e[0].id}`]).then()
+      //window.open(`/#/analysis-group/${e[0].id}`, "_blank")
     }
   }
 
