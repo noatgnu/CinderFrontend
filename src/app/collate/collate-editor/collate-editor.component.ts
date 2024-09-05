@@ -106,9 +106,11 @@ export class CollateEditorComponent {
 
 
   updateProjectOrder() {
+
     if (this._collate) {
       this._collate.settings.projectOrder = this.projects.map(project => project.id);
     }
+    console.log(this.collate)
   }
 
   updateCollate() {
