@@ -20,6 +20,7 @@ import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {CollateProjectListComponent} from "../collate-project-list/collate-project-list.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-collate-editor',
@@ -93,7 +94,7 @@ export class CollateEditorComponent {
   }
   filteredResults: { [projectId: number]: SearchResult[] } = {};
 
-  constructor(private snackBar: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
+  constructor(private router: Router, private snackBar: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
 
   openProjectAddDialog() {
     const dialogRef = this.dialog.open(ProjectAddDialogComponent);
@@ -218,5 +219,11 @@ export class CollateEditorComponent {
   deleteProject(project: Project) {
     this.projects = this.projects.filter(p => p.id !== project.id);
     this.updateProjectOrder();
+  }
+
+  goToCollateView() {
+    if (this._collate) {
+      this.router.navigate(['/collate/view', this._collate.id]);
+    }
   }
 }
