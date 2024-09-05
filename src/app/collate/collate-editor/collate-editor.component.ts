@@ -214,4 +214,9 @@ export class CollateEditorComponent {
       duration: 3000,
     });
   }
+
+  deleteProject(project: Project) {
+    this.projects = this.projects.filter(p => p.id !== project.id);
+    this.updateProjectOrder();
+  }
 }

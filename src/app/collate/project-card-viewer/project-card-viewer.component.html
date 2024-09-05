@@ -22,5 +22,10 @@
       </div>
 
     </mat-card-content>
+    @if (accounts.loggedIn) {
+      <mat-card-actions>
+        <button mat-button color="primary" (click)="deleteProject.emit(project)"><mat-icon>delete</mat-icon></button>
+      </mat-card-actions>
+    }
   </mat-card>
 }

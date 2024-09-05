@@ -19,7 +19,7 @@ export class CollateProjectListComponent {
   @Input() projects: Project[] = [];
   @Input() filteredResults: { [projectId: number]: SearchResult[] } = {};
   @Output() projectOrderChanged = new EventEmitter<Project[]>();
-
+  @Output() deleteProject = new EventEmitter<Project>();
   drop(event: CdkDragDrop<Project[]>) {
     moveItemInArray(this.projects, event.previousIndex, event.currentIndex);
     this.projectOrderChanged.emit(this.projects);

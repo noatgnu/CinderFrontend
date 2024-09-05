@@ -50,4 +50,4 @@
   </div>
 }
 
-<app-collate-project-list [projects]="projects" [filteredResults]="filteredResults" (projectOrderChanged)="onProjectOrderChanged($event)"></app-collate-project-list>
+<app-collate-project-list (deleteProject)="deleteProject($event)" [projects]="projects" [filteredResults]="filteredResults" (projectOrderChanged)="onProjectOrderChanged($event)"></app-collate-project-list>
