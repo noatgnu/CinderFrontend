@@ -78,7 +78,7 @@ export class BarChartComponent {
         name: this.conditionB,
         error_y: {
           type: 'data',
-          array: this.calculateWhisker(this.valueB),
+          array: [this.calculateWhisker(this.valueB)],
           visible: true
         },
         line: {
