@@ -19,6 +19,7 @@ import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {CollateProjectListComponent} from "../collate-project-list/collate-project-list.component";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-collate-editor',
@@ -87,7 +88,7 @@ export class CollateEditorComponent {
   }
   filteredResults: { [projectId: number]: SearchResult[] } = {};
 
-  constructor(private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
+  constructor(private snackBar: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
 
   openProjectAddDialog() {
     const dialogRef = this.dialog.open(ProjectAddDialogComponent);
@@ -112,7 +113,9 @@ export class CollateEditorComponent {
 
   updateCollate() {
     if (this._collate) {
-      this.collateService.updateCollate(this._collate.id, this._collate).subscribe();
+      this.collateService.updateCollate(this._collate.id, this._collate).subscribe(() => {
+        this.showSnackBar('Collate saved successfully');
+      });
     }
   }
 
@@ -197,5 +200,11 @@ export class CollateEditorComponent {
   onProjectOrderChanged(projects: Project[]) {
     this.projects = projects;
     this.updateProjectOrder();
+  }
+
+  showSnackBar(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+    });
   }
 }

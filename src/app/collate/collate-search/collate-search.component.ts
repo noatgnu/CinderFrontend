@@ -33,14 +33,14 @@ export class CollateSearchComponent {
   });
   @Output() searchResultID: EventEmitter<number> = new EventEmitter<number>();
 
-  constructor(private ws: WebsocketService, private fb: FormBuilder, private web: WebService, private sb: MatSnackBar) {
+  constructor(private snackBar: MatSnackBar, private ws: WebsocketService, private fb: FormBuilder, private web: WebService, private sb: MatSnackBar) {
     this.ws.searchWSConnection?.subscribe((data) => {
       if (data) {
         if (data["type"] === "search_status") {
 
           switch (data["status"]) {
             case "complete":
-
+              this.showSnackBar("Search complete")
               this.searchResultID.emit(parseInt(data["id"]));
               //window.open(`/#/search-session/${data["id"]}`, "_blank")
               break
@@ -76,5 +76,11 @@ export class CollateSearchComponent {
         this.sb.open('Search queued', 'Dismiss', { duration: 2000 });
       });
     }
+  }
+
+  showSnackBar(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+    });
   }
 }
