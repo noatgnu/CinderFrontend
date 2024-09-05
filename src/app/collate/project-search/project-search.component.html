@@ -1,0 +1,39 @@
+<form [formGroup]="formProjectSearch" style="display: flex; flex-direction: column; gap: 10px">
+  <mat-form-field>
+    <input matInput formControlName="searchTerm" placeholder="Search Project Name" type="search">
+    <mat-label>Search For Specific Projects</mat-label>
+  </mat-form-field>
+  @if (selectedMultipleProjects.length > 0) {
+    <div>
+      Selected Projects: {{selectedMultipleProjects.length}}
+      <mat-chip-set>
+        @for (p of selectedMultipleProjects; track p.id) {
+          <mat-chip (click)="removeProject(p)">
+            {{p.name}}
+          </mat-chip>
+        }
+      </mat-chip-set>
+    </div>
+  }
+
+  @if (projectQuery) {
+    @if (projectQuery.count > 0) {
+      <div>
+        <mat-selection-list formControlName="selectedProjects" [multiple]="false">
+          @for (p of projectQuery.results; track p.id) {
+            <mat-list-option [value]="p">{{p.name}}</mat-list-option>
+          }
+        </mat-selection-list>
+        <mat-paginator
+          [pageSize]="projectPageSize"
+          [length]="projectQuery.count"
+          [pageIndex]="projectPageIndex"
+          (page)="handleProjectPageEvent($event)">
+        </mat-paginator>
+      </div>
+    } @else {
+      <p>No projects found.</p>
+    }
+  }
+
+</form>

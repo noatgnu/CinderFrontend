@@ -1,0 +1,53 @@
+<mat-toolbar>
+  <mat-toolbar-row>
+    <span class="spacer"></span>
+    <button type="button" aria-label="Add Projects" mat-icon-button (click)="openProjectAddDialog()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button type="button" aria-label="Update Collate" mat-icon-button (click)="updateCollate()">
+      <mat-icon>save</mat-icon>
+    </button>
+  </mat-toolbar-row>
+</mat-toolbar>
+@if (collate) {
+  <div class="header-container" style="display: flex; flex-direction: row; justify-content: center; align-items: center; height: 200px">
+    <div class="header" style="text-align: center; font-family: Roboto, Helvetica Neue, sans-serif">
+      @if (!editTitle) {
+        <h1 (click)="toggleEditTitle()">{{collate.title}}</h1><br>
+      } @else {
+        <div>
+          <mat-form-field style="font-size: 2em; text-align: center; font-family: Roboto, Helvetica Neue, sans-serif; padding:5px">
+            <input (keydown.enter)="toggleEditTitle()" [(ngModel)]="collate.title" matInput>
+          </mat-form-field>
+          <button mat-icon-button (click)="toggleEditTitle()"><mat-icon>save</mat-icon></button>
+        </div>
+      }
+      @if (!editGreeting) {
+        <div (click)="toggleEditGreeting()" style="font-size: 25px; font-family: 'Roboto', 'Arial Narrow', sans-serif">{{collate.greeting}}</div>
+      } @else {
+        <div>
+          <mat-form-field style="font-size: 25px; text-align: center; font-family: 'Roboto', 'Arial Narrow', sans-serif; padding: 5px">
+            <input (keydown.enter)="toggleEditGreeting()" matInput [(ngModel)]="collate.greeting">
+          </mat-form-field>
+          <button mat-icon-button (click)="toggleEditGreeting()"><mat-icon>save</mat-icon></button>
+        </div>
+
+      }
+    </div>
+  </div>
+}
+
+<div style="display: flex; justify-content: center">
+  <app-collate-search [projects]="projects" (searchResultID)="getSearchFromID($event)"></app-collate-search>
+</div>
+@if (searchTerms.length > 0) {
+  <div style="padding: 20px">
+    <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">
+      @for (term of searchTerms; track term) {
+        <mat-tab [label]="term"></mat-tab>
+      }
+    </mat-tab-group>
+  </div>
+}
+
+<app-collate-project-list [projects]="projects" [filteredResults]="filteredResults" (projectOrderChanged)="onProjectOrderChanged($event)"></app-collate-project-list>

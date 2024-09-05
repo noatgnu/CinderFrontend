@@ -1,0 +1,18 @@
+@if (collate) {
+  <app-collate-header [collate]="collate"></app-collate-header>
+}
+
+<div style="display: flex; justify-content: center">
+  <app-collate-search [projects]="projects" (searchResultID)="getSearchFromID($event)"></app-collate-search>
+</div>
+@if (searchTerms.length > 0) {
+  <div style="padding: 20px">
+    <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">
+      @for (term of searchTerms; track term) {
+        <mat-tab [label]="term"></mat-tab>
+      }
+    </mat-tab-group>
+  </div>
+  <app-collate-project-list [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
+}
+

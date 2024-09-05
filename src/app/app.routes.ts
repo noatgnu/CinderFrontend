@@ -22,6 +22,10 @@ export const routes: Routes = [
     loadChildren: () => import('./search-session/search-session.module').then(m => m.SearchSessionModule)
   },
   {
+    path: 'collate',
+    loadChildren: () => import('./collate/collate.module').then(m => m.CollateModule)
+  },
+  {
     path: '**',
     redirectTo: 'home'
   }

@@ -1,0 +1,26 @@
+@if (project) {
+  <mat-card appearance="outlined">
+    <mat-card-header cdkDragHandle>
+      <mat-card-title><span style="color:#ba0000">{{ project.name }}</span></mat-card-title>
+      <mat-card-subtitle>{{ project.description }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div style="display: flex; gap: 20px; flex-wrap: wrap">
+        @if (searchResults.length > 0) {
+          @for (s of searchResults; track s.id) {
+            @if (s.searched_data.length > 0) {
+              <div>
+                <app-bar-chart [data]="s"></app-bar-chart>
+              </div>
+            } @else {
+              <div>
+                <p>No data found for this search</p>
+              </div>
+            }
+          }
+        }
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+}

@@ -1,0 +1,33 @@
+<div class="collate-container">
+
+  <div class="search-box">
+    <div>
+      <button style="width: 100%" mat-button (click)="openCreateCollateDialog()"><h3>+ Create Collate From Projects</h3></button>
+    </div>
+    <hr>
+
+    <mat-card appearance="outlined" style="width:500px">
+      <mat-card-content>
+        <mat-form-field style="width: 100%">
+          <input matInput [(ngModel)]="searchTerm" placeholder="Search Collates" (ngModelChange)="searchCollates()">
+        </mat-form-field>
+        @if (collates.length > 0) {
+          <mat-selection-list [(ngModel)]="selectedCollate" (selectionChange)="onCollateSelect($event)" [multiple]="false">
+            @for (collate of collates; track collate.id) {
+              <mat-list-option [value]="collate">
+                {{ collate.title }}
+              </mat-list-option>
+            }
+          </mat-selection-list>
+          <mat-paginator [length]="totalCount" [pageSize]="limit" [pageSizeOptions]="[5, 10, 20]" (page)="handlePageEvent($event)">
+          </mat-paginator>
+        } @else {
+          <p>Please enter a search term to find collates.</p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+
+  </div>
+
+</div>

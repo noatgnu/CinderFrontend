@@ -21,6 +21,7 @@ export class VerticalBarChartComponent {
 
   private _annotationData: {Sample: string, Condition: string, Value: number}[] = []
   @Input() set annotationData(value: {Sample: string, Condition: string, Value: number}[]) {
+    console.log(value)
     this._annotationData = value
     this.currentColor = 0
     this.drawVerticalBarChart()

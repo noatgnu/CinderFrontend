@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>Project Add</h2>
+<div mat-dialog-content>
+  <app-project-search (selectedProjects)="handleSelectedProjects($event)"></app-project-search>
+  <small>Selected {{ selectedMultipleProjects.length }} Projects.</small>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="save()">Submit</button>
+  <button mat-button (click)="close()">Close</button>
+</div>
