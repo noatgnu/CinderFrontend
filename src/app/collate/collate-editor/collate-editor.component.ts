@@ -56,6 +56,11 @@ export class CollateEditorComponent {
       this.collateService.getCollate(value).subscribe((collate: Collate) => {
         this._collate = collate;
         this.projects = collate.projects;
+        if (!this._collate.settings) {
+          this._collate.settings = {
+            projectOrder: this.projects.map(project => project.id)
+          }
+        }
         if (collate.settings.projectOrder) {
           this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
         }
