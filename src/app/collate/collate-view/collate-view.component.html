@@ -1,3 +1,13 @@
+<mat-toolbar>
+  <mat-toolbar-row>
+    <span class="spacer"></span>
+    @if (accounts.loggedIn) {
+      <button mat-icon-button (click)="navigateToEdit()">
+        <mat-icon>edit</mat-icon>
+      </button>
+    }
+  </mat-toolbar-row>
+</mat-toolbar>
 @if (collate) {
   <app-collate-header [collate]="collate"></app-collate-header>
 }

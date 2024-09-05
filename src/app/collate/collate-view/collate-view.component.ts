@@ -9,6 +9,11 @@ import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {CollateProjectListComponent} from "../collate-project-list/collate-project-list.component";
 import {WebService} from "../../web.service";
 import {AnalysisGroup} from "../../analysis-group/analysis-group";
+import {MatIcon} from "@angular/material/icon";
+import {MatIconButton} from "@angular/material/button";
+import {MatToolbar, MatToolbarRow} from "@angular/material/toolbar";
+import {AccountsService} from "../../accounts/accounts.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-collate-view',
@@ -18,7 +23,11 @@ import {AnalysisGroup} from "../../analysis-group/analysis-group";
     CollateSearchComponent,
     MatTab,
     MatTabGroup,
-    CollateProjectListComponent
+    CollateProjectListComponent,
+    MatIcon,
+    MatIconButton,
+    MatToolbarRow,
+    MatToolbar
   ],
   templateUrl: './collate-view.component.html',
   styleUrl: './collate-view.component.scss'
@@ -55,10 +64,10 @@ export class CollateViewComponent {
 
 
 
-  constructor(private collateService: CollateService, private web: WebService) {
+  constructor(private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
 
   }
-  
+
   async associateAnalysisGroupsWithProjects() {
     const analysisGroups = await this.web.getAnalysisGroupsFromProjects(this.projects).toPromise();
     this.projectAnalysisGroups = {};
@@ -117,5 +126,11 @@ export class CollateViewComponent {
       console.log(data.results)
       this.distributeSearchResults(data.results).then();
     })
+  }
+
+  navigateToEdit() {
+    if (this.collate) {
+      this.router.navigate([`/collate/edit/${this.collate.id}`]);
+    }
   }
 }
