@@ -8,11 +8,11 @@ import {
   MatCardSubtitle,
   MatCardTitle
 } from "@angular/material/card";
-import {CdkDragHandle} from "@angular/cdk/drag-drop";
+import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
 import {SearchResult} from "../../search-session";
 import {BarChartComponent} from "./bar-chart/bar-chart.component";
 import {AccountsService} from "../../accounts/accounts.service";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 
 @Component({
@@ -28,7 +28,10 @@ import {MatIcon} from "@angular/material/icon";
     BarChartComponent,
     MatCardActions,
     MatButton,
-    MatIcon
+    MatIcon,
+    MatIconButton,
+    CdkDrag,
+    CdkDropList
   ],
   templateUrl: './project-card-viewer.component.html',
   styleUrl: './project-card-viewer.component.scss'
@@ -48,9 +51,27 @@ export class ProjectCardViewerComponent {
     console.log(value);
   }
   @Output() deleteProject: EventEmitter<Project> = new EventEmitter<Project>();
+  @Output() searchResultsChange: EventEmitter<SearchResult[]> = new EventEmitter<SearchResult[]>();
+
 
   get searchResults(): SearchResult[] {
     return this._searchResults;
   }
   constructor(public accounts: AccountsService) {}
+
+  drop(event: CdkDragDrop<SearchResult[]>) {
+    const draggedItem = this._searchResults[event.previousIndex];
+    const draggedGroup = draggedItem.analysis_group.id;
+
+    // Find all items with the same analysis group
+    const itemsToMove = this._searchResults.filter(item => item.analysis_group.id === draggedGroup);
+
+    // Remove items from their original positions
+    this._searchResults = this._searchResults.filter(item => item.analysis_group.id !== draggedGroup);
+
+    // Insert items at the new position
+    this._searchResults.splice(event.currentIndex, 0, ...itemsToMove);
+
+    this.searchResultsChange.emit(this._searchResults);
+  }
 }

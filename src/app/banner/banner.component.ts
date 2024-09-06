@@ -114,6 +114,10 @@ export class BannerComponent {
 
           switch (data["status"]) {
             case "complete":
+              // check if current route is not collate
+              if (this.router.url.includes("collate")) {
+                return
+              }
               this.router.navigate([`/search-session/${data["id"]}`]).then()
               //window.open(`/#/search-session/${data["id"]}`, "_blank")
               break

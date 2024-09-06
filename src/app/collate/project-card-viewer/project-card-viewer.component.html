@@ -5,22 +5,24 @@
       <mat-card-subtitle>{{ project.description }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <div style="display: flex; gap: 20px; flex-wrap: wrap">
+      <div cdkDropList (cdkDropListDropped)="drop($event)" style="display: flex; gap: 20px; flex-wrap: wrap">
         @if (searchResults.length > 0) {
           @for (s of searchResults; track s.id) {
-            @if (s.searched_data.length > 0) {
-              <div>
-                <app-bar-chart [data]="s"></app-bar-chart>
-              </div>
-            } @else {
-              <div>
-                <p>No data found for this search</p>
-              </div>
-            }
+            <div cdkDrag>
+              @if (s.searched_data.length > 0) {
+                <div>
+                  <app-bar-chart [data]="s"></app-bar-chart>
+                </div>
+              } @else {
+                <div>
+                  <p>No data found for this search</p>
+                </div>
+              }
+              <button mat-icon-button cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
+            </div>
           }
         }
       </div>
-
     </mat-card-content>
     @if (accounts.loggedIn) {
       <mat-card-actions>

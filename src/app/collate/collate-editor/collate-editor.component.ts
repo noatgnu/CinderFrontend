@@ -59,7 +59,8 @@ export class CollateEditorComponent {
         this.projects = collate.projects;
         if (!this._collate.settings) {
           this._collate.settings = {
-            projectOrder: this.projects.map(project => project.id)
+            projectOrder: this.projects.map(project => project.id),
+            analysisGroupOrderMap: {}
           }
         }
         if (collate.settings.projectOrder) {
@@ -196,7 +197,16 @@ export class CollateEditorComponent {
       // @ts-ignore
       filteredResults[projectId] = this.searchResults[projectId].filter(result => result.search_term === this.selectedSearchTerm);
     });
-
+    if (this.collate?.settings?.analysisGroupOrderMap) {
+      Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
+        // @ts-ignore
+        const analysisGroupOrder = this.collate.settings.analysisGroupOrderMap[projectId];
+        // @ts-ignore
+        filteredResults[projectId] = filteredResults[projectId].sort((a, b) => {
+          return analysisGroupOrder.indexOf(a.analysis_group.id) - analysisGroupOrder.indexOf(b.analysis_group.id);
+        })
+      });
+    }
     return filteredResults;
   }
 
@@ -224,6 +234,22 @@ export class CollateEditorComponent {
   goToCollateView() {
     if (this._collate) {
       this.router.navigate(['/collate/view', this._collate.id]);
+    }
+  }
+
+  onSearchResultsChange(event: SearchResult[], projectId: number) {
+    this.filteredResults[projectId] = event;
+    // update order of analysis groups
+    if (this.collate) {
+      if (!this.collate.settings.analysisGroupOrderMap) {
+        this.collate.settings.analysisGroupOrderMap = {};
+      }
+      this.collate.settings.analysisGroupOrderMap[projectId] = event.map(result => result.analysis_group.id);
+      // update order map to only include unique analysis groups
+      Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
+        // @ts-ignore
+        this.collate.settings.analysisGroupOrderMap[projectId] = Array.from(new Set(this.collate.settings.analysisGroupOrderMap[projectId]));
+      });
     }
   }
 }

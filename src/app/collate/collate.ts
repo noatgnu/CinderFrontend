@@ -9,6 +9,9 @@ export interface Collate {
   projects: Project[]
   settings: {
     projectOrder: number[];
+    analysisGroupOrderMap: {
+      [projectID: number]: number[];
+    }
     [key: string]: any;
   };
 }
