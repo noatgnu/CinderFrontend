@@ -21,6 +21,10 @@ import {MatInput} from "@angular/material/input";
 import {CollateProjectListComponent} from "../collate-project-list/collate-project-list.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {Router} from "@angular/router";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {
+  CollateProjectAnalysisGroupReorderDialogComponent
+} from "../collate-project-analysis-group-reorder-dialog/collate-project-analysis-group-reorder-dialog.component";
 
 @Component({
   selector: 'app-collate-editor',
@@ -45,7 +49,10 @@ import {Router} from "@angular/router";
     MatTab,
     MatFormField,
     MatInput,
-    CollateProjectListComponent
+    CollateProjectListComponent,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger
   ],
   templateUrl: './collate-editor.component.html',
   styleUrl: './collate-editor.component.scss'
@@ -202,6 +209,10 @@ export class CollateEditorComponent {
         // @ts-ignore
         const analysisGroupOrder = this.collate.settings.analysisGroupOrderMap[projectId];
         // @ts-ignore
+        if (!filteredResults[projectId]) {
+          return;
+        }
+        // @ts-ignore
         filteredResults[projectId] = filteredResults[projectId].sort((a, b) => {
           return analysisGroupOrder.indexOf(a.analysis_group.id) - analysisGroupOrder.indexOf(b.analysis_group.id);
         })
@@ -251,5 +262,36 @@ export class CollateEditorComponent {
         this.collate.settings.analysisGroupOrderMap[projectId] = Array.from(new Set(this.collate.settings.analysisGroupOrderMap[projectId]));
       });
     }
+  }
+
+  openReorderDialog() {
+    const ref = this.dialog.open(CollateProjectAnalysisGroupReorderDialogComponent);
+    this.web.getAnalysisGroupsFromProjects(this.projects).subscribe((analysisGroups: AnalysisGroup[]) => {
+      const projectAnalysisGroups: {[projectId: number]: AnalysisGroup[]} = {};
+      analysisGroups.forEach(analysisGroup => {
+        if (!projectAnalysisGroups[analysisGroup.project]) {
+          projectAnalysisGroups[analysisGroup.project] = [];
+        }
+        projectAnalysisGroups[analysisGroup.project].push(analysisGroup);
+      });
+      ref.componentInstance.projectAnalysisGroupMap = projectAnalysisGroups;
+      ref.componentInstance.projects = this.projects;
+    })
+    ref.afterClosed().subscribe((result: {projects: Project[], projectAnalysisGroupMap: {[projectId: number]: AnalysisGroup[]}}) => {
+      this.projects = result.projects;
+      this.updateProjectOrder()
+      this.projectAnalysisGroups = result.projectAnalysisGroupMap;
+      // update order of analysis groups
+      const analysisGroupOrderMap: {[projectId: number]: number[]} = {};
+      Object.keys(this.projectAnalysisGroups).forEach(projectId => {
+        // @ts-ignore
+        analysisGroupOrderMap[projectId] = this.projectAnalysisGroups[projectId].map(analysisGroup => analysisGroup.id);
+      });
+      if (this.collate) {
+        this.collate.settings.analysisGroupOrderMap = analysisGroupOrderMap;
+        this.filteredResults = this.getFilteredSearchResults();
+      }
+
+    })
   }
 }

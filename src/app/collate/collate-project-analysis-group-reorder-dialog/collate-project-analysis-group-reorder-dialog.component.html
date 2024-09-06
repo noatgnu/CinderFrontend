@@ -1,0 +1,30 @@
+<h1 mat-dialog-title>Analysis Group Reorder</h1>
+<div mat-dialog-content>
+  @if (projects.length > 0) {
+    <mat-list>
+      <div cdkDropList (cdkDropListDropped)="dropProject($event)">
+        @for (p of projects; track p.id) {
+          <div cdkDrag>
+            <div mat-subheader cdkDragHandle><b>{{p.name}}</b></div>
+            <div cdkDropList (cdkDropListDropped)="drop($event, p.id)">
+              @for (a of projectAnalysisGroupMap[p.id]; track a.id) {
+                <mat-list-item cdkDrag>
+                  <mat-icon cdkDragHandle matListItemIcon>notes</mat-icon>
+                  <div matListItemTitle>{{a.name}}</div>
+                  <div matListItemLine></div>
+                </mat-list-item>
+              }
+            </div>
+            <mat-divider></mat-divider>
+          </div>
+        }
+      </div>
+
+    </mat-list>
+
+  }
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="cancel()">Close</button>
+  <button mat-button (click)="save()">Save</button>
+</div>

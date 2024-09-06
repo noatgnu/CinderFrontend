@@ -11,6 +11,12 @@
     <button type="button" aria-label="Update Collate" mat-icon-button (click)="updateCollate()">
       <mat-icon>save</mat-icon>
     </button>
+    <button mat-icon-button [matMenuTriggerFor]="extraActionsMenu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #extraActionsMenu="matMenu">
+      <button mat-menu-item (click)="openReorderDialog()">Reorder Analysis Groups</button>
+    </mat-menu>
   </mat-toolbar-row>
 </mat-toolbar>
 @if (collate) {
