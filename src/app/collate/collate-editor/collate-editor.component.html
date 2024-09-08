@@ -16,6 +16,7 @@
     </button>
     <mat-menu #extraActionsMenu="matMenu">
       <button mat-menu-item (click)="openReorderDialog()">Reorder Analysis Groups</button>
+      <button mat-menu-item (click)="openConditionColorEditorDialog()">Set Condition Colors</button>
     </mat-menu>
   </mat-toolbar-row>
 </mat-toolbar>
@@ -60,4 +61,6 @@
   </div>
 }
 
-<app-collate-project-list (deleteProject)="deleteProject($event)" [projects]="projects" [filteredResults]="filteredResults" (projectOrderChanged)="onProjectOrderChanged($event)"></app-collate-project-list>
+@if (collate?.settings?.projectConditionColorMap !== undefined) {
+  <app-collate-project-list [projectConditionColorMap]="collate?.settings?.projectConditionColorMap" (deleteProject)="deleteProject($event)" [projects]="projects" [filteredResults]="filteredResults" (projectOrderChanged)="onProjectOrderChanged($event)"></app-collate-project-list>
+}

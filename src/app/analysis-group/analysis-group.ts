@@ -39,3 +39,8 @@ export interface CurtainData {
   selections: string[];
   selection_map: {[key: string]: {[key: string]: boolean}};
 }
+
+export interface AnalysisGroupCondition {
+  AnalysisGroup: AnalysisGroup;
+  Condition: string;
+}

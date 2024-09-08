@@ -48,6 +48,7 @@ export class BarChartComponent {
   private _colorMap: any = {}
   @Input() set colorMap(value: any) {
     this._colorMap = value
+    console.log(value)
     if (this.data && value) {
       this.drawGraph()
     }

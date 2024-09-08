@@ -25,6 +25,10 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {
   CollateProjectAnalysisGroupReorderDialogComponent
 } from "../collate-project-analysis-group-reorder-dialog/collate-project-analysis-group-reorder-dialog.component";
+import {
+  CollateConditionColorEditorDialogComponent
+} from "../collate-condition-color-editor-dialog/collate-condition-color-editor-dialog.component";
+import {GraphService} from "../../graph.service";
 
 @Component({
   selector: 'app-collate-editor',
@@ -67,11 +71,22 @@ export class CollateEditorComponent {
         if (!this._collate.settings) {
           this._collate.settings = {
             projectOrder: this.projects.map(project => project.id),
-            analysisGroupOrderMap: {}
+            analysisGroupOrderMap: {},
+            projectConditionColorMap: {}
           }
         }
         if (collate.settings.projectOrder) {
           this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
+        }
+        if (this.collate?.settings.projectConditionColorMap) {
+          this.graph.projectConditionColorMap = this.collate.settings.projectConditionColorMap;
+        } else {
+          // @ts-ignore
+          this.collate.settings.projectConditionColorMap = {};
+          for (const p of this.projects) {
+            // @ts-ignore
+            this.collate.settings.projectConditionColorMap[p.id] = {};
+          }
         }
       })
     }
@@ -102,7 +117,7 @@ export class CollateEditorComponent {
   }
   filteredResults: { [projectId: number]: SearchResult[] } = {};
 
-  constructor(private router: Router, private snackBar: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
+  constructor(private graph: GraphService, private router: Router, private snackBar: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
 
   openProjectAddDialog() {
     const dialogRef = this.dialog.open(ProjectAddDialogComponent);
@@ -293,5 +308,20 @@ export class CollateEditorComponent {
       }
 
     })
+  }
+
+  openConditionColorEditorDialog() {
+    const ref = this.dialog.open(CollateConditionColorEditorDialogComponent);
+    ref.componentInstance.projectConditionColorMap = this.collate?.settings?.projectConditionColorMap;
+    ref.componentInstance.projects = this.projects;
+    ref.afterClosed().subscribe((result: { [projectID: number]: { [condition: string]: string } }) => {
+      if (this.collate) {
+        this.collate.settings.projectConditionColorMap = result;
+      }
+      this.graph.projectConditionColorMap = Object.assign({}, result);
+      this.filteredResults = this.getFilteredSearchResults();
+      this.graph.redrawTrigger.next(true);
+    })
+
   }
 }

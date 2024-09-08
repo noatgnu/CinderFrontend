@@ -18,6 +18,7 @@ import {ProjectCardViewerComponent} from "../project-card-viewer/project-card-vi
 export class CollateProjectListComponent {
   @Input() projects: Project[] = [];
   @Input() filteredResults: { [projectId: number]: SearchResult[] } = {};
+  @Input() projectConditionColorMap: { [projectID: number]: { [condition: string]: string } }|undefined|null = {};
   @Output() projectOrderChanged = new EventEmitter<Project[]>();
   @Output() deleteProject = new EventEmitter<Project>();
   drop(event: CdkDragDrop<Project[]>) {

@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {environment} from "../environments/environment";
 import {ChunkUpload} from "./upload-file/chunk-upload";
 import {Project, ProjectQuery} from "./project/project";
-import {AnalysisGroup, AnalysisGroupQuery, CurtainData} from "./analysis-group/analysis-group";
+import {AnalysisGroup, AnalysisGroupCondition, AnalysisGroupQuery, CurtainData} from "./analysis-group/analysis-group";
 import {ProjectFile} from "./project-file";
 import {SampleAnnotation} from "./sample-annotation";
 import {map} from "rxjs";
@@ -570,6 +570,13 @@ export class WebService {
   getFileDownloadToken(file_id: number) {
     return this.http.get<{token: string}>(
       `${this.baseURL}/api/project_files/${file_id}/request_download_token/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getProjectUniqueConditions(project_id: number) {
+    return this.http.get<AnalysisGroupCondition[]>(
+      `${this.baseURL}/api/projects/${project_id}/get_unique_conditions/`,
       {responseType: 'json', observe: 'body'}
     )
   }

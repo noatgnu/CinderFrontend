@@ -1,0 +1,20 @@
+<h1 mat-dialog-title>Condition Color Editor</h1>
+<div mat-dialog-content>
+    @for (p of projects; track p.id) {
+      <div>
+        <div><b>{{p.name}}</b></div>
+        @if (projectConditionMap[p.id]) {
+          @for (c of projectConditionMap[p.id]; track c) {
+            <div style="display: flex; gap:5px; align-items: center">
+              <ngx-colors ngx-colors-trigger [(ngModel)]="projectConditionColorMap[p.id][c]"></ngx-colors> <div>{{c}}</div>
+            </div>
+          }
+        }
+      </div>
+
+    }
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="cancel()">Close</button>
+    <button mat-button (click)="save()">Save</button>
+</div>

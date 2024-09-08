@@ -11,7 +11,7 @@
             <div cdkDrag>
               @if (s.searched_data.length > 0) {
                 <div>
-                  <app-bar-chart [data]="s"></app-bar-chart>
+                  <app-bar-chart [colorMap]="colorMap" [data]="s"></app-bar-chart>
                 </div>
               } @else {
                 <div>
@@ -21,6 +21,8 @@
               <button mat-icon-button cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
             </div>
           }
+        } @else {
+          <p>No search results found in this project</p>
         }
       </div>
     </mat-card-content>

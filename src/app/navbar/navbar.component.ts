@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
@@ -10,6 +10,7 @@ import {NgOptimizedImage} from "@angular/common";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {DataService} from "../data.service";
 import {GraphService} from "../graph.service";
+import {NavigationEnd, Router} from "@angular/router";
 
 @Component({
   selector: 'app-navbar',
@@ -27,9 +28,20 @@ import {GraphService} from "../graph.service";
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
-export class NavbarComponent {
-  constructor(public accounts: AccountsService, private dialog: MatDialog, private graphService: GraphService) {
+export class NavbarComponent implements OnInit {
 
+  isCollateView = false;
+
+  constructor(private router: Router, public accounts: AccountsService, private dialog: MatDialog, private graphService: GraphService) {
+
+  }
+
+  ngOnInit() {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.isCollateView = event.urlAfterRedirects.includes('/collate/view');
+      }
+    });
   }
 
   openLoginDialog() {

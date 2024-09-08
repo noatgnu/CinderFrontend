@@ -19,5 +19,7 @@ export class GraphService {
 
   redrawTrigger: Subject<boolean> = new Subject<boolean>()
 
+  projectConditionColorMap: { [projectID: number]: { [condition: string]: string } } = {}
+
   constructor() { }
 }

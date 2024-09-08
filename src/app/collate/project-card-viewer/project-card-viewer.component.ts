@@ -14,6 +14,7 @@ import {BarChartComponent} from "./bar-chart/bar-chart.component";
 import {AccountsService} from "../../accounts/accounts.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
+import {GraphService} from "../../graph.service";
 
 @Component({
   selector: 'app-project-card-viewer',
@@ -50,6 +51,9 @@ export class ProjectCardViewerComponent {
     this._searchResults = value;
     console.log(value);
   }
+
+  @Input() colorMap: { [condition: string]: string } | undefined = {};
+
   @Output() deleteProject: EventEmitter<Project> = new EventEmitter<Project>();
   @Output() searchResultsChange: EventEmitter<SearchResult[]> = new EventEmitter<SearchResult[]>();
 
