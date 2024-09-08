@@ -191,7 +191,7 @@ export class BarChartComponent {
       dataCount = uniqueConditions.length
       this.graphData = [...traces, ...boxes]
     }
-    console.log(this.graphData)
+    console.log(this.colorMap)
     this.graphLayout.width = this.graphLayout.margin.l + this.graphLayout.margin.r + this.barSize * dataCount
     this.revision++
   }
