@@ -15,10 +15,25 @@ export interface Collate {
     projectConditionColorMap: { [projectID: number]: { [condition: string]: string } };
     [key: string]: any;
   };
+  tags: CollateTag[]
 }
 
 export interface CollateQuery {
   results: Collate[]
+  count: number
+  next: string|null
+  previous: string|null
+}
+
+export interface CollateTag {
+  name: string;
+  created_at: Date;
+  updated_at: Date;
+  id: number;
+}
+
+export interface CollateTagQuery {
+  results: CollateTag[]
   count: number
   next: string|null
   previous: string|null

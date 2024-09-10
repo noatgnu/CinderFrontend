@@ -14,6 +14,7 @@ import {MatIconButton} from "@angular/material/button";
 import {MatToolbar, MatToolbarRow} from "@angular/material/toolbar";
 import {AccountsService} from "../../accounts/accounts.service";
 import {Router} from "@angular/router";
+import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
 
 @Component({
   selector: 'app-collate-view',
@@ -27,7 +28,8 @@ import {Router} from "@angular/router";
     MatIcon,
     MatIconButton,
     MatToolbarRow,
-    MatToolbar
+    MatToolbar,
+    CollateTagsComponent
   ],
   templateUrl: './collate-view.component.html',
   styleUrl: './collate-view.component.scss'

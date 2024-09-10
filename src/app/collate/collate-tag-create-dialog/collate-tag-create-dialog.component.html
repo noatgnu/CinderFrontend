@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>Create/Add Tag</h1>
+<div mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field>
+      <mat-label>Tag Name</mat-label>
+      <input type="text" matInput formControlName="name" [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onTagSelected($event)">
+        @for (tag of filteredTags | async; track tag) {
+          <mat-option [value]="tag">{{tag}}</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-button (click)="submit()" [disabled]="form.invalid">Submit</button>
+</div>

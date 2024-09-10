@@ -1,13 +1,13 @@
 import {Component, Input} from '@angular/core';
 import {MatToolbar, MatToolbarRow} from "@angular/material/toolbar";
-import {MatIconButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatDialog} from "@angular/material/dialog";
 import {ProjectAddDialogComponent} from "../project-add-dialog/project-add-dialog.component";
 import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
 import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
 import {Project} from "../../project/project";
-import {Collate} from "../collate";
+import {Collate, CollateTag} from "../collate";
 import {CollateService} from "../collate.service";
 import {FormsModule} from "@angular/forms";
 import {ProjectCardViewerComponent} from "../project-card-viewer/project-card-viewer.component";
@@ -29,6 +29,9 @@ import {
   CollateConditionColorEditorDialogComponent
 } from "../collate-condition-color-editor-dialog/collate-condition-color-editor-dialog.component";
 import {GraphService} from "../../graph.service";
+import {CollateTagCreateDialogComponent} from "../collate-tag-create-dialog/collate-tag-create-dialog.component";
+import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
+import {forkJoin, Observable} from "rxjs";
 
 @Component({
   selector: 'app-collate-editor',
@@ -56,7 +59,9 @@ import {GraphService} from "../../graph.service";
     CollateProjectListComponent,
     MatMenu,
     MatMenuItem,
-    MatMenuTrigger
+    MatMenuTrigger,
+    MatButton,
+    CollateTagsComponent
   ],
   templateUrl: './collate-editor.component.html',
   styleUrl: './collate-editor.component.scss'
@@ -116,6 +121,7 @@ export class CollateEditorComponent {
     this._selectedSearchTerm = value;
   }
   filteredResults: { [projectId: number]: SearchResult[] } = {};
+  removedTags: CollateTag[] = [];
 
   constructor(private graph: GraphService, private router: Router, private snackBar: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
 
@@ -145,7 +151,15 @@ export class CollateEditorComponent {
   updateCollate() {
     if (this._collate) {
       this.collateService.updateCollate(this._collate.id, this._collate).subscribe(() => {
-        this.showSnackBar('Collate saved successfully');
+        if (this.removedTags.length > 0) {
+          const obserables: Observable<any>[] = this.removedTags.map(tag => this.collateService.removeTagFromCollate(this._collate?.id as number, tag.id));
+          forkJoin(obserables).subscribe(() => {
+            this.showSnackBar('Collate saved successfully');
+            this.removedTags = [];
+          })
+        } else {
+          this.showSnackBar('Collate saved successfully');
+        }
       });
     }
   }
@@ -323,5 +337,39 @@ export class CollateEditorComponent {
       this.graph.redrawTrigger.next(true);
     })
 
+  }
+
+  openCollateTagCreateDialog() {
+    const ref = this.dialog.open(CollateTagCreateDialogComponent);
+    ref.afterClosed().subscribe((result: {name: string, existing: boolean, id: number}) => {
+      if (result) {
+        if (result.name) {
+          if (result.existing && result.id && result.id !== -1) {
+            this.collateService.addTagToCollate(this.collate?.id as number, result.id).subscribe((tag) => {
+              if (this.collate) {
+                this.collate.tags.push(tag);
+              }
+            })
+          } else {
+            this.collateService.createCollateTag(result.name).subscribe((tag) => {
+              this.collateService.addTagToCollate(this.collate?.id as number, tag.id).subscribe((tag) => {
+                if (this.collate) {
+                  this.collate.tags.push(tag);
+                }
+              })
+            })
+          }
+
+        }
+      }
+    })
+  }
+
+  handleCollageTagsChange(tags: CollateTag[]) {
+    if (this.collate) {
+      //check if any tags were removed
+      this.removedTags = this.collate.tags.filter(tag => !tags.includes(tag));
+      this.collate.tags = tags;
+    }
   }
 }

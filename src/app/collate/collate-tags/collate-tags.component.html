@@ -1,0 +1,26 @@
+<div style="display: flex; justify-content: center">
+  @if (accounts.loggedIn) {
+    <mat-chip-set cdkDropList (cdkDropListDropped)="drop($event)">
+      @for (t of collageTags; track t.id)
+      {
+        <mat-chip (removed)="removeTag(t)" cdkDrag>
+          {{t.name}}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      }
+    </mat-chip-set>
+  } @else {
+    <mat-chip-set>
+      @for (t of collageTags; track t.id)
+      {
+        <mat-chip>
+          {{t.name}}
+        </mat-chip>
+      }
+    </mat-chip-set>
+  }
+
+</div>
+<div style="display: flex; justify-content: center">
+
+</div>
