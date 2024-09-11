@@ -41,6 +41,8 @@
             }
           </mat-autocomplete>
         </mat-form-field>
+        <button mat-raised-button color="primary" (click)="searchCollates()">Search</button>
+
         @if (collates.length > 0) {
           <mat-selection-list [(ngModel)]="selectedCollate" (selectionChange)="onCollateSelect($event)" [multiple]="false">
             @for (collate of collates; track collate.id) {

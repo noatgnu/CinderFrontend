@@ -11,6 +11,7 @@ import {WebsocketService} from "../../websocket.service";
 import {MatOption} from "@angular/material/core";
 import {MatSelect} from "@angular/material/select";
 import {MatLabel} from "@angular/material/form-field";
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
   selector: 'app-collate-search',
@@ -26,13 +27,15 @@ import {MatLabel} from "@angular/material/form-field";
     MatCard,
     MatOption,
     MatSelect,
-    MatLabel
+    MatLabel,
+    MatProgressBar
   ],
   templateUrl: './collate-search.component.html',
   styleUrl: './collate-search.component.scss'
 })
 export class CollateSearchComponent {
   @Input() projects: Project[] = [];
+  loading: boolean = false;
 
   form = this.fb.group({
     searchQuery: new FormControl<string>('', Validators.required),
@@ -47,10 +50,15 @@ export class CollateSearchComponent {
 
           switch (data["status"]) {
             case "complete":
+              this.loading = false;
               this.showSnackBar("Search complete")
               this.searchResultID.emit(parseInt(data["id"]));
               //window.open(`/#/search-session/${data["id"]}`, "_blank")
               break
+            case "error":
+              this.loading = false;
+              this.showSnackBar("Search error");
+              break;
           }
         }
       }
@@ -61,7 +69,7 @@ export class CollateSearchComponent {
     if (this.form.invalid) {
       return;
     }
-
+    this.loading = true;
     const analysisGroupIDs: number[] = [];
     if (this.projects.length > 0) {
       const results = await this.web.getAnalysisGroupsFromProjects(this.projects).toPromise();
@@ -80,8 +88,14 @@ export class CollateSearchComponent {
         0.0001,
         0.0001,
         this.form.value.searchMode
-      ).subscribe(() => {
-        this.sb.open('Search queued', 'Dismiss', { duration: 2000 });
+      ).subscribe({
+        next: () => {
+          this.sb.open('Search queued', 'Dismiss', { duration: 2000 });
+        },
+        error: () => {
+          this.loading = false;
+          this.showSnackBar("Search error");
+        }
       });
     }
   }

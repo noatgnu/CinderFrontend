@@ -22,6 +22,8 @@ import {
 } from "@angular/material/autocomplete";
 import {filter, map, Observable, startWith, switchMap} from "rxjs";
 import {AsyncPipe} from "@angular/common";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-collate',
@@ -49,7 +51,8 @@ import {AsyncPipe} from "@angular/common";
     MatAutocomplete,
     AsyncPipe,
     ReactiveFormsModule,
-    MatAutocompleteTrigger
+    MatAutocompleteTrigger,
+    MatProgressSpinner
   ],
   templateUrl: './collate.component.html',
   styleUrl: './collate.component.scss'
@@ -67,8 +70,9 @@ export class CollateComponent implements OnInit{
     tag: ["",],
   });
   filteredTags!: Observable<CollateTag[]>;
+  loading: boolean = false;
 
-  constructor(private fb: FormBuilder, private router: Router, private collateService: CollateService, private dialog: MatDialog) {}
+  constructor(private snackBar: MatSnackBar, private fb: FormBuilder, private router: Router, private collateService: CollateService, private dialog: MatDialog) {}
 
   ngOnInit() {
     this.searchCollates();
@@ -87,9 +91,17 @@ export class CollateComponent implements OnInit{
   }
 
   searchCollates() {
-    this.collateService.getCollates(this.limit, this.offset, this.searchTerm, this.searchTags.map((s) => s.id)).subscribe((data: CollateQuery) => {
-      this.collates = data.results;
-      this.totalCount = data.count;
+    this.loading = true;
+    this.collateService.getCollates(this.limit, this.offset, this.searchTerm, this.searchTags.map((s) => s.id)).subscribe({
+      next: (data: CollateQuery) => {
+        this.collates = data.results;
+        this.totalCount = data.count;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.snackBar.open('Error loading collates', 'Dismiss')
+      }
     });
   }
 

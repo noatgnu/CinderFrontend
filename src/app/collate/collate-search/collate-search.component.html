@@ -18,5 +18,8 @@
     <p>
       For multiple search terms, enclose them in <b>quotes</b> and separate them with <b>OR</b>.
     </p>
+    @if (loading) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
   </mat-card-content>
 </mat-card>
