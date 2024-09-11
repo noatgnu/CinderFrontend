@@ -161,6 +161,7 @@ export class BarChartComponent {
         return this.calculateWhisker(values)
       })
 
+
       const traces = uniqueConditions.map((condition, i) => {
         if (!this.colorMap[condition]) {
           this.colorMap[condition] = this.graph.defaultColorList[this.currentColor]
@@ -182,6 +183,9 @@ export class BarChartComponent {
           },
           line: {
             color: "black"
+          },
+          marker: {
+            color: this.colorMap[condition]
           },
           showlegend: false
         }
