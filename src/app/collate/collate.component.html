@@ -11,6 +11,30 @@
         <mat-form-field style="width: 100%">
           <input matInput [(ngModel)]="searchTerm" placeholder="Search Collates" (ngModelChange)="searchCollates()">
         </mat-form-field>
+        <mat-form-field style="width: 100%">
+          <mat-label>Search Tags</mat-label>
+          <mat-chip-grid #chipGrid>
+            @for (tag of searchTags; track tag.id) {
+              <mat-chip-row [removable]="true" (removed)="removeTag(tag)">
+                {{tag.name}}
+                <button matChipRemove [attr.aria-label]="'remove ' + tag.name">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+            }
+            <input
+              [matChipInputFor]="chipGrid"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [formControl]="form.controls.tag" [matAutocomplete]="auto"
+            />
+          </mat-chip-grid>
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addTag($event)">
+            @for (tag of filteredTags| async; track tag.id) {
+              <mat-option [value]="tag">
+                {{tag.name}}
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
         @if (collates.length > 0) {
           <mat-selection-list [(ngModel)]="selectedCollate" (selectionChange)="onCollateSelect($event)" [multiple]="false">
             @for (collate of collates; track collate.id) {
@@ -22,7 +46,7 @@
           <mat-paginator [length]="totalCount" [pageSize]="limit" [pageSizeOptions]="[5, 10, 20]" (page)="handlePageEvent($event)">
           </mat-paginator>
         } @else {
-          <p>Please enter a search term to find collates.</p>
+          <p>No collates could be found.</p>
         }
       </mat-card-content>
     </mat-card>

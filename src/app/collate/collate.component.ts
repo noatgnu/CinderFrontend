@@ -1,16 +1,27 @@
 import {Component, OnInit} from '@angular/core';
-import {Collate, CollateQuery} from "./collate";
+import {Collate, CollateQuery, CollateTag} from "./collate";
 import {CollateService} from "./collate.service";
 import {MatDialog} from "@angular/material/dialog";
 import {MatListOption, MatSelectionList, MatSelectionListChange} from "@angular/material/list";
 import {CreateCollateDialogComponent} from "./create-collate-dialog/create-collate-dialog.component";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
-import {FormsModule} from "@angular/forms";
+import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {MatButton} from "@angular/material/button";
 import {Router} from "@angular/router";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
+import {MatIcon} from "@angular/material/icon";
+import {MatChip, MatChipGrid, MatChipInput, MatChipRemove, MatChipRow} from "@angular/material/chips";
+import {COMMA, ENTER} from "@angular/cdk/keycodes";
+import {
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+  MatOption
+} from "@angular/material/autocomplete";
+import {filter, map, Observable, startWith, switchMap} from "rxjs";
+import {AsyncPipe} from "@angular/common";
 
 @Component({
   selector: 'app-collate',
@@ -27,27 +38,56 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
     MatCardHeader,
     MatCardTitle,
     MatButton,
-    MatPaginator
+    MatPaginator,
+    MatIcon,
+    MatChipRemove,
+    MatChip,
+    MatChipInput,
+    MatChipGrid,
+    MatChipRow,
+    MatOption,
+    MatAutocomplete,
+    AsyncPipe,
+    ReactiveFormsModule,
+    MatAutocompleteTrigger
   ],
   templateUrl: './collate.component.html',
   styleUrl: './collate.component.scss'
 })
 export class CollateComponent implements OnInit{
   collates: Collate[] = [];
+  searchTags: CollateTag[] = [];
   selectedCollate: Collate | null = null;
   searchTerm: string = '';
   limit: number = 10;
   offset: number = 0;
   totalCount: number = 0;
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+  form = this.fb.group({
+    tag: ["",],
+  });
+  filteredTags!: Observable<CollateTag[]>;
 
-  constructor(private router: Router, private collateService: CollateService, private dialog: MatDialog) {}
+  constructor(private fb: FormBuilder, private router: Router, private collateService: CollateService, private dialog: MatDialog) {}
 
   ngOnInit() {
     this.searchCollates();
+    this.filteredTags = this.form.controls.tag.valueChanges.pipe(
+      startWith(''),
+      filter(value => {
+        if (value) {
+          return value.length >= 2;
+        }
+        return false;
+      }),
+      switchMap(value => this.collateService.getCollateTags(value).pipe(
+        map(response => response.results)
+      ))
+    );
   }
 
   searchCollates() {
-    this.collateService.getCollates(this.limit, this.offset, this.searchTerm).subscribe((data: CollateQuery) => {
+    this.collateService.getCollates(this.limit, this.offset, this.searchTerm, this.searchTags.map((s) => s.id)).subscribe((data: CollateQuery) => {
       this.collates = data.results;
       this.totalCount = data.count;
     });
@@ -73,6 +113,23 @@ export class CollateComponent implements OnInit{
   handlePageEvent(event: PageEvent) {
     this.limit = event.pageSize;
     this.offset = event.pageIndex * this.limit;
+    this.searchCollates();
+  }
+
+  addTag(event: MatAutocompleteSelectedEvent): void {
+    const selectedTag = event.option.value;
+    if (selectedTag && !this.searchTags.find(tag => tag.id === selectedTag.id)) {
+      this.searchTags.push(selectedTag);
+    }
+    this.form.controls.tag.setValue('');
+    this.searchCollates();
+  }
+
+  removeTag(tag: CollateTag): void {
+    const index = this.searchTags.indexOf(tag);
+    if (index >= 0) {
+      this.searchTags.splice(index, 1);
+    }
     this.searchCollates();
   }
 }

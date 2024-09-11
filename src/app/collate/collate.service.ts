@@ -11,7 +11,7 @@ export class CollateService {
 
   constructor(private http: HttpClient) { }
 
-  getCollates(limit: number, offset: number, searchTerm: string|undefined|null) {
+  getCollates(limit: number, offset: number, searchTerm: string|undefined|null, tag_ids: number[]|undefined|null) {
     let params: HttpParams = new HttpParams()
     if (limit) {
       params = params.append('limit', limit)
@@ -21,6 +21,9 @@ export class CollateService {
     }
     if (searchTerm) {
       params = params.append('search', searchTerm)
+    }
+    if (tag_ids) {
+      params = params.append('tag_ids', tag_ids.join(','))
     }
     return this.http.get<CollateQuery>(
       `${this.baseURL}/api/collates`,
