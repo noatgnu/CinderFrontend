@@ -15,6 +15,8 @@ import {MatToolbar, MatToolbarRow} from "@angular/material/toolbar";
 import {AccountsService} from "../../accounts/accounts.service";
 import {Router} from "@angular/router";
 import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
+import {MatDialog} from "@angular/material/dialog";
+import {CollateQrCodeDialogComponent} from "../collate-qr-code-dialog/collate-qr-code-dialog.component";
 
 @Component({
   selector: 'app-collate-view',
@@ -66,7 +68,7 @@ export class CollateViewComponent {
 
 
 
-  constructor(private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
+  constructor(private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
 
   }
 
@@ -134,5 +136,11 @@ export class CollateViewComponent {
     if (this.collate) {
       this.router.navigate([`/collate/edit/${this.collate.id}`]);
     }
+  }
+
+  openQRCodeDialog() {
+    const viewURL = window.location.href;
+    const dialogRef = this.dialog.open(CollateQrCodeDialogComponent);
+    dialogRef.componentInstance.url = viewURL;
   }
 }
