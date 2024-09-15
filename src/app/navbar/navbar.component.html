@@ -4,7 +4,12 @@
       <div style="display: flex; justify-content: center; align-items: center">
         <img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'"> <a href="/#/home"><span style="color:#ba0000"><b>C|nder</b></span></a>
       </div>
+
       <span class="spacer"></span>
+      <button mat-button [matMenuTriggerFor]="labGroupMenu">@if (currentLabGroup) { {{currentLabGroup.name}} } @else {All Lab Group Selected}</button>
+      @if (accounts.loggedIn && accounts.currentUser) {
+        <button mat-button>Logged in as: {{accounts.currentUser.username}} @if(accounts.currentUser.is_staff) {<mat-icon>shield_person</mat-icon>} @else {<mat-icon>person</mat-icon>}</button>
+      }
       <mat-slide-toggle
         class="example-margin"
         [color]="'primary'"
@@ -42,6 +47,25 @@
     <a mat-menu-item href="/#/collate">
       <span>Collate</span>
     </a>
+  </mat-menu>
+  <mat-menu #labGroupMenu="matMenu">
+    @for (group of labGroups; track group.id) {
+      <a mat-menu-item (click)="selectLabGroup(group)">
+        <span>{{group.name}}</span>
+      </a>
+    }
+    @if (currentLabGroup) {
+      <a mat-menu-item (click)="selectAllLabGroups()">
+        <span>All Lab Group</span>
+      </a>
+    }
+    @if (accounts.loggedIn && accounts.currentUser) {
+      @if (accounts.currentUser.is_staff) {
+        <a mat-menu-item (click)="openLabGroupCreateDialog()">
+          + Create New Lab Group
+        </a>
+      }
+    }
   </mat-menu>
 }
 

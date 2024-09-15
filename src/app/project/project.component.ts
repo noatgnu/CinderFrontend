@@ -74,6 +74,11 @@ export class ProjectComponent {
         })
       }
     })
+    this.web.updateFromLabGroupSelection.subscribe((value) => {
+      if (value) {
+        this.refreshData()
+      }
+    })
   }
 
   openCreateProjectDialog() {

@@ -26,6 +26,11 @@ export class AppComponent {
       }
     })
     this.accounts.loadAuthFromStorage()
+    this.web.getCurrentUser().subscribe((data) => {
+      if (data) {
+        this.accounts.currentUser = data
+      }
+    })
     this.web.searchSessionID = localStorage.getItem("cinderSearchSessionID")
     console.log(this.web.searchSessionID)
     if (!this.web.searchSessionID) {

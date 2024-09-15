@@ -6,11 +6,13 @@ import {Project, ProjectQuery} from "./project/project";
 import {AnalysisGroup, AnalysisGroupCondition, AnalysisGroupQuery, CurtainData} from "./analysis-group/analysis-group";
 import {ProjectFile} from "./project-file";
 import {SampleAnnotation} from "./sample-annotation";
-import {map} from "rxjs";
+import {map, Subject} from "rxjs";
 import {ComparisonMatrix} from "./comparison-matrix";
 import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from "./search-session";
 import {Projects} from "@angular/cli/lib/config/workspace-schema";
 import {Species, SpeciesQuery} from "./species";
+import {LabGroup, LabGroupQuery} from "./lab-group";
+import {User} from "./user";
 
 
 
@@ -21,6 +23,7 @@ export class WebService {
   cinderInstanceID: string = crypto.randomUUID()
   baseURL: string = environment.baseURL
   searchSessionID: string|null = null
+  updateFromLabGroupSelection: Subject<boolean> = new Subject<boolean>()
 
   constructor(private http: HttpClient) { }
 
@@ -90,7 +93,7 @@ export class WebService {
     )
   }
 
-  getProjects(url?: string, limit: number = 10, offset: number = 0, search?: string, species: Species|undefined|null = null) {
+  getProjects(url?: string, limit: number = 10, offset: number = 0, search?: string, species: Species|undefined|null = null, lab_group: number|null = null) {
     if (url) {
       return this.http.get<ProjectQuery>(
         url,
@@ -110,6 +113,18 @@ export class WebService {
     if (species) {
       params = params.append('species', species.id.toString())
     }
+    const user = localStorage.getItem("cinderUserAccount")
+    if (user) {
+      const userAccount = JSON.parse(user)
+      if (userAccount.currentLabGroup) {
+        params = params.append('lab_group', userAccount.currentLabGroup.toString())
+      } else {
+        if (lab_group) {
+          params = params.append('lab_group', lab_group.toString())
+        }
+      }
+    }
+
     params = params.append('ordering', '-created_at')
     return this.http.get<ProjectQuery>(
       `${this.baseURL}/api/projects/`,
@@ -140,7 +155,7 @@ export class WebService {
     )
   }
 
-  getAnalysisGroups(url?: string, limit: number = 10, offset: number = 0, search?: string, project?: number) {
+  getAnalysisGroups(url?: string, limit: number = 10, offset: number = 0, search?: string, project?: number, lab_group?: number) {
     if (url) {
       return this.http.get<AnalysisGroupQuery>(
         url,
@@ -159,6 +174,17 @@ export class WebService {
     }
     if (project) {
       params = params.append('project', project.toString())
+    }
+    const user = localStorage.getItem("cinderUserAccount")
+    if (user) {
+      const userAccount = JSON.parse(user)
+      if (userAccount.currentLabGroup) {
+        params = params.append('lab_group', userAccount.currentLabGroup.toString())
+      } else {
+        if (lab_group) {
+          params = params.append('lab_group', lab_group.toString())
+        }
+      }
     }
     params = params.append('ordering', '-created_at')
     return this.http.get<AnalysisGroupQuery>(
@@ -474,17 +500,42 @@ export class WebService {
     )
   }
 
-  getProjectCount() {
+  getProjectCount(lab_group: number|null = null) {
+    let params = new HttpParams()
+    const user = localStorage.getItem("cinderUserAccount")
+    if (user) {
+      const userAccount = JSON.parse(user)
+      if (userAccount.currentLabGroup) {
+        params = params.append('lab_group', userAccount.currentLabGroup.toString())
+      } else {
+        if (lab_group) {
+          params = params.append('lab_group', lab_group.toString())
+        }
+      }
+    }
     return this.http.get<{count: number}>(
+
       `${this.baseURL}/api/projects/get_count/`,
-      {responseType: 'json', observe: 'body'}
+      {responseType: 'json', observe: 'body', params: params}
     )
   }
 
-  getAnalysisGroupCount() {
+  getAnalysisGroupCount(lab_group: number|null = null) {
+    let params = new HttpParams()
+    const user = localStorage.getItem("cinderUserAccount")
+    if (user) {
+      const userAccount = JSON.parse(user)
+      if (userAccount.currentLabGroup) {
+        params = params.append('lab_group', userAccount.currentLabGroup.toString())
+      } else {
+        if (lab_group) {
+          params = params.append('lab_group', lab_group.toString())
+        }
+      }
+    }
     return this.http.get<{count: number}>(
       `${this.baseURL}/api/analysis_groups/get_count/`,
-      {responseType: 'json', observe: 'body'}
+      {responseType: 'json', observe: 'body', params: params}
     )
   }
 
@@ -577,6 +628,84 @@ export class WebService {
   getProjectUniqueConditions(project_id: number) {
     return this.http.get<AnalysisGroupCondition[]>(
       `${this.baseURL}/api/projects/${project_id}/get_unique_conditions/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getLabGroups(search_term: string = "", limit: number = 10, offset: number = 0) {
+    let params = new HttpParams()
+    if (search_term && search_term !== "") {
+      params = params.append('search', search_term)
+    }
+    if (limit) {
+      params = params.append('limit', limit.toString())
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString())
+    }
+    return this.http.get<LabGroupQuery>(
+      `${this.baseURL}/api/lab_groups/`,
+      {responseType: 'json', observe: 'body', params: params}
+    )
+  }
+
+  createLabGroup(name: string) {
+    return this.http.post<any>(
+      `${this.baseURL}/api/lab_groups/`,
+      {name: name},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  deleteLabGroup(id: number) {
+    return this.http.delete(
+      `${this.baseURL}/api/lab_groups/${id}/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  addLabGroupMember(lab_group_id: number, member_id: number) {
+    return this.http.post<LabGroup>(
+      `${this.baseURL}/api/lab_groups/${lab_group_id}/add_member/`,
+      {user_id: member_id},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  removeLabGroupMember(lab_group_id: number, member_id: number) {
+    return this.http.post(
+      `${this.baseURL}/api/lab_groups/${lab_group_id}/remove_member/`,
+      {user_id: member_id},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  createUser(username: string, password: string, email: string) {
+    return this.http.post<User>(
+      `${this.baseURL}/api/users/`,
+      {username: username, password: password, email: email},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  updateUser(id: number, email: string, password: string) {
+    return this.http.put<User>(
+      `${this.baseURL}/api/users/${id}/`,
+      {email: email, password: password},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  removeUser(id: number) {
+    return this.http.delete(
+      `${this.baseURL}/api/users/${id}/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getCurrentUser() {
+    return this.http.get<User>(
+      `${this.baseURL}/api/users/get_current_user/`,
       {responseType: 'json', observe: 'body'}
     )
   }

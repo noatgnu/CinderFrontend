@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MatToolbarModule} from "@angular/material/toolbar";
-import {MatIconButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {AccountsService} from "../accounts/accounts.service";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
@@ -11,6 +11,9 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {DataService} from "../data.service";
 import {GraphService} from "../graph.service";
 import {NavigationEnd, Router} from "@angular/router";
+import {LabGroup} from "../lab-group";
+import {WebService} from "../web.service";
+import {LabGroupCreateDialogComponent} from "./lab-group-create-dialog/lab-group-create-dialog.component";
 
 @Component({
   selector: 'app-navbar',
@@ -23,25 +26,29 @@ import {NavigationEnd, Router} from "@angular/router";
     MatMenuItem,
     MatMenuTrigger,
     NgOptimizedImage,
-    MatSlideToggle
+    MatSlideToggle,
+    MatButton
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent implements OnInit {
-
+  labGroups: LabGroup[] = [];
   isCollateView = false;
+  currentLabGroup: LabGroup | undefined;
 
-  constructor(private router: Router, public accounts: AccountsService, private dialog: MatDialog, private graphService: GraphService) {
+  constructor(private webService: WebService, private router: Router, public accounts: AccountsService, private dialog: MatDialog, private graphService: GraphService) {
 
   }
 
   ngOnInit() {
+    this.fetchLabGroups();
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.isCollateView = event.urlAfterRedirects.includes('/collate/view');
       }
     });
+
   }
 
   openLoginDialog() {
@@ -61,6 +68,41 @@ export class NavbarComponent implements OnInit {
     this.accounts.userAccount.darkMode = !this.accounts.userAccount.darkMode
     this.accounts.saveToStorage()
     this.graphService.redrawTrigger.next(true)
+  }
+
+  fetchLabGroups() {
+    this.webService.getLabGroups().subscribe({
+      next: (response) => {
+        this.labGroups = response.results;
+        if (this.accounts.userAccount.currentLabGroup) {
+          this.currentLabGroup = this.labGroups.find(lg => lg.id === this.accounts.userAccount.currentLabGroup);
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching lab groups:', err);
+      }
+    });
+  }
+
+  selectLabGroup(labGroup: LabGroup) {
+    this.currentLabGroup = labGroup;
+    this.accounts.userAccount.currentLabGroup = labGroup.id;
+    this.accounts.saveToStorage();
+  }
+
+  selectAllLabGroups() {
+    this.currentLabGroup = undefined;
+    this.accounts.userAccount.currentLabGroup = null;
+    this.accounts.saveToStorage();
+  }
+
+  openLabGroupCreateDialog() {
+    const ref = this.dialog.open(LabGroupCreateDialogComponent);
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        this.fetchLabGroups();
+      }
+    });
   }
 
 }

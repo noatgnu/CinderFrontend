@@ -3,6 +3,7 @@ import {environment} from "../../environments/environment";
 import {Observable, Subject} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {UserAccount} from "./user-account";
+import {User} from "../user";
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,10 @@ export class AccountsService {
   baseURL: string = environment.baseURL;
   username: string = ""
   lastVisited: Date = new Date()
-  userAccount: UserAccount = {token: "", username: "", darkMode: false, lastVisited: new Date()}
+  userAccount: UserAccount = {token: "", username: "", darkMode: false, lastVisited: new Date(), currentLabGroup: null}
   triggerLoginSubject: Subject<boolean> = new Subject<boolean>()
   is_staff: boolean = false
+  currentUser: User|null = null
 
   constructor(private http: HttpClient) { }
 
@@ -37,6 +39,7 @@ export class AccountsService {
     localStorage.removeItem("cinderToken")
     localStorage.removeItem("cinderUsername")
     localStorage.removeItem("cinderUserAccount")
+    this.currentUser = null
   }
 
 
@@ -73,7 +76,6 @@ export class AccountsService {
       body.classList.remove('dark-theme')
       body.classList.add('light-theme')
     }
-    console.log(this.userAccount)
   }
 
   saveToStorage() {

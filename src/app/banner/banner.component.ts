@@ -125,6 +125,16 @@ export class BannerComponent {
         }
       }
     })
+    this.web.updateFromLabGroupSelection.subscribe((value) => {
+      if (value) {
+        this.web.getProjectCount().subscribe((data) => {
+          this.projectCount = data.count
+        })
+        this.web.getAnalysisGroupCount().subscribe((data) => {
+          this.analysisGroupCount = data.count
+        })
+      }
+    })
   }
 
   openProjectCreateDialog() {

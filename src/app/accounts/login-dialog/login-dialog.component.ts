@@ -5,6 +5,7 @@ import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
+import {WebService} from "../../web.service";
 
 @Component({
   selector: 'app-login-dialog',
@@ -29,7 +30,7 @@ export class LoginDialogComponent {
     password: new FormControl('', Validators.required),
   })
 
-  constructor(private accounts: AccountsService, private fb: FormBuilder, private dialogRef: MatDialogRef<LoginDialogComponent>) {
+  constructor(private accounts: AccountsService, private fb: FormBuilder, private dialogRef: MatDialogRef<LoginDialogComponent>, private web: WebService) {
 
   }
 
@@ -50,6 +51,11 @@ export class LoginDialogComponent {
           this.accounts.userAccount.username = this.form.value.username
           this.accounts.saveToStorage()
           this.dialogRef.close()
+          this.web.getCurrentUser().subscribe((data) => {
+            if (data) {
+              this.accounts.currentUser = data
+            }
+          })
         },
         (error) => {
           console.log(error)

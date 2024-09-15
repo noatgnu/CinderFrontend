@@ -77,6 +77,13 @@ export class AnalysisGroupComponent {
         })
       }
     })
+    this.web.updateFromLabGroupSelection.subscribe((value) => {
+      if (value) {
+        this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
+          this.analysisGroupQuery = data
+        })
+      }
+    })
   }
 
   openCreateAnalysisGroupDialog() {

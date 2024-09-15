@@ -82,6 +82,14 @@ export class ProjectSearchComponent {
         }
       }
     })
+    this.web.updateFromLabGroupSelection.subscribe((value) => {
+      if (value) {
+        // @ts-ignore
+        this.web.getProjects(undefined, this.projectPageSize, 0, this.formProjectSearch.controls.searchTerm.value, this.species).subscribe((data) => {
+          this.projectQuery = data
+        })
+      }
+    })
   }
 
   handleProjectPageEvent(e: PageEvent) {
