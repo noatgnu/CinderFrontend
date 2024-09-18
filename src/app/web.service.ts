@@ -12,7 +12,7 @@ import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from
 import {Projects} from "@angular/cli/lib/config/workspace-schema";
 import {Species, SpeciesQuery} from "./species";
 import {LabGroup, LabGroupQuery} from "./lab-group";
-import {User} from "./user";
+import {User} from "./user/user";
 
 
 

@@ -16,7 +16,7 @@ import {WebService} from "../../web.service";
 import {SearchResult} from "../../search-session";
 import {AnalysisGroup} from "../../analysis-group/analysis-group";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
-import {MatFormField} from "@angular/material/form-field";
+import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {CollateProjectListComponent} from "../collate-project-list/collate-project-list.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -32,6 +32,7 @@ import {GraphService} from "../../graph.service";
 import {CollateTagCreateDialogComponent} from "../collate-tag-create-dialog/collate-tag-create-dialog.component";
 import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
 import {forkJoin, Observable} from "rxjs";
+import {MatCheckbox} from "@angular/material/checkbox";
 
 @Component({
   selector: 'app-collate-editor',
@@ -61,7 +62,9 @@ import {forkJoin, Observable} from "rxjs";
     MatMenuItem,
     MatMenuTrigger,
     MatButton,
-    CollateTagsComponent
+    CollateTagsComponent,
+    MatLabel,
+    MatCheckbox
   ],
   templateUrl: './collate-editor.component.html',
   styleUrl: './collate-editor.component.scss'
@@ -77,12 +80,19 @@ export class CollateEditorComponent {
           this._collate.settings = {
             projectOrder: this.projects.map(project => project.id),
             analysisGroupOrderMap: {},
-            projectConditionColorMap: {}
+            projectConditionColorMap: {},
+            showTags: false
           }
         }
         if (collate.settings.projectOrder) {
           this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
         }
+        if (this.collate) {
+          if ("showTags" in this.collate.settings) {
+            this.collate.settings.showTags = false;
+          }
+        }
+
         if (this.collate?.settings.projectConditionColorMap) {
           this.graph.projectConditionColorMap = this.collate.settings.projectConditionColorMap;
         } else {

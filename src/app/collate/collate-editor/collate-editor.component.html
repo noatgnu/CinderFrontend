@@ -1,6 +1,11 @@
 <mat-toolbar>
   <mat-toolbar-row>
     <span class="spacer"></span>
+    @if (collate) {
+      <mat-checkbox [(ngModel)]="collate.settings.showTags">Show Tags</mat-checkbox>
+
+    }
+
     <button type="button" aria-label="View Collate" mat-icon-button (click)="goToCollateView()">
       <mat-icon>visibility</mat-icon>
     </button>
@@ -47,15 +52,14 @@
   </div>
 }
 
-<div style="display: flex; justify-content: center">
-  <button mat-button (click)="openCollateTagCreateDialog()">Add Tag +</button>
-</div>
 @if (collate) {
+  <div style="display: flex; justify-content: center">
+    <button mat-button (click)="openCollateTagCreateDialog()">Add Tag +</button>
+  </div>
   <div style="display: flex; justify-content: center; padding: 20px">
     <app-collate-tags [collageTags]="collate.tags" (collageTagsChange)="handleCollageTagsChange($event)"></app-collate-tags>
   </div>
 }
-
 
 <div style="display: flex; justify-content: center">
   <app-collate-search [projects]="projects" (searchResultID)="getSearchFromID($event)"></app-collate-search>

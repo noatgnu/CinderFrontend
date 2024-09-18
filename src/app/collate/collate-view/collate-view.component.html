@@ -15,9 +15,11 @@
   <app-collate-header [collate]="collate"></app-collate-header>
 }
 @if (collate) {
-  <div style="display: flex; justify-content: center; padding: 20px">
-    <app-collate-tags [collageTags]="collate.tags"></app-collate-tags>
-  </div>
+  @if (collate.settings.showTags) {
+    <div style="display: flex; justify-content: center; padding: 20px">
+      <app-collate-tags [collageTags]="collate.tags"></app-collate-tags>
+    </div>
+  }
 }
 
 

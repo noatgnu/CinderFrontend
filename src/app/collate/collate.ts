@@ -13,6 +13,7 @@ export interface Collate {
       [projectID: number]: number[];
     };
     projectConditionColorMap: { [projectID: number]: { [condition: string]: string } };
+    showTags: boolean;
     [key: string]: any;
   };
   tags: CollateTag[]

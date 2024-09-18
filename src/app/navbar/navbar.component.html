@@ -8,7 +8,7 @@
       <span class="spacer"></span>
       <button mat-button [matMenuTriggerFor]="labGroupMenu">@if (currentLabGroup) { {{currentLabGroup.name}} } @else {All Lab Group Selected}</button>
       @if (accounts.loggedIn && accounts.currentUser) {
-        <button mat-button>Logged in as: {{accounts.currentUser.username}} @if(accounts.currentUser.is_staff) {<mat-icon>shield_person</mat-icon>} @else {<mat-icon>person</mat-icon>}</button>
+        <button mat-button [matMenuTriggerFor]="userMenu">Logged in as: {{accounts.currentUser.username}} @if(accounts.currentUser.is_staff) {<mat-icon>shield_person</mat-icon>} @else {<mat-icon>person</mat-icon>}</button>
       }
       <mat-slide-toggle
         class="example-margin"
@@ -65,6 +65,19 @@
           + Create New Lab Group
         </a>
       }
+    }
+  </mat-menu>
+  <mat-menu #userMenu="matMenu">
+    <a mat-menu-item href="/#/user">
+      <span>Profile</span>
+    </a>
+    <a mat-menu-item href="/#/user/change-password">
+      <span>Change Password</span>
+    </a>
+    @if (accounts.currentUser?.is_staff) {
+      <a mat-menu-item href="/#/admin">
+        Administration
+      </a>
     }
   </mat-menu>
 }
