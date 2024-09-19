@@ -1,14 +1,15 @@
 import {Component, Input} from '@angular/core';
 import {WebService} from "../../web.service";
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
-import {LabGroupQuery} from "../../lab-group";
+import {LabGroup, LabGroupQuery} from "../../lab-group";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-register',
@@ -25,7 +26,8 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
     MatHint,
     MatListOption,
     MatSelectionList,
-    MatPaginator
+    MatPaginator,
+    MatDivider
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
@@ -38,6 +40,14 @@ export class RegisterComponent {
   @Input() set token(value: string) {
     this._token = value
     this.form.controls.username.setValue(value.split(":")[0])
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (this.form.controls.username.value) {
+      const valid = emailRegex.test(this.form.controls.username.value)
+      if (valid) {
+        this.form.controls.email.setValue(this.form.controls.username.value)
+      }
+    }
+
     this.form.controls.token.setValue(this._token)
   }
 
@@ -53,7 +63,7 @@ export class RegisterComponent {
     username: ['', Validators.required],
     first_name: ['', Validators.required],
     last_name: ['', Validators.required],
-    lab_group: [null,],
+    lab_group: new FormControl<LabGroup[]|null>([]),
     search_lab_group: [''],
   })
 
@@ -84,7 +94,7 @@ export class RegisterComponent {
       return
     }
     if (this.form.value.username && this.form.value.token && this.form.value.email && this.form.value.last_name && this.form.value.password && this.form.value.first_name) {
-      this.webService.createUserWithToken(this.form.value.username, this.form.value.token, this.form.value.email, this.form.value.last_name, this.form.value.password, this.form.value.first_name).subscribe(
+      this.webService.createUserWithToken(this.form.value.username, this.form.value.token, this.form.value.email, this.form.value.last_name, this.form.value.password, this.form.value.first_name, this.form.value.lab_group).subscribe(
         (response) => {
         this.snackBar.open('Account created', 'Close', { duration: 2000 })
       }, error => {

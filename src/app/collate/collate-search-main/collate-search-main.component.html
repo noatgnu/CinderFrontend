@@ -1,0 +1,15 @@
+<form [formGroup]="form" style="display: flex; flex-direction: column">
+  <mat-form-field>
+    <input matInput placeholder="Search" type="search" formControlName="query">
+    <mat-label>Search Term</mat-label>
+  </mat-form-field>
+  <mat-selection-list [multiple]="false" formControlName="selected">
+    @for (collate of collates; track collate.id) {
+      <mat-list-option [value]="collate">
+        {{ collate.title }}
+      </mat-list-option>
+    }
+  </mat-selection-list>
+  <mat-paginator [length]="totalCount" [pageSize]="limit" (page)="handlePageEvent($event)"></mat-paginator>
+
+</form>

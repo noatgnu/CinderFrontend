@@ -39,6 +39,9 @@ import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material/autocom
 import {BehaviorSubject} from "rxjs";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
 import {Router} from "@angular/router";
+import {CollateSearchMainComponent} from "../collate/collate-search-main/collate-search-main.component";
+import {CreateCollateDialogComponent} from "../collate/create-collate-dialog/create-collate-dialog.component";
+import {CollateService} from "../collate/collate.service";
 
 @Component({
   selector: 'app-banner',
@@ -70,7 +73,8 @@ import {Router} from "@angular/router";
     AsyncPipe,
     MatAutocompleteTrigger,
     MatSelectionList,
-    MatListOption
+    MatListOption,
+    CollateSearchMainComponent
   ],
   templateUrl: './banner.component.html',
   styleUrl: './banner.component.scss'
@@ -82,7 +86,7 @@ export class BannerComponent {
 
   form = this.fb.group({
     search: new FormControl<string>("", Validators.required),
-    searchMode: new FormControl<"full"|"pi"|"gene"|"uniprot">("full", Validators.required),
+    searchMode: new FormControl<"full"|"pi"|"gene"|"uniprot">("gene", Validators.required),
     foldChange: new FormControl<number>(0.6, Validators.required),
     pValue: new FormControl<number>(1.31, Validators.required),
     projects: new FormControl<Project[]>([]),
@@ -94,7 +98,7 @@ export class BannerComponent {
   speciesQueryBehaviorSubject = new BehaviorSubject<Species[]>([])
   selectedSpecies: Species|undefined = undefined
 
-  constructor(private router: Router, public accounts: AccountsService, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private sb: MatSnackBar, private ws: WebsocketService) {
+  constructor(private collateService: CollateService, private router: Router, public accounts: AccountsService, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private sb: MatSnackBar, private ws: WebsocketService) {
     this.web.getProjectCount().subscribe((data) => {
       this.projectCount = data.count
     })
@@ -210,6 +214,18 @@ export class BannerComponent {
       return
     }
     this.selectedSpecies = species
+  }
+
+  openCreateCollateDialog() {
+    const dialogRef = this.dialog.open(CreateCollateDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.collateService.createCollate(result.title, result.greeting).subscribe((data) => {
+          this.router.navigate([`/collate/edit/${data.id}`]).then(r => console.log(r));
+        });
+      }
+    });
   }
 
 }

@@ -4,6 +4,25 @@
       <mat-card-header>
         <mat-card-title>
           <span style="color:#ba0000"><mat-icon>lock</mat-icon></span>
+          <a href="/#/collate"><span style="color:#ba0000">Collate</span></a>
+        </mat-card-title>
+        <mat-card-subtitle>
+          Cinder Data Collate
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <app-collate-search-main></app-collate-search-main>
+      </mat-card-content>
+      @if (accounts.loggedIn) {
+        <mat-card-actions>
+          <button mat-button type="button" (click)="openCreateCollateDialog()">Create Collate</button>
+        </mat-card-actions>
+      }
+    </mat-card>
+    <mat-card style="width: 350px" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>
+          <span style="color:#ba0000"><mat-icon>lock</mat-icon></span>
           <a href="/#/project"><span style="color:#ba0000">Project</span></a>
         </mat-card-title>
         <mat-card-subtitle>

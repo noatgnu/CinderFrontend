@@ -732,10 +732,10 @@ export class WebService {
     )
   }
 
-  createUserWithToken(username: string, token: string, email: string, last_name: string, password: string, first_name: string, lab_group_id: number|null|undefined = null) {
+  createUserWithToken(username: string, token: string, email: string, last_name: string, password: string, first_name: string, lab_group_id: LabGroup[]|null = null) {
     const payload: any = {'username': username, 'token': token, 'email': email, 'last_name': last_name, 'password': password, 'first_name': first_name}
     if (lab_group_id) {
-      payload['lab_group'] = lab_group_id
+      payload['lab_group'] = lab_group_id.map((lg) => lg.id)
     }
     return this.http.post<User>(`${this.baseURL}/api/users/create_with_token/`, payload, {responseType: 'json', observe: 'body'})
   }

@@ -143,4 +143,8 @@ export class CollateViewComponent {
     const dialogRef = this.dialog.open(CollateQrCodeDialogComponent);
     dialogRef.componentInstance.url = viewURL;
   }
+
+  navigateToHome() {
+    this.router.navigate(['/']);
+  }
 }

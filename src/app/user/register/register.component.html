@@ -1,6 +1,6 @@
 <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
   <div style="width: 600px">
-    <h1>User Registration</h1>
+    <h1><a href="/#/user/register/{{token}}"><span style="color:#ba0000">Registration</span></a></h1>
     <form [formGroup]="form" (ngSubmit)="createAccount()" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
       <mat-form-field>
         <input matInput formControlName="username" placeholder="Username" type="text" readonly>
@@ -36,12 +36,16 @@
         <input matInput formControlName="last_name" placeholder="Last Name" type="text">
         <mat-label>Last Name</mat-label>
       </mat-form-field>
+      <mat-divider></mat-divider>
       <div style="display: flex; flex-direction: column; gap: 10px">
+        <div>
+          Lab Group Selection:
+        </div>
         <mat-form-field>
           <input matInput formControlName="search_lab_group">
           <mat-label>Search Lab Group</mat-label>
         </mat-form-field>
-        <mat-selection-list formControlName="lab_group">
+        <mat-selection-list formControlName="lab_group" [multiple]="false">
           @for (labGroup of labGroupQuery?.results; track labGroup.id) {
             <mat-list-option [value]="labGroup">
               {{ labGroup.name }}
@@ -50,6 +54,7 @@
         </mat-selection-list>
         <mat-paginator [length]="labGroupQuery?.count" [pageSize]="limit" [pageIndex]="offset" (page)="onPageChange($event)"></mat-paginator>
       </div>
+      <mat-divider></mat-divider>
       <mat-form-field>
         <input matInput formControlName="token" type="text" readonly>
         <mat-label>Registration token</mat-label>
