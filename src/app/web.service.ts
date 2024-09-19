@@ -667,7 +667,7 @@ export class WebService {
   addLabGroupMember(lab_group_id: number, member_id: number) {
     return this.http.post<LabGroup>(
       `${this.baseURL}/api/lab_groups/${lab_group_id}/add_member/`,
-      {user_id: member_id},
+      {user: member_id},
       {responseType: 'json', observe: 'body'}
     )
   }
@@ -675,7 +675,7 @@ export class WebService {
   removeLabGroupMember(lab_group_id: number, member_id: number) {
     return this.http.post(
       `${this.baseURL}/api/lab_groups/${lab_group_id}/remove_member/`,
-      {user_id: member_id},
+      {user: member_id},
       {responseType: 'json', observe: 'body'}
     )
   }
@@ -688,10 +688,25 @@ export class WebService {
     )
   }
 
-  updateUser(id: number, email: string, password: string) {
+  updateUser(id: number, email: string|null|undefined, password: string|null|undefined, last_name: string|null|undefined, first_name: string|null|undefined) {
+    const payload: any = {}
+
+    if (email) {
+      payload["email"] = email
+    }
+    if (password) {
+      payload["password"] = password
+    }
+    if (last_name) {
+      payload["last_name"] = last_name
+    }
+    if (first_name) {
+      payload["first_name"] = first_name
+    }
+
     return this.http.put<User>(
       `${this.baseURL}/api/users/${id}/`,
-      {email: email, password: password},
+      payload,
       {responseType: 'json', observe: 'body'}
     )
   }
@@ -709,4 +724,20 @@ export class WebService {
       {responseType: 'json', observe: 'body'}
     )
   }
+
+  getCurrentUserLabGroups() {
+    return this.http.get<LabGroup[]>(
+      `${this.baseURL}/api/users/get_user_lab_group/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  createUserWithToken(username: string, token: string, email: string, last_name: string, password: string, first_name: string, lab_group_id: number|null|undefined = null) {
+    const payload: any = {'username': username, 'token': token, 'email': email, 'last_name': last_name, 'password': password, 'first_name': first_name}
+    if (lab_group_id) {
+      payload['lab_group'] = lab_group_id
+    }
+    return this.http.post<User>(`${this.baseURL}/api/users/create_with_token/`, payload, {responseType: 'json', observe: 'body'})
+  }
+
 }

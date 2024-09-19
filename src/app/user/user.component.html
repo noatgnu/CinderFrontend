@@ -1,1 +1,72 @@
-<p>user works!</p>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+  <div style="width: 600px">
+    <h1>Basic Information</h1>
+    <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px; padding: 20px" (ngSubmit)="updateUser()">
+      <mat-form-field>
+        <input matInput formControlName="first_name">
+        <mat-label>First Name</mat-label>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput formControlName="last_name">
+        <mat-label>Last Name</mat-label>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput formControlName="email">
+        <mat-label>Email Address</mat-label>
+      </mat-form-field>
+      <div>
+        <button mat-raised-button color="primary" type="submit">Update Basic Information</button>
+      </div>
+    </form>
+    <mat-divider></mat-divider>
+    <h1>Lab Group</h1>
+    <form [formGroup]="labGroupForm" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
+      User Belongs To Lab Groups:
+      <mat-chip-set>
+        @for (labGroup of labGroupForm.controls.lab_group.value; track labGroup.id) {
+          <mat-chip (removed)="removeLabGroup(labGroup)">
+            {{ labGroup.name }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        }
+      </mat-chip-set>
+      Search Lab Groups:
+      <mat-form-field>
+        <input matInput formControlName="search_term" (input)="fetchLabGroups()">
+      </mat-form-field>
+      <mat-selection-list (selectionChange)="onLabGroupSelect($event)">
+        @for (labGroup of labGroupQuery?.results; track labGroup.id) {
+          <mat-list-option [value]="labGroup">
+            {{ labGroup.name }}
+          </mat-list-option>
+        }
+      </mat-selection-list>
+      <mat-paginator [length]="labGroupQuery?.count" [pageSize]="size" (page)="onPageChange($event)"></mat-paginator>
+      <div>
+        <button mat-raised-button color="primary" (click)="updateLabGroups()">Update Lab Groups</button>
+      </div>
+    </form>
+    <mat-divider></mat-divider>
+    <h1>Change Password</h1>
+    <form [formGroup]="passwordForm" style="display: flex; flex-direction: column; gap: 20px; padding: 20px" (ngSubmit)="updatePassword()">
+      <mat-form-field>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="new_password" placeholder="Password">
+        <mat-label>Password</mat-label>
+        <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirm_password" placeholder="Confirm Password">
+        <mat-label>Confirm Password</mat-label>
+        <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="'Hide confirm password'" [attr.aria-pressed]="hideConfirmPassword">
+          <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
+      <div>
+        <button mat-raised-button color="primary" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+
+</div>

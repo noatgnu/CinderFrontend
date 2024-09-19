@@ -1,0 +1,62 @@
+<div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+  <div style="width: 600px">
+    <h1>User Registration</h1>
+    <form [formGroup]="form" (ngSubmit)="createAccount()" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
+      <mat-form-field>
+        <input matInput formControlName="username" placeholder="Username" type="text" readonly>
+        <mat-label>Username</mat-label>
+        <mat-hint>Username automatically assigned</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput formControlName="email" placeholder="Email" type="email">
+        <mat-label>Email</mat-label>
+        <mat-hint>Must be a valid email</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Password">
+        <mat-label>Password</mat-label>
+        <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-hint>Password must be at least 8 characters long</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirm_password" placeholder="Confirm Password">
+        <mat-label>Confirm Password</mat-label>
+        <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="'Hide confirm password'" [attr.aria-pressed]="hideConfirmPassword">
+          <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-hint>Confirm password must match</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput formControlName="first_name" placeholder="First Name" type="text">
+        <mat-label>First Name</mat-label>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput formControlName="last_name" placeholder="Last Name" type="text">
+        <mat-label>Last Name</mat-label>
+      </mat-form-field>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <mat-form-field>
+          <input matInput formControlName="search_lab_group">
+          <mat-label>Search Lab Group</mat-label>
+        </mat-form-field>
+        <mat-selection-list formControlName="lab_group">
+          @for (labGroup of labGroupQuery?.results; track labGroup.id) {
+            <mat-list-option [value]="labGroup">
+              {{ labGroup.name }}
+            </mat-list-option>
+          }
+        </mat-selection-list>
+        <mat-paginator [length]="labGroupQuery?.count" [pageSize]="limit" [pageIndex]="offset" (page)="onPageChange($event)"></mat-paginator>
+      </div>
+      <mat-form-field>
+        <input matInput formControlName="token" type="text" readonly>
+        <mat-label>Registration token</mat-label>
+        <mat-hint>Automatically assigned</mat-hint>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary">Register</button>
+    </form>
+  </div>
+</div>

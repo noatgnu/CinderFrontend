@@ -1,1 +1,17 @@
-<p>admin works!</p>
+@if (isStaff) {
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+    <div style="width: 600px">
+      <mat-tab-group>
+        <mat-tab label="User Management">
+          <app-user-management></app-user-management>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+} @else {
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 20px">
+    <p>
+      You are not authorized to view this page.
+    </p>
+  </div>
+}
