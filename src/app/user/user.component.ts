@@ -47,19 +47,29 @@ export class UserComponent {
     if (!value) {
       this.web.getCurrentUser().subscribe((user) => {
         this._user = user
+        this.form.patchValue({
+          username: this._user.username,
+          first_name: this._user.first_name,
+          last_name: this._user.last_name,
+          email: this._user.email
+        })
         }
       )
     } else {
       this._user = value
+      this.form.patchValue({
+        username: this._user.username,
+        first_name: this._user.first_name,
+        last_name: this._user.last_name,
+        email: this._user.email
+      })
     }
 
-    this.form.patchValue(value)
+
     this.web.getCurrentUserLabGroups().subscribe((labGroups) => {
       this.labGroupForm.controls.lab_group.setValue(labGroups)
     })
     this.fetchLabGroups()
-    console.log(value)
-    console.log(this._user)
   }
 
   get user(): User {

@@ -1,8 +1,6 @@
 <mat-toolbar>
   <mat-toolbar-row>
-    <button mat-icon-button (click)="navigateToHome()">
-      <mat-icon>whatshot</mat-icon>
-    </button>
+    <a href="/#/home"><img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'"></a>
     <span class="spacer"></span>
     <button mat-icon-button (click)="openQRCodeDialog()">
       <mat-icon>qr_code</mat-icon>

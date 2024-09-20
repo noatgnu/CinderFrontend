@@ -33,6 +33,7 @@ import {CollateTagCreateDialogComponent} from "../collate-tag-create-dialog/coll
 import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
 import {forkJoin, Observable} from "rxjs";
 import {MatCheckbox} from "@angular/material/checkbox";
+import {AccountsService} from "../../accounts/accounts.service";
 
 @Component({
   selector: 'app-collate-editor',
@@ -71,10 +72,14 @@ import {MatCheckbox} from "@angular/material/checkbox";
 })
 export class CollateEditorComponent {
   private _collate: Collate | null = null;
+  canEdit: boolean = false;
   @Input() set collateId(value: number | null) {
     if (value) {
       this.collateService.getCollate(value).subscribe((collate: Collate) => {
         this._collate = collate;
+        this.accounts.getCollatePermissions(collate.id).subscribe((permissions) => {
+          this.canEdit = permissions.edit;
+        });
         this.projects = collate.projects;
         if (!this._collate.settings) {
           this._collate.settings = {
@@ -133,7 +138,7 @@ export class CollateEditorComponent {
   filteredResults: { [projectId: number]: SearchResult[] } = {};
   removedTags: CollateTag[] = [];
 
-  constructor(private graph: GraphService, private router: Router, private snackBar: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
+  constructor(private accounts: AccountsService, private graph: GraphService, private router: Router, private snackBar: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
 
   openProjectAddDialog() {
     const dialogRef = this.dialog.open(ProjectAddDialogComponent);

@@ -17,22 +17,24 @@ import {Router} from "@angular/router";
 import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
 import {MatDialog} from "@angular/material/dialog";
 import {CollateQrCodeDialogComponent} from "../collate-qr-code-dialog/collate-qr-code-dialog.component";
+import {NgOptimizedImage} from "@angular/common";
 
 @Component({
   selector: 'app-collate-view',
   standalone: true,
-  imports: [
-    CollateHeaderComponent,
-    CollateSearchComponent,
-    MatTab,
-    MatTabGroup,
-    CollateProjectListComponent,
-    MatIcon,
-    MatIconButton,
-    MatToolbarRow,
-    MatToolbar,
-    CollateTagsComponent
-  ],
+    imports: [
+        CollateHeaderComponent,
+        CollateSearchComponent,
+        MatTab,
+        MatTabGroup,
+        CollateProjectListComponent,
+        MatIcon,
+        MatIconButton,
+        MatToolbarRow,
+        MatToolbar,
+        CollateTagsComponent,
+        NgOptimizedImage
+    ],
   templateUrl: './collate-view.component.html',
   styleUrl: './collate-view.component.scss'
 })
