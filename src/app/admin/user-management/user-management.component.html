@@ -1,4 +1,4 @@
-<h1>Create User</h1>
+<h1>Generate Registration Link</h1>
 <form [formGroup]="userTokenForm" (ngSubmit)="createUserToken()" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
   <mat-form-field>
     <input matInput formControlName="username" placeholder="Username" type="text">
@@ -10,15 +10,15 @@
   @if (userTokenLink) {
     <mat-card appearance="outlined">
       <mat-card-content>
-        <p>
-          Username: {{userTokenForm.value.username}}
-        </p>
-        <div style="display: flex; align-items: center">
-          <span>Copy Link:</span> <mat-icon (click)="copyTokenLink()">content_paste</mat-icon>
-        </div>
-
+        Registration Link and Information
+        <mat-form-field style="width:100%">
+          <input matInput [value]="userTokenLink" type="text" readonly>
+          <mat-label>Registration Link</mat-label>
+          <button mat-icon-button  matSuffix (click)="copyTokenLink()">
+            <mat-icon>content_paste</mat-icon>
+          </button>
+        </mat-form-field>
       </mat-card-content>
     </mat-card>
   }
-
 </form>

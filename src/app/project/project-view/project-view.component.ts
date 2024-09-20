@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Project} from "../project";
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {WebService} from "../../web.service";
@@ -36,18 +36,25 @@ import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-
     MatSelect,
     MatSelectionList,
     MatListOption,
-    MatIconButton
+    MatIconButton,
+    MatSuffix
   ],
   templateUrl: './project-view.component.html',
   styleUrl: './project-view.component.scss'
 })
 export class ProjectViewComponent {
   private _project?: Project|undefined
+
+  canEdit = false
+
   @Input() set project(value: Project|undefined) {
     this._project = value
     if (!value) {
       return
     }
+    this.accounts.getProjectPermissions(value.id).subscribe((data) => {
+      this.canEdit = data.edit
+    })
     this.titleService.setTitle(`Project - ${value.name}`)
     this.form.controls.name.setValue(value.name)
     this.form.controls.description.setValue(value.description)

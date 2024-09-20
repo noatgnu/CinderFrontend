@@ -10,21 +10,17 @@
           <textarea matInput formControlName="description" placeholder="Project Description"></textarea>
           <mat-label>Project Description</mat-label>
         </mat-form-field>
-        <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">
-          <mat-form-field style="width: 100%">
-            <input matInput formControlName="species_name" placeholder="Species Name" type="search">
-            <mat-label>Species Name Search</mat-label>
-          </mat-form-field>
-          @if (speciesEditable) {
-            <button mat-icon-button (click)="changeSpeciesEditableState()">
+        <mat-form-field style="width: 100%">
+          <input matInput formControlName="species_name" placeholder="Species Name" type="search">
+          <mat-label>Species Name Search</mat-label>
+          <button mat-icon-button matSuffix (click)="changeSpeciesEditableState()">
+            @if (speciesEditable) {
               <mat-icon>lock_open</mat-icon>
-            </button>
-          } @else {
-            <button mat-icon-button (click)="changeSpeciesEditableState()">
+            } @else {
               <mat-icon>lock</mat-icon>
-            </button>
-          }
-        </div>
+            }
+          </button>
+        </mat-form-field>
 
         @if (speciesQuery && speciesEditable) {
           @if (speciesQuery.results.length > 0) {
@@ -39,9 +35,11 @@
         }
 
         <div style="display: flex; flex-direction: row; gap: 20px">
-          <button mat-flat-button color="primary" type="submit" [disabled]="!accounts.loggedIn">Update</button>
-          <button mat-flat-button color="accent" [disabled]="!accounts.loggedIn" (click)="openAnalysisGroupCreateModal()"><mat-icon>add</mat-icon> Analysis Group</button>
-          <button mat-flat-button color="warn" [disabled]="!accounts.loggedIn" (click)="deleteProject()">Delete</button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="!canEdit">Update</button>
+          @if (canEdit) {
+            <button mat-flat-button color="accent" (click)="openAnalysisGroupCreateModal()"><mat-icon>add</mat-icon> Analysis Group</button>
+            <button mat-flat-button color="warn" (click)="deleteProject()">Delete</button>
+          }
         </div>
       </form>
       @if (analysisGroupQuery) {

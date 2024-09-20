@@ -81,4 +81,16 @@ export class AccountsService {
   saveToStorage() {
     localStorage.setItem("cinderUserAccount", JSON.stringify(this.userAccount))
   }
+
+  getProjectPermissions(project_id: number) {
+    return this.http.get<{'edit': boolean}>(`${this.baseURL}/api/projects/${project_id}/permissions/`, {responseType: 'json', observe: 'body'})
+  }
+
+  getAnalysisGroupPermissions(analysis_group_id: number) {
+    return this.http.get<{'edit': boolean}>(`${this.baseURL}/api/analysis_groups/${analysis_group_id}/permissions/`, {responseType: 'json', observe: 'body'})
+  }
+
+  getCollatePermissions(collate_id: number) {
+    return this.http.get<{'edit': boolean}>(`${this.baseURL}/api/collates/${collate_id}/permissions/`, {responseType: 'json', observe: 'body'})
+  }
 }

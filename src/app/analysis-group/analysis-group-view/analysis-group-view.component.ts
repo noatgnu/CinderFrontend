@@ -52,6 +52,9 @@ export class AnalysisGroupViewComponent {
   associatedProject?: Project|undefined
   private _analysisGroup: AnalysisGroup|undefined
   analysisType: string = "proteomics"
+
+  canEdit: boolean = false
+
   composingCurtainProgress: any = {
     progress: 0,
     message: "",
@@ -61,6 +64,12 @@ export class AnalysisGroupViewComponent {
   }
   @Input() set analysisGroup(value: AnalysisGroup|undefined) {
     this._analysisGroup = value
+    if (value) {
+      this.accounts.getAnalysisGroupPermissions(value.id).subscribe((data) => {
+        this.canEdit = data.edit
+      })
+    }
+
     this.curtainData = undefined
     if (value) {
       if (value.curtain_link) {
