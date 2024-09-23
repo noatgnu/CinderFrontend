@@ -123,6 +123,9 @@ export class WebService {
           params = params.append('lab_group', lab_group.toString())
         }
       }
+      if (userAccount.currentUser) {
+        params = params.append('users', userAccount.currentUser.toString())
+      }
     }
 
     params = params.append('ordering', '-created_at')
@@ -184,6 +187,9 @@ export class WebService {
         if (lab_group) {
           params = params.append('lab_group', lab_group.toString())
         }
+      }
+      if (userAccount.currentUser) {
+        params = params.append('users', userAccount.currentUser.toString())
       }
     }
     params = params.append('ordering', '-created_at')
@@ -750,7 +756,7 @@ export class WebService {
     )
   }
 
-  getUsers(search: string|null|undefined, limit: number = 10, offset: number = 0) {
+  getUsers(search: string|null|undefined, limit: number = 10, offset: number = 0, lab_group: number|null = null) {
     let params = new HttpParams()
     if (search && search !== "") {
       params = params.append('search', search)
@@ -760,6 +766,11 @@ export class WebService {
     }
     if (offset) {
       params = params.append('offset', offset.toString())
+    }
+    if (lab_group) {
+      if (lab_group !== 0) {
+        params = params.append('lab_group', lab_group.toString())
+      }
     }
     return this.http.get<UserQuery>(
       `${this.baseURL}/api/users/`,

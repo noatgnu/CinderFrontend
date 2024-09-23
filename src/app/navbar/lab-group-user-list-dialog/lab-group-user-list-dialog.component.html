@@ -1,0 +1,47 @@
+<h1 mat-dialog-title>Select Lab Member</h1>
+<div mat-dialog-content>
+  <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px" (ngSubmit)="fetchMembers()">
+    <mat-form-field>
+      <input matInput formControlName="searchTerm">
+      <mat-label>Search Term</mat-label>
+      <button mat-icon-button matSuffix (click)="fetchMembers()">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+  </form>
+  @if (memberQuery) {
+    <table mat-table [dataSource]="memberQuery.results" class="mat-elevation-z8">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let user"> {{user.id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef> Username </th>
+        <td mat-cell *matCellDef="let user"> {{user.username}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="first_name">
+        <th mat-header-cell *matHeaderCellDef> First Name </th>
+        <td mat-cell *matCellDef="let user"> {{user.first_name}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="last_name">
+        <th mat-header-cell *matHeaderCellDef> Last Name </th>
+        <td mat-cell *matCellDef="let user"> {{user.last_name}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="submit(row)"></tr>
+    </table>
+    <mat-paginator
+      [length]="memberQuery.count"
+      [pageSize]="limit"
+      [pageIndex]="offset"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  }
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="close()">Cancel</button>
+</div>

@@ -4,4 +4,5 @@ export interface UserAccount {
   darkMode: boolean
   lastVisited: Date
   currentLabGroup: number|null
+  currentUser: number|null
 }

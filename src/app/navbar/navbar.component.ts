@@ -14,6 +14,8 @@ import {NavigationEnd, Router} from "@angular/router";
 import {LabGroup} from "../lab-group";
 import {WebService} from "../web.service";
 import {LabGroupCreateDialogComponent} from "./lab-group-create-dialog/lab-group-create-dialog.component";
+import {LabGroupUserListDialogComponent} from "./lab-group-user-list-dialog/lab-group-user-list-dialog.component";
+import {User} from "../user/user";
 
 @Component({
   selector: 'app-navbar',
@@ -36,9 +38,19 @@ export class NavbarComponent implements OnInit {
   labGroups: LabGroup[] = [];
   isCollateView = false;
   currentLabGroup: LabGroup | undefined;
+  currentUser: User | undefined;
 
   constructor(private webService: WebService, private router: Router, public accounts: AccountsService, private dialog: MatDialog, private graphService: GraphService) {
-
+    if (this.accounts.userAccount.currentUser) {
+      this.webService.getUser(this.accounts.userAccount.currentUser).subscribe({
+        next: (response) => {
+          this.currentUser = response;
+        },
+        error: (err) => {
+          console.error('Error fetching user:', err);
+        }
+      });
+    }
   }
 
   ngOnInit() {
@@ -107,4 +119,18 @@ export class NavbarComponent implements OnInit {
     });
   }
 
+  openLabMemberDialog() {
+    const ref = this.dialog.open(LabGroupUserListDialogComponent)
+    if (this.currentLabGroup) {
+      ref.componentInstance.labGroupID = this.currentLabGroup.id;
+    }
+    ref.afterClosed().subscribe((result: User) => {
+      this.currentUser = result;
+      this.accounts.userAccount.currentUser = result.id;
+      this.accounts.saveToStorage();
+      this.webService.updateFromLabGroupSelection.next(true);
+
+    })
+
+  }
 }

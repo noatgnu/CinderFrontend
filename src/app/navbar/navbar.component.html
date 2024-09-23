@@ -6,6 +6,7 @@
       </div>
 
       <span class="spacer"></span>
+      <button mat-button (click)="openLabMemberDialog()">Filter By Lab Member @if (currentUser) { ({{currentUser.first_name}} {{currentUser.last_name}})}</button>
       <button mat-button [matMenuTriggerFor]="labGroupMenu">@if (currentLabGroup) { {{currentLabGroup.name}} } @else {All Lab Group Selected}</button>
       @if (accounts.loggedIn && accounts.currentUser) {
         <button mat-button [matMenuTriggerFor]="userMenu">Logged in as: {{accounts.currentUser.username}} @if(accounts.currentUser.is_staff) {<mat-icon>shield_person</mat-icon>} @else {<mat-icon>person</mat-icon>}</button>

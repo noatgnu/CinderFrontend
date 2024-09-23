@@ -14,7 +14,7 @@ export class AccountsService {
   baseURL: string = environment.baseURL;
   username: string = ""
   lastVisited: Date = new Date()
-  userAccount: UserAccount = {token: "", username: "", darkMode: false, lastVisited: new Date(), currentLabGroup: null}
+  userAccount: UserAccount = {token: "", username: "", darkMode: false, lastVisited: new Date(), currentLabGroup: null, currentUser: null}
   triggerLoginSubject: Subject<boolean> = new Subject<boolean>()
   is_staff: boolean = false
   currentUser: User|null = null

@@ -31,6 +31,9 @@ export class CollateService {
       if (userAccount.currentLabGroup) {
         params = params.append('lab_group', userAccount.currentLabGroup.toString())
       }
+      if (userAccount.currentUser) {
+        params = params.append('users', userAccount.currentUser.toString())
+      }
     }
     return this.http.get<CollateQuery>(
       `${this.baseURL}/api/collates`,
