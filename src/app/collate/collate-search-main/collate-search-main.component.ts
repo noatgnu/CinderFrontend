@@ -10,6 +10,7 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {FormBuilder, FormControl, ReactiveFormsModule} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
+import {WebService} from "../../web.service";
 
 @Component({
   selector: 'app-collate-search-main',
@@ -40,11 +41,22 @@ export class CollateSearchMainComponent implements OnInit {
   })
 
 
-  constructor(private fb: FormBuilder, private snackBar: MatSnackBar, private router: Router, private collateService: CollateService, private dialog: MatDialog) {
+  constructor(private web: WebService, private fb: FormBuilder, private snackBar: MatSnackBar, private router: Router, private collateService: CollateService, private dialog: MatDialog) {
     this.form.controls.selected.valueChanges.subscribe((value: Collate[]|null) => {
       if (value) {
 
         this.router.navigate([`/collate/view/${value[0].id}`]).then();
+      }
+    })
+
+    this.web.updateFromLabGroupSelection.subscribe((value) => {
+      if (value) {
+        // @ts-ignore
+        this.collateService.getCollates(this.limit, this.offset, this.form.controls.query.value, []).subscribe(data =>{
+          this.collates = data.results;
+          this.totalCount = data.count;
+
+        })
       }
     })
   }
@@ -75,10 +87,7 @@ export class CollateSearchMainComponent implements OnInit {
 
   onCollateSelect(event: MatSelectionListChange) {
     this.selectedCollate = event.options[0].value;
-    }
-
-
-
+  }
 
   handlePageEvent(event: PageEvent) {
     this.limit = event.pageSize;

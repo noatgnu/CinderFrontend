@@ -12,7 +12,7 @@ import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from
 import {Projects} from "@angular/cli/lib/config/workspace-schema";
 import {Species, SpeciesQuery} from "./species";
 import {LabGroup, LabGroupQuery} from "./lab-group";
-import {User} from "./user/user";
+import {User, UserQuery} from "./user/user";
 
 
 
@@ -688,7 +688,7 @@ export class WebService {
     )
   }
 
-  updateUser(id: number, email: string|null|undefined, password: string|null|undefined, last_name: string|null|undefined, first_name: string|null|undefined) {
+  updateUser(id: number, email: string|null|undefined, password: string|null|undefined, last_name: string|null|undefined, first_name: string|null|undefined, username: string|null|undefined=null) {
     const payload: any = {}
 
     if (email) {
@@ -704,6 +704,9 @@ export class WebService {
       payload["first_name"] = first_name
     }
 
+    if (username) {
+      payload["username"] = username
+    }
     return this.http.put<User>(
       `${this.baseURL}/api/users/${id}/`,
       payload,
@@ -738,6 +741,30 @@ export class WebService {
       payload['lab_group'] = lab_group_id.map((lg) => lg.id)
     }
     return this.http.post<User>(`${this.baseURL}/api/users/create_with_token/`, payload, {responseType: 'json', observe: 'body'})
+  }
+
+  getUser(id: number) {
+    return this.http.get<User>(
+      `${this.baseURL}/api/users/${id}/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getUsers(search: string|null|undefined, limit: number = 10, offset: number = 0) {
+    let params = new HttpParams()
+    if (search && search !== "") {
+      params = params.append('search', search)
+    }
+    if (limit) {
+      params = params.append('limit', limit.toString())
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString())
+    }
+    return this.http.get<UserQuery>(
+      `${this.baseURL}/api/users/`,
+      {responseType: 'json', observe: 'body', params: params}
+    )
   }
 
 }

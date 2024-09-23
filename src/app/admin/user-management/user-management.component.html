@@ -22,3 +22,46 @@
     </mat-card>
   }
 </form>
+<mat-divider></mat-divider>
+<h1>Manage Users</h1>
+<form [formGroup]="userSearchForm" (ngSubmit)="fetchUsers()" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
+  <mat-form-field>
+    <input matInput formControlName="query" placeholder="Search" type="text">
+    <mat-label>Search Term</mat-label>
+  </mat-form-field>
+</form>
+@if (userQuery) {
+  <table mat-table [dataSource]="userQuery.results" class="mat-elevation-z8">
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef> ID </th>
+      <td mat-cell *matCellDef="let user"> {{user.id}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="username">
+      <th mat-header-cell *matHeaderCellDef> Username </th>
+      <td mat-cell *matCellDef="let user"> {{user.username}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="first_name">
+      <th mat-header-cell *matHeaderCellDef> First Name </th>
+      <td mat-cell *matCellDef="let user"> {{user.first_name}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="last_name">
+      <th mat-header-cell *matHeaderCellDef> Last Name </th>
+      <td mat-cell *matCellDef="let user"> {{user.last_name}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="openEditUserDialog(row)"></tr>
+  </table>
+  <mat-paginator
+    [length]="userQuery.count"
+    [pageSize]="limit"
+    [pageIndex]="offset"
+    (page)="onPageChange($event)">
+  </mat-paginator>
+} @else {
+  <p>No users found.</p>
+}
+

@@ -88,12 +88,14 @@ export class NavbarComponent implements OnInit {
     this.currentLabGroup = labGroup;
     this.accounts.userAccount.currentLabGroup = labGroup.id;
     this.accounts.saveToStorage();
+    this.webService.updateFromLabGroupSelection.next(true);
   }
 
   selectAllLabGroups() {
     this.currentLabGroup = undefined;
     this.accounts.userAccount.currentLabGroup = null;
     this.accounts.saveToStorage();
+    this.webService.updateFromLabGroupSelection.next(true);
   }
 
   openLabGroupCreateDialog() {

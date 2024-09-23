@@ -192,9 +192,9 @@ export class UserComponent {
         }
       });
 
-      existingLabGroups.forEach(labGroup => {
-        if (!currentLabGroupIds.has(labGroup.id)) {
-          this.web.removeLabGroupMember(labGroup.id, this.user.id).subscribe();
+      currentLabGroupIds.forEach(labGroup => {
+        if (!existingLabGroupIds.has(labGroup)) {
+          this.web.removeLabGroupMember(labGroup, this.user.id).subscribe();
         }
       });
     });

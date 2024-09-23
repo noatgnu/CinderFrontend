@@ -25,6 +25,13 @@ export class CollateService {
     if (tag_ids) {
       params = params.append('tag_ids', tag_ids.join(','))
     }
+    const user = localStorage.getItem("cinderUserAccount")
+    if (user) {
+      const userAccount = JSON.parse(user)
+      if (userAccount.currentLabGroup) {
+        params = params.append('lab_group', userAccount.currentLabGroup.toString())
+      }
+    }
     return this.http.get<CollateQuery>(
       `${this.baseURL}/api/collates`,
       {params: params}
