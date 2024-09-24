@@ -85,8 +85,8 @@ export class CollateSearchComponent {
         analysisGroupIDs,
         this.form.value.searchQuery,
         this.web.searchSessionID,
-        0.0001,
-        0.0001,
+        0.000000001,
+        0.000000001,
         this.form.value.searchMode
       ).subscribe({
         next: () => {

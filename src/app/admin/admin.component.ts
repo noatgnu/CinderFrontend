@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {AccountsService} from "../accounts/accounts.service";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {UserManagementComponent} from "./user-management/user-management.component";
+import {CollateManagementComponent} from "./collate-management/collate-management.component";
 
 @Component({
   selector: 'app-admin',
@@ -9,7 +10,8 @@ import {UserManagementComponent} from "./user-management/user-management.compone
   imports: [
     MatTabGroup,
     MatTab,
-    UserManagementComponent
+    UserManagementComponent,
+    CollateManagementComponent
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'

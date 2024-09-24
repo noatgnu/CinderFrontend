@@ -62,7 +62,7 @@ export class CollateComponent implements OnInit{
   searchTags: CollateTag[] = [];
   selectedCollate: Collate | null = null;
   searchTerm: string = '';
-  limit: number = 10;
+  limit: number = 5;
   offset: number = 0;
   totalCount: number = 0;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];

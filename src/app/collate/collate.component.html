@@ -51,7 +51,7 @@
               </mat-list-option>
             }
           </mat-selection-list>
-          <mat-paginator [length]="totalCount" [pageSize]="limit" [pageSizeOptions]="[5, 10, 20]" (page)="handlePageEvent($event)">
+          <mat-paginator [length]="totalCount" [pageSize]="limit" (page)="handlePageEvent($event)">
           </mat-paginator>
         } @else {
           <p>No collates could be found.</p>
