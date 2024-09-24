@@ -94,4 +94,8 @@ export class LabGroupUserListDialogComponent {
     this.fetchMembers()
   }
 
+  selectAll() {
+    this.dialogRef.close({all: true})
+  }
+
 }

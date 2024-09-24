@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
+import {WebService} from "../web.service";
 
 @Component({
   selector: 'app-footer',
@@ -8,5 +9,9 @@ import { Component } from '@angular/core';
   styleUrl: './footer.component.scss'
 })
 export class FooterComponent {
+  @Input() text: string|undefined = ''
+
+  constructor() {
+  }
 
 }

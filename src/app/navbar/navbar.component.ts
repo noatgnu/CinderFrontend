@@ -124,13 +124,20 @@ export class NavbarComponent implements OnInit {
     if (this.currentLabGroup) {
       ref.componentInstance.labGroupID = this.currentLabGroup.id;
     }
-    ref.afterClosed().subscribe((result: User) => {
-      this.currentUser = result;
-      this.accounts.userAccount.currentUser = result.id;
+    ref.afterClosed().subscribe((result: User|{all: boolean}) => {
+      if ("all" in result) {
+        this.currentUser = undefined;
+        this.accounts.userAccount.currentUser = null;
+      } else {
+        this.currentUser = result;
+        this.accounts.userAccount.currentUser = result.id;
+      }
+
       this.accounts.saveToStorage();
       this.webService.updateFromLabGroupSelection.next(true);
 
     })
 
   }
+
 }

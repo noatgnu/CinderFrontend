@@ -778,4 +778,8 @@ export class WebService {
     )
   }
 
+
+  getFrontEndTemplateData() {
+    return this.http.get<{footer: string}>(`${this.baseURL}/api/frontend_template/`, {responseType: 'json', observe: 'body'})
+  }
 }
