@@ -278,6 +278,7 @@ export class AnalysisGroupViewComponent {
 
   openExtraDataModal(file: ProjectFile) {
     const ref = this.matDialog.open(FileExtraDataModalComponent)
+    ref.componentInstance.analysisGroupType = this.analysisGroup?.analysis_group_type
     ref.componentInstance.file = file
     ref.afterClosed().subscribe((data) => {
       if (data) {

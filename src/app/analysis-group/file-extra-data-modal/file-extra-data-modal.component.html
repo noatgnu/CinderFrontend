@@ -27,6 +27,40 @@
           </mat-select>
           <mat-label>UniProt Accession ID Column</mat-label>
         </mat-form-field>
+        @if (analysisGroupType && analysisGroupType === "ptm") {
+          <mat-form-field>
+            <mat-select formControlName="modification_position_in_peptide_col">
+              @for (c of columns; track c) {
+                <mat-option [value]="c">{{c}}</mat-option>
+              }
+            </mat-select>
+            <mat-label>Mod Position in Peptide Column</mat-label>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-select formControlName="modification_position_in_protein_col">
+              @for (c of columns; track c) {
+                <mat-option [value]="c">{{c}}</mat-option>
+              }
+            </mat-select>
+            <mat-label>Mod Position in Protein Column</mat-label>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-select formControlName="localization_prob_col">
+              @for (c of columns; track c) {
+                <mat-option [value]="c">{{c}}</mat-option>
+              }
+            </mat-select>
+            <mat-label>Localization Probability Column</mat-label>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-select formControlName="peptide_seq_col">
+              @for (c of columns; track c) {
+                <mat-option [value]="c">{{c}}</mat-option>
+              }
+            </mat-select>
+            <mat-label>Peptide Sequence Column</mat-label>
+          </mat-form-field>
+        }
       </form>
     } @else if (file.file_category === 'searched') {
       <form [formGroup]="formSearchedColumn" style="display: flex; flex-direction: column; gap: 10px">

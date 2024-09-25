@@ -112,9 +112,6 @@ export class ProjectViewComponent {
   }
 
   updateProject() {
-    if (this.form.invalid) {
-      return
-    }
     if (this.form.value.species) {
       // @ts-ignore
       this.web.updateProject(this.project.id, this.form.value.name, this.form.value.description, this.form.value.species[0].id).subscribe((data) => {

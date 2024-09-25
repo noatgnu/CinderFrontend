@@ -7,6 +7,8 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOption} from "@angular/material/core";
 import {MatSelect} from "@angular/material/select";
 import {MatButton} from "@angular/material/button";
+import {AnalysisGroup} from "../analysis-group";
+import {MatInput} from "@angular/material/input";
 
 @Component({
   selector: 'app-file-extra-data-modal',
@@ -20,17 +22,18 @@ import {MatButton} from "@angular/material/button";
     MatSelect,
     MatFormField,
     MatDialogActions,
-    MatButton
+    MatButton,
+    MatInput
   ],
   templateUrl: './file-extra-data-modal.component.html',
   styleUrl: './file-extra-data-modal.component.scss'
 })
 export class FileExtraDataModalComponent {
   private _file: ProjectFile|undefined = undefined
+  @Input() analysisGroupType: string|undefined = undefined
   @Input() set file(value: ProjectFile) {
     this._file = value
     if (value.extra_data) {
-      console.log(value.extra_data)
       if (value.file_category === "df") {
         this.formDFColumn.controls.primary_id_col.setValue(value.extra_data.primary_id_col)
         this.formDFColumn.controls.gene_name_col.setValue(value.extra_data.gene_name_col)
@@ -39,7 +42,6 @@ export class FileExtraDataModalComponent {
         this.formDFColumn.controls.modification_position_in_peptide_col.setValue(value.extra_data.modification_position_in_peptide_col)
         this.formDFColumn.controls.modification_position_in_protein_col.setValue(value.extra_data.modification_position_in_protein_col)
         this.formDFColumn.controls.localization_prob_col.setValue(value.extra_data.localization_prob_col)
-        console.log(this.formDFColumn.value)
       } else if (value.file_category === "searched") {
         this.formSearchedColumn.controls.primary_id_col.setValue(value.extra_data.primary_id_col)
         this.formSearchedColumn.controls.gene_name_col.setValue(value.extra_data.gene_name_col)
@@ -103,6 +105,18 @@ export class FileExtraDataModalComponent {
       }
       if (this.formDFColumn.controls.gene_name_col.value){
         payload["extra_data"]["gene_name_col"] = this.formDFColumn.controls.gene_name_col.value
+      }
+      if (this.formDFColumn.controls.modification_position_in_peptide_col.value){
+        payload["extra_data"]["modification_position_in_peptide_col"] = this.formDFColumn.controls.modification_position_in_peptide_col.value
+      }
+      if (this.formDFColumn.controls.modification_position_in_protein_col.value){
+        payload["extra_data"]["modification_position_in_protein_col"] = this.formDFColumn.controls.modification_position_in_protein_col.value
+      }
+      if (this.formDFColumn.controls.localization_prob_col.value) {
+        payload["extra_data"]["localization_prob_col"] = this.formDFColumn.controls.localization_prob_col.value
+      }
+      if (this.formDFColumn.controls.peptide_seq_col.value) {
+        payload["extra_data"]["peptide_seq_col"] = this.formDFColumn.controls.peptide_seq_col.value
       }
     } else if (this.file.file_category === "searched") {
       if (this.formSearchedColumn.controls.uniprot_id_col.value){
