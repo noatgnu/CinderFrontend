@@ -35,6 +35,12 @@ export interface SearchResult {
   uniprot_id: string|null
   copy_number: number|null
   rank: number|null
+  ptm_data: {
+    peptide_seq_col: null|string,
+    modification_position_in_peptide_col: null|string,
+    modification_position_in_protein_col: null|string,
+    localization_prob_col: null|number,
+  }|null
 }
 
 export interface SearchResultQuery {

@@ -9,7 +9,6 @@ import {SampleAnnotation} from "./sample-annotation";
 import {map, Subject} from "rxjs";
 import {ComparisonMatrix} from "./comparison-matrix";
 import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from "./search-session";
-import {Projects} from "@angular/cli/lib/config/workspace-schema";
 import {Species, SpeciesQuery} from "./species";
 import {LabGroup, LabGroupQuery} from "./lab-group";
 import {User, UserQuery} from "./user/user";

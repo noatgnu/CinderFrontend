@@ -282,7 +282,6 @@ export class AnalysisGroupViewComponent {
     ref.componentInstance.file = file
     ref.afterClosed().subscribe((data) => {
       if (data) {
-        console.log(data)
         this.web.updateProjectFileExtraData(file.id, data.extra_data).subscribe((new_file_data) => {
           if (file.file_category === "df") {
             this.analysisGroupDF = new_file_data

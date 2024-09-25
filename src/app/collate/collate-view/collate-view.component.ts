@@ -45,6 +45,14 @@ export class CollateViewComponent {
       this.collateService.getCollate(value).subscribe((collate: Collate) => {
         this.collate = collate;
         this.projects = collate.projects;
+        if (!collate.settings) {
+          collate.settings = {
+            projectOrder: [],
+            analysisGroupOrderMap: {},
+            projectConditionColorMap: {},
+            showTags: false,
+          };
+        }
         if (collate.settings.projectOrder) {
           this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
         }

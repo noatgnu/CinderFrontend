@@ -38,7 +38,7 @@
         <div style="display: flex; flex-direction: row; gap:10px">
           <button mat-flat-button color="primary" type="submit" [disabled]="!canEdit">Update Analysis Group</button>
           @if (analysisGroup.curtain_link) {
-            <button mat-flat-button color="primary" type="button" (click)="composeDataFromCurtain()" [disabled]="!accounts.loggedIn">Use Curtain Link For Data</button>
+            <button mat-flat-button color="primary" type="button" (click)="composeDataFromCurtain()" [disabled]="!canEdit">Use Curtain Link For Data</button>
           }
         </div>
       </form>
@@ -83,7 +83,7 @@
           <button mat-icon-button (click)="downloadFile(analysisGroupCopyNumber)"><mat-icon>download</mat-icon></button>
           @if (canEdit) {
             <button mat-icon-button (click)="deleteFile(analysisGroupCopyNumber)"><mat-icon>delete</mat-icon></button>
-            <button mat-flat-button color="primary" (click)="openExtraDataModal(analysisGroupCopyNumber)" [disabled]="!accounts.loggedIn">Extra Data</button>
+            <button mat-flat-button color="primary" (click)="openExtraDataModal(analysisGroupCopyNumber)" [disabled]="!canEdit">Extra Data</button>
           }
         }
       </div>
