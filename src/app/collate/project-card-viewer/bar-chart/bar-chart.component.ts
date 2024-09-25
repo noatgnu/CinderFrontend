@@ -27,6 +27,17 @@ export class BarChartComponent {
     return this._data;
   }
 
+  private _expanded: boolean = false;
+  @Input() set expanded(value: boolean) {
+    this._expanded = value;
+    if (this.data) {
+      this.drawGraph();
+    }
+  }
+  get expanded(): boolean {
+    return this._expanded;
+  }
+
   graphData: any[] = [];
   graphLayout: any = {
     title: "",
@@ -90,7 +101,7 @@ export class BarChartComponent {
       };
     }
     let dataCount = 0
-    if (this.data && this.data.condition_A && this.data.condition_B && this.data.searched_data) {
+    if (this.data && this.data.condition_A && this.data.condition_B && this.data.searched_data && !this.expanded) {
       this.conditionA = this.data.condition_A || ""
       this.conditionB = this.data.condition_B || ""
       this.valueA = this.data.searched_data.filter(x => x.Condition === this.conditionA).map(x => x.Value)
@@ -148,7 +159,7 @@ export class BarChartComponent {
       dataCount = 2
       this.graphData = [traceA, boxA, traceB, boxB]
 
-    } else if (this.data && (this.data.condition_A == "" || this.data.condition_B == "")){
+    } else if (this.data && (this.expanded || (this.data.condition_A == "" || this.data.condition_B == ""))){
       const uniqueConditions = Array.from(new Set(this.data.searched_data.map(x => x.Condition)))
       const meanValues = uniqueConditions.map(condition => {
         // @ts-ignore

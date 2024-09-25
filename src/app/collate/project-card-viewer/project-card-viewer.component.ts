@@ -15,6 +15,16 @@ import {AccountsService} from "../../accounts/accounts.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {GraphService} from "../../graph.service";
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell, MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow, MatRowDef, MatTable
+} from "@angular/material/table";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
 
 @Component({
   selector: 'app-project-card-viewer',
@@ -32,7 +42,18 @@ import {GraphService} from "../../graph.service";
     MatIcon,
     MatIconButton,
     CdkDrag,
-    CdkDropList
+    CdkDropList,
+    MatCell,
+    MatCellDef,
+    MatColumnDef,
+    MatHeaderCell,
+    MatHeaderRow,
+    MatHeaderRowDef,
+    MatRow,
+    MatRowDef,
+    MatTable,
+    MatHeaderCellDef,
+    MatSlideToggle
   ],
   templateUrl: './project-card-viewer.component.html',
   styleUrl: './project-card-viewer.component.scss'
@@ -57,7 +78,9 @@ export class ProjectCardViewerComponent {
   @Output() deleteProject: EventEmitter<Project> = new EventEmitter<Project>();
   @Output() searchResultsChange: EventEmitter<SearchResult[]> = new EventEmitter<SearchResult[]>();
 
+  searchResultDisplayColumns: string[] = ["primary_id", "uniprot_id", "gene_name", "condition_A", "condition_B", "log2_fc", "log10_p", "comparison_label"];
 
+  expanded: boolean = false;
   get searchResults(): SearchResult[] {
     return this._searchResults;
   }
