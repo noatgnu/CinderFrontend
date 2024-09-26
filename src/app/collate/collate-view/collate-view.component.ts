@@ -22,6 +22,7 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {Observable} from "rxjs";
 import {WebsocketService} from "../../websocket.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-collate-view',
@@ -41,7 +42,8 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     MatMenu,
     MatMenuItem,
     MatMenuTrigger,
-    MatTabLabel
+    MatTabLabel,
+    MatTooltip
   ],
   templateUrl: './collate-view.component.html',
   styleUrl: './collate-view.component.scss'

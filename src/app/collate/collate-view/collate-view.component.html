@@ -3,7 +3,7 @@
     <a href="/#/home"><img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'"></a>
     <span class="spacer"></span>
     @if (collate) {
-      <button mat-icon-button [matMenuTriggerFor]="previousSearch">
+      <button mat-icon-button [matMenuTriggerFor]="previousSearch" matTooltip="View previous searches">
         <mat-icon>history</mat-icon>
       </button>
       <mat-menu #previousSearch="matMenu">
@@ -20,11 +20,11 @@
       </mat-menu>
     }
 
-    <button mat-icon-button (click)="openQRCodeDialog()">
+    <button mat-icon-button (click)="openQRCodeDialog()" matTooltip="Open QR code dialog">
       <mat-icon>qr_code</mat-icon>
     </button>
     @if (accounts.loggedIn) {
-      <button mat-icon-button (click)="navigateToEdit()">
+      <button mat-icon-button (click)="navigateToEdit()" matTooltip="Edit collate">
         <mat-icon>edit</mat-icon>
       </button>
     }
@@ -52,7 +52,7 @@
         <mat-tab>
           <ng-template mat-tab-label >
             {{term}}
-            <button mat-icon-button (click)="exportData(term)" [disabled]="waitingForDownload">
+            <button mat-icon-button (click)="exportData(term)" [disabled]="waitingForDownload" matTooltip="Export data">
               <mat-icon>download</mat-icon>
             </button>
 

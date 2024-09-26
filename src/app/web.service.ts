@@ -570,7 +570,7 @@ export class WebService {
       params = params.append('offset', offset.toString())
     }
     if (search && search !== "") {
-      params = params.append('search', search)
+      params = params.append('search', `'${search}'`)
     }
     params = params.append('ordering', 'official_name')
     return this.http.get<SpeciesQuery>(
