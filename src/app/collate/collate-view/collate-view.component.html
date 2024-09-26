@@ -52,7 +52,10 @@
         <mat-tab>
           <ng-template mat-tab-label >
             {{term}}
-            <mat-icon (click)="exportData(term)">download</mat-icon>
+            <button mat-icon-button (click)="exportData(term)" [disabled]="waitingForDownload">
+              <mat-icon>download</mat-icon>
+            </button>
+
           </ng-template>
         </mat-tab>
 

@@ -86,7 +86,7 @@ export class CollateViewComponent {
   searchSession: SearchSession|undefined;
 
   pastSearches: {searchQuery: SearchResultQuery, termFounds: string[], collate: number, searchID:number}[] = [];
-
+  waitingForDownload = false
   constructor(private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
     const pastSearches = localStorage.getItem('cinderPastSearches');
     if (pastSearches) {
@@ -96,19 +96,23 @@ export class CollateViewComponent {
       if (data) {
         if (data.type === "export_status") {
           if (this.web.cinderInstanceID === data.instance_id) {
-            switch (data.status) {
-              case "error":
-                break
-              case "started":
-                this.sb.open("Export started", "Dismiss", {duration: 2000})
-                break
-              case "in_progress":
-                break
-              case "complete":
-                this.sb.open("Export complete", "Dismiss", {duration: 2000})
-                const link = `${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`
-                window.open(link, "_blank")
-                break
+            if (this.waitingForDownload) {
+              switch (data.status) {
+                case "error":
+                  this.waitingForDownload = false
+                  break
+                case "started":
+                  this.sb.open("Export started", "Dismiss", {duration: 2000})
+                  break
+                case "in_progress":
+                  break
+                case "complete":
+                  this.waitingForDownload = false
+                  this.sb.open("Export complete", "Dismiss", {duration: 2000})
+                  const link = `${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`
+                  window.open(link, "_blank")
+                  break
+              }
             }
           }
         }
@@ -210,7 +214,7 @@ export class CollateViewComponent {
   exportData(searchTerm: string) {
     // @ts-ignore
     this.web.exportSearchData(this.searchSession.id, searchTerm, 0.00000001, 0.00000001, this.web.searchSessionID).subscribe((data) => {
-
+      this.waitingForDownload = true
     })
   }
 }
