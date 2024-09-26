@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {SearchResult} from "../../search-session";
+import {SearchResult, SearchResultQuery} from "../../search-session";
 import {Project} from "../../project/project";
 import {Collate} from "../collate";
 import {CollateService} from "../collate.service";
@@ -18,23 +18,27 @@ import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
 import {MatDialog} from "@angular/material/dialog";
 import {CollateQrCodeDialogComponent} from "../collate-qr-code-dialog/collate-qr-code-dialog.component";
 import {NgOptimizedImage} from "@angular/common";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 
 @Component({
   selector: 'app-collate-view',
   standalone: true,
-    imports: [
-        CollateHeaderComponent,
-        CollateSearchComponent,
-        MatTab,
-        MatTabGroup,
-        CollateProjectListComponent,
-        MatIcon,
-        MatIconButton,
-        MatToolbarRow,
-        MatToolbar,
-        CollateTagsComponent,
-        NgOptimizedImage
-    ],
+  imports: [
+    CollateHeaderComponent,
+    CollateSearchComponent,
+    MatTab,
+    MatTabGroup,
+    CollateProjectListComponent,
+    MatIcon,
+    MatIconButton,
+    MatToolbarRow,
+    MatToolbar,
+    CollateTagsComponent,
+    NgOptimizedImage,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger
+  ],
   templateUrl: './collate-view.component.html',
   styleUrl: './collate-view.component.scss'
 })
@@ -76,10 +80,14 @@ export class CollateViewComponent {
     this._selectedSearchTerm = value;
   }
 
+  pastSearches: {searchQuery: SearchResultQuery, termFounds: string[], collate: number}[] = [];
 
 
   constructor(private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
-
+    const pastSearches = localStorage.getItem('cinderPastSearches');
+    if (pastSearches) {
+      this.pastSearches = JSON.parse(pastSearches);
+    }
   }
 
   async associateAnalysisGroupsWithProjects() {
@@ -137,9 +145,21 @@ export class CollateViewComponent {
       console.log(data)
     })
     this.web.getSearchResults(id,99999).subscribe((data) => {
+      if (!this.collate) {
+        return
+      }
       console.log(data.results)
+      const uniqueSearchTerms = Array.from(new Set(data.results.map(result => result.search_term)));
+      this.pastSearches.push({searchQuery: data, termFounds: uniqueSearchTerms, collate: this.collate.id});
+      // keep most recent 10 searches
+      this.pastSearches = this.pastSearches.slice(-10);
+      localStorage.setItem('cinderPastSearches', JSON.stringify(this.pastSearches));
       this.distributeSearchResults(data.results).then();
     })
+  }
+
+  restoreSearches(searchQuery: SearchResultQuery) {
+    this.distributeSearchResults(searchQuery.results).then();
   }
 
   navigateToEdit() {

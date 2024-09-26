@@ -5,6 +5,15 @@
       <mat-card-subtitle>{{ project.description }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
+      @if (searchResults.length > 0) {
+        <mat-slide-toggle
+          [color]="'primary'"
+          (change)="expanded = !expanded"
+        >
+          Expand Bar Chart
+        </mat-slide-toggle>
+      }
+      
       <div cdkDropList (cdkDropListDropped)="drop($event)" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center">
         @if (searchResults.length > 0) {
           @for (s of searchResults; track s.id) {
@@ -70,12 +79,7 @@
         @if (accounts.loggedIn) {
           <button mat-button color="primary" (click)="deleteProject.emit(project)"><mat-icon>delete</mat-icon></button>
         }
-        <mat-slide-toggle
-          [color]="'primary'"
-          (change)="expanded = !expanded"
-        >
-          Expand Bar Chart
-        </mat-slide-toggle>
+
       </mat-card-actions>
 
   </mat-card>

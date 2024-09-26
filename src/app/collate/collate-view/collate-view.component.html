@@ -2,6 +2,24 @@
   <mat-toolbar-row>
     <a href="/#/home"><img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'"></a>
     <span class="spacer"></span>
+    @if (collate) {
+      <button mat-icon-button [matMenuTriggerFor]="previousSearch">
+        <mat-icon>history</mat-icon>
+      </button>
+      <mat-menu #previousSearch="matMenu">
+        @if (pastSearches.length === 0) {
+          <button mat-menu-item disabled>No previous searches</button>
+        } @else {
+          @for (p of pastSearches; track p) {
+            @if (p.collate === collate.id) {
+              <button mat-menu-item (click)="restoreSearches(p.searchQuery)">{{p.termFounds.join(',')}}</button>
+            }
+          }
+        }
+
+      </mat-menu>
+    }
+
     <button mat-icon-button (click)="openQRCodeDialog()">
       <mat-icon>qr_code</mat-icon>
     </button>
@@ -37,4 +55,6 @@
   </div>
   <app-collate-project-list [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
 }
+
+
 
