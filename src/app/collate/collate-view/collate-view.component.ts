@@ -1,11 +1,11 @@
 import {Component, Input} from '@angular/core';
-import {SearchResult, SearchResultQuery} from "../../search-session";
+import {SearchResult, SearchResultQuery, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import {Collate} from "../collate";
 import {CollateService} from "../collate.service";
 import {CollateHeaderComponent} from "../collate-header/collate-header.component";
 import {CollateSearchComponent} from "../collate-search/collate-search.component";
-import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {MatTab, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
 import {CollateProjectListComponent} from "../collate-project-list/collate-project-list.component";
 import {WebService} from "../../web.service";
 import {AnalysisGroup} from "../../analysis-group/analysis-group";
@@ -19,6 +19,9 @@ import {MatDialog} from "@angular/material/dialog";
 import {CollateQrCodeDialogComponent} from "../collate-qr-code-dialog/collate-qr-code-dialog.component";
 import {NgOptimizedImage} from "@angular/common";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {Observable} from "rxjs";
+import {WebsocketService} from "../../websocket.service";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-collate-view',
@@ -37,7 +40,8 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
     NgOptimizedImage,
     MatMenu,
     MatMenuItem,
-    MatMenuTrigger
+    MatMenuTrigger,
+    MatTabLabel
   ],
   templateUrl: './collate-view.component.html',
   styleUrl: './collate-view.component.scss'
@@ -79,15 +83,37 @@ export class CollateViewComponent {
   set selectedSearchTerm(value: string) {
     this._selectedSearchTerm = value;
   }
+  searchSession: SearchSession|undefined;
 
   pastSearches: {searchQuery: SearchResultQuery, termFounds: string[], collate: number, searchID:number}[] = [];
 
-
-  constructor(private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
+  constructor(private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
     const pastSearches = localStorage.getItem('cinderPastSearches');
     if (pastSearches) {
       this.pastSearches = JSON.parse(pastSearches);
     }
+    this.ws.searchWSConnection?.subscribe((data) => {
+      if (data) {
+        if (data.type === "export_status") {
+          if (this.web.cinderInstanceID === data.instance_id) {
+            switch (data.status) {
+              case "error":
+                break
+              case "started":
+                this.sb.open("Export started", "Dismiss", {duration: 2000})
+                break
+              case "in_progress":
+                break
+              case "complete":
+                this.sb.open("Export complete", "Dismiss", {duration: 2000})
+                const link = `${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`
+                window.open(link, "_blank")
+                break
+            }
+          }
+        }
+      }
+    })
   }
 
   async associateAnalysisGroupsWithProjects() {
@@ -142,7 +168,7 @@ export class CollateViewComponent {
 
   getSearchFromID(id: number) {
     this.web.getSearchSession(id).subscribe((data) => {
-      console.log(data)
+      this.searchSession = data;
     })
     this.web.getSearchResults(id,99999).subscribe((data) => {
       if (!this.collate) {
@@ -158,7 +184,10 @@ export class CollateViewComponent {
     })
   }
 
-  restoreSearches(searchQuery: SearchResultQuery) {
+  restoreSearches(searchQuery: SearchResultQuery, searchID: number) {
+    this.web.getSearchSession(searchID).subscribe((data) => {
+      this.searchSession = data;
+    })
     this.distributeSearchResults(searchQuery.results).then();
   }
 
@@ -176,5 +205,12 @@ export class CollateViewComponent {
 
   navigateToHome() {
     this.router.navigate(['/']);
+  }
+
+  exportData(searchTerm: string) {
+    // @ts-ignore
+    this.web.exportSearchData(this.searchSession.id, searchTerm, 0.00000001, 0.00000001, this.web.searchSessionID).subscribe((data) => {
+
+    })
   }
 }

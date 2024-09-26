@@ -12,7 +12,7 @@
         } @else {
           @for (p of pastSearches; track p) {
             @if (p.collate === collate.id) {
-              <button mat-menu-item (click)="restoreSearches(p.searchQuery)">{{p.searchID}}. {{p.termFounds.join(',')}}</button>
+              <button mat-menu-item (click)="restoreSearches(p.searchQuery, p.searchID)">{{p.searchID}}. {{p.termFounds.join(',')}}</button>
             }
           }
         }
@@ -49,7 +49,13 @@
   <div style="padding: 20px">
     <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">
       @for (term of searchTerms; track term) {
-        <mat-tab [label]="term"></mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label >
+            {{term}}
+            <mat-icon (click)="exportData(term)">download</mat-icon>
+          </ng-template>
+        </mat-tab>
+
       }
     </mat-tab-group>
   </div>
