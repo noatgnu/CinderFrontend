@@ -13,7 +13,7 @@
           Expand Bar Chart
         </mat-slide-toggle>
       }
-      
+
       <div cdkDropList (cdkDropListDropped)="drop($event)" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center">
         @if (searchResults.length > 0) {
           @for (s of searchResults; track s.id) {
