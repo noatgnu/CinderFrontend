@@ -1,11 +1,15 @@
 @if (project) {
   <mat-card appearance="outlined">
-    <mat-card-header cdkDragHandle>
-      <mat-card-title><span style="color:#ba0000">{{ project.name }}</span></mat-card-title>
+    <mat-card-header>
+      <mat-card-title cdkDragHandle><span style="color:#ba0000">{{ project.name }}</span></mat-card-title>
       <mat-card-subtitle>{{ project.description }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
+      @if (project) {
+        <a href="/#/project/{{project.id}}" target="_blank"><mat-icon>link</mat-icon></a>
+      }
       @if (searchResults.length > 0) {
+
         <mat-slide-toggle
           [color]="'primary'"
           (change)="expanded = !expanded"
@@ -78,8 +82,10 @@
     </mat-card-content>
       <mat-card-actions>
         @if (accounts.loggedIn) {
-          <button mat-button color="primary" (click)="deleteProject.emit(project)"><mat-icon>delete</mat-icon></button>
+          <button mat-icon-button color="primary" (click)="deleteProject.emit(project)" matTooltip="Delete Project {{project.name}} from collate"><mat-icon>delete</mat-icon></button>
         }
+
+
       </mat-card-actions>
 
   </mat-card>

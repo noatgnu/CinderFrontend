@@ -25,6 +25,7 @@ import {
   MatRow, MatRowDef, MatTable
 } from "@angular/material/table";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-project-card-viewer',
@@ -53,7 +54,8 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
     MatRowDef,
     MatTable,
     MatHeaderCellDef,
-    MatSlideToggle
+    MatSlideToggle,
+    MatTooltip
   ],
   templateUrl: './project-card-viewer.component.html',
   styleUrl: './project-card-viewer.component.scss'
