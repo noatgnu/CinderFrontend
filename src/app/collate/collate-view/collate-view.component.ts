@@ -80,7 +80,7 @@ export class CollateViewComponent {
     this._selectedSearchTerm = value;
   }
 
-  pastSearches: {searchQuery: SearchResultQuery, termFounds: string[], collate: number}[] = [];
+  pastSearches: {searchQuery: SearchResultQuery, termFounds: string[], collate: number, searchID:number}[] = [];
 
 
   constructor(private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
@@ -150,7 +150,7 @@ export class CollateViewComponent {
       }
       console.log(data.results)
       const uniqueSearchTerms = Array.from(new Set(data.results.map(result => result.search_term)));
-      this.pastSearches.push({searchQuery: data, termFounds: uniqueSearchTerms, collate: this.collate.id});
+      this.pastSearches.push({searchQuery: data, termFounds: uniqueSearchTerms, collate: this.collate.id, searchID: id});
       // keep most recent 10 searches
       this.pastSearches = this.pastSearches.slice(-10);
       localStorage.setItem('cinderPastSearches', JSON.stringify(this.pastSearches));
