@@ -74,7 +74,7 @@
     </div>
   }
 
-  @if (collate?.settings?.projectConditionColorMap !== undefined && collate.settings.renameSampleCondition !== undefined && collate.settings.renameSampleCondition !== null) {
+  @if (collate?.settings?.projectConditionColorMap !== undefined && collate?.settings?.projectConditionColorMap !== undefined) {
     <app-collate-project-list
       [projectConditionColorMap]="collate.settings.projectConditionColorMap"
       (deleteProject)="deleteProject($event)"

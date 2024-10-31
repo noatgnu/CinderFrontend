@@ -76,7 +76,7 @@ export class ProjectCardViewerComponent {
   }
 
   @Input() colorMap: { [condition: string]: string } | undefined = {};
-  @Input() renameCondition: {[key: string]: string} = {}
+  @Input() renameCondition: {[key: string]: string} | undefined = {}
 
   @Output() deleteProject: EventEmitter<Project> = new EventEmitter<Project>();
 

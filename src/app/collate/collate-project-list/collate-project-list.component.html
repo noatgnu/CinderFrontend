@@ -3,7 +3,14 @@
     <div style="margin:20px">
       @if (project && project.id) {
 
-        <app-project-card-viewer [colorMap]="projectConditionColorMap?.[project.id]" (deleteProject)="deleteProject.emit($event)" [project]="project" [searchResults]="filteredResults[project.id] || []" [renameCondition]="renameCondition[project.id]" cdkDrag></app-project-card-viewer>
+        <app-project-card-viewer
+          [colorMap]="projectConditionColorMap?.[project.id]"
+          (deleteProject)="deleteProject.emit($event)"
+          [project]="project"
+          [searchResults]="filteredResults[project.id] || []"
+          [renameCondition]="renameCondition?.[project.id]" cdkDrag>
+
+        </app-project-card-viewer>
       }
     </div>
   }
