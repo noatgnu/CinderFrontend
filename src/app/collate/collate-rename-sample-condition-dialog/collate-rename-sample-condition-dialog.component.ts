@@ -19,6 +19,8 @@ import {MatChip, MatChipSet} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatFormField} from "@angular/material/form-field";
+import {MatInput} from "@angular/material/input";
 
 @Component({
   selector: 'app-collate-rename-sample-condition-dialog',
@@ -43,6 +45,8 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     MatHeaderCellDef,
     MatDialogActions,
     MatButton,
+    MatFormField,
+    MatInput,
   ],
   templateUrl: './collate-rename-sample-condition-dialog.component.html',
   styleUrl: './collate-rename-sample-condition-dialog.component.scss'
