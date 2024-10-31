@@ -18,6 +18,19 @@ PlotlyModule.plotlyjs = PlotlyJS;
 })
 export class BarChartComponent {
   private _data: SearchResult|null = null;
+  private _renameCondition: {[key: string]: string} = {}
+  @Input() set renameCondition(value: any) {
+    if (value) {
+      this._renameCondition = value
+    } else {
+      this._renameCondition = {}
+    }
+  }
+
+  get renameCondition(): {[key: string]: string} {
+    return this._renameCondition
+  }
+
   @Input() set data(value: SearchResult|null) {
     this._data = value;
     this.graphLayout.title = value?.analysis_group?.name || ""
@@ -113,11 +126,11 @@ export class BarChartComponent {
         this.currentColor++
       }
       const traceA = {
-        x: [this.conditionA],
+        x: [this.renameCondition[this.conditionA]],
         y: [meanA],
         type: 'bar',
         mode: 'markers',
-        name: this.conditionA,
+        name: this.renameCondition[this.conditionA],
         error_y: {
           type: 'data',
           array: [this.calculateWhisker(this.valueA)],
@@ -131,17 +144,17 @@ export class BarChartComponent {
         },
         showlegend: false
       }
-      const boxA = this.drawTransparentBoxPlot(this.valueA, this.conditionA)
+      const boxA = this.drawTransparentBoxPlot(this.valueA, this.renameCondition[this.conditionA])
       if (!this.colorMap[this.conditionB]) {
         this.colorMap[this.conditionB] = this.graph.defaultColorList[this.currentColor]
         this.currentColor++
       }
       const traceB = {
-        x: [this.conditionB],
+        x: [this.renameCondition[this.conditionB]],
         y: [meanB],
         type: 'bar',
         mode: 'markers',
-        name: this.conditionB,
+        name: this.renameCondition[this.conditionB],
         error_y: {
           type: 'data',
           array: [this.calculateWhisker(this.valueB)],
@@ -155,7 +168,7 @@ export class BarChartComponent {
         },
         showlegend: false
       }
-      const boxB = this.drawTransparentBoxPlot(this.valueB, this.conditionB)
+      const boxB = this.drawTransparentBoxPlot(this.valueB, this.renameCondition[this.conditionB])
       dataCount = 2
       this.graphData = [traceA, boxA, traceB, boxB]
 
@@ -182,11 +195,11 @@ export class BarChartComponent {
           }
         }
         return {
-          x: [condition],
+          x: [this.renameCondition[condition]],
           y: [meanValues[i]],
           type: 'bar',
           mode: 'markers',
-          name: condition,
+          name: this.renameCondition[condition],
           error_y: {
             type: 'data',
             array: [whiskerValues[i]],
@@ -204,7 +217,7 @@ export class BarChartComponent {
       const boxes = uniqueConditions.map((condition, i) => {
         // @ts-ignore
         const values = this.data.searched_data.filter(x => x.Condition === condition).map(x => x.Value)
-        return this.drawTransparentBoxPlot(values, condition)
+        return this.drawTransparentBoxPlot(values, this.renameCondition[condition])
       })
       dataCount = uniqueConditions.length
       this.graphData = [...traces, ...boxes]
