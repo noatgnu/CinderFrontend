@@ -73,20 +73,23 @@
       </mat-tab-group>
     </div>
   }
-  @if (collate?.settings) {
-    @if (
-      collate.settings.projectConditionColorMap !== undefined &&
-      collate.settings.renameSampleCondition !== undefined) {
-      <app-collate-project-list
-        [projectConditionColorMap]="collate.settings.projectConditionColorMap"
-        (deleteProject)="deleteProject($event)"
-        [projects]="projects"
-        [filteredResults]="filteredResults"
-        (projectOrderChanged)="onProjectOrderChanged($event)"
-        [renameCondition]="collate.settings.renameSampleCondition"
-      ></app-collate-project-list>
+  @if (collate){
+    @if (collate.settings) {
+      @if (
+        collate.settings.projectConditionColorMap &&
+        collate.settings.renameSampleCondition) {
+        <app-collate-project-list
+          [projectConditionColorMap]="collate.settings.projectConditionColorMap"
+          (deleteProject)="deleteProject($event)"
+          [projects]="projects"
+          [filteredResults]="filteredResults"
+          (projectOrderChanged)="onProjectOrderChanged($event)"
+          [renameCondition]="collate.settings.renameSampleCondition"
+        ></app-collate-project-list>
+      }
     }
   }
+
 
 
 } @else {
