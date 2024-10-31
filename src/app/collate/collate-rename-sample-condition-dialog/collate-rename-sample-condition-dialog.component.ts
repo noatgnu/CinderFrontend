@@ -137,15 +137,19 @@ export class CollateRenameSampleConditionDialogComponent {
   }
 
   submit() {
+    const payload: any = {}
     for (const k in this.formMap) {
+      payload[k] = {}
       for (const c in this.formMap[k]) {
+        payload[k][c] = this.formMap[k][c].value[c]
         if (!this.formMap[k][c].valid) {
           this.sb.open(`${c} is invalid`)
           return
         }
       }
     }
-    this.dialog.close(this.renameSampleCondition)
+
+    this.dialog.close(payload)
   }
 
 
