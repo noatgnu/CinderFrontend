@@ -117,15 +117,17 @@ export class CollateEditorComponent {
 
         } else {
           // @ts-ignore
-          this.collate.settings.renameSampeCondition = {};
+          this.collate.settings.renameSampleCondition = {};
           for (const p of this.projects) {
             // @ts-ignore
-            this.collate.settings.renameSampeCondition[p.id] = {}
+            this.collate.settings.renameSampleCondition[p.id] = {}
             this.web.getProjectUniqueConditions(p.id).subscribe((value) => {
               for (const a of value) {
                 // @ts-ignore
                 this.collate.settings.renameSampleCondition[p.id][a.Condition] = a.Condition
               }
+              // @ts-ignore
+              console.log(this.collate.settings.renameSampleCondition)
             })
           }
         }
