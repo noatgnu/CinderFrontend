@@ -62,7 +62,10 @@
       }
     </mat-tab-group>
   </div>
-  <app-collate-project-list [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
+  @if (collate) {
+    <app-collate-project-list [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
+  }
+
 }
 
 

@@ -67,6 +67,24 @@ export class CollateViewComponent {
         if (collate.settings.projectOrder) {
           this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
         }
+        if (this.collate?.settings.renameSampleCondition) {
+
+        } else {
+          // @ts-ignore
+          this.collate.settings.renameSampleCondition = {};
+          for (const p of this.projects) {
+            // @ts-ignore
+            this.collate.settings.renameSampleCondition[p.id] = {}
+            this.web.getProjectUniqueConditions(p.id).subscribe((value) => {
+              for (const a of value) {
+                // @ts-ignore
+                this.collate.settings.renameSampleCondition[p.id][a.Condition] = a.Condition
+              }
+              // @ts-ignore
+              console.log(this.collate.settings.renameSampleCondition)
+            })
+          }
+        }
         console.log(this.projects)
       })
     }
