@@ -419,6 +419,7 @@ export class CollateEditorComponent {
       ref.afterClosed().subscribe((result: any)=> {
         if (this.collate) {
           this.collate.settings.renameSampleCondition = Object.assign({}, result)
+          console.log(this.collate.settings.renameSampleCondition)
         }
       })
     }
