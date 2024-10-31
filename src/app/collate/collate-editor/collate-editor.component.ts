@@ -112,13 +112,17 @@ export class CollateEditorComponent {
             // @ts-ignore
             this.collate.settings.projectConditionColorMap[p.id] = {};
           }
+        }
+        if (this.collate?.settings.renameSampleCondition) {
+
+        } else {
           // @ts-ignore
           this.collate.settings.renameSampeCondition = {};
           for (const p of this.projects) {
             // @ts-ignore
             this.collate.settings.renameSampeCondition[p.id] = {}
-
           }
+
         }
       })
     }
