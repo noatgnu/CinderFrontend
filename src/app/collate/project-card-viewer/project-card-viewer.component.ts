@@ -76,8 +76,10 @@ export class ProjectCardViewerComponent {
   }
 
   @Input() colorMap: { [condition: string]: string } | undefined = {};
+  @Input() renameCondition: {[key: string]: string} = {}
 
   @Output() deleteProject: EventEmitter<Project> = new EventEmitter<Project>();
+
   @Output() searchResultsChange: EventEmitter<SearchResult[]> = new EventEmitter<SearchResult[]>();
 
   searchResultDisplayColumns: string[] = ["primary_id", "uniprot_id", "gene_name", "condition_A", "condition_B", "log2_fc", "log10_p", "comparison_label"];

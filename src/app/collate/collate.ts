@@ -12,6 +12,11 @@ export interface Collate {
     analysisGroupOrderMap: {
       [projectID: number]: number[];
     };
+    renameSampleCondition: {
+      [projectID: number]: {
+        [key: string]: string
+      }
+    }
     projectConditionColorMap: { [projectID: number]: { [condition: string]: string } };
     showTags: boolean;
     [key: string]: any;

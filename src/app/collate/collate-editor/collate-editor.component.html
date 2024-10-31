@@ -4,9 +4,7 @@
       <span class="spacer"></span>
       @if (collate) {
         <mat-checkbox [(ngModel)]="collate.settings.showTags">Show Tags</mat-checkbox>
-
       }
-
       <button type="button" aria-label="View Collate" mat-icon-button (click)="goToCollateView()">
         <mat-icon>visibility</mat-icon>
       </button>
@@ -22,6 +20,7 @@
       <mat-menu #extraActionsMenu="matMenu">
         <button mat-menu-item (click)="openReorderDialog()">Reorder Analysis Groups</button>
         <button mat-menu-item (click)="openConditionColorEditorDialog()">Set Condition Colors</button>
+        <button mat-menu-item (click)="openRenameConditionDialog()">Rename Condition</button>
       </mat-menu>
     </mat-toolbar-row>
   </mat-toolbar>
@@ -76,7 +75,14 @@
   }
 
   @if (collate?.settings?.projectConditionColorMap !== undefined) {
-    <app-collate-project-list [projectConditionColorMap]="collate?.settings?.projectConditionColorMap" (deleteProject)="deleteProject($event)" [projects]="projects" [filteredResults]="filteredResults" (projectOrderChanged)="onProjectOrderChanged($event)"></app-collate-project-list>
+    <app-collate-project-list
+      [projectConditionColorMap]="collate?.settings?.projectConditionColorMap"
+      (deleteProject)="deleteProject($event)"
+      [projects]="projects"
+      [filteredResults]="filteredResults"
+      (projectOrderChanged)="onProjectOrderChanged($event)"
+      [renameCondition]="collate?.settings?.renameSampleCondition"
+    ></app-collate-project-list>
   }
 
 } @else {

@@ -60,6 +60,7 @@ export class CollateViewComponent {
             projectOrder: [],
             analysisGroupOrderMap: {},
             projectConditionColorMap: {},
+            renameSampleCondition: {},
             showTags: false,
           };
         }

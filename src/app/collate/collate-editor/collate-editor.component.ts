@@ -34,6 +34,9 @@ import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
 import {forkJoin, Observable} from "rxjs";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {AccountsService} from "../../accounts/accounts.service";
+import {
+  CollateRenameSampleConditionDialogComponent
+} from "../collate-rename-sample-condition-dialog/collate-rename-sample-condition-dialog.component";
 
 @Component({
   selector: 'app-collate-editor',
@@ -86,6 +89,7 @@ export class CollateEditorComponent {
             projectOrder: this.projects.map(project => project.id),
             analysisGroupOrderMap: {},
             projectConditionColorMap: {},
+            renameSampleCondition: {},
             showTags: false
           }
         }
@@ -98,6 +102,7 @@ export class CollateEditorComponent {
           }
         }
 
+
         if (this.collate?.settings.projectConditionColorMap) {
           this.graph.projectConditionColorMap = this.collate.settings.projectConditionColorMap;
         } else {
@@ -106,6 +111,13 @@ export class CollateEditorComponent {
           for (const p of this.projects) {
             // @ts-ignore
             this.collate.settings.projectConditionColorMap[p.id] = {};
+          }
+          // @ts-ignore
+          this.collate.settings.renameSampeCondition = {};
+          for (const p of this.projects) {
+            // @ts-ignore
+            this.collate.settings.renameSampeCondition[p.id] = {}
+
           }
         }
       })
@@ -385,6 +397,19 @@ export class CollateEditorComponent {
       //check if any tags were removed
       this.removedTags = this.collate.tags.filter(tag => !tags.includes(tag));
       this.collate.tags = tags;
+    }
+  }
+
+  openRenameConditionDialog() {
+    if (this.collate) {
+      const ref = this.dialog.open(CollateRenameSampleConditionDialogComponent)
+      ref.componentInstance.projects = this.collate.projects
+      ref.componentInstance.renameSampleCondition = this.collate.settings.renameSampleCondition
+      ref.afterClosed().subscribe((result: any)=> {
+        if (this.collate) {
+          this.collate.settings.renameSampleCondition = Object.assign({}, result)
+        }
+      })
     }
   }
 }
