@@ -183,6 +183,20 @@ export class CollateViewComponent {
     Object.keys(this.searchResults).forEach(projectId => {
       // @ts-ignore
       filteredResults[projectId] = this.searchResults[projectId].filter(result => result.search_term === this.selectedSearchTerm);
+      if (this.collate?.settings?.analysisGroupOrderMap) {
+        Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
+          // @ts-ignore
+          const analysisGroupOrder = this.collate.settings.analysisGroupOrderMap[projectId];
+          // @ts-ignore
+          if (!filteredResults[projectId]) {
+            return;
+          }
+          // @ts-ignore
+          filteredResults[projectId] = filteredResults[projectId].sort((a, b) => {
+            return analysisGroupOrder.indexOf(a.analysis_group.id) - analysisGroupOrder.indexOf(b.analysis_group.id);
+          })
+        });
+      }
     });
 
     return filteredResults;
