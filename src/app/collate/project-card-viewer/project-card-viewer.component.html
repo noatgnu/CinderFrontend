@@ -25,7 +25,7 @@
             <div cdkDrag>
               @if (s.searched_data.length > 0) {
                 <div>
-                  <app-bar-chart [searchTerm]="searchTerm" [expanded]="expanded" [renameCondition]="renameCondition" [colorMap]="colorMap" [data]="s"></app-bar-chart>
+                  <app-bar-chart [searchTerm]="s.gene_name" [expanded]="expanded" [renameCondition]="renameCondition" [colorMap]="colorMap" [data]="s"></app-bar-chart>
                 </div>
               } @else {
                 <div>

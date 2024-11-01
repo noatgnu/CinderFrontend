@@ -19,7 +19,19 @@ PlotlyModule.plotlyjs = PlotlyJS;
 export class BarChartComponent {
   private _data: SearchResult|null = null;
   private _renameCondition: {[key: string]: string} = {}
-  @Input() searchTerm: string = ""
+  private _searchTerm: string = ""
+  @Input() set searchTerm(value: any) {
+    if (value) {
+      this._searchTerm = value
+    } else {
+      this._searchTerm = ""
+    }
+  }
+
+  get searchTerm(): string {
+    return this._searchTerm
+  }
+
   @Input() set renameCondition(value: any) {
     if (value) {
       this._renameCondition = value
