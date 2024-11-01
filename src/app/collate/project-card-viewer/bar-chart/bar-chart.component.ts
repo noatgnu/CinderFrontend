@@ -35,6 +35,7 @@ export class BarChartComponent {
   @Input() set data(value: SearchResult|null) {
     this._data = value;
     this.graphLayout.title = value?.analysis_group?.name || ""
+    this.graphLayout.yaxis.title = this.searchTerm || ""
     this.drawGraph();
   }
   get data(): SearchResult|null {
@@ -57,7 +58,7 @@ export class BarChartComponent {
     title: "",
     height: 400,
     margin: {
-      l: 100,
+      l: 150,
       r: 100,
       b: 100,
       t: 100,
