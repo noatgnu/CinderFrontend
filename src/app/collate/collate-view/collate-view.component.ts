@@ -205,7 +205,7 @@ export class CollateViewComponent {
       const uniqueSearchTerms = Array.from(new Set(data.results.map(result => result.search_term)));
       this.pastSearches.push({searchQuery: data, termFounds: uniqueSearchTerms, collate: this.collate.id, searchID: id});
       // keep most recent 10 searches
-      this.pastSearches = this.pastSearches.slice(-10);
+      this.pastSearches = this.pastSearches.slice(-20);
       localStorage.setItem('cinderPastSearches', JSON.stringify(this.pastSearches));
       this.distributeSearchResults(data.results).then();
     })
