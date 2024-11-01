@@ -23,6 +23,7 @@ import {Observable} from "rxjs";
 import {WebsocketService} from "../../websocket.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatTooltip} from "@angular/material/tooltip";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-collate-view',
@@ -54,6 +55,7 @@ export class CollateViewComponent {
     if (value) {
       this.collateService.getCollate(value).subscribe((collate: Collate) => {
         this.collate = collate;
+        this.title.setTitle(`${collate.title} - C|nder`);
         this.projects = collate.projects;
         if (!collate.settings) {
           collate.settings = {
@@ -108,7 +110,7 @@ export class CollateViewComponent {
 
   pastSearches: {searchQuery: SearchResultQuery, termFounds: string[], collate: number, searchID:number}[] = [];
   waitingForDownload = false
-  constructor(private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
+  constructor(private title: Title, private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
     const pastSearches = localStorage.getItem('cinderPastSearches');
     if (pastSearches) {
       this.pastSearches = JSON.parse(pastSearches);
