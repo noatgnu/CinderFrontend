@@ -4,6 +4,7 @@
       @if (project && project.id) {
 
         <app-project-card-viewer
+          [searchTerm]="searchTerm"
           [colorMap]="projectConditionColorMap?.[project.id]"
           (deleteProject)="deleteProject.emit($event)"
           [project]="project"

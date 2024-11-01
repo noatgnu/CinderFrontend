@@ -19,6 +19,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
 export class BarChartComponent {
   private _data: SearchResult|null = null;
   private _renameCondition: {[key: string]: string} = {}
+  @Input() searchTerm: string = ""
   @Input() set renameCondition(value: any) {
     if (value) {
       this._renameCondition = value
@@ -61,6 +62,12 @@ export class BarChartComponent {
       b: 100,
       t: 100,
     },
+    yaxis: {
+      title: this.searchTerm,
+      tickfont: {
+        size: 14
+      }
+    }
   }
 
   conditionA = ""

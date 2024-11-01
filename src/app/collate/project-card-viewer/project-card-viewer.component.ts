@@ -62,6 +62,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 })
 export class ProjectCardViewerComponent {
   private _project: Project | null = null;
+  @Input() searchTerm: string = "";
   @Input() set project(value: Project | null) {
     this._project = value;
   }
@@ -85,6 +86,7 @@ export class ProjectCardViewerComponent {
   searchResultDisplayColumns: string[] = ["primary_id", "uniprot_id", "gene_name", "condition_A", "condition_B", "log2_fc", "log10_p", "comparison_label"];
 
   expanded: boolean = false;
+  viewDifferentialAnalysis: boolean = false;
   get searchResults(): SearchResult[] {
     return this._searchResults;
   }

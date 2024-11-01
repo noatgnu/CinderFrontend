@@ -79,6 +79,7 @@
         collate.settings.projectConditionColorMap &&
         collate.settings.renameSampleCondition) {
         <app-collate-project-list
+          [searchTerm]="selectedSearchTerm"
           [projectConditionColorMap]="collate.settings.projectConditionColorMap"
           (deleteProject)="deleteProject($event)"
           [projects]="projects"

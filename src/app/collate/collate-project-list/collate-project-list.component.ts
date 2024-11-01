@@ -16,6 +16,18 @@ import {ProjectCardViewerComponent} from "../project-card-viewer/project-card-vi
   styleUrl: './collate-project-list.component.scss'
 })
 export class CollateProjectListComponent {
+  private _searchTerm: string = "";
+  @Input() set searchTerm(value: string|undefined|null) {
+    if (value) {
+      this._searchTerm = value;
+    } else {
+      this._searchTerm = "";
+    }
+  }
+
+  get searchTerm(): string {
+    return this._searchTerm;
+  }
   @Input() projects: Project[] = [];
   @Input() filteredResults: { [projectId: number]: SearchResult[] } = {};
   @Input() projectConditionColorMap: { [projectID: number]: { [condition: string]: string } }|undefined|null = {};

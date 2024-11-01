@@ -7,22 +7,25 @@
     <mat-card-content>
 
       @if (searchResults.length > 0) {
-
-        <mat-slide-toggle
-          [color]="'primary'"
-          (change)="expanded = !expanded"
-        >
-          Expand Bar Chart
-        </mat-slide-toggle>
+        <div style="display: flex; flex-direction: column; gap: 20px">
+          <mat-slide-toggle
+            [color]="'primary'"
+            (change)="expanded = !expanded"
+          >
+            Expand Bar Chart
+          </mat-slide-toggle>
+          <mat-slide-toggle [color]="'primary'" (change)="viewDifferentialAnalysis = !viewDifferentialAnalysis">
+            View Differential Analysis Stats
+          </mat-slide-toggle>
+        </div>
       }
-
       <div cdkDropList (cdkDropListDropped)="drop($event)" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center">
         @if (searchResults.length > 0) {
           @for (s of searchResults; track s.id) {
             <div cdkDrag>
               @if (s.searched_data.length > 0) {
                 <div>
-                  <app-bar-chart [expanded]="expanded" [renameCondition]="renameCondition" [colorMap]="colorMap" [data]="s"></app-bar-chart>
+                  <app-bar-chart [searchTerm]="searchTerm" [expanded]="expanded" [renameCondition]="renameCondition" [colorMap]="colorMap" [data]="s"></app-bar-chart>
                 </div>
               } @else {
                 <div>
@@ -36,7 +39,7 @@
           <p>No search results found in this project</p>
         }
       </div>
-      @if (searchResults.length >0) {
+      @if (searchResults.length >0 && viewDifferentialAnalysis) {
         <table mat-table [dataSource]="searchResults" class="mat-elevation-z8">
           <ng-container matColumnDef="primary_id">
             <th mat-header-cell *matHeaderCellDef> Primary ID </th>
