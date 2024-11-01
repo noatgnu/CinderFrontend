@@ -99,6 +99,7 @@ export class BarChartComponent {
   }
 
   drawGraph() {
+    console.log(this.searchTerm)
     let element = document.getElementsByTagName("body")[0]
     let style = window.getComputedStyle(element)
     let backgroundColor = style.backgroundColor
