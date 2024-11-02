@@ -80,10 +80,18 @@ export class CollateSearchComponent {
       }
     }
 
+
+
     if (this.form.value.searchQuery && this.form.value.searchMode) {
+      const queries = this.form.value.searchQuery.toUpperCase().split("OR");
+      const reformatQueries = queries.map((query) => {
+        const transformedQuery = query.trim().replace(/'/g, "").replace(/"/g, "");
+        return `"${transformedQuery}"`;
+      });
+
       this.web.createSearch(
         analysisGroupIDs,
-        this.form.value.searchQuery,
+        reformatQueries.join(" OR "),
         this.web.searchSessionID,
         0.000000001,
         0.000000001,
