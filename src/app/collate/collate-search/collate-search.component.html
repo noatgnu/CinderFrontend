@@ -16,9 +16,10 @@
       <button mat-icon-button color="primary" type="submit"><mat-icon>search</mat-icon></button>
     </form>
     <p>
-      For multiple search terms, enclose them in <b>quotes</b> and separate them with <b>OR</b>.
+      For multiple search terms separate them with <b>OR</b>.
     </p>
     @if (loading) {
+      <p>Elapsed Time: {{ elapsedTime }} seconds</p>
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     }
   </mat-card-content>

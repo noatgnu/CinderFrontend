@@ -36,6 +36,9 @@ import {MatProgressBar} from "@angular/material/progress-bar";
 export class CollateSearchComponent {
   @Input() projects: Project[] = [];
   loading: boolean = false;
+  searchStartTime: Date | null = null;
+  elapsedTime: string = '0.00';
+  private timerInterval: any;
 
   form = this.fb.group({
     searchQuery: new FormControl<string>('', Validators.required),
@@ -51,7 +54,9 @@ export class CollateSearchComponent {
           switch (data["status"]) {
             case "complete":
               this.loading = false;
-              this.showSnackBar("Search complete")
+              clearInterval(this.timerInterval);
+              const elapsedTime = this.calculateElapsedTime();
+              this.showSnackBar(`Search complete in ${elapsedTime} seconds`);
               this.searchResultID.emit(parseInt(data["id"]));
               //window.open(`/#/search-session/${data["id"]}`, "_blank")
               break
@@ -66,10 +71,16 @@ export class CollateSearchComponent {
   }
 
   async runSearch() {
+
     if (this.form.invalid) {
       return;
     }
     this.loading = true;
+    this.searchStartTime = new Date();
+    this.elapsedTime = '0.00';
+    this.timerInterval = setInterval(() => {
+      this.elapsedTime = this.calculateElapsedTime().toFixed(2);
+    }, 200);
     const analysisGroupIDs: number[] = [];
     if (this.projects.length > 0) {
       const results = await this.web.getAnalysisGroupsFromProjects(this.projects).toPromise();
@@ -102,6 +113,7 @@ export class CollateSearchComponent {
         },
         error: () => {
           this.loading = false;
+          clearInterval(this.timerInterval);
           this.showSnackBar("Search error");
         }
       });
@@ -112,5 +124,14 @@ export class CollateSearchComponent {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
     });
+  }
+
+  calculateElapsedTime(): number {
+    if (this.searchStartTime) {
+      const endTime = new Date();
+      const elapsedTime = (endTime.getTime() - this.searchStartTime.getTime()) / 1000;
+      return elapsedTime;
+    }
+    return 0;
   }
 }
