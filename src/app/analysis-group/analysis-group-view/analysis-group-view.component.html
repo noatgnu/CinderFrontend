@@ -2,19 +2,23 @@
   <div style="display: flex; flex-direction: row; justify-content: center; flex-wrap: wrap">
     <app-volcano-plot [curtainData]="curtainData" (selected)="handleVolcanoSelection($event)"></app-volcano-plot>
   </div>
-  <p>
-    Curtain Link: <a href="{{analysisGroup?.curtain_link}}" target="_blank">{{analysisGroup?.curtain_link}}</a>
-  </p>
+
 }
 <div style="display: flex; flex-direction: row; justify-content: center; padding: 50px">
   <div style="width: 100%">
     @if (analysisGroup) {
       @if (associatedProject) {
         <p>
-          Associated Project: <a href="/#/project/{{analysisGroup.project}}" target="_blank">{{associatedProject.name}}</a>
+          <b>Associated Project: </b><a href="/#/project/{{analysisGroup.project}}" target="_blank">{{associatedProject.name}}</a>
         </p>
 
       }
+      @if (analysisGroup.curtain_link) {
+        <p>
+          <b>Curtain Link: </b><a href="{{analysisGroup.curtain_link}}" target="_blank">{{analysisGroup.curtain_link}}</a>
+        </p>
+      }
+
       <form (ngSubmit)="updateAnalysisGroup()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
         <mat-form-field style="width: 100%">
           <input matInput formControlName="name" type="text" placeholder="Analysis Group Name">

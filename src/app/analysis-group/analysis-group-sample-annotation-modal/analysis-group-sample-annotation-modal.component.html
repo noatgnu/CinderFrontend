@@ -19,10 +19,13 @@
       <ng-container matColumnDef="Condition">
         <th mat-header-cell *matHeaderCellDef> Condition </th>
         <td mat-cell *matCellDef="let element">
-          <mat-form-field>
-            <input style="border-radius: 0" matInput #optionCondition (change)="handleAutoCompleteChange($event, optionCondition.value)" placeholder="{{element.value.Sample}}" value="{{element.value.Condition}}">
-            <mat-label>{{element.value.Sample}}</mat-label>
-          </mat-form-field>
+          <form [formGroup]="element">
+            <mat-form-field>
+              <input style="border-radius: 0" matInput #optionCondition  (change)="handleAutoCompleteChange($event, optionCondition.value)" placeholder="{{element.value.Sample}}" formControlName="Condition">
+              <mat-label>{{element.value.Sample}}</mat-label>
+            </mat-form-field>
+          </form>
+
         </td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
