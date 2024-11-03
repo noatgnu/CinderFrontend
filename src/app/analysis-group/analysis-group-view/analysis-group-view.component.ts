@@ -193,9 +193,15 @@ export class AnalysisGroupViewComponent {
   handleFileUploaded(file: ProjectFile, file_category: "searched"| "df"|"copy_number"){
     if (file_category === "searched") {
       this.analysisGroupSearched = file
+      this.web.getProjectFileSampleAnnotations(file.id).subscribe((data) => {
+        this.sampleAnnotations = data
+      })
       this.sb.open("Searched File uploaded", "Dismiss", {duration: 5000})
     } else if (file_category === "df"){
       this.analysisGroupDF = file
+      this.web.getProjectFileComparisonMatrix(this.analysisGroupDF.id).subscribe((data) => {
+        this.comparisonMatrix = data
+      })
       this.sb.open("Differential Analysis File uploaded", "Dismiss", {duration: 5000})
     } else if (file_category === "copy_number") {
       this.analysisGroupCopyNumber = file

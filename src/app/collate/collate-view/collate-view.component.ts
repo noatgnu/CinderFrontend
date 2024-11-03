@@ -63,12 +63,25 @@ export class CollateViewComponent {
             analysisGroupOrderMap: {},
             projectConditionColorMap: {},
             renameSampleCondition: {},
+            projectAnalysisGroupVisibility: {},
             showTags: false,
           };
         }
         if (collate.settings.projectOrder) {
           this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
         }
+
+        if (this.collate?.settings.projectAnalysisGroupVisibility) {
+
+        } else {
+          // @ts-ignore
+          this.collate.settings.projectAnalysisGroupVisibility = {};
+          for (const p of this.projects) {
+            // @ts-ignore
+            this.collate.settings.projectAnalysisGroupVisibility[p.id] = {}
+          }
+        }
+
         if (this.collate?.settings.renameSampleCondition) {
 
         } else {
@@ -185,16 +198,33 @@ export class CollateViewComponent {
       filteredResults[projectId] = this.searchResults[projectId].filter(result => result.search_term === this.selectedSearchTerm);
       if (this.collate?.settings?.analysisGroupOrderMap) {
         Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
-          // @ts-ignore
-          const analysisGroupOrder = this.collate.settings.analysisGroupOrderMap[projectId];
-          // @ts-ignore
-          if (!filteredResults[projectId]) {
+          const id = parseInt(projectId);
+          const analysisGroupOrder = this.collate?.settings.analysisGroupOrderMap[id];
+
+          if (!filteredResults[id]) {
             return;
           }
-          // @ts-ignore
-          filteredResults[projectId] = filteredResults[projectId].sort((a, b) => {
+          if (!analysisGroupOrder) {
+            return;
+          }
+          const notInOrder = filteredResults[id].filter(result => !analysisGroupOrder.includes(result.analysis_group.id));
+          filteredResults[id] = filteredResults[id].filter(result => analysisGroupOrder.includes(result.analysis_group.id));
+          filteredResults[id] = filteredResults[id].sort((a, b) => {
             return analysisGroupOrder.indexOf(a.analysis_group.id) - analysisGroupOrder.indexOf(b.analysis_group.id);
           })
+          filteredResults[id].concat(notInOrder);
+          if (this.collate?.settings?.projectAnalysisGroupVisibility) {
+            const projectAnalysisGroupVisibility = this.collate?.settings.projectAnalysisGroupVisibility[id];
+            filteredResults[id] = filteredResults[id].filter(result => {
+              if (!projectAnalysisGroupVisibility) {
+                return true;
+              }
+              if (!(result.analysis_group.id in projectAnalysisGroupVisibility)) {
+                return true;
+              }
+              return projectAnalysisGroupVisibility[result.analysis_group.id];
+            })
+          }
         });
       }
     });

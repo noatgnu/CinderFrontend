@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>Analysis Group Visibility</h1>
+<div mat-dialog-content>
+  <form style="display: flex; flex-direction: column; gap: 20px">
+    @for (p of projects; track p.id) {
+      <h2>{{p.name}}</h2>
+      @if (projectAnalysisGroupMap[p.id]) {
+        @for (a of projectAnalysisGroupMap[p.id]; track a.id) {
+          <mat-checkbox [(ngModel)]="projectAnalysisGroupVisibilityMap[p.id][a.id]" [ngModelOptions]="{standalone: true}">
+            {{a.name}}
+          </mat-checkbox>
+        }
+      }
+    }
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-button (click)="save()">Submit</button>
+</div>

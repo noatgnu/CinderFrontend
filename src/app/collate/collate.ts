@@ -16,7 +16,10 @@ export interface Collate {
       [projectID: number]: {
         [key: string]: string
       }
-    }
+    };
+    projectAnalysisGroupVisibility: {
+      [projectID: number]: { [analysisGroupID: number]: boolean }
+    };
     projectConditionColorMap: { [projectID: number]: { [condition: string]: string } };
     showTags: boolean;
     [key: string]: any;
