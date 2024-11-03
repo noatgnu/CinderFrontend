@@ -2,6 +2,9 @@
   <div style="display: flex; flex-direction: row; justify-content: center; flex-wrap: wrap">
     <app-volcano-plot [curtainData]="curtainData" (selected)="handleVolcanoSelection($event)"></app-volcano-plot>
   </div>
+  <p>
+    Curtain Link: <a href="{{analysisGroup?.curtain_link}}" target="_blank">{{analysisGroup?.curtain_link}}</a>
+  </p>
 }
 <div style="display: flex; flex-direction: row; justify-content: center; padding: 50px">
   <div style="width: 100%">
