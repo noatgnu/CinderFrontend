@@ -57,13 +57,14 @@ export class AnalysisGroupComparisonMatrixModalComponent {
     for (const f of this.form) {
       if (f.controls.comparison_col.value) {
         this.web.getUniqueComparisonLabel(value.file, f.controls.comparison_col.value).subscribe((labels) => {
-          this.comparison_labels = labels
+          // @ts-ignore
+          this.comparison_labels_map[f.controls.comparison_col.value] = labels
         })
       }
       f.controls.comparison_col.valueChanges.subscribe((data) => {
         if (data) {
           this.web.getUniqueComparisonLabel(value.file, data).subscribe((labels) => {
-            this.comparison_labels = labels
+            this.comparison_labels_map[data] = labels
           })
         }
       })
@@ -75,6 +76,7 @@ export class AnalysisGroupComparisonMatrixModalComponent {
     }
   }
   comparison_labels: string[] = []
+  comparison_labels_map: { [key: string]: string[] } = {}
   columns: string[] = []
   private _projectFile: ProjectFile|undefined
   @Input() set projectFile(value: ProjectFile) {

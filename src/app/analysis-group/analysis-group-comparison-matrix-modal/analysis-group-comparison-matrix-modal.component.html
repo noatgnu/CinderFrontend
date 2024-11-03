@@ -63,7 +63,7 @@
                     @if (f.value.comparison_col) {
                       <mat-form-field>
                         <mat-select formControlName="comparison_label">
-                          @for (c of comparison_labels; track c) {
+                          @for (c of comparison_labels_map[f.value.comparison_col]; track c) {
                             <mat-option [value]="c">{{c}}</mat-option>
                           }
                         </mat-select>
