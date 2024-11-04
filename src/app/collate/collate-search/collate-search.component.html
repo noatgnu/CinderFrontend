@@ -19,7 +19,9 @@
       For multiple search terms separate them with <b>OR</b>.
     </p>
     @if (loading) {
-      <p>Elapsed Time: {{ elapsedTime }} seconds</p>
+      <p>Elapsed Time: {{ elapsedTime }} seconds<br>
+        {{this.progress}}
+      </p>
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     }
   </mat-card-content>

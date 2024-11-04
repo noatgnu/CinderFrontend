@@ -39,7 +39,7 @@ export class CollateSearchComponent {
   searchStartTime: Date | null = null;
   elapsedTime: string = '0.00';
   private timerInterval: any;
-
+  progress: string = "";
   form = this.fb.group({
     searchQuery: new FormControl<string>('', Validators.required),
     searchMode: new FormControl<"pi"|"gene"|"uniprot">("gene", Validators.required),
@@ -56,12 +56,17 @@ export class CollateSearchComponent {
               this.loading = false;
               clearInterval(this.timerInterval);
               const elapsedTime = this.calculateElapsedTime();
+              this.progress = "";
               this.showSnackBar(`Search complete in ${elapsedTime} seconds`);
               this.searchResultID.emit(parseInt(data["id"]));
               //window.open(`/#/search-session/${data["id"]}`, "_blank")
               break
+            case "in_progress":
+              this.progress = `Current progress: ${data["current_progress"]}/${data["found_files"]}`
+              break;
             case "error":
               this.loading = false;
+              this.progress = "Search error";
               this.showSnackBar("Search error");
               break;
           }
@@ -76,6 +81,7 @@ export class CollateSearchComponent {
       return;
     }
     this.loading = true;
+    this.progress = "Current progress: search initiated";
     this.searchStartTime = new Date();
     this.elapsedTime = '0.00';
     this.timerInterval = setInterval(() => {
