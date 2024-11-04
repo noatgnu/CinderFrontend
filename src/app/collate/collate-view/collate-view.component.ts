@@ -24,6 +24,9 @@ import {WebsocketService} from "../../websocket.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatTooltip} from "@angular/material/tooltip";
 import {Title} from "@angular/platform-browser";
+import {
+  CollateProjectAnalysisGroupVisibilityDialogComponent
+} from "../collate-project-analysis-group-visibility-dialog/collate-project-analysis-group-visibility-dialog.component";
 
 @Component({
   selector: 'app-collate-view',
@@ -282,6 +285,66 @@ export class CollateViewComponent {
     // @ts-ignore
     this.web.exportSearchData(this.searchSession.id, searchTerm, 0.00000001, 0.00000001, this.web.searchSessionID).subscribe((data) => {
       this.waitingForDownload = true
+    })
+  }
+
+  openVisibilityDialog() {
+    const ref = this.dialog.open(CollateProjectAnalysisGroupVisibilityDialogComponent)
+    this.web.getAnalysisGroupsFromProjects(this.projects).subscribe((analysisGroups: AnalysisGroup[]) => {
+      const projectAnalysisGroups: {[projectId: number]: AnalysisGroup[]} = {};
+      analysisGroups.forEach(analysisGroup => {
+        if (!projectAnalysisGroups[analysisGroup.project]) {
+          projectAnalysisGroups[analysisGroup.project] = [];
+        }
+        projectAnalysisGroups[analysisGroup.project].push(analysisGroup);
+      });
+      // reorder analysisGroup in each project by id found in settings if analysisGroup can't be found in settings, it will be placed at the end
+      if (this.collate?.settings?.analysisGroupOrderMap) {
+        Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
+          const id = parseInt(projectId);
+          const analysisGroupOrder = this.collate?.settings.analysisGroupOrderMap[id];
+          if (!analysisGroupOrder) {
+            return;
+          }
+          if (!projectAnalysisGroups[id]) {
+            return;
+          }
+          // take out analysis groups that are not in the order map to be placed at the end
+          const notInOrder = projectAnalysisGroups[id].filter(analysisGroup => !analysisGroupOrder.includes(analysisGroup.id));
+          projectAnalysisGroups[id] = projectAnalysisGroups[id].filter(analysisGroup => analysisGroupOrder.includes(analysisGroup.id));
+
+          projectAnalysisGroups[id] = projectAnalysisGroups[id].sort((a, b) => {
+            return analysisGroupOrder.indexOf(a.id) - analysisGroupOrder.indexOf(b.id);
+          });
+          projectAnalysisGroups[id] = projectAnalysisGroups[id].concat(notInOrder);
+        });
+      }
+
+      ref.componentInstance.projectAnalysisGroupMap = projectAnalysisGroups;
+
+      ref.componentInstance.projects = this.projects;
+
+      let projectAnalysisGroupVisibility: {[projectId: number]: {[analysisGroupID: number]: boolean}} = {};
+      if (this.collate?.settings?.projectAnalysisGroupVisibility) {
+        projectAnalysisGroupVisibility = this.collate.settings.projectAnalysisGroupVisibility;
+      }
+      for (const projectId in projectAnalysisGroups) {
+        if (!projectAnalysisGroupVisibility[projectId]) {
+          projectAnalysisGroupVisibility[projectId] = {};
+        }
+        for (const analysisGroup of projectAnalysisGroups[projectId]) {
+          if (!(analysisGroup.id in projectAnalysisGroupVisibility[projectId])) {
+            projectAnalysisGroupVisibility[projectId][analysisGroup.id] = true;
+          }
+        }
+      }
+      ref.componentInstance.projectAnalysisGroupVisibilityMap = Object.assign({}, projectAnalysisGroupVisibility);
+    })
+    ref.afterClosed().subscribe((result: { [projectID: number]: { [analysisGroupID: number]: boolean } }) => {
+      if (this.collate && result) {
+        this.collate.settings.projectAnalysisGroupVisibility = result;
+        this.filteredResults = this.getFilteredSearchResults();
+      }
     })
   }
 }
