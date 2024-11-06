@@ -1,0 +1,23 @@
+<div style="display: flex; flex-direction: column; gap: 20px">
+  @for (m of metadata; track m.id) {
+    <div style="display: flex; gap: 20px">
+      <mat-form-field style="flex-grow: 1">
+        <textarea matInput [(ngModel)]="m.value" [disabled]="markedForDeletion.includes(m)"></textarea>
+        <mat-label>{{m.name}}</mat-label>
+      </mat-form-field>
+      @if (!markedForDeletion.includes(m)) {
+        <button mat-icon-button type="button" (click)="metadataDeleted.emit(m);markedForDeletion.push(m)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      } @else {
+        <button mat-icon-button type="button" (click)="undoDeletion(m)">
+          <mat-icon>undo</mat-icon>
+        </button>
+      }
+    </div>
+  }
+</div>
+
+
+
+<button mat-flat-button type="button" color="primary" (click)="createMetadata()">Add Metadata</button>

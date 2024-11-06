@@ -12,6 +12,10 @@ import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from
 import {Species, SpeciesQuery} from "./species";
 import {LabGroup, LabGroupQuery} from "./lab-group";
 import {User, UserQuery} from "./user/user";
+import {Tissue, TissueQuery} from "./tissue";
+import {SubcellularLocation, SubcellularLocationQuery} from "./subcellular-location";
+import {HumanDiseaseQuery} from "./human-disease";
+import {MetadataColumn} from "./analysis-group/metadata-column";
 
 
 
@@ -586,6 +590,83 @@ export class WebService {
     )
   }
 
+  getTissues(url?: string, limit: number = 10, offset: number = 0, search?: string) {
+    if (url) {
+      return this.http.get<TissueQuery>(url, {responseType: 'json', observe: 'body'})
+    }
+    let params = new HttpParams()
+    if (limit) {
+      params = params.append('limit', limit.toString())
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString())
+    }
+    if (search && search !== "") {
+      params = params.append('search', `'${search}'`)
+    }
+    params = params.append('ordering', 'identifier')
+    return this.http.get<TissueQuery>(
+      `${this.baseURL}/api/tissues/`,
+      {responseType: 'json', observe: 'body', params: params}
+    )
+  }
+
+  getTissueByID(id: number) {
+    return this.http.get<Tissue>(
+      `${this.baseURL}/api/tissues/${id}/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getSubcellularLocations(url?: string, limit: number = 10, offset: number = 0, search?: string) {
+    if (url) {
+      return this.http.get<SubcellularLocationQuery>(url, {responseType: 'json', observe: 'body'})
+    }
+    let params = new HttpParams()
+    if (limit) {
+      params = params.append('limit', limit.toString())
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString())
+    }
+    if (search && search !== "") {
+      params = params.append('search', `'${search}'`)
+    }
+    params = params.append('ordering', 'identifier')
+    return this.http.get<SubcellularLocationQuery>(
+      `${this.baseURL}/api/subcellular_locations/`,
+      {responseType: 'json', observe: 'body', params: params}
+    )
+  }
+
+  getSubcellularLocationByID(id: number) {
+    return this.http.get<SubcellularLocation>(
+      `${this.baseURL}/api/subcellular_locations/${id}/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getHumandDiseases(url?: string, limit: number = 10, offset: number = 0, search?: string) {
+    if (url) {
+      return this.http.get<HumanDiseaseQuery>(url, {responseType: 'json', observe: 'body'})
+    }
+    let params = new HttpParams()
+    if (limit) {
+      params = params.append('limit', limit.toString())
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString())
+    }
+    if (search && search !== "") {
+      params = params.append('search', `'${search}'`)
+    }
+    params = params.append('ordering', 'identifier')
+    return this.http.get<HumanDiseaseQuery>(
+      `${this.baseURL}/api/human_diseases/`,
+      {responseType: 'json', observe: 'body', params: params}
+    )
+  }
+
   getUniqueComparisonLabel(file_id: number, column: string) {
     return this.http.get<string[]>(
       `${this.baseURL}/api/project_files/${file_id}/get_unique_comparison_label/`,
@@ -781,4 +862,32 @@ export class WebService {
   getFrontEndTemplateData() {
     return this.http.get<{footer: string}>(`${this.baseURL}/api/frontend_template/`, {responseType: 'json', observe: 'body'})
   }
+
+  createMetaDataColumn(analysis_group: number, metadataColumn?: any, source_file?: number) {
+    const payload: any = {analysis_group: analysis_group}
+    console.log(metadataColumn)
+    if (metadataColumn) {
+      payload["name"] = metadataColumn.metadataName
+      payload["type"] = metadataColumn.metadataType
+      payload["value"] = metadataColumn.metadataValue
+    }
+    if (source_file) {
+      payload["source_file"] = source_file
+    }
+    console.log(payload)
+    return this.http.post<MetadataColumn[]>(
+      `${this.baseURL}/api/metadata_columns/`,
+      payload,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  deleteMetaDataColumn(id: number) {
+    return this.http.delete(
+      `${this.baseURL}/api/metadata_columns/${id}/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+
 }

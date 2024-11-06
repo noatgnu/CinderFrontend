@@ -28,6 +28,11 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {VolcanoPlotComponent} from "../volcano-plot/volcano-plot.component";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
+import {
+  AnalysisGroupGeneralMetadataComponent
+} from "../analysis-group-general-metadata/analysis-group-general-metadata.component";
+import {MetadataColumn} from "../metadata-column";
+import {forkJoin} from "rxjs";
 
 @Component({
   selector: 'app-analysis-group-view',
@@ -43,7 +48,8 @@ import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-
     UploadFileComponent,
     MatIconButton,
     VolcanoPlotComponent,
-    MatProgressBar
+    MatProgressBar,
+    AnalysisGroupGeneralMetadataComponent
   ],
   templateUrl: './analysis-group-view.component.html',
   styleUrl: './analysis-group-view.component.scss'
@@ -128,6 +134,8 @@ export class AnalysisGroupViewComponent {
 
   curtainData?: CurtainData
 
+  metadataDeletionList: MetadataColumn[] = []
+
   constructor(private sb: MatSnackBar, private dataService: DataService, private titleService: Title, private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService, private ws: WebsocketService) {
     this.ws.curtainWSConnection?.subscribe((data) => {
       if (data.analysis_group_id === this.analysisGroup?.id) {
@@ -167,14 +175,19 @@ export class AnalysisGroupViewComponent {
     })
   }
 
-  updateAnalysisGroup() {
+  async updateAnalysisGroup() {
     if (this.form.invalid) {
       return
     }
+    if (this.metadataDeletionList.length > 0) {
+      for (const metadata of this.metadataDeletionList) {
+        await this.web.deleteMetaDataColumn(metadata.id).toPromise()
+      }
+    }
     // @ts-ignore
-    this.web.updateAnalysisGroup(this.analysisGroup!.id, this.form.value.name, this.form.value.description, this.form.value.curtain_link, this.web.searchSessionID).subscribe((data) => {
-      this.updated.emit(data)
-    })
+    const data = await this.web.updateAnalysisGroup(this.analysisGroup!.id, this.form.value.name, this.form.value.description, this.form.value.curtain_link, this.web.searchSessionID).toPromise()
+    this.metadataDeletionList = []
+    this.updated.emit(data)
   }
 
   getCurtainData() {
@@ -366,5 +379,13 @@ export class AnalysisGroupViewComponent {
     this.web.getFileDownloadToken(file.id).subscribe((data) => {
       window.open(`${this.web.baseURL}/api/project_files/download/?token=${data.token}`)
     })
+  }
+
+  updateDeletionList(metadataColumn: MetadataColumn) {
+    if (this.metadataDeletionList.includes(metadataColumn)) {
+      this.metadataDeletionList = this.metadataDeletionList.filter((a) => a !== metadataColumn)
+    } else {
+      this.metadataDeletionList.push(metadataColumn)
+    }
   }
 }

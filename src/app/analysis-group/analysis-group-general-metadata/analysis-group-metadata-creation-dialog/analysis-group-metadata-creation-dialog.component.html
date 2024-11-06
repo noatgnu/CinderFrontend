@@ -1,0 +1,68 @@
+<h1 mat-dialog-title>Adding New Metadata</h1>
+<div mat-dialog-content>
+  <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
+    <mat-form-field>
+      <input matInput formControlName="metadataName" [matAutocomplete]="autoMetadataName">
+      <mat-label>Metadata Name</mat-label>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput formControlName="metadataType" [matAutocomplete]="autoMetadataType">
+      <mat-label>Metadata Type</mat-label>
+    </mat-form-field>
+
+    @if (form.value.metadataName) {
+      @if (metadataNameAutocomplete.includes(form.value.metadataName)) {
+        <mat-form-field>
+          <input matInput formControlName="metadataValue" [matAutocomplete]="autoMetadataValue">
+          <mat-label>Metadata Value</mat-label>
+        </mat-form-field>
+      } @else {
+        <mat-form-field>
+          <textarea matInput formControlName="metadataValue"></textarea>
+          <mat-label>Metadata Value</mat-label>
+        </mat-form-field>
+
+      }
+    }
+
+    <mat-autocomplete #autoMetadataType="matAutocomplete">
+      @for (m of metadataTypeAutocomplete; track m) {
+        <mat-option [value]="m">
+          {{m}}
+        </mat-option>
+      }
+    </mat-autocomplete>
+    <mat-autocomplete #autoMetadataName="matAutocomplete">
+      @if (form.value.metadataType === "Characteristic") {
+        @for (m of metadataCharacteristics; track m) {
+          <mat-option [value]="m">
+            {{m}}
+          </mat-option>
+        }
+      } @else if (form.value.metadataType === "Comment") {
+        @for (m of metadataComment; track m) {
+          <mat-option [value]="m">
+            {{m}}
+          </mat-option>
+        }
+      } @else {
+        @for (m of metadataNameAutocomplete; track m) {
+          <mat-option [value]="m">
+            {{m}}
+          </mat-option>
+        }
+      }
+    </mat-autocomplete>
+    <mat-autocomplete #autoMetadataValue="matAutocomplete">
+      @for (m of filteredResults| async ; track m) {
+        <mat-option [value]="displayData(m)">
+          {{displayData(m)}}
+        </mat-option>
+      }
+    </mat-autocomplete>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-button [disabled]="!form.valid" (click)="submit()">Submit</button>
+</div>

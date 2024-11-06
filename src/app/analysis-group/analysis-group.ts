@@ -1,3 +1,5 @@
+import {MetadataColumn} from "./metadata-column";
+
 export interface AnalysisGroup {
   id: number;
   name: string;
@@ -6,6 +8,7 @@ export interface AnalysisGroup {
   analysis_group_type: string;
   created_at: Date;
   curtain_link: string;
+  metadata_columns: MetadataColumn[];
 }
 
 export interface AnalysisGroupQuery {
@@ -38,6 +41,7 @@ export interface CurtainData {
   settings: any;
   selections: string[];
   selection_map: {[key: string]: {[key: string]: boolean}};
+
 }
 
 export interface AnalysisGroupCondition {
