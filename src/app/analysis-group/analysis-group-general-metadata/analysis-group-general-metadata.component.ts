@@ -17,9 +17,9 @@ import {MatDialog} from "@angular/material/dialog";
 import {
   AnalysisGroupMetadataCreationDialogComponent
 } from "./analysis-group-metadata-creation-dialog/analysis-group-metadata-creation-dialog.component";
-import {FormsModule} from "@angular/forms";
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatFormField, MatInput} from "@angular/material/input";
-import {MatLabel} from "@angular/material/form-field";
+import {MatHint, MatLabel} from "@angular/material/form-field";
 import {AsyncPipe} from "@angular/common";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
 import {filter, map, Observable, of, startWith, switchMap} from "rxjs";
@@ -36,6 +36,8 @@ import {
   MatExpansionPanelDescription, MatExpansionPanelHeader,
   MatExpansionPanelTitle
 } from "@angular/material/expansion";
+import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
+import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -72,7 +74,12 @@ import {
     MatExpansionPanel,
     MatExpansionPanelTitle,
     MatExpansionPanelDescription,
-    MatExpansionPanelHeader
+    MatExpansionPanelHeader,
+    MatCard,
+    MatCardHeader,
+    MatCardContent,
+    MatHint,
+    ReactiveFormsModule
   ],
   templateUrl: './analysis-group-general-metadata.component.html',
   styleUrl: './analysis-group-general-metadata.component.scss'
@@ -83,20 +90,59 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   private _metadata: MetadataColumn[] = []
   @Input() set metadata(value: MetadataColumn[]) {
     this._metadata = value.filter((m) => !m.source_file)
+    for (const m of this._metadata) {
+      this.metadataFormMap[m.id] = this.fb.group({
+        value: [m.value],
+        name: [m.name],
+        type: [m.type]
+      })
+      this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
+        if (data.value) {
+          this.updateValueField(m, data.value)
+        }
+      })
+    }
   }
+
+  metadataFormMap: {[key: string]: FormGroup} = {}
+
   get metadata(): MetadataColumn[] {
     return this._metadata
   }
+  private _sourceFiles: SourceFile[] = []
+  @Input() set sourceFiles(value: SourceFile[]) {
+    this._sourceFiles = value
+    this.sourceFileMap = {}
+    for (const s of value) {
+      this.sourceFileMap[s.id] = s
+      for (const m of s.metadata_columns) {
+        this.metadataFormMap[m.id] = this.fb.group({
+          value: [m.value],
+          name: [m.name],
+          type: [m.type]
+        })
+        this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
+          if (data.value) {
+            this.updateValueField(m, data.value)
+          }
+        })
+      }
+    }
+  }
 
-  @Input() sourceFiles: SourceFile[] = []
+  get sourceFiles(): SourceFile[] {
+    return this._sourceFiles
+  }
 
   @Output() metadataChange = new EventEmitter<MetadataColumn[]>()
   @Output() metadataDeleted = new EventEmitter<MetadataColumn>()
+  @Output() sourceFilesChanged = new EventEmitter<SourceFile[]>()
   markedForDeletion: MetadataColumn[] = []
 
   @Input() canEdit: boolean = false
   autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[]>} = {}
-  constructor(private web: WebService, private dialog: MatDialog) { }
+  sourceFileMap: {[key: string]: SourceFile} = {}
+  constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder) { }
 
   updateValueField(metadata: MetadataColumn, data: string) {
     if (data.length < 2) {
@@ -176,12 +222,78 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       if (result) {
         if (result.name) {
           this.web.createSourceFile(this.analysis_group_id, result.name, result.description).subscribe((sourceFile) => {
-
+              this.sourceFiles.push(sourceFile)
+              this.sourceFilesChanged.emit(this.sourceFiles)
             }
           )
         }
       }
     })
+  }
 
+  removeSampleFile(id: number) {
+    const ref = this.dialog.open(AreYouSureDialogComponent)
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        this.web.deleteSourceFile(id).subscribe(() => {
+          this.sourceFiles = this.sourceFiles.filter((s) => s.id !== id)
+          this.sourceFilesChanged.emit(this.sourceFiles)
+        })
+      }
+    })
+  }
+
+  createMetadataFileSpecific(customizationTemplate: string|undefined|null = null, fileId: number) {
+    const ref = this.dialog.open(AnalysisGroupMetadataCreationDialogComponent)
+    if (customizationTemplate) {
+      ref.componentInstance.readonlyType = true
+      ref.componentInstance.readonlyName = true
+      switch (customizationTemplate) {
+        case "subcellular location":
+          ref.componentInstance.metadataName = "Subcellular Location"
+          ref.componentInstance.metadataType = "Characteristic"
+          break
+        case "disease":
+          ref.componentInstance.metadataType = "Disease"
+          ref.componentInstance.metadataType = "Characteristic"
+          break
+        case "tissue":
+          ref.componentInstance.metadataType = "Tissue"
+          ref.componentInstance.metadataType = "Characteristic"
+          break
+      }
+    }
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        this.web.createMetaDataColumn(this.analysis_group_id, result, fileId).subscribe((metadata) => {
+          for (const m of metadata) {
+            this.sourceFileMap[fileId].metadata_columns.push(m)
+            this.metadataFormMap[m.id] = this.fb.group({
+              value: [m.value],
+              name: [m.name],
+              type: [m.type]
+            })
+            this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
+              if (data.value) {
+                this.updateValueField(m, data.value)
+              }
+            })
+          }
+        })
+      }
+    })
+  }
+
+  updateMetadata(metadata: MetadataColumn) {
+    this.web.updateMetaDataColumn(metadata.id, undefined, undefined, metadata.value).subscribe(() => {
+      if (metadata.source_file) {
+        this.sourceFileMap[metadata.source_file].metadata_columns = this.sourceFileMap[metadata.source_file].metadata_columns.map((m) => {
+          if (m.id === metadata.id) {
+            return metadata
+          }
+          return m
+        })
+      }
+    })
   }
 }

@@ -3,10 +3,15 @@
   <div style="display: flex; flex-direction: column; gap: 20px">
     @for (m of metadata; track m.id) {
       <div style="display: flex; gap: 20px">
-        <mat-form-field style="flex-grow: 1">
-          <textarea [readonly]="!canEdit" matInput [(ngModel)]="m.value" [disabled]="markedForDeletion.includes(m)" [matAutocomplete]="autoMetadataValue" (ngModelChange)="updateValueField(m, $event)"></textarea>
-          <mat-label>{{m.name}}</mat-label>
-        </mat-form-field>
+        @if (metadataFormMap[m.id]) {
+          <form [formGroup]="metadataFormMap[m.id]">
+            <mat-form-field style="flex-grow: 1">
+              <textarea [readonly]="!canEdit" matInput formControlName="value" [disabled]="markedForDeletion.includes(m)" [matAutocomplete]="autoMetadataValue"></textarea>
+              <mat-label>{{m.name}}</mat-label>
+            </mat-form-field>
+          </form>
+        }
+
         <mat-autocomplete #autoMetadataValue="matAutocomplete">
           @for (m of autoCompleteMap[m.id]| async ; track m) {
             <mat-option [value]="displayData(m)">
@@ -50,6 +55,47 @@
               {{s.description}}
             </mat-panel-description>
           </mat-expansion-panel-header>
+          <div style="display: flex; flex-direction: column; gap: 20px">
+            <div style="display: flex; gap: 20px">
+              <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Add new metadata annotation'" [matMenuTriggerFor]="metadataMenuFileSpecific"><mat-icon>add</mat-icon></button>
+              @if (canEdit) {
+                <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Remove this source file'" (click)="removeSampleFile(s.id)"><mat-icon>delete</mat-icon></button>
+              }
+            </div>
+            <mat-menu #metadataMenuFileSpecific="matMenu">
+              <button mat-menu-item (click)="createMetadataFileSpecific('disease', s.id)">Disease</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('tissue', s.id)">Tissue</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('subcellular location', s.id)">Subcellular location</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific(null, s.id)">Create custom metadata field</button>
+            </mat-menu>
+            <div style="display: flex; gap: 20px">
+              <div style="width:300px">
+                <mat-form-field style="width: 100%">
+                  <input matInput [(ngModel)]="s.name">
+                  <mat-label>Sample Name</mat-label>
+                </mat-form-field>
+                <mat-form-field style="width: 100%">
+                  <textarea matInput [(ngModel)]="s.description"></textarea>
+                  <mat-label>Sample Description</mat-label>
+                </mat-form-field>
+              </div>
+              <div style="flex-grow: 1">
+                @for (c of s.metadata_columns; track c.id) {
+                  <mat-form-field style="width: 100%">
+                    <input matInput [(ngModel)]="c.value">
+                    <mat-label>{{c.name}}</mat-label>
+                    <mat-hint>{{c.type}}</mat-hint>
+                  </mat-form-field>
+                }
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 20px">
+            @for (c of s.metadata_columns; track c.id) {
+
+            }
+          </div>
+
         </mat-expansion-panel>
       }
     </mat-accordion>

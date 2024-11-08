@@ -883,6 +883,24 @@ export class WebService {
     )
   }
 
+  updateMetaDataColumn(id: number, name?: string, type?: string, value?: string) {
+    const payload: any = {}
+    if (name) {
+      payload["name"] = name
+    }
+    if (value) {
+      payload["value"] = value
+    }
+    if (type) {
+      payload["type"] = type
+    }
+    return this.http.put<MetadataColumn>(
+      `${this.baseURL}/api/metadata_columns/${id}/`,
+      payload,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
   deleteMetaDataColumn(id: number) {
     return this.http.delete(
       `${this.baseURL}/api/metadata_columns/${id}/`,
@@ -898,6 +916,13 @@ export class WebService {
     return this.http.post<SourceFile>(
       `${this.baseURL}/api/source_files/`,
       payload,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  deleteSourceFile(id: number) {
+    return this.http.delete(
+      `${this.baseURL}/api/source_files/${id}/`,
       {responseType: 'json', observe: 'body'}
     )
   }

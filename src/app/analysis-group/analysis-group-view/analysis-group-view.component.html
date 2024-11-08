@@ -30,7 +30,7 @@
         </mat-form-field>
         @if (analysisGroup) {
           <mat-divider></mat-divider>
-          <app-analysis-group-general-metadata [sourceFiles]="analysisGroup.source_files" [canEdit]="canEdit" (metadataDeleted)="updateDeletionList($event)" [analysis_group_id]="analysisGroup.id" [metadata]="analysisGroup.metadata_columns"></app-analysis-group-general-metadata>
+          <app-analysis-group-general-metadata (sourceFilesChanged)="analysisGroup.source_files=$event" [sourceFiles]="analysisGroup.source_files" [canEdit]="canEdit" (metadataDeleted)="updateDeletionList($event)" [analysis_group_id]="analysisGroup.id" [metadata]="analysisGroup.metadata_columns"></app-analysis-group-general-metadata>
         }
         <mat-divider></mat-divider>
         <div style="display: flex; flex-direction: row; gap: 10px">

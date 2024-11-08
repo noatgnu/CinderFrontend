@@ -75,6 +75,9 @@ export class AnalysisGroupComparisonMatrixModalComponent {
       })
     }
   }
+  get comparisonMatrix(): ComparisonMatrix {
+    return this._comparisonMatrix!
+  }
   comparison_labels: string[] = []
   comparison_labels_map: { [key: string]: string[] } = {}
   columns: string[] = []
@@ -142,6 +145,7 @@ export class AnalysisGroupComparisonMatrixModalComponent {
     form.controls.comparison_col.valueChanges.subscribe((data) => {
       if (data) {
         this.web.getUniqueComparisonLabel(this.comparisonMatrix.file, data).subscribe((labels) => {
+          this.comparison_labels_map[data] = labels
           this.comparison_labels = labels
         })
       }

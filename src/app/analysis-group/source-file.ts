@@ -1,3 +1,5 @@
+import {MetadataColumn} from "./metadata-column";
+
 export interface SourceFile {
   name: string,
   description: string,
@@ -7,6 +9,7 @@ export interface SourceFile {
   user: number|null,
   analysis_group: number|null,
   id: number,
+  metadata_columns: MetadataColumn[]
 }
 
 export interface SourceFileQuery {

@@ -113,7 +113,6 @@ export class BarChartComponent {
   }
 
   drawGraph() {
-    console.log(this.conditionA, this.conditionB)
     let renamedConditionA = this.renameCondition[this.conditionA]
     if (!renamedConditionA) {
       renamedConditionA = this.conditionA
