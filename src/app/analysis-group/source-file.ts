@@ -6,6 +6,7 @@ export interface SourceFile {
   updated_at: Date,
   user: number|null,
   analysis_group: number|null,
+  id: number,
 }
 
 export interface SourceFileQuery {

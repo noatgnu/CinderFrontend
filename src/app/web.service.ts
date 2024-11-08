@@ -16,6 +16,7 @@ import {Tissue, TissueQuery} from "./tissue";
 import {SubcellularLocation, SubcellularLocationQuery} from "./subcellular-location";
 import {HumanDiseaseQuery} from "./human-disease";
 import {MetadataColumn} from "./analysis-group/metadata-column";
+import {SourceFile} from "./analysis-group/source-file";
 
 
 
@@ -885,6 +886,18 @@ export class WebService {
   deleteMetaDataColumn(id: number) {
     return this.http.delete(
       `${this.baseURL}/api/metadata_columns/${id}/`,
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  createSourceFile(analysis_group: number, name: string, description?: string) {
+    const payload: any = {analysis_group: analysis_group, name: name}
+    if (description) {
+      payload["description"] = description
+    }
+    return this.http.post<SourceFile>(
+      `${this.baseURL}/api/source_files/`,
+      payload,
       {responseType: 'json', observe: 'body'}
     )
   }

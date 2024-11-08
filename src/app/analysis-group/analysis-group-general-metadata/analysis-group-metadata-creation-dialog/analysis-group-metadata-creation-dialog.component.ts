@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {AsyncPipe} from "@angular/common";
@@ -45,7 +45,14 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   })
 
   filteredResults: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[]> = of([])
-
+  @Input() readonlyType: boolean = false
+  @Input() readonlyName: boolean = false
+  @Input() set metadataType(value: string) {
+    this.form.controls.metadataType.setValue(value)
+  }
+  @Input() set metadataName(value: string) {
+    this.form.controls.metadataName.setValue(value)
+  }
   constructor(private dialog: MatDialogRef<AnalysisGroupMetadataCreationDialogComponent>, private fb: FormBuilder, private web: WebService) {
   }
 
@@ -62,15 +69,15 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
         if (!value) {
           return of([])
         }
-        if (this.form.controls.metadataName.value === "Subcellular Location") {
+        if (this.form.controls.metadataName.value?.toLowerCase() === "subcellular location") {
           return this.web.getSubcellularLocations(undefined, 5, 0, value).pipe(
             map((response) => response.results)
           )
-        } else if (this.form.controls.metadataName.value === "Disease") {
+        } else if (this.form.controls.metadataName.value?.toLowerCase() === "disease") {
           return this.web.getHumandDiseases(undefined, 5, 0, value).pipe(
             map((response) => response.results)
           )
-        } else if (this.form.controls.metadataName.value === "Tissue") {
+        } else if (this.form.controls.metadataName.value?.toLowerCase() === "tissue") {
           return this.web.getTissues(undefined, 5, 0, value).pipe(
             map((response) => response.results)
           )

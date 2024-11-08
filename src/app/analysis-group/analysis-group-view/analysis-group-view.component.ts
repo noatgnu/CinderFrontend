@@ -33,6 +33,7 @@ import {
 } from "../analysis-group-general-metadata/analysis-group-general-metadata.component";
 import {MetadataColumn} from "../metadata-column";
 import {forkJoin} from "rxjs";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-analysis-group-view',
@@ -49,7 +50,8 @@ import {forkJoin} from "rxjs";
     MatIconButton,
     VolcanoPlotComponent,
     MatProgressBar,
-    AnalysisGroupGeneralMetadataComponent
+    AnalysisGroupGeneralMetadataComponent,
+    MatDivider
   ],
   templateUrl: './analysis-group-view.component.html',
   styleUrl: './analysis-group-view.component.scss'

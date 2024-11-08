@@ -48,6 +48,8 @@ export class BarChartComponent {
     this._data = value;
     this.graphLayout.title = value?.analysis_group?.name || ""
     this.graphLayout.yaxis.title = this.searchTerm || ""
+    this.conditionA = value?.condition_A || ""
+    this.conditionB = value?.condition_B || ""
     this.drawGraph();
   }
   get data(): SearchResult|null {
@@ -93,7 +95,6 @@ export class BarChartComponent {
   @Input() set colorMap(value: any) {
     if (value) {
       this._colorMap = value
-      console.log(value)
       if (this.data && value) {
         this.drawGraph()
       }
@@ -112,7 +113,15 @@ export class BarChartComponent {
   }
 
   drawGraph() {
-    console.log(this.searchTerm)
+    console.log(this.conditionA, this.conditionB)
+    let renamedConditionA = this.renameCondition[this.conditionA]
+    if (!renamedConditionA) {
+      renamedConditionA = this.conditionA
+    }
+    let renamedConditionB = this.renameCondition[this.conditionB]
+    if (!renamedConditionB) {
+      renamedConditionB = this.conditionB
+    }
     let element = document.getElementsByTagName("body")[0]
     let style = window.getComputedStyle(element)
     let backgroundColor = style.backgroundColor
@@ -147,11 +156,11 @@ export class BarChartComponent {
         this.currentColor++
       }
       const traceA = {
-        x: [this.renameCondition[this.conditionA]],
+        x: [renamedConditionA],
         y: [meanA],
         type: 'bar',
         mode: 'markers',
-        name: this.renameCondition[this.conditionA],
+        name: renamedConditionA,
         error_y: {
           type: 'data',
           array: [this.calculateWhisker(this.valueA)],
@@ -165,17 +174,17 @@ export class BarChartComponent {
         },
         showlegend: false
       }
-      const boxA = this.drawTransparentBoxPlot(this.valueA, this.renameCondition[this.conditionA])
+      const boxA = this.drawTransparentBoxPlot(this.valueA, renamedConditionA)
       if (!this.colorMap[this.conditionB]) {
         this.colorMap[this.conditionB] = this.graph.defaultColorList[this.currentColor]
         this.currentColor++
       }
       const traceB = {
-        x: [this.renameCondition[this.conditionB]],
+        x: [renamedConditionB],
         y: [meanB],
         type: 'bar',
         mode: 'markers',
-        name: this.renameCondition[this.conditionB],
+        name: renamedConditionB,
         error_y: {
           type: 'data',
           array: [this.calculateWhisker(this.valueB)],
@@ -189,7 +198,7 @@ export class BarChartComponent {
         },
         showlegend: false
       }
-      const boxB = this.drawTransparentBoxPlot(this.valueB, this.renameCondition[this.conditionB])
+      const boxB = this.drawTransparentBoxPlot(this.valueB, renamedConditionB)
       dataCount = 2
       this.graphData = [traceA, boxA, traceB, boxB]
 
@@ -215,12 +224,16 @@ export class BarChartComponent {
             this.currentColor = 0
           }
         }
+        let renamedCondition = this.renameCondition[condition]
+        if (!renamedCondition) {
+          renamedCondition = condition
+        }
         return {
-          x: [this.renameCondition[condition]],
+          x: [renamedCondition],
           y: [meanValues[i]],
           type: 'bar',
           mode: 'markers',
-          name: this.renameCondition[condition],
+          name: renamedCondition,
           error_y: {
             type: 'data',
             array: [whiskerValues[i]],
@@ -236,9 +249,13 @@ export class BarChartComponent {
         }
       })
       const boxes = uniqueConditions.map((condition, i) => {
+        let renamedCondition = this.renameCondition[condition]
+        if (!renamedCondition) {
+          renamedCondition = condition
+        }
         // @ts-ignore
         const values = this.data.searched_data.filter(x => x.Condition === condition).map(x => x.Value)
-        return this.drawTransparentBoxPlot(values, this.renameCondition[condition])
+        return this.drawTransparentBoxPlot(values, renamedCondition)
       })
       dataCount = uniqueConditions.length
       this.graphData = [...traces, ...boxes]
@@ -246,6 +263,7 @@ export class BarChartComponent {
     console.log(this.colorMap)
     this.graphLayout.width = this.graphLayout.margin.l + this.graphLayout.margin.r + this.barSize * dataCount
     this.revision++
+    console.log(this.graphData)
   }
 
   calculateMean(data: number[]): number {

@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>Adding Sample File</h1>
+<div mat-dialog-content>
+  <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
+    <mat-form-field>
+      <input matInput formControlName="name">
+      <mat-label>Sample Name</mat-label>
+    </mat-form-field>
+    <mat-form-field>
+      <textarea matInput formControlName="description"></textarea>
+      <mat-label>Sample Description</mat-label>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-button (click)="submit()">Submit</button>
+</div>

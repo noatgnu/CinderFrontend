@@ -2,13 +2,10 @@
 <div mat-dialog-content>
   <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
     <mat-form-field>
-      <input matInput formControlName="metadataName" [matAutocomplete]="autoMetadataName">
+      <input matInput formControlName="metadataName" [matAutocomplete]="autoMetadataName" [readonly]="readonlyName">
       <mat-label>Metadata Name</mat-label>
     </mat-form-field>
-    <mat-form-field>
-      <input matInput formControlName="metadataType" [matAutocomplete]="autoMetadataType">
-      <mat-label>Metadata Type</mat-label>
-    </mat-form-field>
+
 
     @if (form.value.metadataName) {
       @if (metadataNameAutocomplete.includes(form.value.metadataName)) {
@@ -24,6 +21,10 @@
 
       }
     }
+    <mat-form-field>
+      <input matInput formControlName="metadataType" [matAutocomplete]="autoMetadataType" [readonly]="readonlyType">
+      <mat-label>Metadata Type</mat-label>
+    </mat-form-field>
 
     <mat-autocomplete #autoMetadataType="matAutocomplete">
       @for (m of metadataTypeAutocomplete; track m) {

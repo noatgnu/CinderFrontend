@@ -20,6 +20,22 @@ import {
 import {FormsModule} from "@angular/forms";
 import {MatFormField, MatInput} from "@angular/material/input";
 import {MatLabel} from "@angular/material/form-field";
+import {AsyncPipe} from "@angular/common";
+import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
+import {filter, map, Observable, of, startWith, switchMap} from "rxjs";
+import {SubcellularLocation} from "../../subcellular-location";
+import {HumanDisease} from "../../human-disease";
+import {Tissue} from "../../tissue";
+import {MatTooltip} from "@angular/material/tooltip";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {AnalysisGroupSampleFileComponent} from "./analysis-group-sample-file/analysis-group-sample-file.component";
+import {SourceFile} from "../source-file";
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelDescription, MatExpansionPanelHeader,
+  MatExpansionPanelTitle
+} from "@angular/material/expansion";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -43,7 +59,20 @@ import {MatLabel} from "@angular/material/form-field";
     FormsModule,
     MatInput,
     MatFormField,
-    MatLabel
+    MatLabel,
+    AsyncPipe,
+    MatAutocomplete,
+    MatOption,
+    MatAutocompleteTrigger,
+    MatTooltip,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelTitle,
+    MatExpansionPanelDescription,
+    MatExpansionPanelHeader
   ],
   templateUrl: './analysis-group-general-metadata.component.html',
   styleUrl: './analysis-group-general-metadata.component.scss'
@@ -59,17 +88,62 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     return this._metadata
   }
 
+  @Input() sourceFiles: SourceFile[] = []
+
   @Output() metadataChange = new EventEmitter<MetadataColumn[]>()
   @Output() metadataDeleted = new EventEmitter<MetadataColumn>()
   markedForDeletion: MetadataColumn[] = []
 
+  @Input() canEdit: boolean = false
+  autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[]>} = {}
   constructor(private web: WebService, private dialog: MatDialog) { }
 
-  ngOnInit(): void {
+  updateValueField(metadata: MetadataColumn, data: string) {
+    if (data.length < 2) {
+      this.autoCompleteMap[metadata.id] = of([])
+      return
+    }
+    if (metadata.name.toLowerCase() === "subcellular location") {
+      this.autoCompleteMap[metadata.id] = this.web.getSubcellularLocations(undefined, 5, 0, data).pipe(
+        map((response) => response.results)
+      )
+    } else if (metadata.name.toLowerCase() === "disease") {
+      this.autoCompleteMap[metadata.id] = this.web.getHumandDiseases(undefined, 5, 0, data).pipe(
+        map((response) => response.results)
+      )
+    } else if (metadata.name.toLowerCase() === "tissue") {
+      this.autoCompleteMap[metadata.id] = this.web.getTissues(undefined, 5, 0, data).pipe(
+        map((response) => response.results)
+      )
+    } else {
+      this.autoCompleteMap[metadata.id] = of([])
+    }
   }
 
-  createMetadata() {
+  ngOnInit(): void {
+
+  }
+
+  createMetadata(customizationTemplate: string|undefined|null = null) {
     const ref = this.dialog.open(AnalysisGroupMetadataCreationDialogComponent)
+    if (customizationTemplate) {
+      ref.componentInstance.readonlyType = true
+      ref.componentInstance.readonlyName = true
+      switch (customizationTemplate) {
+        case "subcellular location":
+          ref.componentInstance.metadataName = "Subcellular Location"
+          ref.componentInstance.metadataType = "Characteristic"
+          break
+        case "disease":
+          ref.componentInstance.metadataType = "Disease"
+          ref.componentInstance.metadataType = "Characteristic"
+          break
+        case "tissue":
+          ref.componentInstance.metadataType = "Tissue"
+          ref.componentInstance.metadataType = "Characteristic"
+          break
+      }
+    }
     ref.afterClosed().subscribe((result) => {
       if (result) {
         this.web.createMetaDataColumn(this.analysis_group_id, result).subscribe((metadata) => {
@@ -85,4 +159,29 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     this.metadataDeleted.emit(metadata)
   }
 
+  displayData(data: SubcellularLocation | HumanDisease | Tissue) {
+    if (data) {
+      if ("identifier" in data) {
+        return data.identifier
+      } else {
+        return data.location_identifier
+      }
+    }
+    return ""
+  }
+
+  addSampleFile() {
+    const ref = this.dialog.open(AnalysisGroupSampleFileComponent)
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        if (result.name) {
+          this.web.createSourceFile(this.analysis_group_id, result.name, result.description).subscribe((sourceFile) => {
+
+            }
+          )
+        }
+      }
+    })
+
+  }
 }

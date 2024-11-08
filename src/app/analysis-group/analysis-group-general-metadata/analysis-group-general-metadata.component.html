@@ -1,23 +1,60 @@
 <div style="display: flex; flex-direction: column; gap: 20px">
-  @for (m of metadata; track m.id) {
-    <div style="display: flex; gap: 20px">
-      <mat-form-field style="flex-grow: 1">
-        <textarea matInput [(ngModel)]="m.value" [disabled]="markedForDeletion.includes(m)"></textarea>
-        <mat-label>{{m.name}}</mat-label>
-      </mat-form-field>
-      @if (!markedForDeletion.includes(m)) {
-        <button mat-icon-button type="button" (click)="metadataDeleted.emit(m);markedForDeletion.push(m)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      } @else {
-        <button mat-icon-button type="button" (click)="undoDeletion(m)">
-          <mat-icon>undo</mat-icon>
-        </button>
+  <h3>Metadata</h3>
+  <div style="display: flex; flex-direction: column; gap: 20px">
+    @for (m of metadata; track m.id) {
+      <div style="display: flex; gap: 20px">
+        <mat-form-field style="flex-grow: 1">
+          <textarea [readonly]="!canEdit" matInput [(ngModel)]="m.value" [disabled]="markedForDeletion.includes(m)" [matAutocomplete]="autoMetadataValue" (ngModelChange)="updateValueField(m, $event)"></textarea>
+          <mat-label>{{m.name}}</mat-label>
+        </mat-form-field>
+        <mat-autocomplete #autoMetadataValue="matAutocomplete">
+          @for (m of autoCompleteMap[m.id]| async ; track m) {
+            <mat-option [value]="displayData(m)">
+              {{displayData(m)}}
+            </mat-option>
+          }
+        </mat-autocomplete>
+        @if (!markedForDeletion.includes(m)) {
+          <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Mark for deletion'" (click)="metadataDeleted.emit(m);markedForDeletion.push(m)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        } @else {
+          <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Undo deletion mark'" (click)="undoDeletion(m)">
+            <mat-icon>undo</mat-icon>
+          </button>
+        }
+
+      </div>
+    }
+  </div>
+
+  <div style="display: flex; gap:20px">
+    <button [disabled]="!canEdit" mat-flat-button type="button" color="primary" [matMenuTriggerFor]="metadataMenu">Add Metadata</button>
+    <button [disabled]="!canEdit" mat-flat-button type="button" color="primary" (click)="addSampleFile()">Add Sample File</button>
+  </div>
+  <mat-menu #metadataMenu="matMenu">
+    <button mat-menu-item (click)="createMetadata('disease')">Disease</button>
+    <button mat-menu-item (click)="createMetadata('tissue')">Tissue</button>
+    <button mat-menu-item (click)="createMetadata('subcellular location')">Subcellular location</button>
+    <button mat-menu-item (click)="createMetadata()">Create custom metadata field</button>
+  </mat-menu>
+  @if (sourceFiles.length > 0) {
+    <mat-accordion multi>
+      @for (s of sourceFiles; track s.id) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{s.name}}
+            </mat-panel-title>
+            <mat-panel-description>
+              {{s.description}}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
       }
-    </div>
+    </mat-accordion>
+
+
   }
 </div>
 
-
-
-<button mat-flat-button type="button" color="primary" (click)="createMetadata()">Add Metadata</button>

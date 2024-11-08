@@ -1,4 +1,5 @@
 import {MetadataColumn} from "./metadata-column";
+import {SourceFile} from "./source-file";
 
 export interface AnalysisGroup {
   id: number;
@@ -9,6 +10,7 @@ export interface AnalysisGroup {
   created_at: Date;
   curtain_link: string;
   metadata_columns: MetadataColumn[];
+  source_files: SourceFile[];
 }
 
 export interface AnalysisGroupQuery {

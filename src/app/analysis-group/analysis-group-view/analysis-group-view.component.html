@@ -29,8 +29,10 @@
           <mat-label>Analysis Group Description</mat-label>
         </mat-form-field>
         @if (analysisGroup) {
-          <app-analysis-group-general-metadata (metadataDeleted)="updateDeletionList($event)" [analysis_group_id]="analysisGroup.id" [metadata]="analysisGroup.metadata_columns"></app-analysis-group-general-metadata>
+          <mat-divider></mat-divider>
+          <app-analysis-group-general-metadata [sourceFiles]="analysisGroup.source_files" [canEdit]="canEdit" (metadataDeleted)="updateDeletionList($event)" [analysis_group_id]="analysisGroup.id" [metadata]="analysisGroup.metadata_columns"></app-analysis-group-general-metadata>
         }
+        <mat-divider></mat-divider>
         <div style="display: flex; flex-direction: row; gap: 10px">
           <mat-form-field style="width: 100%">
             <input matInput formControlName="curtain_link" type="text" placeholder="Curtain Link">
@@ -100,7 +102,7 @@
       </div>
       <div style="display: flex; flex-direction: row; gap: 20px; padding: 20px">
         @if (analysisGroupSearched) {
-          <button mat-flat-button color="primary" [disabled]="!canEdit" (click)="setAnnotationModal(analysisGroupSearched)">Sample Annotation @if(sampleAnnotations) {({{sampleAnnotations.annotations.length}})}</button>
+          <button mat-flat-button color="primary" [disabled]="!canEdit" (click)="setAnnotationModal(analysisGroupSearched)">Plot Sample Annotation @if(sampleAnnotations) {({{sampleAnnotations.annotations.length}})}</button>
         }
         @if (sampleAnnotations && analysisGroupSearched && analysisGroupDF) {
           <button mat-flat-button color="primary" [disabled]="!canEdit" (click)="setComparisonMatrixModal(sampleAnnotations, analysisGroupSearched, analysisGroupDF)">Comparison Matrix @if(comparisonMatrix) {({{comparisonMatrix.matrix.length}})}</button>
