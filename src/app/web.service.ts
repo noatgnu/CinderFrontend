@@ -927,5 +927,11 @@ export class WebService {
     )
   }
 
-
+  reorganizeColumns(positions: MetadataColumn[], analysis_group: number) {
+    return this.http.post<any>(
+      `${this.baseURL}/api/analysis_groups/${analysis_group}/reorganize_column/`,
+      {positions: positions},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
 }

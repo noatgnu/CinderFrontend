@@ -89,31 +89,35 @@
                   }
                 </div>
                 <h5>Metadata Annotation</h5>
-                @for (c of s.metadata_columns; track c.id) {
-                  @if (metadataFormMap[c.id]) {
-                    <form [formGroup]="metadataFormMap[c.id]">
-                      <mat-form-field style="width: 100%">
-                        <input matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue">
-                        <mat-label>{{c.name}}</mat-label>
-                        <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)}</mat-hint>
-                        <button type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
-                          @if (!markedForDeletion.includes(c)) {
-                            <mat-icon>delete</mat-icon>
-                          } @else {
-                            <mat-icon>undo</mat-icon>
-                          }
-                        </button>
-                        <mat-autocomplete #autoMetadataSourceFileValue="matAutocomplete">
-                          @for (m of autoCompleteMap[c.id]| async ; track m) {
-                            <mat-option [value]="displayData(m)">
-                              {{displayData(m)}}
-                            </mat-option>
-                          }
-                        </mat-autocomplete>
-                      </mat-form-field>
-                    </form>
+                <div style="display: flex; flex-direction: column; gap: 20px" cdkDropList (cdkDropListDropped)="drop($event, s)">
+                  @for (c of s.metadata_columns; track c.id) {
+                    @if (metadataFormMap[c.id]) {
+                      <form [formGroup]="metadataFormMap[c.id]" cdkDrag [cdkDragData]="c">
+                        <mat-form-field style="width: 100%">
+                          <input matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue">
+                          <mat-label>{{c.name}}</mat-label>
+                          <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)}</mat-hint>
+                          <button type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
+                            @if (!metadataFormMap[c.id].controls['value'].disabled) {
+                              <mat-icon>delete</mat-icon>
+                            } @else {
+                              <mat-icon>undo</mat-icon>
+                            }
+                          </button>
+                          <mat-autocomplete #autoMetadataSourceFileValue="matAutocomplete">
+                            @for (m of autoCompleteMap[c.id]| async ; track m) {
+                              <mat-option [value]="displayData(m)">
+                                {{displayData(m)}}
+                              </mat-option>
+                            }
+                          </mat-autocomplete>
+                        </mat-form-field>
+                        <button mat-icon-button cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
+                      </form>
+                    }
                   }
-                }
+                </div>
+
               </div>
             </div>
           </div>

@@ -98,6 +98,7 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   }
 
   displayData(data: SubcellularLocation | HumanDisease | Tissue) {
+    console.log(data)
     if (data) {
       if ("identifier" in data) {
         return data.identifier

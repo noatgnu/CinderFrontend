@@ -38,6 +38,7 @@ import {
 } from "@angular/material/expansion";
 import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
+import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -80,7 +81,10 @@ import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
     MatCardContent,
     MatHint,
     ReactiveFormsModule,
-    MatSuffix
+    MatSuffix,
+    CdkDropList,
+    CdkDrag,
+    CdkDragHandle
   ],
   templateUrl: './analysis-group-general-metadata.component.html',
   styleUrl: './analysis-group-general-metadata.component.scss'
@@ -143,6 +147,8 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   @Output() metadataChange = new EventEmitter<MetadataColumn[]>()
   @Output() metadataDeleted = new EventEmitter<MetadataColumn>()
   @Output() sourceFilesChanged = new EventEmitter<SourceFile[]>()
+  @Output() sourceFileMetadataDeleted = new EventEmitter<MetadataColumn>()
+  @Output() reorderMetadataSourceFiles = new EventEmitter<MetadataColumn[]>()
   markedForDeletion: MetadataColumn[] = []
 
   @Input() canEdit: boolean = false
@@ -186,7 +192,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       ref.componentInstance.readonlyName = true
       switch (customizationTemplate) {
         case "subcellular location":
-          ref.componentInstance.metadataName = "Subcellular Location"
+          ref.componentInstance.metadataName = "Subcellular location"
           ref.componentInstance.metadataType = "Characteristic"
           break
         case "disease":
@@ -275,7 +281,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       ref.componentInstance.readonlyName = true
       switch (customizationTemplate) {
         case "subcellular location":
-          ref.componentInstance.metadataName = "Subcellular Location"
+          ref.componentInstance.metadataName = "Subcellular location"
           ref.componentInstance.metadataType = "Characteristic"
           break
         case "disease":
@@ -292,18 +298,22 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       if (result) {
         this.web.createMetaDataColumn(this.analysis_group_id, result, fileId).subscribe((metadata) => {
           for (const m of metadata) {
-            this.sourceFileMap[fileId].metadata_columns.push(m)
-            this.sourceFileMap[fileId].metadata_columns = [...this.sourceFileMap[fileId].metadata_columns]
-            this.metadataFormMap[m.id] = this.fb.group({
-              value: [m.value],
-              name: [m.name],
-              type: [m.type]
-            })
-            this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
-              if (data.value) {
-                this.updateValueField(m, data.value)
-              }
-            })
+            const fId = m.source_file?.toString()
+            if (fId) {
+              this.sourceFileMap[fId].metadata_columns.push(m)
+              this.sourceFileMap[fId].metadata_columns = [...this.sourceFileMap[fId].metadata_columns]
+              this.metadataFormMap[m.id] = this.fb.group({
+                value: [m.value],
+                name: [m.name],
+                type: [m.type]
+              })
+              this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
+                if (data.value) {
+                  this.updateValueField(m, data.value)
+                }
+              })
+            }
+
           }
         })
       }
@@ -326,14 +336,56 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   markForDeleteOrUndo(metadata: MetadataColumn) {
     const columns = this.sourceFiles.map((s) => s.metadata_columns).flat()
     const selectedColumns = columns.filter((m) => m.column_position === metadata.column_position)
-    for (const m of selectedColumns) {
-      if (this.markedForDeletion.includes(m)) {
-        this.markedForDeletion = this.markedForDeletion.filter((md) => md !== m)
-        this.metadataFormMap[m.id].controls["value"].enable()
-      } else {
-        this.markedForDeletion.push(m)
-        this.metadataFormMap[m.id].controls["value"].disable()
+    const currentState =  this.metadataFormMap[metadata.id].controls["value"].disabled
+    if (currentState) {
+      this.metadataFormMap[metadata.id].controls["value"].enable()
+      if (this.markedForDeletion.includes(metadata)) {
+        this.markedForDeletion = this.markedForDeletion.filter((md) => md !== metadata)
+      }
+    } else {
+      this.metadataFormMap[metadata.id].controls["value"].disable()
+
+      if (!this.markedForDeletion.includes(metadata)) {
+        this.markedForDeletion.push(metadata)
       }
     }
+    for (const m of selectedColumns) {
+      if (m !== metadata) {
+        this.markedForDeletion = this.markedForDeletion.filter((md) => md !== m)
+        const metaCurrentValue = this.metadataFormMap[metadata.id].controls["value"].disabled
+        if (metaCurrentValue) {
+          this.metadataFormMap[m.id].controls["value"].disable()
+        } else {
+          this.metadataFormMap[m.id].controls["value"].enable()
+        }
+      }
+    }
+    this.sourceFileMetadataDeleted.emit(metadata)
+  }
+
+  drop(event: CdkDragDrop<MetadataColumn[]>, currentSourceFile: SourceFile) {
+    const previousIndex = event.previousIndex;
+    const currentIndex = event.currentIndex;
+    const data = event.item.data as MetadataColumn;
+    const listOfColumnsChanged: MetadataColumn[] = []
+    const new_index_position = currentSourceFile.metadata_columns[currentIndex].column_position
+    this.sourceFiles.forEach(sourceFile => {
+      moveItemInArray(sourceFile.metadata_columns, previousIndex, currentIndex);
+      sourceFile.metadata_columns[currentIndex].column_position = new_index_position
+      listOfColumnsChanged.push(sourceFile.metadata_columns[currentIndex])
+      // if currentIndex is greater than previousIndex, we need to decrement the column_position of all columns between previousIndex and currentIndex
+      if (currentIndex > previousIndex) {
+        for (let i = previousIndex; i <= currentIndex; i++) {
+          sourceFile.metadata_columns[i].column_position -= 1
+          listOfColumnsChanged.push(sourceFile.metadata_columns[i])
+        }
+      } else {
+        for (let i = currentIndex+1; i <= previousIndex; i++) {
+          sourceFile.metadata_columns[i].column_position += 1
+          listOfColumnsChanged.push(sourceFile.metadata_columns[i])
+        }
+      }
+    });
+    this.reorderMetadataSourceFiles.emit(listOfColumnsChanged)
   }
 }

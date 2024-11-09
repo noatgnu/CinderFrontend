@@ -61,7 +61,7 @@ export class AnalysisGroupViewComponent {
   associatedProject?: Project|undefined
   private _analysisGroup: AnalysisGroup|undefined
   analysisType: string = "proteomics"
-
+  reorderMetadataColumnSourceFile: MetadataColumn[] = []
   canEdit: boolean = false
 
   composingCurtainProgress: any = {
@@ -185,13 +185,25 @@ export class AnalysisGroupViewComponent {
     if (this.metadataDeletionList.length > 0) {
       for (const metadata of this.metadataDeletionList) {
         await this.web.deleteMetaDataColumn(metadata.id).toPromise()
+        this.sb.open(`Metadata column ${metadata.name} deleted`, "Dismiss", {duration: 5000})
+        if (metadata.source_file && this.generalMetadata) {
+          const columnsWithSamePosition = this.generalMetadata.sourceFiles.map((s) => s.metadata_columns).flat().filter((m) => m.column_position === metadata.column_position)
+          if (columnsWithSamePosition.length === 1) {
+            const sourceFile = this.generalMetadata.sourceFiles.find((s) => s.id === metadata.source_file)
+            if (sourceFile) {
+              sourceFile.metadata_columns = sourceFile.metadata_columns.filter((m) => m.column_position !== metadata.column_position)
+            }
+          }
+        }
       }
     }
+
     if (this.generalMetadata) {
       for (const metadataID in this.generalMetadata.metadataFormMap) {
         if (this.generalMetadata.metadataFormMap[metadataID].dirty) {
           await this.web.updateMetaDataColumn(parseInt(metadataID), undefined, undefined, this.generalMetadata.metadataFormMap[metadataID].value.value).toPromise()
           this.generalMetadata.metadataFormMap[metadataID].markAsPristine()
+          this.sb.open(`Metadata column ${this.generalMetadata.metadataFormMap[metadataID].value.name} updated`, "Dismiss", {duration: 5000})
         }
       }
     }
@@ -398,5 +410,32 @@ export class AnalysisGroupViewComponent {
     } else {
       this.metadataDeletionList.push(metadataColumn)
     }
+  }
+
+  updateDeletionListSourceFile(metadataColumn: MetadataColumn) {
+    if (this.generalMetadata) {
+      const columns = this.generalMetadata?.sourceFiles.map((s) => s.metadata_columns).flat()
+      const selectedColumns = columns.filter((m) => m.column_position === metadataColumn.column_position)
+      if (this.metadataDeletionList.includes(metadataColumn)) {
+        this.metadataDeletionList = this.metadataDeletionList.filter((a) => a.id !== metadataColumn.id)
+      } else {
+        this.metadataDeletionList.push(metadataColumn)
+        for (const m of selectedColumns) {
+          if (m !== metadataColumn) {
+            this.metadataDeletionList = this.metadataDeletionList.filter((md) => md.id !== m.id)
+          }
+        }
+      }
+    }
+    console.log(this.metadataDeletionList)
+  }
+
+  reorderMetadataColumn(columnsChanged: MetadataColumn[]) {
+    if (this.analysisGroup) {
+      this.web.reorganizeColumns(columnsChanged, this.analysisGroup.id).subscribe((data) => {
+        this.sb.open("Metadata columns reordered", "Dismiss", {duration: 5000})
+      })
+    }
+
   }
 }
