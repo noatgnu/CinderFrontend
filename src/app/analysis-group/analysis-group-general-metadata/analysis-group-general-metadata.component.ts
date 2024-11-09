@@ -18,7 +18,7 @@ import {
   AnalysisGroupMetadataCreationDialogComponent
 } from "./analysis-group-metadata-creation-dialog/analysis-group-metadata-creation-dialog.component";
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatFormField, MatInput} from "@angular/material/input";
+import {MatFormField, MatInput, MatSuffix} from "@angular/material/input";
 import {MatHint, MatLabel} from "@angular/material/form-field";
 import {AsyncPipe} from "@angular/common";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
@@ -79,7 +79,8 @@ import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
     MatCardHeader,
     MatCardContent,
     MatHint,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatSuffix
   ],
   templateUrl: './analysis-group-general-metadata.component.html',
   styleUrl: './analysis-group-general-metadata.component.scss'
@@ -105,6 +106,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   }
 
   metadataFormMap: {[key: string]: FormGroup} = {}
+  sourcefileFormMap: {[key: string]: FormGroup} = {}
 
   get metadata(): MetadataColumn[] {
     return this._metadata
@@ -115,6 +117,10 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     this.sourceFileMap = {}
     for (const s of value) {
       this.sourceFileMap[s.id] = s
+      this.sourcefileFormMap[s.id] = this.fb.group({
+        name: [s.name],
+        description: [s.description]
+      })
       for (const m of s.metadata_columns) {
         this.metadataFormMap[m.id] = this.fb.group({
           value: [m.value],
@@ -145,6 +151,9 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder) { }
 
   updateValueField(metadata: MetadataColumn, data: string) {
+    if (!this.autoCompleteMap[metadata.id]) {
+      this.autoCompleteMap[metadata.id] = of([])
+    }
     if (data.length < 2) {
       this.autoCompleteMap[metadata.id] = of([])
       return
@@ -195,6 +204,18 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         this.web.createMetaDataColumn(this.analysis_group_id, result).subscribe((metadata) => {
           this.metadata.push(...metadata)
           this.metadataChange.emit(this.metadata)
+          for (const m of metadata) {
+            this.metadataFormMap[m.id] = this.fb.group({
+              value: [m.value],
+              name: [m.name],
+              type: [m.type]
+            })
+            this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
+              if (data.value) {
+                this.updateValueField(m, data.value)
+              }
+            })
+          }
         })
       }
     })
@@ -223,6 +244,10 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         if (result.name) {
           this.web.createSourceFile(this.analysis_group_id, result.name, result.description).subscribe((sourceFile) => {
               this.sourceFiles.push(sourceFile)
+              this.sourcefileFormMap[sourceFile.id] = this.fb.group({
+                name: [sourceFile.name],
+                description: [sourceFile.description]
+              })
               this.sourceFilesChanged.emit(this.sourceFiles)
             }
           )
@@ -268,6 +293,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         this.web.createMetaDataColumn(this.analysis_group_id, result, fileId).subscribe((metadata) => {
           for (const m of metadata) {
             this.sourceFileMap[fileId].metadata_columns.push(m)
+            this.sourceFileMap[fileId].metadata_columns = [...this.sourceFileMap[fileId].metadata_columns]
             this.metadataFormMap[m.id] = this.fb.group({
               value: [m.value],
               name: [m.name],
@@ -295,5 +321,19 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         })
       }
     })
+  }
+
+  markForDeleteOrUndo(metadata: MetadataColumn) {
+    const columns = this.sourceFiles.map((s) => s.metadata_columns).flat()
+    const selectedColumns = columns.filter((m) => m.column_position === metadata.column_position)
+    for (const m of selectedColumns) {
+      if (this.markedForDeletion.includes(m)) {
+        this.markedForDeletion = this.markedForDeletion.filter((md) => md !== m)
+        this.metadataFormMap[m.id].controls["value"].enable()
+      } else {
+        this.markedForDeletion.push(m)
+        this.metadataFormMap[m.id].controls["value"].disable()
+      }
+    }
   }
 }

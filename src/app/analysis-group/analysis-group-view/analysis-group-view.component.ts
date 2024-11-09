@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {AnalysisGroup, CurtainData} from "../analysis-group";
 import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -57,6 +57,7 @@ import {MatDivider} from "@angular/material/divider";
   styleUrl: './analysis-group-view.component.scss'
 })
 export class AnalysisGroupViewComponent {
+  @ViewChild('generalMetadata') generalMetadata?: AnalysisGroupGeneralMetadataComponent
   associatedProject?: Project|undefined
   private _analysisGroup: AnalysisGroup|undefined
   analysisType: string = "proteomics"
@@ -184,6 +185,14 @@ export class AnalysisGroupViewComponent {
     if (this.metadataDeletionList.length > 0) {
       for (const metadata of this.metadataDeletionList) {
         await this.web.deleteMetaDataColumn(metadata.id).toPromise()
+      }
+    }
+    if (this.generalMetadata) {
+      for (const metadataID in this.generalMetadata.metadataFormMap) {
+        if (this.generalMetadata.metadataFormMap[metadataID].dirty) {
+          await this.web.updateMetaDataColumn(parseInt(metadataID), undefined, undefined, this.generalMetadata.metadataFormMap[metadataID].value.value).toPromise()
+          this.generalMetadata.metadataFormMap[metadataID].markAsPristine()
+        }
       }
     }
     // @ts-ignore

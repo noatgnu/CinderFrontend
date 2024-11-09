@@ -2,34 +2,39 @@
   <h3>Metadata</h3>
   <div style="display: flex; flex-direction: column; gap: 20px">
     @for (m of metadata; track m.id) {
-      <div style="display: flex; gap: 20px">
-        @if (metadataFormMap[m.id]) {
-          <form [formGroup]="metadataFormMap[m.id]">
-            <mat-form-field style="flex-grow: 1">
-              <textarea [readonly]="!canEdit" matInput formControlName="value" [disabled]="markedForDeletion.includes(m)" [matAutocomplete]="autoMetadataValue"></textarea>
-              <mat-label>{{m.name}}</mat-label>
-            </mat-form-field>
-          </form>
-        }
+      @if (metadataFormMap[m.id]) {
+        <form [formGroup]="metadataFormMap[m.id]" style="display: flex; gap:20px">
+          <mat-form-field style="flex-grow: 1">
+            <textarea
+              [readonly]="!canEdit"
+              matInput
+              formControlName="value"
+              [disabled]="markedForDeletion.includes(m)"
+              [matAutocomplete]="autoMetadataValue">
 
-        <mat-autocomplete #autoMetadataValue="matAutocomplete">
-          @for (m of autoCompleteMap[m.id]| async ; track m) {
-            <mat-option [value]="displayData(m)">
-              {{displayData(m)}}
-            </mat-option>
+            </textarea>
+            <mat-label>{{m.name}}</mat-label>
+            <mat-hint>@if(metadataFormMap[m.id].dirty) {(value modified)}</mat-hint>
+          </mat-form-field>
+          <mat-autocomplete #autoMetadataValue="matAutocomplete">
+            @for (m of autoCompleteMap[m.id]| async ; track m) {
+              <mat-option [value]="displayData(m)">
+                {{displayData(m)}}
+              </mat-option>
+            }
+          </mat-autocomplete>
+          @if (!markedForDeletion.includes(m)) {
+            <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Mark for deletion'" (click)="metadataDeleted.emit(m);markedForDeletion.push(m)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          } @else {
+            <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Undo deletion mark'" (click)="undoDeletion(m)">
+              <mat-icon>undo</mat-icon>
+            </button>
           }
-        </mat-autocomplete>
-        @if (!markedForDeletion.includes(m)) {
-          <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Mark for deletion'" (click)="metadataDeleted.emit(m);markedForDeletion.push(m)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        } @else {
-          <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Undo deletion mark'" (click)="undoDeletion(m)">
-            <mat-icon>undo</mat-icon>
-          </button>
-        }
+        </form>
 
-      </div>
+      }
     }
   </div>
 
@@ -56,12 +61,7 @@
             </mat-panel-description>
           </mat-expansion-panel-header>
           <div style="display: flex; flex-direction: column; gap: 20px">
-            <div style="display: flex; gap: 20px">
-              <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Add new metadata annotation'" [matMenuTriggerFor]="metadataMenuFileSpecific"><mat-icon>add</mat-icon></button>
-              @if (canEdit) {
-                <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Remove this source file'" (click)="removeSampleFile(s.id)"><mat-icon>delete</mat-icon></button>
-              }
-            </div>
+
             <mat-menu #metadataMenuFileSpecific="matMenu">
               <button mat-menu-item (click)="createMetadataFileSpecific('disease', s.id)">Disease</button>
               <button mat-menu-item (click)="createMetadataFileSpecific('tissue', s.id)">Tissue</button>
@@ -69,23 +69,50 @@
               <button mat-menu-item (click)="createMetadataFileSpecific(null, s.id)">Create custom metadata field</button>
             </mat-menu>
             <div style="display: flex; gap: 20px">
-              <div style="width:300px">
-                <mat-form-field style="width: 100%">
-                  <input matInput [(ngModel)]="s.name">
-                  <mat-label>Sample Name</mat-label>
-                </mat-form-field>
-                <mat-form-field style="width: 100%">
-                  <textarea matInput [(ngModel)]="s.description"></textarea>
-                  <mat-label>Sample Description</mat-label>
-                </mat-form-field>
-              </div>
-              <div style="flex-grow: 1">
-                @for (c of s.metadata_columns; track c.id) {
+              @if (sourcefileFormMap[s.id]) {
+                <form [formGroup]="sourcefileFormMap[s.id]" style="width:300px">
                   <mat-form-field style="width: 100%">
-                    <input matInput [(ngModel)]="c.value">
-                    <mat-label>{{c.name}}</mat-label>
-                    <mat-hint>{{c.type}}</mat-hint>
+                    <input matInput formControlName="name">
+                    <mat-label>Source File Sample Name</mat-label>
                   </mat-form-field>
+                  <mat-form-field style="width: 100%">
+                    <textarea matInput formControlName="description"></textarea>
+                    <mat-label>Source File Sample Description</mat-label>
+                  </mat-form-field>
+                </form>
+              }
+              <div style="flex-grow: 1">
+                <div style="display: flex; gap: 20px">
+                  <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Add new metadata annotation'" [matMenuTriggerFor]="metadataMenuFileSpecific"><mat-icon>add</mat-icon></button>
+                  @if (canEdit) {
+                    <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Remove this source file'" (click)="removeSampleFile(s.id)"><mat-icon>delete</mat-icon></button>
+                  }
+                </div>
+                <h5>Metadata Annotation</h5>
+                @for (c of s.metadata_columns; track c.id) {
+                  @if (metadataFormMap[c.id]) {
+                    <form [formGroup]="metadataFormMap[c.id]">
+                      <mat-form-field style="width: 100%">
+                        <input matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue">
+                        <mat-label>{{c.name}}</mat-label>
+                        <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)}</mat-hint>
+                        <button type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
+                          @if (!markedForDeletion.includes(c)) {
+                            <mat-icon>delete</mat-icon>
+                          } @else {
+                            <mat-icon>undo</mat-icon>
+                          }
+                        </button>
+                        <mat-autocomplete #autoMetadataSourceFileValue="matAutocomplete">
+                          @for (m of autoCompleteMap[c.id]| async ; track m) {
+                            <mat-option [value]="displayData(m)">
+                              {{displayData(m)}}
+                            </mat-option>
+                          }
+                        </mat-autocomplete>
+                      </mat-form-field>
+                    </form>
+                  }
                 }
               </div>
             </div>
