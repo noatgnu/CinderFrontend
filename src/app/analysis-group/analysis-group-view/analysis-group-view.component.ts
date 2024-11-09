@@ -130,9 +130,9 @@ export class AnalysisGroupViewComponent {
   @Output() updated: EventEmitter<AnalysisGroup> = new EventEmitter<AnalysisGroup>()
 
   form = this.fb.group({
-    name: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]}),
-    description: new FormControl({value: "", disabled: !this.accounts.loggedIn}, {validators: [Validators.required]}),
-    curtain_link: new FormControl({value: "", disabled: !this.accounts.loggedIn})
+    name: new FormControl({value: "", disabled: false}, {validators: [Validators.required]}),
+    description: new FormControl({value: "", disabled: false}, {validators: [Validators.required]}),
+    curtain_link: new FormControl({value: "", disabled: false})
   })
 
   curtainData?: CurtainData

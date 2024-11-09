@@ -21,11 +21,11 @@
 
       <form (ngSubmit)="updateAnalysisGroup()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
         <mat-form-field style="width: 100%">
-          <input matInput formControlName="name" type="text" placeholder="Analysis Group Name">
+          <input matInput formControlName="name" type="text" placeholder="Analysis Group Name" [readonly]="!canEdit">
           <mat-label>Analysis Group Name</mat-label>
         </mat-form-field>
         <mat-form-field style="width: 100%">
-          <textarea matInput formControlName="description" placeholder="Analysis Group Description"></textarea>
+          <textarea matInput formControlName="description" placeholder="Analysis Group Description" [readonly]="!canEdit"></textarea>
           <mat-label>Analysis Group Description</mat-label>
         </mat-form-field>
         @if (analysisGroup) {
@@ -35,7 +35,7 @@
         <mat-divider></mat-divider>
         <div style="display: flex; flex-direction: row; gap: 10px">
           <mat-form-field style="width: 100%">
-            <input matInput formControlName="curtain_link" type="text" placeholder="Curtain Link">
+            <input matInput formControlName="curtain_link" type="text" placeholder="Curtain Link" [readonly]="!canEdit">
             <mat-label>Curtain Link</mat-label>
           </mat-form-field>
           <button mat-icon-button (click)="refreshCurtainLink()" [disabled]="!canEdit" type="button">
