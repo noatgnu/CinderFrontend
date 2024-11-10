@@ -11,6 +11,7 @@ import {WebService} from "../../../web.service";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
+import {Species} from "../../../species";
 
 @Component({
   selector: 'app-analysis-group-metadata-creation-dialog',
@@ -34,8 +35,8 @@ import {MatButton} from "@angular/material/button";
 })
 export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   metadataTypeAutocomplete: string[] = ["Characteristic", "Comment", "Factor value", "Material type", "Assay name", "Technology type"]
-  metadataNameAutocomplete: string[] = ["Disease", "Tissue", "Subcellular location"]
-  metadataCharacteristics: string[] = ["Disease", "Tissue", "Subcellular location", "Cell type", "Cell line", "Developmental stage", "Ancestry category", "Sex", "Age", "Biological replicate"]
+  metadataNameAutocomplete: string[] = ["Disease", "Tissue", "Subcellular location", "Organism"]
+  metadataCharacteristics: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Cell type", "Cell line", "Developmental stage", "Ancestry category", "Sex", "Age", "Biological replicate"]
   metadataComment: string[] = ["Data file", "File uri", "Technical replicate", "Fraction identifier", "Label", "Cleavage agent details", "Instrument", "Modification parameters", "Dissociation method", "Precursor mass tolerance", "Fragment mass tolerance", ""]
 
   form = this.fb.group({
@@ -44,7 +45,7 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
     metadataValue: ""
   })
 
-  filteredResults: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[]> = of([])
+  filteredResults: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[]> = of([])
   @Input() readonlyType: boolean = false
   @Input() readonlyName: boolean = false
   @Input() set metadataType(value: string) {
@@ -81,6 +82,10 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
           return this.web.getTissues(undefined, 5, 0, value).pipe(
             map((response) => response.results)
           )
+        } else if (this.form.controls.metadataName.value?.toLowerCase() === "organism") {
+          return this.web.getSpecies(undefined, 5, 0, value).pipe(
+            map((response) => response.results)
+          )
         } else {
           return of([])
         }
@@ -97,11 +102,12 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
     this.dialog.close(this.form.value)
   }
 
-  displayData(data: SubcellularLocation | HumanDisease | Tissue) {
-    console.log(data)
+  displayData(data: SubcellularLocation | HumanDisease | Tissue | Species) {
     if (data) {
       if ("identifier" in data) {
         return data.identifier
+      } else if ("official_name" in data){
+        return data.official_name
       } else {
         return data.location_identifier
       }

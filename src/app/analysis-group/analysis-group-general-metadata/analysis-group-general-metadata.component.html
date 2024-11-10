@@ -41,11 +41,13 @@
   <div style="display: flex; gap:20px">
     <button [disabled]="!canEdit" mat-flat-button type="button" color="primary" [matMenuTriggerFor]="metadataMenu">Add Metadata</button>
     <button [disabled]="!canEdit" mat-flat-button type="button" color="primary" (click)="addSampleFile()">Add Sample File</button>
+    <button mat-flat-button type="button" color="warn" (click)="exportSDRF()">Export SDRF</button>
   </div>
   <mat-menu #metadataMenu="matMenu">
     <button mat-menu-item (click)="createMetadata('disease')">Disease</button>
     <button mat-menu-item (click)="createMetadata('tissue')">Tissue</button>
     <button mat-menu-item (click)="createMetadata('subcellular location')">Subcellular location</button>
+    <button mat-menu-item (click)="createMetadata('organism')">Organism</button>
     <button mat-menu-item (click)="createMetadata()">Create custom metadata field</button>
   </mat-menu>
   @if (sourceFiles.length > 0) {
@@ -66,6 +68,7 @@
               <button mat-menu-item (click)="createMetadataFileSpecific('disease', s.id)">Disease</button>
               <button mat-menu-item (click)="createMetadataFileSpecific('tissue', s.id)">Tissue</button>
               <button mat-menu-item (click)="createMetadataFileSpecific('subcellular location', s.id)">Subcellular location</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('organism', s.id)">Organism</button>
               <button mat-menu-item (click)="createMetadataFileSpecific(null, s.id)">Create custom metadata field</button>
             </mat-menu>
             <div style="display: flex; gap: 20px">

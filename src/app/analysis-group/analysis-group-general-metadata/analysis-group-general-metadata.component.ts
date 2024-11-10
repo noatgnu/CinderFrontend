@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {MetadataColumn} from "../metadata-column";
+import {MetadataColumn, SDRF} from "../metadata-column";
 import {WebService} from "../../web.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {
@@ -39,6 +39,7 @@ import {
 import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
+import {Species} from "../../species";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -152,7 +153,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   markedForDeletion: MetadataColumn[] = []
 
   @Input() canEdit: boolean = false
-  autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[]>} = {}
+  autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[]>} = {}
   sourceFileMap: {[key: string]: SourceFile} = {}
   constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder) { }
 
@@ -176,6 +177,10 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       this.autoCompleteMap[metadata.id] = this.web.getTissues(undefined, 5, 0, data).pipe(
         map((response) => response.results)
       )
+    } else if (metadata.name.toLowerCase() === "organism") {
+      this.autoCompleteMap[metadata.id] = this.web.getSpecies(undefined, 5, 0, data).pipe(
+        map((response) => response.results)
+      )
     } else {
       this.autoCompleteMap[metadata.id] = of([])
     }
@@ -196,11 +201,15 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           ref.componentInstance.metadataType = "Characteristic"
           break
         case "disease":
-          ref.componentInstance.metadataType = "Disease"
+          ref.componentInstance.metadataName = "Disease"
           ref.componentInstance.metadataType = "Characteristic"
           break
         case "tissue":
-          ref.componentInstance.metadataType = "Tissue"
+          ref.componentInstance.metadataName = "Tissue"
+          ref.componentInstance.metadataType = "Characteristic"
+          break
+        case "organism":
+          ref.componentInstance.metadataName = "Organism"
           ref.componentInstance.metadataType = "Characteristic"
           break
       }
@@ -232,10 +241,12 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     this.metadataDeleted.emit(metadata)
   }
 
-  displayData(data: SubcellularLocation | HumanDisease | Tissue) {
+  displayData(data: SubcellularLocation | HumanDisease | Tissue |Species) {
     if (data) {
       if ("identifier" in data) {
         return data.identifier
+      } else if ("official_name" in data) {
+        return data.official_name
       } else {
         return data.location_identifier
       }
@@ -285,11 +296,15 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           ref.componentInstance.metadataType = "Characteristic"
           break
         case "disease":
-          ref.componentInstance.metadataType = "Disease"
+          ref.componentInstance.metadataName = "Disease"
           ref.componentInstance.metadataType = "Characteristic"
           break
         case "tissue":
-          ref.componentInstance.metadataType = "Tissue"
+          ref.componentInstance.metadataName = "Tissue"
+          ref.componentInstance.metadataType = "Characteristic"
+          break
+        case "organism":
+          ref.componentInstance.metadataName = "Organism"
           ref.componentInstance.metadataType = "Characteristic"
           break
       }
@@ -387,5 +402,19 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       }
     });
     this.reorderMetadataSourceFiles.emit(listOfColumnsChanged)
+  }
+
+  exportSDRF() {
+    const data = new SDRF(this.sourceFiles)
+    const table = data.convertToTSV()
+    const blob = new Blob([table], {type: "text/plain;charset=utf-8"})
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "analysis_group_metadata.tsv"
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(url)
   }
 }
