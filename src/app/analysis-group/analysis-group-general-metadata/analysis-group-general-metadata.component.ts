@@ -198,19 +198,19 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       switch (customizationTemplate) {
         case "subcellular location":
           ref.componentInstance.metadataName = "Subcellular location"
-          ref.componentInstance.metadataType = "Characteristic"
+          ref.componentInstance.metadataType = "Characteristics"
           break
         case "disease":
           ref.componentInstance.metadataName = "Disease"
-          ref.componentInstance.metadataType = "Characteristic"
+          ref.componentInstance.metadataType = "Characteristics"
           break
         case "tissue":
           ref.componentInstance.metadataName = "Tissue"
-          ref.componentInstance.metadataType = "Characteristic"
+          ref.componentInstance.metadataType = "Characteristics"
           break
         case "organism":
           ref.componentInstance.metadataName = "Organism"
-          ref.componentInstance.metadataType = "Characteristic"
+          ref.componentInstance.metadataType = "Characteristics"
           break
       }
     }
@@ -293,19 +293,19 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       switch (customizationTemplate) {
         case "subcellular location":
           ref.componentInstance.metadataName = "Subcellular location"
-          ref.componentInstance.metadataType = "Characteristic"
+          ref.componentInstance.metadataType = "Characteristics"
           break
         case "disease":
           ref.componentInstance.metadataName = "Disease"
-          ref.componentInstance.metadataType = "Characteristic"
+          ref.componentInstance.metadataType = "Characteristics"
           break
         case "tissue":
           ref.componentInstance.metadataName = "Tissue"
-          ref.componentInstance.metadataType = "Characteristic"
+          ref.componentInstance.metadataType = "Characteristics"
           break
         case "organism":
           ref.componentInstance.metadataName = "Organism"
-          ref.componentInstance.metadataType = "Characteristic"
+          ref.componentInstance.metadataType = "Characteristics"
           break
       }
     }

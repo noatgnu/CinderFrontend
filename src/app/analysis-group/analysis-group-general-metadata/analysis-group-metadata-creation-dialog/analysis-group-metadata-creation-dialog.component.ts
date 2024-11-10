@@ -34,13 +34,13 @@ import {Species} from "../../../species";
   styleUrl: './analysis-group-metadata-creation-dialog.component.scss'
 })
 export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
-  metadataTypeAutocomplete: string[] = ["Characteristic", "Comment", "Factor value", "Material type", "Assay name", "Technology type"]
+  metadataTypeAutocomplete: string[] = ["Characteristics", "Comment", "Factor value", "Material type", "Assay name", "Technology type"]
   metadataNameAutocomplete: string[] = ["Disease", "Tissue", "Subcellular location", "Organism"]
   metadataCharacteristics: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Cell type", "Cell line", "Developmental stage", "Ancestry category", "Sex", "Age", "Biological replicate"]
   metadataComment: string[] = ["Data file", "File uri", "Technical replicate", "Fraction identifier", "Label", "Cleavage agent details", "Instrument", "Modification parameters", "Dissociation method", "Precursor mass tolerance", "Fragment mass tolerance", ""]
 
   form = this.fb.group({
-    metadataType: "Characteristic",
+    metadataType: "Characteristics",
     metadataName: "Tissue",
     metadataValue: ""
   })

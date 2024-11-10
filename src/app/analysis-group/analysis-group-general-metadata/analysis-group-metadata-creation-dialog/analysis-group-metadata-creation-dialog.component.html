@@ -5,7 +5,7 @@
       <input matInput formControlName="metadataName" [matAutocomplete]="autoMetadataName" [readonly]="readonlyName">
       <mat-label>Metadata Name</mat-label>
       <mat-autocomplete #autoMetadataName="matAutocomplete">
-        @if (form.value.metadataType === "Characteristic") {
+        @if (form.value.metadataType === "Characteristics") {
           @for (m of metadataCharacteristics; track m) {
             <mat-option [value]="m">
               {{m}}
