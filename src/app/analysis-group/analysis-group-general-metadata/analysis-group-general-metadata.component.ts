@@ -260,14 +260,25 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       if (result) {
         if (result.name) {
           this.web.createSourceFile(this.analysis_group_id, result.name, result.description).subscribe((sourceFile) => {
-              this.sourceFiles.push(sourceFile)
-              this.sourcefileFormMap[sourceFile.id] = this.fb.group({
-                name: [sourceFile.name],
-                description: [sourceFile.description]
+            this.sourceFiles.push(sourceFile)
+            this.sourcefileFormMap[sourceFile.id] = this.fb.group({
+              name: [sourceFile.name],
+              description: [sourceFile.description]
+            })
+            for (const m of sourceFile.metadata_columns) {
+              this.metadataFormMap[m.id] = this.fb.group({
+                value: [m.value],
+                name: [m.name],
+                type: [m.type]
               })
-              this.sourceFilesChanged.emit(this.sourceFiles)
+              this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
+                if (data.value) {
+                  this.updateValueField(m, data.value)
+                }
+              })
             }
-          )
+            this.sourceFilesChanged.emit(this.sourceFiles)
+          })
         }
       }
     })

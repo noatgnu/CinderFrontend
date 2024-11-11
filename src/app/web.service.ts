@@ -17,6 +17,8 @@ import {SubcellularLocation, SubcellularLocationQuery} from "./subcellular-locat
 import {HumanDiseaseQuery} from "./human-disease";
 import {MetadataColumn} from "./analysis-group/metadata-column";
 import {SourceFile} from "./analysis-group/source-file";
+import {MsVocab, MsVocabQuery} from "./ms-vocab";
+import {UnimodQuery} from "./unimod";
 
 
 
@@ -932,6 +934,54 @@ export class WebService {
       `${this.baseURL}/api/analysis_groups/${analysis_group}/reorganize_column/`,
       {positions: positions},
       {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  getUnimod(url?: string, limit: number = 10, offset: number = 0, search?: string) {
+    if (url) {
+      return this.http.get<any>(url, {responseType: 'json', observe: 'body'})
+    }
+    let params = new HttpParams()
+    if (limit) {
+      params = params.append('limit', limit.toString())
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString())
+    }
+    if (search && search !== "") {
+      params = params.append('search', `'${search}'`)
+    }
+    params = params.append('ordering', 'name')
+    return this.http.get<UnimodQuery>(
+      `${this.baseURL}/api/unimod/`,
+      {responseType: 'json', observe: 'body', params: params}
+    )
+  }
+
+  getMSVocab(url?: string, limit: number = 10, offset: number = 0, search?: string, term_type?: string) {
+    if (url) {
+      return this.http.get<any>(url, {responseType: 'json', observe: 'body'})
+    }
+    let params = new HttpParams()
+    if (limit) {
+      params = params.append('limit', limit.toString())
+    }
+    if (offset) {
+      params = params.append('offset', offset.toString())
+    }
+    if (search && search !== "") {
+      params = params.append('search', `'${search}'`)
+    }
+    if (term_type && term_type !== "") {
+      if (term_type === "cleavage agent details") {
+        term_type = "cleavage agent"
+      }
+      params = params.append('term_type', term_type)
+    }
+    params = params.append('ordering', 'name')
+    return this.http.get<MsVocabQuery>(
+      `${this.baseURL}/api/ms_vocab/`,
+      {responseType: 'json', observe: 'body', params: params}
     )
   }
 }

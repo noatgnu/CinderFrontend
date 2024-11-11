@@ -12,6 +12,8 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {Species} from "../../../species";
+import {Unimod} from "../../../unimod";
+import {MsVocab} from "../../../ms-vocab";
 
 @Component({
   selector: 'app-analysis-group-metadata-creation-dialog',
@@ -35,7 +37,7 @@ import {Species} from "../../../species";
 })
 export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   metadataTypeAutocomplete: string[] = ["Characteristics", "Comment", "Factor value", "Material type", "Assay name", "Technology type"]
-  metadataNameAutocomplete: string[] = ["Disease", "Tissue", "Subcellular location", "Organism"]
+  metadataNameAutocomplete: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Instrument", "Label", "Cleavage agent details", "Dissociation method", "Modification parameters"]
   metadataCharacteristics: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Cell type", "Cell line", "Developmental stage", "Ancestry category", "Sex", "Age", "Biological replicate"]
   metadataComment: string[] = ["Data file", "File uri", "Technical replicate", "Fraction identifier", "Label", "Cleavage agent details", "Instrument", "Modification parameters", "Dissociation method", "Precursor mass tolerance", "Fragment mass tolerance", ""]
 
@@ -45,7 +47,7 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
     metadataValue: ""
   })
 
-  filteredResults: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[]> = of([])
+  filteredResults: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[] | Unimod[] | MsVocab[]> = of([])
   @Input() readonlyType: boolean = false
   @Input() readonlyName: boolean = false
   @Input() set metadataType(value: string) {
@@ -70,20 +72,37 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
         if (!value) {
           return of([])
         }
-        if (this.form.controls.metadataName.value?.toLowerCase() === "subcellular location") {
+        if (!this.form.controls.metadataName.value) {
+          return of([])
+        }
+        const name = this.form.controls.metadataName.value.toLowerCase()
+
+        if (name === "subcellular location") {
           return this.web.getSubcellularLocations(undefined, 5, 0, value).pipe(
             map((response) => response.results)
           )
-        } else if (this.form.controls.metadataName.value?.toLowerCase() === "disease") {
+        } else if (name === "disease") {
           return this.web.getHumandDiseases(undefined, 5, 0, value).pipe(
             map((response) => response.results)
           )
-        } else if (this.form.controls.metadataName.value?.toLowerCase() === "tissue") {
+        } else if (name === "tissue") {
           return this.web.getTissues(undefined, 5, 0, value).pipe(
             map((response) => response.results)
           )
-        } else if (this.form.controls.metadataName.value?.toLowerCase() === "organism") {
+        } else if (name === "organism") {
           return this.web.getSpecies(undefined, 5, 0, value).pipe(
+            map((response) => response.results)
+          )
+        } else if (["cleavage agent details", "instrument", "dissociation method"].includes(name)) {
+          return this.web.getMSVocab(undefined, 5, 0, value, name).pipe(
+            map((response) => response.results)
+          )
+        } else if (name === "label") {
+          return this.web.getMSVocab(undefined, 5, 0, value, "sample attribute").pipe(
+            map((response) => response.results)
+          )
+        } else if (name === "modification parameters") {
+          return this.web.getUnimod(undefined, 5, 0, value).pipe(
             map((response) => response.results)
           )
         } else {
@@ -102,14 +121,16 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
     this.dialog.close(this.form.value)
   }
 
-  displayData(data: SubcellularLocation | HumanDisease | Tissue | Species) {
+  displayData(data: SubcellularLocation | HumanDisease | Tissue | Species | Unimod | MsVocab): string {
     if (data) {
       if ("identifier" in data) {
         return data.identifier
       } else if ("official_name" in data){
         return data.official_name
-      } else {
+      } else if ("location_identifier" in data) {
         return data.location_identifier
+      } else if ("name" in data) {
+        return data.name
       }
     }
     return ""
