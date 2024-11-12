@@ -32,7 +32,7 @@
                   <p>No data found for this search</p>
                 </div>
               }
-              <button mat-icon-button cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
+              <button [matTooltip]="s.analysis_group.name" mat-icon-button cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
             </div>
           }
         } @else {
