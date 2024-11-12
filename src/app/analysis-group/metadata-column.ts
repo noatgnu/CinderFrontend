@@ -10,6 +10,7 @@ export interface MetadataColumn {
   id: number,
   created_at: Date,
   updated_at: Date,
+  not_applicable: boolean,
 }
 
 export interface MetadataColumnQuery {

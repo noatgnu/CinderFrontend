@@ -902,7 +902,7 @@ export class WebService {
     )
   }
 
-  updateMetaDataColumn(id: number, name?: string, type?: string, value?: string) {
+  updateMetaDataColumn(id: number, name?: string, type?: string, value?: string, not_applicable?: boolean) {
     const payload: any = {}
     if (name) {
       payload["name"] = name
@@ -912,6 +912,9 @@ export class WebService {
     }
     if (type) {
       payload["type"] = type
+    }
+    if (not_applicable !== undefined) {
+      payload["not_applicable"] = not_applicable
     }
     return this.http.put<MetadataColumn>(
       `${this.baseURL}/api/metadata_columns/${id}/`,
@@ -977,7 +980,7 @@ export class WebService {
 
   getMSVocab(url?: string, limit: number = 10, offset: number = 0, search?: string, term_type?: string) {
     if (url) {
-      return this.http.get<any>(url, {responseType: 'json', observe: 'body'})
+      return this.http.get<MsVocabQuery>(url, {responseType: 'json', observe: 'body'})
     }
     let params = new HttpParams()
     if (limit) {

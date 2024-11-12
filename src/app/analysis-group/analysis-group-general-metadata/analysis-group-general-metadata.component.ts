@@ -41,6 +41,8 @@ import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
 import {Species} from "../../species";
 import {WebsocketService} from "../../websocket.service";
+import {MsVocab} from "../../ms-vocab";
+import {MatCheckbox} from "@angular/material/checkbox";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -86,7 +88,8 @@ import {WebsocketService} from "../../websocket.service";
     MatSuffix,
     CdkDropList,
     CdkDrag,
-    CdkDragHandle
+    CdkDragHandle,
+    MatCheckbox
   ],
   templateUrl: './analysis-group-general-metadata.component.html',
   styleUrl: './analysis-group-general-metadata.component.scss'
@@ -131,12 +134,16 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         this.metadataFormMap[m.id] = this.fb.group({
           value: [m.value],
           name: [m.name],
-          type: [m.type]
+          type: [m.type],
+          not_applicable: [m.not_applicable]
         })
-        this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
-          if (data.value) {
-            this.updateValueField(m, data.value)
-          }
+        if (m.not_applicable) {
+          this.metadataFormMap[m.id].controls["value"].disable()
+        } else {
+          this.metadataFormMap[m.id].controls["value"].enable()
+        }
+        this.metadataFormMap[m.id].controls["value"].valueChanges.subscribe((data: string) => {
+          this.updateValueField(m, data)
         })
       }
     }
@@ -154,7 +161,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   markedForDeletion: MetadataColumn[] = []
 
   @Input() canEdit: boolean = false
-  autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[]>} = {}
+  autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[] | MsVocab[]>} = {}
   sourceFileMap: {[key: string]: SourceFile} = {}
   constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private ws: WebsocketService) {
     this.ws.curtainWSConnection?.subscribe((data) => {
@@ -177,24 +184,40 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     if (!this.autoCompleteMap[metadata.id]) {
       this.autoCompleteMap[metadata.id] = of([])
     }
-    if (data.length < 2) {
+    if (data) {
+      if (data.length < 2) {
+        this.autoCompleteMap[metadata.id] = of([])
+        return
+      }
+    } else {
       this.autoCompleteMap[metadata.id] = of([])
       return
     }
-    if (metadata.name.toLowerCase() === "subcellular location") {
+
+    const name = metadata.name.toLowerCase()
+
+    if (name === "subcellular location") {
       this.autoCompleteMap[metadata.id] = this.web.getSubcellularLocations(undefined, 5, 0, data).pipe(
         map((response) => response.results)
       )
-    } else if (metadata.name.toLowerCase() === "disease") {
+    } else if (name === "disease") {
       this.autoCompleteMap[metadata.id] = this.web.getHumandDiseases(undefined, 5, 0, data).pipe(
         map((response) => response.results)
       )
-    } else if (metadata.name.toLowerCase() === "tissue") {
+    } else if (name === "tissue") {
       this.autoCompleteMap[metadata.id] = this.web.getTissues(undefined, 5, 0, data).pipe(
         map((response) => response.results)
       )
-    } else if (metadata.name.toLowerCase() === "organism") {
+    } else if (name === "organism") {
       this.autoCompleteMap[metadata.id] = this.web.getSpecies(undefined, 5, 0, data).pipe(
+        map((response) => response.results)
+      )
+    } else if (["cleavage agent details", "instrument", "dissociation method"].includes(name)) {
+      this.autoCompleteMap[metadata.id] = this.web.getMSVocab(undefined, 5, 0, data, name).pipe(
+        map((response) => response.results)
+      )
+    } else if (name === "label") {
+      this.autoCompleteMap[metadata.id] = this.web.getMSVocab(undefined, 5, 0, data, "sample attribute").pipe(
         map((response) => response.results)
       )
     } else {
@@ -257,12 +280,14 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     this.metadataDeleted.emit(metadata)
   }
 
-  displayData(data: SubcellularLocation | HumanDisease | Tissue |Species) {
+  displayData(data: SubcellularLocation | HumanDisease | Tissue |Species | MsVocab) {
     if (data) {
       if ("identifier" in data) {
         return data.identifier
       } else if ("official_name" in data) {
         return data.official_name
+      } else if ("name" in data) {
+        return data.name
       } else {
         return data.location_identifier
       }
@@ -285,12 +310,11 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
               this.metadataFormMap[m.id] = this.fb.group({
                 value: [m.value],
                 name: [m.name],
-                type: [m.type]
+                type: [m.type],
+                not_applicable: [m.not_applicable]
               })
-              this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
-                if (data.value) {
-                  this.updateValueField(m, data.value)
-                }
+              this.metadataFormMap[m.id].controls["value"].valueChanges.subscribe((data: string) => {
+                this.updateValueField(m, data)
               })
             }
             this.sourceFilesChanged.emit(this.sourceFiles)
@@ -350,12 +374,11 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
               this.metadataFormMap[m.id] = this.fb.group({
                 value: [m.value],
                 name: [m.name],
-                type: [m.type]
+                type: [m.type],
+                not_applicable: [m.not_applicable]
               })
-              this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
-                if (data.value) {
-                  this.updateValueField(m, data.value)
-                }
+              this.metadataFormMap[m.id].controls["value"].valueChanges.subscribe((data: string) => {
+                this.updateValueField(m, data)
               })
             }
 
@@ -456,5 +479,28 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       })
     }
 
+  }
+
+  updateNotApplicable(metadata: MetadataColumn) {
+    const metadataColumns = this.sourceFiles.map((s) => s.metadata_columns).flat()
+    const selectedColumns = metadataColumns.filter((m) => m.column_position === metadata.column_position)
+    for (const m of selectedColumns) {
+      if (m !== metadata) {
+        this.metadataFormMap[m.id].controls["not_applicable"].setValue(!metadata.not_applicable)
+        this.metadataFormMap[m.id].markAsDirty()
+        m.not_applicable = !metadata.not_applicable
+        if (m.not_applicable) {
+          this.metadataFormMap[m.id].controls["value"].disable()
+        } else {
+          this.metadataFormMap[m.id].controls["value"].enable()
+        }
+      }
+    }
+    metadata.not_applicable = !metadata.not_applicable
+    if (metadata.not_applicable) {
+      this.metadataFormMap[metadata.id].controls["value"].disable()
+    } else {
+      this.metadataFormMap[metadata.id].controls["value"].enable()
+    }
   }
 }

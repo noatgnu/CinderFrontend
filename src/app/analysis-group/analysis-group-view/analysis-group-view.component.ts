@@ -201,7 +201,7 @@ export class AnalysisGroupViewComponent {
     if (this.generalMetadata) {
       for (const metadataID in this.generalMetadata.metadataFormMap) {
         if (this.generalMetadata.metadataFormMap[metadataID].dirty) {
-          await this.web.updateMetaDataColumn(parseInt(metadataID), undefined, undefined, this.generalMetadata.metadataFormMap[metadataID].value.value).toPromise()
+          await this.web.updateMetaDataColumn(parseInt(metadataID), undefined, undefined, this.generalMetadata.metadataFormMap[metadataID].value.value, this.generalMetadata.metadataFormMap[metadataID].value.not_applicable).toPromise()
           this.generalMetadata.metadataFormMap[metadataID].markAsPristine()
           this.sb.open(`Metadata column ${this.generalMetadata.metadataFormMap[metadataID].value.name} updated`, "Dismiss", {duration: 5000})
         }
