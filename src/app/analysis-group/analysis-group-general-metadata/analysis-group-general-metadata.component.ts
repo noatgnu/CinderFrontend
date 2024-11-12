@@ -40,6 +40,7 @@ import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-
 import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
 import {Species} from "../../species";
+import {WebsocketService} from "../../websocket.service";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -112,7 +113,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
 
   metadataFormMap: {[key: string]: FormGroup} = {}
   sourcefileFormMap: {[key: string]: FormGroup} = {}
-
+  export_job_id: string = ""
   get metadata(): MetadataColumn[] {
     return this._metadata
   }
@@ -155,7 +156,22 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   @Input() canEdit: boolean = false
   autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[]>} = {}
   sourceFileMap: {[key: string]: SourceFile} = {}
-  constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder) { }
+  constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private ws: WebsocketService) {
+    this.ws.curtainWSConnection?.subscribe((data) => {
+      if (data.analysis_group_id === this.analysis_group_id) {
+        if (data.type === "export_sdrf_status") {
+          if (data.status === "complete") {
+            if ("job_id" in data && "file" in data) {
+              if (data.job_id === this.export_job_id) {
+                console.log(data)
+                window.open(`${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`)
+              }
+            }
+          }
+        }
+      }
+    })
+  }
 
   updateValueField(metadata: MetadataColumn, data: string) {
     if (!this.autoCompleteMap[metadata.id]) {
@@ -318,6 +334,9 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           ref.componentInstance.metadataName = "Organism"
           ref.componentInstance.metadataType = "Characteristics"
           break
+        case "modification":
+          ref.componentInstance.metadataName = "Modification parameters"
+          ref.componentInstance.metadataType = "Comment"
       }
     }
     ref.afterClosed().subscribe((result) => {
@@ -427,5 +446,15 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     a.click()
     document.body.removeChild(a)
     window.URL.revokeObjectURL(url)
+  }
+
+  exportSDRFFromBackend() {
+    if (this.web.searchSessionID) {
+      this.web.exportSDRFFile(this.analysis_group_id, this.web.searchSessionID).subscribe((data) => {
+        this.export_job_id = data.job_id
+        console.log(data)
+      })
+    }
+
   }
 }

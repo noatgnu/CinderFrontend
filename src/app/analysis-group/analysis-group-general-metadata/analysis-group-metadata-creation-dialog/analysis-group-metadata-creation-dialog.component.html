@@ -33,9 +33,8 @@
         <mat-form-field>
           <input matInput formControlName="metadataValue" [matAutocomplete]="autoMetadataValue">
           <mat-label>Metadata Value</mat-label>
-
         </mat-form-field>
-        <mat-autocomplete #autoMetadataValue="matAutocomplete">
+        <mat-autocomplete #autoMetadataValue="matAutocomplete" (optionSelected)="getSelectedData($event)">
           @for (m of filteredResults| async ; track m) {
             <mat-option [value]="displayData(m)">
               {{displayData(m)}}
@@ -62,7 +61,52 @@
       </mat-autocomplete>
     </mat-form-field>
 
-
+    @if (form.value.metadataName) {
+      @if (form.value.metadataName.toLowerCase() === "modification parameters") {
+        <mat-form-field>
+          <mat-select (valueChange)="selectSpec($event)">
+            @for (m of availableSpecs; track m) {
+              <mat-option [value]="m">
+                {{m.name}} @if (m.classification) {({{m.classification}})}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-label>Unimod Specifications</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="metadataPP">
+            @for (m of ["Anywhere", "Protein N-term", "Protein C-term", "Any N-term", "Any C-term"]; track m) {
+              <mat-option [value]="m">
+                {{m}}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-label>Modification Position</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select formControlName="metadataMT">
+            @for (m of ["Fixed", "Variable", "Annotated"]; track m) {
+              <mat-option [value]="m">
+                {{m}}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-label>Modification Type</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput formControlName="metadataTA">
+          <mat-label>Target Amino Acid</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="number" formControlName="metadataMM">
+          <mat-label>Monoisotopic Mass</mat-label>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="text" formControlName="metadataTS">
+          <mat-label>Target Site</mat-label>
+        </mat-form-field>
+      }
+    }
 
 
   </form>

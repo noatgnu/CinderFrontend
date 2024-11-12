@@ -874,6 +874,23 @@ export class WebService {
       payload["type"] = metadataColumn.metadataType
       payload["value"] = metadataColumn.metadataValue
     }
+    if (payload["name"] === "Modification parameters") {
+      if (metadataColumn.metadataMM) {
+        payload["value"] += `;MM=${metadataColumn.metadataMM}`
+      }
+      if (metadataColumn.metadataPP) {
+        payload["value"] += `;PP=${metadataColumn.metadataPP}`
+      }
+      if (metadataColumn.metadataTA) {
+        payload["value"] += `;TA=${metadataColumn.metadataTA}`
+      }
+      if (metadataColumn.metadataTS) {
+        payload["value"] += `;TS=${metadataColumn.metadataTS}`
+      }
+      if (metadataColumn.metadataMT) {
+        payload["value"] += `;MT=${metadataColumn.metadataMT}`
+      }
+    }
     if (source_file) {
       payload["source_file"] = source_file
     }
@@ -982,6 +999,14 @@ export class WebService {
     return this.http.get<MsVocabQuery>(
       `${this.baseURL}/api/ms_vocab/`,
       {responseType: 'json', observe: 'body', params: params}
+    )
+  }
+
+  exportSDRFFile(analysis_group: number, session_id: string) {
+    return this.http.post<{job_id: string}>(
+      `${this.baseURL}/api/analysis_groups/${analysis_group}/export_sdrf/`,
+      {session_id: session_id},
+      {responseType: 'json', observe: 'body'}
     )
   }
 }

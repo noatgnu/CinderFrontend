@@ -2,7 +2,12 @@ import {Component, Input, OnInit} from '@angular/core';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {AsyncPipe} from "@angular/common";
-import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
+import {
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+  MatOption
+} from "@angular/material/autocomplete";
 import {filter, map, Observable, of, startWith, switchMap} from "rxjs";
 import {SubcellularLocation, SubcellularLocationQuery} from "../../../subcellular-location";
 import {HumanDisease, HumanDiseaseQuery} from "../../../human-disease";
@@ -14,6 +19,7 @@ import {MatButton} from "@angular/material/button";
 import {Species} from "../../../species";
 import {Unimod} from "../../../unimod";
 import {MsVocab} from "../../../ms-vocab";
+import {MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-analysis-group-metadata-creation-dialog',
@@ -30,7 +36,8 @@ import {MsVocab} from "../../../ms-vocab";
     MatAutocompleteTrigger,
     MatButton,
     MatDialogActions,
-    MatLabel
+    MatLabel,
+    MatSelect
   ],
   templateUrl: './analysis-group-metadata-creation-dialog.component.html',
   styleUrl: './analysis-group-metadata-creation-dialog.component.scss'
@@ -44,8 +51,15 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   form = this.fb.group({
     metadataType: "Characteristics",
     metadataName: "Tissue",
-    metadataValue: ""
+    metadataValue: "",
+    metadataMT: "Fixed",
+    metadataPP: "Anywhere",
+    metadataTA: "",
+    metadataTS: "",
+    metadataMM: 0,
   })
+
+  availableSpecs: any[] = []
 
   filteredResults: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[] | Unimod[] | MsVocab[]> = of([])
   @Input() readonlyType: boolean = false
@@ -56,6 +70,12 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   @Input() set metadataName(value: string) {
     this.form.controls.metadataName.setValue(value)
   }
+
+  selectedData: Unimod|undefined = undefined
+
+  optionsArray: Unimod[] = []
+
+
   constructor(private dialog: MatDialogRef<AnalysisGroupMetadataCreationDialogComponent>, private fb: FormBuilder, private web: WebService) {
   }
 
@@ -103,7 +123,10 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
           )
         } else if (name === "modification parameters") {
           return this.web.getUnimod(undefined, 5, 0, value).pipe(
-            map((response) => response.results)
+            map((response) => {
+              this.optionsArray = response.results
+              return response.results
+            })
           )
         } else {
           return of([])
@@ -136,4 +159,57 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
     return ""
   }
 
+  getSelectedData(data: MatAutocompleteSelectedEvent) {
+    if (this.form.controls.metadataName.value) {
+      if (this.form.controls.metadataName.value.toLowerCase() === "modification parameters") {
+        this.selectedData = this.optionsArray.find((option) => option.name === data.option.value)
+        if (this.selectedData) {
+          const mapData: any = {}
+
+          for (const a of this.selectedData.additional_data) {
+            console.log(a)
+            if (a["id"] === "delta_mono_mass") {
+              this.form.controls.metadataMM.setValue(parseFloat(a["description"]))
+            }
+            if (a["id"].startsWith("spec_")) {
+              const nameSplitted = a["id"].split("_")
+              const name = `spec_${nameSplitted[1]}`
+              if (!mapData[name]) {
+                mapData[name] = {name: name}
+              }
+              if (a["id"].endsWith("position")) {
+                mapData[name]["position"] = a["description"]
+              } else if (a["id"].endsWith("site")) {
+                mapData[name]["aa"] = a["description"]
+              } else if (a["id"].endsWith("classification")) {
+                mapData[name]["classification"] = a["description"]
+              } else if (a["id"].endsWith("mono_mass")) {
+                const mm = parseFloat(a["description"])
+                if (mm > 0) {
+                  mapData[name]["mono_mass"] = mm
+                }
+
+              }
+            }
+          }
+          console.log(mapData)
+          this.availableSpecs = Object.values(mapData)
+        }
+
+      }
+    }
+  }
+
+  selectSpec(spec: any) {
+    if (spec.position) {
+      this.form.controls.metadataPP.setValue(spec.position)
+    }
+    if (spec.aa) {
+      this.form.controls.metadataTA.setValue(spec.aa)
+    }
+    if (spec.mono_mass) {
+      this.form.controls.metadataMM.setValue(spec.mono_mass)
+    }
+
+  }
 }

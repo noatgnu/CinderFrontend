@@ -41,7 +41,7 @@
   <div style="display: flex; gap:20px">
     <button [disabled]="!canEdit" mat-flat-button type="button" color="primary" [matMenuTriggerFor]="metadataMenu">Add Metadata</button>
     <button [disabled]="!canEdit" mat-flat-button type="button" color="primary" (click)="addSampleFile()">Add Sample File</button>
-    <button mat-flat-button type="button" color="warn" (click)="exportSDRF()">Export SDRF</button>
+    <button mat-flat-button type="button" color="warn" (click)="exportSDRFFromBackend()">Export SDRF</button>
   </div>
   <mat-menu #metadataMenu="matMenu">
     <button mat-menu-item (click)="createMetadata('disease')">Disease</button>
@@ -69,6 +69,7 @@
               <button mat-menu-item (click)="createMetadataFileSpecific('tissue', s.id)">Tissue</button>
               <button mat-menu-item (click)="createMetadataFileSpecific('subcellular location', s.id)">Subcellular location</button>
               <button mat-menu-item (click)="createMetadataFileSpecific('organism', s.id)">Organism</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('modification', s.id)">Modification</button>
               <button mat-menu-item (click)="createMetadataFileSpecific(null, s.id)">Create custom metadata field</button>
             </mat-menu>
             <div style="display: flex; gap: 20px">
@@ -99,7 +100,7 @@
                         <mat-form-field style="width: 100%">
                           <input matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue">
                           <mat-label>{{c.name}}</mat-label>
-                          <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)}</mat-hint>
+                          <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)} - Position {{c.column_position}}</mat-hint>
                           <button type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
                             @if (!metadataFormMap[c.id].controls['value'].disabled) {
                               <mat-icon>delete</mat-icon>
