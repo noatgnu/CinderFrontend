@@ -102,7 +102,7 @@
                             <textarea matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue"></textarea>
                             <mat-label>{{c.name}}</mat-label>
                             <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)} - Position {{c.column_position}}</mat-hint>
-                            <button type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
+                            <button [disabled]="!canEdit || metadataFormMap[c.id].controls['not_applicable']" type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
                               @if (!metadataFormMap[c.id].controls['value'].disabled) {
                                 <mat-icon>delete</mat-icon>
                               } @else {
