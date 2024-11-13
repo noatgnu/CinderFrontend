@@ -199,6 +199,13 @@ export class AnalysisGroupViewComponent {
     }
 
     if (this.generalMetadata) {
+      for (const sourceFileID in this.generalMetadata.sourcefileFormMap) {
+        if (this.generalMetadata.sourcefileFormMap[sourceFileID].dirty) {
+          await this.web.updateSourceFile(parseInt(sourceFileID), this.generalMetadata.sourcefileFormMap[sourceFileID].value.name, this.generalMetadata.sourcefileFormMap[sourceFileID].value.description).toPromise()
+          this.generalMetadata.sourcefileFormMap[sourceFileID].markAsPristine()
+          this.sb.open(`Source file ${this.generalMetadata.sourcefileFormMap[sourceFileID].value.name} updated`, "Dismiss", {duration: 5000})
+        }
+      }
       for (const metadataID in this.generalMetadata.metadataFormMap) {
         if (this.generalMetadata.metadataFormMap[metadataID].dirty) {
           await this.web.updateMetaDataColumn(parseInt(metadataID), undefined, undefined, this.generalMetadata.metadataFormMap[metadataID].value.value, this.generalMetadata.metadataFormMap[metadataID].value.not_applicable).toPromise()

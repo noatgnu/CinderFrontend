@@ -1012,4 +1012,12 @@ export class WebService {
       {responseType: 'json', observe: 'body'}
     )
   }
+
+  updateSourceFile(id: number, name: string, description: string) {
+    return this.http.put<SourceFile>(
+      `${this.baseURL}/api/source_files/${id}/`,
+      {name: name, description: description},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
 }
