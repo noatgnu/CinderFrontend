@@ -11,6 +11,7 @@ export interface MetadataColumn {
   created_at: Date,
   updated_at: Date,
   not_applicable: boolean,
+  mandatory: boolean,
 }
 
 export interface MetadataColumnQuery {

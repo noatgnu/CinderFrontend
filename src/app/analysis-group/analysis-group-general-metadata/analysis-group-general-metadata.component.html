@@ -23,17 +23,18 @@
               </mat-option>
             }
           </mat-autocomplete>
-          @if (!markedForDeletion.includes(m)) {
-            <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Mark for deletion'" (click)="metadataDeleted.emit(m);markedForDeletion.push(m)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          } @else {
-            <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Undo deletion mark'" (click)="undoDeletion(m)">
-              <mat-icon>undo</mat-icon>
-            </button>
+          @if (m.mandatory) {
+            @if (!markedForDeletion.includes(m)) {
+              <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Mark for deletion'" (click)="metadataDeleted.emit(m);markedForDeletion.push(m)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            } @else {
+              <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Undo deletion mark'" (click)="undoDeletion(m)">
+                <mat-icon>undo</mat-icon>
+              </button>
+            }
           }
         </form>
-
       }
     }
   </div>
@@ -104,13 +105,15 @@
                             <textarea matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue"></textarea>
                             <mat-label>{{c.name}}</mat-label>
                             <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)} - Position {{c.column_position}}</mat-hint>
-                            <button [disabled]="!canEdit || metadataFormMap[c.id].controls['not_applicable']" type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
-                              @if (!metadataFormMap[c.id].controls['value'].disabled) {
-                                <mat-icon>delete</mat-icon>
-                              } @else {
-                                <mat-icon>undo</mat-icon>
-                              }
-                            </button>
+                            @if (!c.mandatory) {
+                              <button [disabled]="!canEdit || metadataFormMap[c.id].controls['not_applicable']" type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
+                                @if (!metadataFormMap[c.id].controls['value'].disabled) {
+                                  <mat-icon>delete</mat-icon>
+                                } @else {
+                                  <mat-icon>undo</mat-icon>
+                                }
+                              </button>
+                            }
                             <mat-autocomplete #autoMetadataSourceFileValue="matAutocomplete">
                               @for (m of autoCompleteMap[c.id]| async ; track m) {
                                 <mat-option [value]="displayData(m)">
