@@ -1,7 +1,10 @@
 @if (curtainData) {
-  <div style="display: flex; flex-direction: row; justify-content: center; flex-wrap: wrap">
-    <app-volcano-plot [curtainData]="curtainData" (selected)="handleVolcanoSelection($event)"></app-volcano-plot>
-  </div>
+  @if (analysisGroup) {
+    <div style="display: flex; flex-direction: row; justify-content: center; flex-wrap: wrap">
+      <app-volcano-plot [plotType]="analysisGroup.analysis_group_type" [curtainData]="curtainData" (selected)="handleVolcanoSelection($event)"></app-volcano-plot>
+    </div>
+  }
+
 
 }
 <div style="display: flex; flex-direction: row; justify-content: center; padding: 50px">

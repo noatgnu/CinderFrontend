@@ -16,6 +16,7 @@ PlotlyModule.plotlyjs = PlotlyJS;
   styleUrl: './volcano-plot.component.scss'
 })
 export class VolcanoPlotComponent {
+  @Input() plotType: string = "proteomics"
   @Output() selected: EventEmitter<{"Primary ID": string, "Gene Names": string|null, "Entry": string, "Fold Change": number, "P-value": number }[]> = new EventEmitter<{"Primary ID": string, "Gene Names": string|null, "Entry": string, "Fold Change": number, "P-value": number }[]>()
   private _curtainData: CurtainData|undefined = undefined
   @Input() set curtainData(value: CurtainData) {
@@ -174,7 +175,13 @@ export class VolcanoPlotComponent {
           temp["Background"].data.push(d)
         } else {
           const significantGroup = this.significantGroup(d["Fold Change"], d["P-value"])
-          const colorLabel = allColorLabels.find((label) => label.startsWith(`${significantGroup[0]} (${d["Comparison"]})`))
+          let colorLabel: string|undefined
+          if (this.plotType === "proteomics") {
+            colorLabel = allColorLabels.find((label) => label.startsWith(`${significantGroup[0]} (${d["Comparison"]})`))
+          } else {
+            colorLabel = allColorLabels.find((label) => label.startsWith(`${significantGroup[0]}`))
+          }
+
           if (colorLabel) {
             if (!temp[colorLabel]) {
               temp[colorLabel] = {
