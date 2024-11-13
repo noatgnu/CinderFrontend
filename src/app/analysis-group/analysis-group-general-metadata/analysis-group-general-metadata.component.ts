@@ -402,6 +402,9 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   }
 
   markForDeleteOrUndo(metadata: MetadataColumn) {
+    if (this.metadataFormMap[metadata.id].controls["not_applicable"]) {
+      return
+    }
     const columns = this.sourceFiles.map((s) => s.metadata_columns).flat()
     const selectedColumns = columns.filter((m) => m.column_position === metadata.column_position)
     const currentState =  this.metadataFormMap[metadata.id].controls["value"].disabled
