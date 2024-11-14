@@ -43,6 +43,7 @@ import {Species} from "../../species";
 import {WebsocketService} from "../../websocket.service";
 import {MsVocab} from "../../ms-vocab";
 import {MatCheckbox} from "@angular/material/checkbox";
+import {DataService} from "../../data.service";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -163,7 +164,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   @Input() canEdit: boolean = false
   autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[] | MsVocab[]>} = {}
   sourceFileMap: {[key: string]: SourceFile} = {}
-  constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private ws: WebsocketService) {
+  constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private ws: WebsocketService, public data: DataService) {
     this.ws.curtainWSConnection?.subscribe((data) => {
       if (data.analysis_group_id === this.analysis_group_id) {
         if (data.type === "export_sdrf_status") {
@@ -220,6 +221,10 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       this.autoCompleteMap[metadata.id] = this.web.getMSVocab(undefined, 5, 0, data, "sample attribute").pipe(
         map((response) => response.results)
       )
+    } else if (name === "cell type") {
+      this.autoCompleteMap[metadata.id] = this.web.getMSVocab(undefined, 5, 0, data, "cell line").pipe(
+        map((response) => response.results)
+      )
     } else {
       this.autoCompleteMap[metadata.id] = of([])
     }
@@ -249,6 +254,14 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           break
         case "organism":
           ref.componentInstance.metadataName = "Organism"
+          ref.componentInstance.metadataType = "Characteristics"
+          break
+        case "cell type":
+          ref.componentInstance.metadataName = "Cell type"
+          ref.componentInstance.metadataType = "Characteristics"
+          break
+        case "enrichment process":
+          ref.componentInstance.metadataName = "Enrichment process"
           ref.componentInstance.metadataType = "Characteristics"
           break
       }
@@ -361,6 +374,15 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         case "modification":
           ref.componentInstance.metadataName = "Modification parameters"
           ref.componentInstance.metadataType = "Comment"
+          break
+        case "enrichment process":
+          ref.componentInstance.metadataName = "Enrichment process"
+          ref.componentInstance.metadataType = "Characteristics"
+          break
+        case "cell type":
+          ref.componentInstance.metadataName = "Cell type"
+          ref.componentInstance.metadataType = "Characteristics"
+          break
       }
     }
     ref.afterClosed().subscribe((result) => {

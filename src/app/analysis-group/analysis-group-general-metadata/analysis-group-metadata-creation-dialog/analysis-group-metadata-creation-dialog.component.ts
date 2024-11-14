@@ -13,13 +13,14 @@ import {SubcellularLocation, SubcellularLocationQuery} from "../../../subcellula
 import {HumanDisease, HumanDiseaseQuery} from "../../../human-disease";
 import {Tissue, TissueQuery} from "../../../tissue";
 import {WebService} from "../../../web.service";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {Species} from "../../../species";
 import {Unimod} from "../../../unimod";
 import {MsVocab} from "../../../ms-vocab";
 import {MatSelect} from "@angular/material/select";
+import {DataService} from "../../../data.service";
 
 @Component({
   selector: 'app-analysis-group-metadata-creation-dialog',
@@ -37,15 +38,16 @@ import {MatSelect} from "@angular/material/select";
     MatButton,
     MatDialogActions,
     MatLabel,
-    MatSelect
+    MatSelect,
+    MatHint
   ],
   templateUrl: './analysis-group-metadata-creation-dialog.component.html',
   styleUrl: './analysis-group-metadata-creation-dialog.component.scss'
 })
 export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   metadataTypeAutocomplete: string[] = ["Characteristics", "Comment", "Factor value", "Material type", "Assay name", "Technology type"]
-  metadataNameAutocomplete: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Instrument", "Label", "Cleavage agent details", "Dissociation method", "Modification parameters"]
-  metadataCharacteristics: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Cell type", "Cell line", "Developmental stage", "Ancestry category", "Sex", "Age", "Biological replicate"]
+  metadataNameAutocomplete: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Instrument", "Label", "Cleavage agent details", "Dissociation method", "Modification parameters", "Cell type", "Enrichment process"]
+  metadataCharacteristics: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Cell type", "Cell line", "Developmental stage", "Ancestry category", "Sex", "Age", "Biological replicate", "Enrichment process"]
   metadataComment: string[] = ["Data file", "File uri", "Technical replicate", "Fraction identifier", "Label", "Cleavage agent details", "Instrument", "Modification parameters", "Dissociation method", "Precursor mass tolerance", "Fragment mass tolerance", ""]
 
   form = this.fb.group({
@@ -76,7 +78,7 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   optionsArray: Unimod[] = []
 
 
-  constructor(private dialog: MatDialogRef<AnalysisGroupMetadataCreationDialogComponent>, private fb: FormBuilder, private web: WebService) {
+  constructor(private dialog: MatDialogRef<AnalysisGroupMetadataCreationDialogComponent>, private fb: FormBuilder, private web: WebService, public data: DataService) {
   }
 
   ngOnInit() {
@@ -113,7 +115,7 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
           return this.web.getSpecies(undefined, 5, 0, value).pipe(
             map((response) => response.results)
           )
-        } else if (["cleavage agent details", "instrument", "dissociation method"].includes(name)) {
+        } else if (["cleavage agent details", "instrument", "dissociation method", "enrichment process"].includes(name)) {
           return this.web.getMSVocab(undefined, 5, 0, value, name).pipe(
             map((response) => response.results)
           )
@@ -121,7 +123,11 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
           return this.web.getMSVocab(undefined, 5, 0, value, "sample attribute").pipe(
             map((response) => response.results)
           )
-        } else if (name === "modification parameters") {
+        } else if (name === "cell type") {
+          return this.web.getMSVocab(undefined, 5, 0, value, "cell line").pipe(
+            map((response) => response.results)
+          )
+        }  else if (name === "modification parameters") {
           return this.web.getUnimod(undefined, 5, 0, value).pipe(
             map((response) => {
               this.optionsArray = response.results

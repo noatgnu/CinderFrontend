@@ -33,6 +33,11 @@
         <mat-form-field>
           <input matInput formControlName="metadataValue" [matAutocomplete]="autoMetadataValue">
           <mat-label>Metadata Value</mat-label>
+          <mat-hint>
+            @if (data.metadataHintMap[form.value.metadataName]) {
+              {{data.metadataHintMap[form.value.metadataName]}}
+            }
+          </mat-hint>
         </mat-form-field>
         <mat-autocomplete #autoMetadataValue="matAutocomplete" (optionSelected)="getSelectedData($event)">
           @for (m of filteredResults| async ; track m) {

@@ -14,7 +14,9 @@
 
             </textarea>
             <mat-label>{{m.name}}</mat-label>
-            <mat-hint>@if(metadataFormMap[m.id].dirty) {(value modified)}</mat-hint>
+            <mat-hint>@if(metadataFormMap[m.id].dirty) {(value modified)}. @if (data.metadataHintMap[m.name]) {
+              {{data.metadataHintMap[m.name]}}
+            }</mat-hint>
           </mat-form-field>
           <mat-autocomplete #autoMetadataValue="matAutocomplete">
             @for (m of autoCompleteMap[m.id]| async ; track m) {
@@ -49,6 +51,8 @@
     <button mat-menu-item (click)="createMetadata('tissue')">Tissue</button>
     <button mat-menu-item (click)="createMetadata('subcellular location')">Subcellular location</button>
     <button mat-menu-item (click)="createMetadata('organism')">Organism</button>
+    <button mat-menu-item (click)="createMetadata('cell type')">Cell type</button>
+    <button mat-menu-item (click)="createMetadata('enrichment process')">Enrichment process</button>
     <button mat-menu-item (click)="createMetadata()">Create custom metadata field</button>
   </mat-menu>
   @if (sourceFiles.length > 0) {
@@ -71,6 +75,8 @@
               <button mat-menu-item (click)="createMetadataFileSpecific('subcellular location', s.id)">Subcellular location</button>
               <button mat-menu-item (click)="createMetadataFileSpecific('organism', s.id)">Organism</button>
               <button mat-menu-item (click)="createMetadataFileSpecific('modification', s.id)">Modification</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('cell type', s.id)">Modification</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('enrichment process', s.id)">Modification</button>
               <button mat-menu-item (click)="createMetadataFileSpecific(null, s.id)">Create custom metadata field</button>
             </mat-menu>
             <div style="display: flex; gap: 20px">
@@ -104,7 +110,10 @@
                           <mat-form-field style="flex-grow: 1">
                             <textarea matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue"></textarea>
                             <mat-label>{{c.name}}</mat-label>
-                            <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)} - Position {{c.column_position}}</mat-hint>
+                            <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)} - Position {{c.column_position}}.
+                              @if (data.metadataHintMap[c.name]) {
+                                {{data.metadataHintMap[c.name]}}
+                              }</mat-hint>
                             @if (canEdit) {
                               @if (!c.mandatory) {
                                 <button type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
