@@ -44,6 +44,9 @@ import {WebsocketService} from "../../websocket.service";
 import {MsVocab} from "../../ms-vocab";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {DataService} from "../../data.service";
+import {
+  AnalysisGroupSdrfValidationDialogComponent
+} from "./analysis-group-sdrf-validation-dialog/analysis-group-sdrf-validation-dialog.component";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -174,6 +177,13 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
                 console.log(data)
                 window.open(`${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`)
               }
+            }
+          }
+        } else if (data.type === "sdrf_validation") {
+          if (data.status === "error") {
+            const ref = this.dialog.open(AnalysisGroupSdrfValidationDialogComponent)
+            if ("errors" in data) {
+              ref.componentInstance.errors = data.errors as string[]
             }
           }
         }
@@ -527,5 +537,14 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     } else {
       this.metadataFormMap[metadata.id].controls["value"].enable()
     }
+  }
+
+  validateSDRF() {
+    if (!this.web.searchSessionID) {
+      return
+    }
+    this.web.validateSDRFFile(this.analysis_group_id, this.web.searchSessionID).subscribe((data) => {
+
+    })
   }
 }

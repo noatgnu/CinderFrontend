@@ -1020,4 +1020,12 @@ export class WebService {
       {responseType: 'json', observe: 'body'}
     )
   }
+
+  validateSDRFFile(analysis_group: number, session_id: string) {
+    return this.http.post<{job_id: string}>(
+      `${this.baseURL}/api/analysis_groups/${analysis_group}/validate_sdrf/`,
+      {session_id: session_id},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
 }

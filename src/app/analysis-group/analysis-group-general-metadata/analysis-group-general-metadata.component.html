@@ -44,6 +44,7 @@
   <div style="display: flex; gap:20px">
     <button [disabled]="!canEdit" mat-flat-button type="button" color="primary" [matMenuTriggerFor]="metadataMenu">Add Metadata</button>
     <button [disabled]="!canEdit" mat-flat-button type="button" color="primary" (click)="addSampleFile()">Add Sample File</button>
+    <button mat-flat-button type="button" color="warn" (click)="validateSDRF()">Validate SDRF</button>
     <button mat-flat-button type="button" color="warn" (click)="exportSDRFFromBackend()">Export SDRF</button>
   </div>
   <mat-menu #metadataMenu="matMenu">
@@ -55,6 +56,9 @@
     <button mat-menu-item (click)="createMetadata('enrichment process')">Enrichment process</button>
     <button mat-menu-item (click)="createMetadata()">Create custom metadata field</button>
   </mat-menu>
+  <p>
+    Cinder utilize the Sample Data Relationship Format for exporting data into tabulated text format. For more information and detail specification please visit: <a href="https://github.com/bigbio/proteomics-sample-metadata/tree/master/sdrf-proteomics" target="_blank">https://github.com/bigbio/proteomics-sample-metadata/tree/master/sdrf-proteomics</a>
+  </p>
   @if (sourceFiles.length > 0) {
     <mat-accordion multi>
       @for (s of sourceFiles; track s.id) {
