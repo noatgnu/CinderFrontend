@@ -274,6 +274,18 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           ref.componentInstance.metadataName = "Enrichment process"
           ref.componentInstance.metadataType = "Characteristics"
           break
+        case "technology type":
+          ref.componentInstance.metadataName = ""
+          ref.componentInstance.metadataType = "Technology type"
+          break
+        case "assay name":
+          ref.componentInstance.metadataName = ""
+          ref.componentInstance.metadataType = "Assay name"
+          break
+        case "label":
+          ref.componentInstance.metadataName = ""
+          ref.componentInstance.metadataType = "Label"
+          break
       }
     }
     ref.afterClosed().subscribe((result) => {
@@ -392,6 +404,18 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         case "cell type":
           ref.componentInstance.metadataName = "Cell type"
           ref.componentInstance.metadataType = "Characteristics"
+          break
+        case "technology type":
+          ref.componentInstance.metadataName = ""
+          ref.componentInstance.metadataType = "Technology type"
+          break
+        case "assay name":
+          ref.componentInstance.metadataName = ""
+          ref.componentInstance.metadataType = "Assay name"
+          break
+        case "label":
+          ref.componentInstance.metadataName = ""
+          ref.componentInstance.metadataType = "Label"
           break
       }
     }

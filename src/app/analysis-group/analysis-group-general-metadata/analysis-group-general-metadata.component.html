@@ -54,6 +54,8 @@
     <button mat-menu-item (click)="createMetadata('organism')">Organism</button>
     <button mat-menu-item (click)="createMetadata('cell type')">Cell type</button>
     <button mat-menu-item (click)="createMetadata('enrichment process')">Enrichment process</button>
+    <button mat-menu-item (click)="createMetadata('technology type')">Technology type</button>
+    <button mat-menu-item (click)="createMetadata('label')">Label</button>
     <button mat-menu-item (click)="createMetadata()">Create custom metadata field</button>
   </mat-menu>
   <p>
@@ -79,8 +81,11 @@
               <button mat-menu-item (click)="createMetadataFileSpecific('subcellular location', s.id)">Subcellular location</button>
               <button mat-menu-item (click)="createMetadataFileSpecific('organism', s.id)">Organism</button>
               <button mat-menu-item (click)="createMetadataFileSpecific('modification', s.id)">Modification</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('cell type', s.id)">Modification</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('enrichment process', s.id)">Modification</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('cell type', s.id)">Cell type</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('enrichment process', s.id)">Enrichment process</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('technology type', s.id)">Technology type</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('label', s.id)">Label</button>
+              <button mat-menu-item (click)="createMetadataFileSpecific('assay name', s.id)">Assay name</button>
               <button mat-menu-item (click)="createMetadataFileSpecific(null, s.id)">Create custom metadata field</button>
             </mat-menu>
             <div style="display: flex; gap: 20px">
