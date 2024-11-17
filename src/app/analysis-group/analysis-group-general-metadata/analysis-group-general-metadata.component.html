@@ -58,6 +58,9 @@
     <button mat-menu-item (click)="createMetadata('label')">Label</button>
     <button mat-menu-item (click)="createMetadata()">Create custom metadata field</button>
   </mat-menu>
+  @if (sdrfValidating) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
   <p>
     Cinder utilizes the Sample Data Relationship Format for exporting data into tabulated text format. For more information and detail specification please visit: <a href="https://github.com/bigbio/proteomics-sample-metadata/tree/master/sdrf-proteomics" target="_blank">https://github.com/bigbio/proteomics-sample-metadata/tree/master/sdrf-proteomics</a> <br>
     Any analysis wide metadata will be applied to all source files' new metadata fields of the same name and type.

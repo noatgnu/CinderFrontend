@@ -47,6 +47,8 @@ import {DataService} from "../../data.service";
 import {
   AnalysisGroupSdrfValidationDialogComponent
 } from "./analysis-group-sdrf-validation-dialog/analysis-group-sdrf-validation-dialog.component";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -93,12 +95,14 @@ import {
     CdkDropList,
     CdkDrag,
     CdkDragHandle,
-    MatCheckbox
+    MatCheckbox,
+    MatProgressBar
   ],
   templateUrl: './analysis-group-general-metadata.component.html',
   styleUrl: './analysis-group-general-metadata.component.scss'
 })
 export class AnalysisGroupGeneralMetadataComponent implements OnInit {
+  sdrfValidating: boolean = false
   displayedColumns: string[] = ["metadataType", "metadataName", "metadataValue"]
   @Input() analysis_group_id: number = 0
   private _metadata: MetadataColumn[] = []
@@ -167,7 +171,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   @Input() canEdit: boolean = false
   autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[] | MsVocab[]>} = {}
   sourceFileMap: {[key: string]: SourceFile} = {}
-  constructor(private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private ws: WebsocketService, public data: DataService) {
+  constructor(private sb: MatSnackBar, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private ws: WebsocketService, public data: DataService) {
     this.ws.curtainWSConnection?.subscribe((data) => {
       if (data.analysis_group_id === this.analysis_group_id) {
         if (data.type === "export_sdrf_status") {
@@ -180,6 +184,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
             }
           }
         } else if (data.type === "sdrf_validation") {
+          this.sdrfValidating = false
           if (data.status === "error") {
             const ref = this.dialog.open(AnalysisGroupSdrfValidationDialogComponent)
             if ("errors" in data) {
@@ -275,16 +280,16 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           ref.componentInstance.metadataType = "Characteristics"
           break
         case "technology type":
-          ref.componentInstance.metadataName = ""
-          ref.componentInstance.metadataType = "Technology type"
+          ref.componentInstance.metadataName = "Technology type"
+          ref.componentInstance.metadataType = ""
           break
         case "assay name":
-          ref.componentInstance.metadataName = ""
-          ref.componentInstance.metadataType = "Assay name"
+          ref.componentInstance.metadataName = "Assay name"
+          ref.componentInstance.metadataType = ""
           break
         case "label":
-          ref.componentInstance.metadataName = ""
-          ref.componentInstance.metadataType = "Label"
+          ref.componentInstance.metadataName = "Label"
+          ref.componentInstance.metadataType = ""
           break
       }
     }
@@ -406,16 +411,16 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           ref.componentInstance.metadataType = "Characteristics"
           break
         case "technology type":
-          ref.componentInstance.metadataName = ""
-          ref.componentInstance.metadataType = "Technology type"
+          ref.componentInstance.metadataName = "Technology type"
+          ref.componentInstance.metadataType = ""
           break
         case "assay name":
-          ref.componentInstance.metadataName = ""
-          ref.componentInstance.metadataType = "Assay name"
+          ref.componentInstance.metadataName = "Assay name"
+          ref.componentInstance.metadataType = ""
           break
         case "label":
-          ref.componentInstance.metadataName = ""
-          ref.componentInstance.metadataType = "Label"
+          ref.componentInstance.metadataName = "Label"
+          ref.componentInstance.metadataType = ""
           break
       }
     }
@@ -567,8 +572,12 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     if (!this.web.searchSessionID) {
       return
     }
+    this.sdrfValidating = true
     this.web.validateSDRFFile(this.analysis_group_id, this.web.searchSessionID).subscribe((data) => {
 
+    }, (error) => {
+      this.sdrfValidating = false
+      this.sb.open("Error validating SDRF file", "Close", {duration: 5000})
     })
   }
 }

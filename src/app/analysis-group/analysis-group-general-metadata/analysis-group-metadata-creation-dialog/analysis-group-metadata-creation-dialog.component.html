@@ -1,5 +1,8 @@
 <h1 mat-dialog-title>Adding New Metadata</h1>
 <div mat-dialog-content>
+  <p>
+    For the metadata with dropdowns autocomplete options, unless you are sure that the value is not in the database, please try your best to select the value from the dropdown.
+  </p>
   <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
     <mat-form-field>
       <input matInput formControlName="metadataName" [matAutocomplete]="autoMetadataName" [readonly]="readonlyName">
