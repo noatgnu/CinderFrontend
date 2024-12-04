@@ -99,6 +99,14 @@ export class WebService {
     )
   }
 
+  processMetadataFile(analysis_group_id: number, upload_id: number) {
+    return this.http.post<any>(
+      `${this.baseURL}/api/analysis_groups/${analysis_group_id}/process_uploaded_metadata_file/`,
+      {upload_id: upload_id},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
   getProjects(url?: string, limit: number = 10, offset: number = 0, search?: string, species: Species|undefined|null = null, lab_group: number|null = null) {
     if (url) {
       return this.http.get<ProjectQuery>(
@@ -1025,6 +1033,14 @@ export class WebService {
     return this.http.post<{job_id: string}>(
       `${this.baseURL}/api/analysis_groups/${analysis_group}/validate_sdrf/`,
       {session_id: session_id},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
+
+  bindUploadedMetadataFile(analysis_group_id: number, upload_id: string, file_type: string, session_id: string) {
+    return this.http.post<any>(
+      `${this.baseURL}/api/analysis_groups/${analysis_group_id}/process_uploaded_metadata_file/`,
+      {upload_id: upload_id, file_type: file_type, session_id: session_id},
       {responseType: 'json', observe: 'body'}
     )
   }

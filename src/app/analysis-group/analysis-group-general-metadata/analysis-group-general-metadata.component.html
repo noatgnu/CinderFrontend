@@ -46,6 +46,9 @@
     <button [disabled]="!canEdit" mat-flat-button type="button" color="primary" (click)="addSampleFile()">Add Sample File</button>
     <button mat-flat-button type="button" color="warn" (click)="validateSDRF()">Validate SDRF</button>
     <button mat-flat-button type="button" color="warn" (click)="exportSDRFFromBackend()">Export SDRF</button>
+    @if (canEdit){
+      <app-analysis-group-metadata-import (fileUploaded)="handleImportedData($event)" [analysisGroupId]="analysis_group_id"></app-analysis-group-metadata-import>
+    }
   </div>
   <mat-menu #metadataMenu="matMenu">
     <button mat-menu-item (click)="createMetadata('disease')">Disease</button>

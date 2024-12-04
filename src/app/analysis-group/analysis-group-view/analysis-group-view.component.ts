@@ -173,6 +173,26 @@ export class AnalysisGroupViewComponent {
               this.composingCurtainProgress.error = true
               break
           }
+        } else if (data.type === "sdrf_import") {
+          if (data.status === "in_progress") {
+            if ("progress" in data) {
+              const percentage = (data["progress"] as number).toFixed(2)
+
+              this.sb.open(`Importing data ${percentage}%`, "Dismiss", {duration: 5000})
+            }
+          } else if (data.status === "complete") {
+            if (this.analysisGroup) {
+              this.sb.open("Retrieving updated Data.", "Dismiss", {duration: 5000})
+              this.web.getAnalysisGroup(this.analysisGroup.id).subscribe((data) => {
+                if (this.analysisGroup) {
+                  this.analysisGroup.metadata_columns = data.metadata_columns
+                  this.analysisGroup.source_files = data.source_files
+                }
+                this.sb.open("Data imported", "Dismiss", {duration: 5000})
+              })
+            }
+
+          }
         }
       }
     })

@@ -1,0 +1,7 @@
+<button mat-raised-button [matMenuTriggerFor]="importFileMenu" type="button">Import Metadata File</button>
+<input type="file" #uploadFile (change)="uploadData($event)" hidden>
+<mat-menu #importFileMenu="matMenu">
+  @for (i of importTypes; track i) {
+    <button mat-menu-item (click)="fileType=i; uploadFile.click()">{{i}}</button>
+  }
+</mat-menu>

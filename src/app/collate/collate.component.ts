@@ -51,8 +51,7 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
     MatAutocomplete,
     AsyncPipe,
     ReactiveFormsModule,
-    MatAutocompleteTrigger,
-    MatProgressSpinner
+    MatAutocompleteTrigger
   ],
   templateUrl: './collate.component.html',
   styleUrl: './collate.component.scss'

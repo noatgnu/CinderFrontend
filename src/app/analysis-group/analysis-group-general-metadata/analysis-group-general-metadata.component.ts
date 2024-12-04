@@ -49,6 +49,10 @@ import {
 } from "./analysis-group-sdrf-validation-dialog/analysis-group-sdrf-validation-dialog.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatProgressBar} from "@angular/material/progress-bar";
+import {
+  AnalysisGroupMetadataImportComponent
+} from "./analysis-group-metadata-import/analysis-group-metadata-import.component";
+import {AnalysisGroup} from "../analysis-group";
 
 @Component({
   selector: 'app-analysis-group-general-metadata',
@@ -96,7 +100,8 @@ import {MatProgressBar} from "@angular/material/progress-bar";
     CdkDrag,
     CdkDragHandle,
     MatCheckbox,
-    MatProgressBar
+    MatProgressBar,
+    AnalysisGroupMetadataImportComponent
   ],
   templateUrl: './analysis-group-general-metadata.component.html',
   styleUrl: './analysis-group-general-metadata.component.scss'
@@ -166,6 +171,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   @Output() sourceFilesChanged = new EventEmitter<SourceFile[]>()
   @Output() sourceFileMetadataDeleted = new EventEmitter<MetadataColumn>()
   @Output() reorderMetadataSourceFiles = new EventEmitter<MetadataColumn[]>()
+  @Output() metadataImported = new EventEmitter<AnalysisGroup>()
   markedForDeletion: MetadataColumn[] = []
 
   @Input() canEdit: boolean = false
@@ -579,5 +585,9 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       this.sdrfValidating = false
       this.sb.open("Error validating SDRF file", "Close", {duration: 5000})
     })
+  }
+
+  handleImportedData(analysisGroup: AnalysisGroup) {
+    this.metadataImported.emit(analysisGroup)
   }
 }

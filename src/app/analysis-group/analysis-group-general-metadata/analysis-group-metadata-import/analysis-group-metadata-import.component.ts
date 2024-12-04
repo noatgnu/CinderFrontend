@@ -1,37 +1,41 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {WebService} from "../web.service";
+import {MatDialogRef} from "@angular/material/dialog";
+import {FormBuilder} from "@angular/forms";
 import jsSHA from "jssha";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
-import {MatInput} from "@angular/material/input";
-import {MatIconButton} from "@angular/material/button";
-import {MatIcon} from "@angular/material/icon";
-import {ProjectFile} from "../project-file";
-import {MatProgressBar} from "@angular/material/progress-bar";
-import {ReactiveFormsModule} from "@angular/forms";
+import {WebService} from "../../../web.service";
+import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 
 @Component({
-  selector: 'app-upload-file',
+  selector: 'app-analysis-group-metadata-import',
   standalone: true,
   imports: [
     MatIconButton,
-    MatIcon,
-    MatProgressBar,
-    ReactiveFormsModule
+    MatButton,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger
   ],
-  templateUrl: './upload-file.component.html',
-  styleUrl: './upload-file.component.scss'
+  templateUrl: './analysis-group-metadata-import.component.html',
+  styleUrl: './analysis-group-metadata-import.component.scss'
 })
-export class UploadFileComponent {
+export class AnalysisGroupMetadataImportComponent {
+  importTypes: string[] = ["Spectronaut Condition Setup File", "SDRF"]
   fileProgressMap: {[key: string]: {progress: number, total: number}} = {};
   fileList: File[] = [];
-  @Input() fileType: string = "";
-  @Input() fileCategory: string = "";
+
   @Input() analysisGroupId: number = 0;
 
-  @Output() fileUploaded: EventEmitter<ProjectFile> = new EventEmitter<ProjectFile>();
 
-  allowFileType = ["csv", "tsv", "txt"]
+  fileType: string = ""
+  allowFileType: string[] = ["csv", "txt", "tsv"]
+
+  @Output() fileUploaded = new EventEmitter<any>()
+
   constructor(private web: WebService) {
+  }
+
+  submit() {
 
   }
 
@@ -61,21 +65,21 @@ export class UploadFileComponent {
     const chunkSize = 1024 * 1024;
     const fileSize = file.size;
     const hashObj = new jsSHA("SHA-256", "ARRAYBUFFER");
-    this.fileType = this.getFileExntension(file);
-
-    if (this.allowFileType.indexOf(this.fileType) === -1) {
+    const extension = this.getFileExntension(file);
+    if (this.allowFileType.indexOf(extension) === -1) {
       return;
     }
-    if (chunkSize > fileSize) {
+    if (chunkSize > fileSize && this.web.searchSessionID) {
       const chunk = await file.arrayBuffer();
       hashObj.update(chunk)
       const hashDigest = hashObj.getHash("HEX");
       const result = await this.web.uploadDataChunkComplete("", hashDigest, file, file.name).toPromise()
       this.fileProgressMap[file.name].progress = fileSize;
+      console.log(result)
       if (result?.completed_at) {
-        this.web.bindUploadedFile(this.analysisGroupId, this.fileType, this.fileCategory, file.name, result?.id).subscribe((data) => {
+        this.web.bindUploadedMetadataFile(this.analysisGroupId, result?.id, this.fileType, this.web.searchSessionID).subscribe((data) => {
 
-          this.fileUploaded.emit(data)
+          //this.fileUploaded.emit(data)
         })
       }
     } else {
@@ -102,13 +106,14 @@ export class UploadFileComponent {
       if (currentURL !== "") {
         const hashDigest = hashObj.getHash("HEX");
         const result = await this.web.uploadDataChunkComplete(currentURL, hashDigest).toPromise()
-        if (result?.completed_at) {
-          this.web.bindUploadedFile(this.analysisGroupId, this.fileType, this.fileCategory, file.name, result?.id).subscribe((data) => {
+        if (result?.completed_at && this.web.searchSessionID) {
+          this.web.bindUploadedMetadataFile(this.analysisGroupId, result?.id, this.fileType, this.web.searchSessionID).subscribe((data) => {
             this.fileProgressMap[file.name].progress = fileSize;
-            this.fileUploaded.emit(data)
+            //this.fileUploaded.emit(data)
           })
         }
       }
     }
   }
+
 }
