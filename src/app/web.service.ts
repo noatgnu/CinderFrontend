@@ -1056,4 +1056,12 @@ export class WebService {
       {responseType: 'json', observe: 'body'}
     )
   }
+
+  analysisGroupReorderColumns(analysis_group_id: number) {
+    return this.http.post<AnalysisGroup>(
+      `${this.baseURL}/api/analysis_groups/${analysis_group_id}/reorder_columns/`,
+      {},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
 }

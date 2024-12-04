@@ -33,6 +33,7 @@ export class AnalysisGroupMetadataImportComponent {
   @Output() fileUploaded = new EventEmitter<any>()
 
   constructor(private web: WebService) {
+
   }
 
   submit() {

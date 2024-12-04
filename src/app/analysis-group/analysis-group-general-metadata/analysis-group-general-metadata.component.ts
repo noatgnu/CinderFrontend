@@ -108,6 +108,10 @@ import {AnalysisGroup} from "../analysis-group";
 })
 export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   sdrfValidating: boolean = false
+
+  sdrfImportingProgress: number = 0
+  sdrfImportingText: string = ""
+  sdrfImporting: boolean = false
   displayedColumns: string[] = ["metadataType", "metadataName", "metadataValue"]
   @Input() analysis_group_id: number = 0
   private _metadata: MetadataColumn[] = []
@@ -178,6 +182,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[] | MsVocab[]>} = {}
   sourceFileMap: {[key: string]: SourceFile} = {}
   constructor(private sb: MatSnackBar, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private ws: WebsocketService, public data: DataService) {
+
     this.ws.curtainWSConnection?.subscribe((data) => {
       if (data.analysis_group_id === this.analysis_group_id) {
         if (data.type === "export_sdrf_status") {
@@ -196,6 +201,32 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
             if ("errors" in data) {
               ref.componentInstance.errors = data.errors as string[]
             }
+          }
+        } else if (data.type === "sdrf_import") {
+          if (data.status === "in_progress") {
+            if ("progress" in data) {
+              this.sdrfImporting = true
+              const percentage = data["progress"] as number
+              if (percentage > this.sdrfImportingProgress) {
+                this.sdrfImportingProgress = percentage
+                this.sdrfImportingText = `Importing data ${percentage.toFixed(2)}%`
+              }
+            }
+          } else if (data.status === "complete") {
+            if (this.sourceFiles.length > 0) {
+              this.sdrfImportingProgress = 50
+              this.sdrfImportingText = "Retrieving updated Data."
+
+              this.sb.open("Retrieving updated Data.", "Dismiss", {duration: 5000})
+              this.web.getAnalysisGroup(this.analysis_group_id).subscribe((data) => {
+                this.sb.open("Data imported", "Dismiss", {duration: 5000})
+                this.sdrfImporting = false
+                this.sdrfImportingProgress = 0
+                this.sdrfImportingText = ""
+                this.handleImportedData(data)
+              })
+            }
+
           }
         }
       }
@@ -610,5 +641,14 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         }
       }
     })
+  }
+
+  reorderAnalysisGroupMetadataColumn() {
+    if (this.sourceFiles.length > 0) {
+      this.web.analysisGroupReorderColumns(this.analysis_group_id).subscribe((data) => {
+        this.sourceFiles = data.source_files
+        this.sb.open("Metadata columns reordered", "Dismiss", {duration: 5000})
+      })
+    }
   }
 }
