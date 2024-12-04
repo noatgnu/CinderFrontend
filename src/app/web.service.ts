@@ -1044,4 +1044,16 @@ export class WebService {
       {responseType: 'json', observe: 'body'}
     )
   }
+
+  copyMetadataValueToAllInSamePosition(metadata_column_id: number, blank_only: boolean) {
+    let blank_only_value = "false"
+    if (blank_only) {
+      blank_only_value = "true"
+    }
+    return this.http.post<MetadataColumn[]>(
+      `${this.baseURL}/api/metadata_columns/${metadata_column_id}/copy_value_to_all_in_same_position/`,
+      {blank_only: blank_only_value},
+      {responseType: 'json', observe: 'body'}
+    )
+  }
 }

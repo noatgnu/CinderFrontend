@@ -590,4 +590,25 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   handleImportedData(analysisGroup: AnalysisGroup) {
     this.metadataImported.emit(analysisGroup)
   }
+
+  copyMetadata(metadata: MetadataColumn, blank_only: boolean) {
+    if (this.metadataFormMap[metadata.id].controls["value"].dirty){
+      this.sb.open("Please save the metadata before copying", "Close", {duration: 5000})
+      return
+    }
+    this.web.copyMetadataValueToAllInSamePosition(metadata.id, blank_only).subscribe((data) => {
+      for (const m of data) {
+        if (m.source_file) {
+          this.sourceFileMap[m.source_file].metadata_columns = this.sourceFileMap[m.source_file].metadata_columns.map((md) => {
+            if (md.id === m.id) {
+              this.metadataFormMap[m.id].controls["value"].patchValue(m.value)
+              return m
+            }
+            return md
+          })
+
+        }
+      }
+    })
+  }
 }

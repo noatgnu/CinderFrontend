@@ -152,8 +152,15 @@
                           </mat-form-field>
                           <mat-checkbox formControlName="not_applicable" (click)="updateNotApplicable(c)">Field not applicable</mat-checkbox>
                         </div>
+                        <div>
+                          <button mat-icon-button type="button" cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
+                          <button mat-icon-button type="button" [matMenuTriggerFor]="copyMenu"><mat-icon>copy_all</mat-icon></button>
+                          <mat-menu #copyMenu>
+                            <button type="button" mat-menu-item (click)="copyMetadata(c, true)">Copy value and fill in blank metadata at the same position {{c.column_position}}</button>
+                            <button type="button" mat-menu-item (click)="copyMetadata(c, false)">Copy value and replace metadata at the same position {{c.column_position}}</button>
+                          </mat-menu>
+                        </div>
 
-                        <button mat-icon-button cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
                       </form>
                     }
                   }
