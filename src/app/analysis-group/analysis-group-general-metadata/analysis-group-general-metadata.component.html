@@ -74,8 +74,8 @@
     Any analysis wide metadata will be applied to all source files' new metadata fields of the same name and type.
   </p>
   @if (sourceFiles.length > 0) {
-    <mat-accordion multi>
-      @for (s of sourceFiles; track s.id) {
+    <mat-accordion multi #metaColAccordion>
+      @for (s of sourceFiles; track s.id; let index = $index) {
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
@@ -126,7 +126,7 @@
                 <div style="display: flex; flex-direction: column; gap: 20px" cdkDropList (cdkDropListDropped)="drop($event, s)">
                   @for (c of s.metadata_columns; track c.id) {
                     @if (metadataFormMap[c.id]) {
-                      <form [formGroup]="metadataFormMap[c.id]" cdkDrag [cdkDragData]="c">
+                      <form id="metadata-column-{{s.id}}-{{c.id}}" [formGroup]="metadataFormMap[c.id]" cdkDrag [cdkDragData]="c">
                         <div style="display: flex; gap: 20px">
                           <mat-form-field style="flex-grow: 1">
                             <textarea matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue"></textarea>
@@ -155,16 +155,28 @@
                               }
                             </mat-autocomplete>
                           </mat-form-field>
-                          <mat-checkbox formControlName="not_applicable" (click)="updateNotApplicable(c)">Field not applicable</mat-checkbox>
+                          <div>
+                            <mat-checkbox formControlName="not_applicable" (click)="updateNotApplicable(c)">Field not applicable</mat-checkbox>
+                            <div>
+                              <button mat-icon-button type="button" cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
+                              <button mat-icon-button type="button" [matMenuTriggerFor]="copyMenu"><mat-icon>copy_all</mat-icon></button>
+                              <mat-menu #copyMenu>
+                                <button type="button" mat-menu-item (click)="copyMetadata(c, true)">Copy value and fill in blank metadata at the same position {{c.column_position}}</button>
+                                <button type="button" mat-menu-item (click)="copyMetadata(c, false)">Copy value and replace metadata at the same position {{c.column_position}}</button>
+                              </mat-menu>
+                              <button mat-icon-button type="button" [matMenuTriggerFor]="navigateMenu" [matTooltip]="'Navigate to next or previous source file'" >
+                                <mat-icon>arrow_forward</mat-icon>
+                              </button>
+                              <mat-menu #navigateMenu>
+                                <button type="button" mat-menu-item (click)="navigateToSourceFile(c.column_position, index, 'next')" [matTooltip]="'Navigate to position '+c.column_position+' in the next file'">Next file</button>
+                                <button type="button" mat-menu-item (click)="navigateToSourceFile(c.column_position, index, 'previous')" [matTooltip]="'Navigate to position '+c.column_position+' in the previous file'">Previous file</button>
+                              </mat-menu>
+
+                            </div>
+                          </div>
+
                         </div>
-                        <div>
-                          <button mat-icon-button type="button" cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
-                          <button mat-icon-button type="button" [matMenuTriggerFor]="copyMenu"><mat-icon>copy_all</mat-icon></button>
-                          <mat-menu #copyMenu>
-                            <button type="button" mat-menu-item (click)="copyMetadata(c, true)">Copy value and fill in blank metadata at the same position {{c.column_position}}</button>
-                            <button type="button" mat-menu-item (click)="copyMetadata(c, false)">Copy value and replace metadata at the same position {{c.column_position}}</button>
-                          </mat-menu>
-                        </div>
+
 
                       </form>
                     }

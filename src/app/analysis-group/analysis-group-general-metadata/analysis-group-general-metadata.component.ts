@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {MetadataColumn, SDRF} from "../metadata-column";
 import {WebService} from "../../web.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -107,6 +107,8 @@ import {AnalysisGroup} from "../analysis-group";
   styleUrl: './analysis-group-general-metadata.component.scss'
 })
 export class AnalysisGroupGeneralMetadataComponent implements OnInit {
+  @ViewChildren(MatExpansionPanel) expansionPanels!: QueryList<MatExpansionPanel>;
+  @ViewChild("metaColAccordion") metaColAccordion!: MatAccordion
   sdrfValidating: boolean = false
 
   sdrfImportingProgress: number = 0
@@ -649,6 +651,39 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         this.sourceFiles = data.source_files
         this.sb.open("Metadata columns reordered", "Dismiss", {duration: 5000})
       })
+    }
+  }
+
+  navigateToSourceFile(columnPosition: number, sourceFileIndex: number, direction: 'next' | 'previous') {
+    if (columnPosition !== -1) {
+      const targetIndex = direction === 'next' ? sourceFileIndex + 1 : sourceFileIndex - 1;
+      if (targetIndex >= 0 && targetIndex < this.sourceFiles.length) {
+        const targetSourceFile = this.sourceFiles[targetIndex];
+        const targetMetadataColumn = targetSourceFile.metadata_columns.find(column => column.column_position === columnPosition);
+        if (targetMetadataColumn && this.expansionPanels) {
+          const panel = this.expansionPanels.toArray()[targetIndex];
+          if (panel) {
+            if (!panel.expanded) {
+              panel.open();
+              const interval = setInterval(() => {
+                const element = document.getElementById(`metadata-column-${targetSourceFile.id}-${targetMetadataColumn.id}`);
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                  clearInterval(interval);
+                }
+              }, 300);
+            } else {
+              const interval = setInterval(() => {
+                const element = document.getElementById(`metadata-column-${targetSourceFile.id}-${targetMetadataColumn.id}`);
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                  clearInterval(interval);
+                }
+              }, 300);
+            }
+          }
+        }
+      }
     }
   }
 }
