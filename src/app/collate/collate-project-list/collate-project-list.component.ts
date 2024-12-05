@@ -29,7 +29,20 @@ export class CollateProjectListComponent {
     return this._searchTerm;
   }
   @Input() projects: Project[] = [];
-  @Input() filteredResults: { [projectId: number]: SearchResult[] } = {};
+  private _filteredResults: { [projectId: number]: SearchResult[] } = {};
+  @Input() set filteredResults(value: { [projectId: number]: SearchResult[] }|undefined|null) {
+    console.log(value)
+    if (value) {
+      this._filteredResults = value;
+    } else {
+      this._filteredResults = {};
+    }
+  }
+
+  get filteredResults(): { [projectId: number]: SearchResult[] } {
+    return this._filteredResults;
+  }
+
   @Input() projectConditionColorMap: { [projectID: number]: { [condition: string]: string } }|undefined|null = {};
   @Input() renameCondition: {[projectId: number]: {[key: string]: string}}|undefined|null  = {}
   @Output() projectOrderChanged = new EventEmitter<Project[]>();

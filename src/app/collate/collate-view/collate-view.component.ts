@@ -67,9 +67,14 @@ export class CollateViewComponent {
             projectConditionColorMap: {},
             renameSampleCondition: {},
             projectAnalysisGroupVisibility: {},
+            plotSettings: {},
             showTags: false,
           };
         }
+        if (!collate.settings.plotSettings  ) {
+          collate.settings.plotSettings = {}
+        }
+
         if (collate.settings.projectOrder) {
           this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
         }
@@ -190,6 +195,7 @@ export class CollateViewComponent {
         this.searchResults[project.id].push(result);
       }
     });
+    console.log(this.searchResults);
     this.selectedSearchTerm = this.searchTerms[0];
     this.filterDataBySearchTerm();
   }
@@ -200,6 +206,7 @@ export class CollateViewComponent {
       // @ts-ignore
       filteredResults[projectId] = this.searchResults[projectId].filter(result => result.search_term === this.selectedSearchTerm);
       if (this.collate?.settings?.analysisGroupOrderMap) {
+        console.log(this.collate.settings.analysisGroupOrderMap);
         Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
           const id = parseInt(projectId);
           const analysisGroupOrder = this.collate?.settings.analysisGroupOrderMap[id];
@@ -210,6 +217,7 @@ export class CollateViewComponent {
           if (!analysisGroupOrder) {
             return;
           }
+          console.log(analysisGroupOrder);
           const notInOrder = filteredResults[id].filter(result => !analysisGroupOrder.includes(result.analysis_group.id));
           filteredResults[id] = filteredResults[id].filter(result => analysisGroupOrder.includes(result.analysis_group.id));
           filteredResults[id] = filteredResults[id].sort((a, b) => {
@@ -238,6 +246,7 @@ export class CollateViewComponent {
   filterDataBySearchTerm() {
     this.selectedSearchTerm = this.searchTerms[this.selectedIndex];
     this.filteredResults = this.getFilteredSearchResults();
+    console.log(this.filteredResults);
   }
 
   getSearchFromID(id: number) {

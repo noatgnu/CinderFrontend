@@ -46,7 +46,7 @@ export class BarChartComponent {
 
   @Input() set data(value: SearchResult|null) {
     this._data = value;
-    this.graphLayout.title = value?.analysis_group?.name || ""
+    this.graphLayout.title.text = value?.analysis_group?.name || ""
     this.graphLayout.yaxis.title = this.searchTerm || ""
     this.conditionA = value?.condition_A || ""
     this.conditionB = value?.condition_B || ""
@@ -69,7 +69,12 @@ export class BarChartComponent {
 
   graphData: any[] = [];
   graphLayout: any = {
-    title: "",
+    title: {
+      text: "",
+      font: {
+        size: 16
+      }
+    },
     height: 400,
     margin: {
       l: 150,
@@ -113,6 +118,10 @@ export class BarChartComponent {
   }
 
   drawGraph() {
+    this.loadPlotSettings()
+    if (!this.graph.plotSettings.showTitle) {
+      this.graphLayout.title.text = ""
+    }
     let renamedConditionA = this.renameCondition[this.conditionA]
     if (!renamedConditionA) {
       renamedConditionA = this.conditionA
@@ -296,5 +305,16 @@ export class BarChartComponent {
       //visible: visible,
       showlegend: false
     }
+  }
+
+  loadPlotSettings() {
+    this.graphLayout.height = this.graph.plotSettings.height
+    this.graphLayout.margin.l = this.graph.plotSettings.marginLeft
+    this.graphLayout.margin.r = this.graph.plotSettings.marginRight
+    this.graphLayout.margin.b = this.graph.plotSettings.marginBottom
+    this.graphLayout.margin.t = this.graph.plotSettings.marginTop
+    this.graphLayout.title.font.size = this.graph.plotSettings.titleTextSize
+    this.barSize = this.graph.plotSettings.barSize
+
   }
 }

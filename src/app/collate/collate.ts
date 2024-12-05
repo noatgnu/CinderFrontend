@@ -21,6 +21,7 @@ export interface Collate {
       [projectID: number]: { [analysisGroupID: number]: boolean }
     };
     projectConditionColorMap: { [projectID: number]: { [condition: string]: string } };
+    plotSettings: any,
     showTags: boolean;
     [key: string]: any;
   };

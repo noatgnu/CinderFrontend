@@ -19,6 +19,17 @@ export class GraphService {
 
   redrawTrigger: Subject<boolean> = new Subject<boolean>()
 
+  plotSettings: any = {
+    marginLeft: 150,
+    marginRight: 100,
+    marginTop: 100,
+    marginBottom: 100,
+    titleTextSize: 14,
+    showTitle: true,
+    height: 500,
+    barSize: 50,
+  }
+
   projectConditionColorMap: { [projectID: number]: { [condition: string]: string } } = {}
 
   constructor() { }

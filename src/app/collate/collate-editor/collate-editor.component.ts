@@ -40,6 +40,7 @@ import {
 import {
   CollateProjectAnalysisGroupVisibilityDialogComponent
 } from "../collate-project-analysis-group-visibility-dialog/collate-project-analysis-group-visibility-dialog.component";
+import {CollatePlotSettingsComponent} from "../collate-plot-settings/collate-plot-settings.component";
 
 @Component({
   selector: 'app-collate-editor',
@@ -94,8 +95,12 @@ export class CollateEditorComponent {
             projectConditionColorMap: {},
             renameSampleCondition: {},
             projectAnalysisGroupVisibility: {},
+            plotSettings: {},
             showTags: false
           }
+        }
+        if (!this._collate.settings.plotSettings) {
+          this._collate.settings.plotSettings = {};
         }
         if (collate.settings.projectOrder) {
           const notFound = this.projects.filter(project => !collate.settings.projectOrder.includes(project.id));
@@ -528,6 +533,20 @@ export class CollateEditorComponent {
           console.log(this.collate.settings.renameSampleCondition)
         }
       })
+    }
+  }
+
+  openPlotSettings() {
+    if (this.collate) {
+      const ref = this.dialog.open(CollatePlotSettingsComponent);
+      ref.componentInstance.settings = this.collate.settings.plotSettings;
+      ref.afterClosed().subscribe((result: any) => {
+        if (this.collate && result) {
+          this.collate.settings.plotSettings = result;
+          this.graph.plotSettings = result;
+          this.graph.redrawTrigger.next(true);
+        }
+      });
     }
   }
 }
