@@ -1,7 +1,7 @@
 <h5 mat-dialog-title>Plot General Settings</h5>
 <div mat-dialog-content>
   <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
-    <section>
+    <section style="display: flex; flex-direction: column; gap: 5px">
       <b>Overall Size</b>
       <mat-form-field>
         <input matInput formControlName="height" type="number">
@@ -27,10 +27,10 @@
         <input matInput formControlName="marginBottom" type="number">
         <mat-label>Margin Bottom</mat-label>
       </mat-form-field>
-      <hr>
-    </section>
 
-    <section>
+    </section>
+    <mat-divider></mat-divider>
+    <section style="display: flex; flex-direction: column; gap: 5px">
       <b>Title</b>
       <mat-checkbox formControlName="showTitle">Show Title</mat-checkbox>
       <mat-form-field>

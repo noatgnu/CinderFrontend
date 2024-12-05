@@ -5,6 +5,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatButton} from "@angular/material/button";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-collate-plot-settings',
@@ -18,7 +19,8 @@ import {MatButton} from "@angular/material/button";
     MatLabel,
     MatCheckbox,
     MatDialogActions,
-    MatButton
+    MatButton,
+    MatDivider
   ],
   templateUrl: './collate-plot-settings.component.html',
   styleUrl: './collate-plot-settings.component.scss'
