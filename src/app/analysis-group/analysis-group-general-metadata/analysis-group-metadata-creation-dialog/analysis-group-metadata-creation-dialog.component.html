@@ -21,7 +21,7 @@
             </mat-option>
           }
         } @else {
-          @for (m of metadataNameAutocomplete; track m) {
+          @for (m of metadataOtherAutocomplete; track m) {
             <mat-option [value]="m">
               {{m}}
             </mat-option>
@@ -71,7 +71,6 @@
               {{m}}
             </mat-option>
           }
-
         }
       </mat-autocomplete>
     </mat-form-field>
