@@ -62,9 +62,16 @@
       <mat-label>Metadata Type</mat-label>
       <mat-autocomplete #autoMetadataType="matAutocomplete">
         @for (m of metadataTypeAutocomplete; track m) {
-          <mat-option [value]="m">
-            {{m}}
-          </mat-option>
+          @if (m === 'Other') {
+            <mat-option [value]="''">
+              {{m}}
+            </mat-option>
+          } @else {
+            <mat-option [value]="m">
+              {{m}}
+            </mat-option>
+          }
+
         }
       </mat-autocomplete>
     </mat-form-field>
