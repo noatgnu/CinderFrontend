@@ -145,7 +145,7 @@ export class CollateViewComponent {
   }
   searchSession: SearchSession|undefined;
 
-  pastSearches: {searchQuery: SearchResultQuery, termFounds: string[], collate: number, searchID:number}[] = [];
+  pastSearches: {searchQuery: SearchResultQuery|null, termFounds: string[], collate: number, searchID:number}[] = [];
   waitingForDownload = false
   constructor(private title: Title, private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
     const pastSearches = localStorage.getItem('cinderPastSearches');
@@ -278,7 +278,7 @@ export class CollateViewComponent {
       //check if search id is in past searches
       const search = this.pastSearches.find(search => search.searchID === id);
       if (!search) {
-        this.pastSearches.push({searchQuery: data, termFounds: uniqueSearchTerms, collate: this.collate.id, searchID: id});
+        this.pastSearches.push({searchQuery: null, termFounds: uniqueSearchTerms, collate: this.collate.id, searchID: id});
         this.pastSearches = this.pastSearches.slice(-20);
         localStorage.setItem('cinderPastSearches', JSON.stringify(this.pastSearches));
       }
@@ -286,11 +286,18 @@ export class CollateViewComponent {
     })
   }
 
-  restoreSearches(searchQuery: SearchResultQuery, searchID: number) {
+  restoreSearches(searchQuery: SearchResultQuery|null, searchID: number) {
     this.web.getSearchSession(searchID).subscribe((data) => {
       this.searchSession = data;
     })
-    this.distributeSearchResults(searchQuery.results).then();
+    if (searchQuery) {
+      this.distributeSearchResults(searchQuery.results).then();
+    } else {
+      this.web.getSearchResults(searchID,99999).subscribe((data) => {
+        this.distributeSearchResults(data.results).then();
+      })
+    }
+
   }
 
   navigateToEdit() {
