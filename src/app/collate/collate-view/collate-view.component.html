@@ -46,7 +46,7 @@
 
 
 <div style="display: flex; justify-content: center">
-  <app-collate-search [projects]="projects" (searchResultID)="getSearchFromID($event)"></app-collate-search>
+  <app-collate-search [projects]="projects" (searchResultID)="sessionId=$event;getSearchFromID($event)"></app-collate-search>
 </div>
 @if (searchTerms.length > 0) {
   <div style="padding: 20px">
