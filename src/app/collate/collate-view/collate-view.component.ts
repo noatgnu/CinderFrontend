@@ -212,6 +212,9 @@ export class CollateViewComponent {
       }
     });
     console.log(this.searchResults);
+    this.searchTerms.sort((a, b) => {
+      return a.localeCompare(b);
+    })
     this.selectedSearchTerm = this.searchTerms[0];
     this.filterDataBySearchTerm();
   }
