@@ -53,7 +53,7 @@ import {
   styleUrl: './collate-view.component.scss'
 })
 export class CollateViewComponent {
-  private _sessionId: number | null = null;
+  _sessionId: number | null = null;
   @Input() set sessionId(value: number | null) {
     if (value && this.collate) {
       this.getSearchFromID(value);
