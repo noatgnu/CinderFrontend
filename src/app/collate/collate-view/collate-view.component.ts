@@ -53,6 +53,11 @@ import {
   styleUrl: './collate-view.component.scss'
 })
 export class CollateViewComponent {
+  @Input() set sessionId(value: number | null) {
+    if (value) {
+      this.getSearchFromID(value);
+    }
+  }
 
   @Input() set collateId(value: number | null) {
     if (value) {
@@ -259,10 +264,13 @@ export class CollateViewComponent {
       }
       console.log(data.results)
       const uniqueSearchTerms = Array.from(new Set(data.results.map(result => result.search_term)));
-      this.pastSearches.push({searchQuery: data, termFounds: uniqueSearchTerms, collate: this.collate.id, searchID: id});
-      // keep most recent 10 searches
-      this.pastSearches = this.pastSearches.slice(-20);
-      localStorage.setItem('cinderPastSearches', JSON.stringify(this.pastSearches));
+      //check if search id is in past searches
+      const search = this.pastSearches.find(search => search.searchID === id);
+      if (!search) {
+        this.pastSearches.push({searchQuery: data, termFounds: uniqueSearchTerms, collate: this.collate.id, searchID: id});
+        this.pastSearches = this.pastSearches.slice(-20);
+        localStorage.setItem('cinderPastSearches', JSON.stringify(this.pastSearches));
+      }
       this.distributeSearchResults(data.results).then();
     })
   }

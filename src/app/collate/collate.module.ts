@@ -19,6 +19,10 @@ const routes: Routes = [
     path: 'view/:collateId',
   },
   {
+    component: CollateViewComponent,
+    path: 'view/:collateId/:sessionId',
+  },
+  {
     component: CollateEditorComponent,
     path: 'edit',
   },
