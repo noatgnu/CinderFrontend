@@ -53,10 +53,16 @@ import {
   styleUrl: './collate-view.component.scss'
 })
 export class CollateViewComponent {
+  private _sessionId: number | null = null;
   @Input() set sessionId(value: number | null) {
-    if (value) {
+    if (value && this.collate) {
       this.getSearchFromID(value);
     }
+    this._sessionId = value;
+  }
+
+  get sessionId(): number | null {
+    return this._sessionId;
   }
 
   @Input() set collateId(value: number | null) {
@@ -96,7 +102,9 @@ export class CollateViewComponent {
         }
 
         if (this.collate?.settings.renameSampleCondition) {
-
+          if (this.sessionId) {
+            this.getSearchFromID(this.sessionId);
+          }
         } else {
           // @ts-ignore
           this.collate.settings.renameSampleCondition = {};
@@ -111,6 +119,9 @@ export class CollateViewComponent {
               // @ts-ignore
               console.log(this.collate.settings.renameSampleCondition)
             })
+          }
+          if (this.sessionId) {
+            this.getSearchFromID(this.sessionId);
           }
         }
         console.log(this.projects)
