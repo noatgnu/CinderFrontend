@@ -3,7 +3,7 @@ import {environment} from "../../environments/environment";
 import {Observable, Subject} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {UserAccount} from "./user-account";
-import {User} from "../user/user";
+import {User, UserSession} from "../user/user";
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class AccountsService {
   triggerLoginSubject: Subject<boolean> = new Subject<boolean>()
   is_staff: boolean = false
   currentUser: User|null = null
-
+  userSession?: UserSession
   constructor(private http: HttpClient) { }
 
   login(username: string, password: string): Observable<any> {

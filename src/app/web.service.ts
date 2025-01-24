@@ -11,7 +11,7 @@ import {ComparisonMatrix} from "./comparison-matrix";
 import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from "./search-session";
 import {Species, SpeciesQuery} from "./species";
 import {LabGroup, LabGroupQuery} from "./lab-group";
-import {User, UserQuery} from "./user/user";
+import {User, UserQuery, UserSession} from "./user/user";
 import {Tissue, TissueQuery} from "./tissue";
 import {SubcellularLocation, SubcellularLocationQuery} from "./subcellular-location";
 import {HumanDiseaseQuery} from "./human-disease";
@@ -28,6 +28,7 @@ import {UnimodQuery} from "./unimod";
 export class WebService {
   cinderInstanceID: string = crypto.randomUUID()
   baseURL: string = environment.baseURL
+  keycloakCallbackUrl: string = environment.keycloakCallbackUrl
   searchSessionID: string|null = null
   updateFromLabGroupSelection: Subject<boolean> = new Subject<boolean>()
 
@@ -1063,5 +1064,78 @@ export class WebService {
       {},
       {responseType: 'json', observe: 'body'}
     )
+  }
+
+  getLoginProviderRedirect() {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `${this.baseURL}/_allauth/browser/v1/auth/provider/redirect`;
+
+    const providerInput = document.createElement('input');
+    providerInput.type = 'hidden';
+    providerInput.name = 'provider';
+    providerInput.value = 'keycloak';
+    form.appendChild(providerInput);
+
+    const callbackUrlInput = document.createElement('input');
+    callbackUrlInput.type = 'hidden';
+    callbackUrlInput.name = 'callback_url';
+    callbackUrlInput.value = this.keycloakCallbackUrl;
+    form.appendChild(callbackUrlInput);
+
+    const processInput = document.createElement('input');
+    processInput.type = 'hidden';
+    processInput.name = 'process';
+    processInput.value = 'login';
+    form.appendChild(processInput);
+
+    const csrfToken = this.getCSRFTokenFromCookies();
+    if (csrfToken) {
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'csrfmiddlewaretoken';
+      csrfInput.value = csrfToken;
+      form.appendChild(csrfInput);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  getCSRFTokenFromCookies(): string | null {
+    const cookies = document.cookie.split(';');
+    const csrf = cookies.find((cookie) => cookie.trim().startsWith('csrfToken='));
+    if (csrf) {
+      return csrf.split('=')[1];
+    }
+    return null;
+  }
+
+  getCSRFToken() {
+    return this.http.get(`${this.baseURL}/api/users/set-csrf/`, { observe: 'response'})
+  }
+
+  getAuthenticationStatus(){
+    return this.http.get<UserSession>(`${this.baseURL}/_allauth/browser/v1/auth/session`, {responseType: 'json', observe: 'body', withCredentials: true})
+  }
+
+  logoutProvider() {
+    let headers = new HttpHeaders()
+    headers = headers.append('X-Session-Token', this.getSessionIDFromCookies() || "")
+    headers = headers.append('X-CSRFToken', this.getCSRFTokenFromCookies() || "")
+    return this.http.delete(`${this.baseURL}/_allauth/browser/v1/auth/session`, {headers: headers, withCredentials: true})
+  }
+
+  getSessionIDFromCookies(): string | null {
+    const cookies = document.cookie.split(';');
+    const sessionID = cookies.find((cookie) => cookie.trim().startsWith('sessionid='));
+    if (sessionID) {
+      return sessionID.split('=')[1];
+    }
+    return null;
+  }
+
+  getUserTokenThroughSession() {
+    return this.http.get<{token: string}>(`${this.baseURL}/api/users/get_token/`, {responseType: 'json', observe: 'body'})
   }
 }
