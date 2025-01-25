@@ -88,18 +88,28 @@ export class AppComponent implements AfterViewInit {
   async login() {
     this.accounts.loadAuthFromStorage()
     if (!this.accounts.loggedIn) {
-      const resp = await this.web.getCSRFToken().toPromise()
-      if (resp) {
-        if (resp.status === 200) {
-          const userSession = await this.web.getAuthenticationStatus().toPromise()
-          if (userSession) {
-            if (userSession.status === 200) {
-              this.accounts.userSession = userSession
-              this.accounts.loggedIn = true
-            }
+      try {
+        const resp = await this.web.getCSRFToken().toPromise()
+        if (resp) {
+          if (resp.status === 200) {
+
           }
         }
+      } catch (e) {
+        console.log(e)
       }
+      try {
+        const userSession = await this.web.getAuthenticationStatus().toPromise()
+        if (userSession) {
+          if (userSession.status === 200) {
+            this.accounts.userSession = userSession
+            this.accounts.loggedIn = true
+          }
+        }
+      } catch (e) {
+        console.log(e)
+      }
+
     }
     return this.accounts.loggedIn
   }
