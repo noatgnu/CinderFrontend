@@ -2,10 +2,11 @@
 <div mat-dialog-content>
   @if (config.data && config.data !== '') {
     <div style="display: flex; justify-content: center; align-items: center">
-      <ngx-qrcode-styling [config]="config"></ngx-qrcode-styling>
+      <div id="canvas"></div>
     </div>
   }
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="close()">Close</button>
+  <button type="button" class="btn btn-primary" (click)="download()">Download</button>
 </div>

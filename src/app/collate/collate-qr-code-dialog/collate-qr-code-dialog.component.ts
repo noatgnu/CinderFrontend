@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
-import {NgxQrcodeStylingModule, Options} from "ngx-qrcode-styling";
+import {AfterViewInit, Component, Input} from '@angular/core';
+import QRCodeStyling from "qr-code-styling";
+import {Options} from "qr-code-styling";
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {MatButton} from "@angular/material/button";
 
@@ -8,14 +9,13 @@ import {MatButton} from "@angular/material/button";
     imports: [
         MatDialogTitle,
         MatDialogContent,
-        NgxQrcodeStylingModule,
         MatDialogActions,
         MatButton
     ],
     templateUrl: './collate-qr-code-dialog.component.html',
     styleUrl: './collate-qr-code-dialog.component.scss'
 })
-export class CollateQrCodeDialogComponent {
+export class CollateQrCodeDialogComponent implements AfterViewInit {
   private _url: string = ""
   @Input() set url(value: string) {
     this.config.data = value
@@ -40,11 +40,32 @@ export class CollateQrCodeDialogComponent {
     }
     //image: "assets/favicon.png",
   }
+  qrCode?: QRCodeStyling
 
   constructor(private dialogRef: MatDialogRef<CollateQrCodeDialogComponent>) {
   }
 
+  ngAfterViewInit() {
+    const qrCode = new QRCodeStyling(this.config);
+    const canvas = document.getElementById("canvas")
+    if (canvas) {
+      qrCode.append(canvas)
+    }
+    this.qrCode = qrCode
+  }
+
   close() {
     this.dialogRef.close()
+  }
+
+  download() {
+    if (this.qrCode) {
+      this.qrCode.download({
+        name: "qrcode",
+        extension: "svg"
+      }).then(() => {
+
+      })
+    }
   }
 }
