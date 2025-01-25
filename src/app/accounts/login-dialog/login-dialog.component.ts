@@ -61,7 +61,10 @@ export class LoginDialogComponent {
         }
       )
     }
+  }
 
+  connectKeycloak() {
+    this.web.getLoginProviderRedirect()
   }
 
 }
