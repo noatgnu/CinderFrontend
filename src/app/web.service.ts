@@ -1112,7 +1112,7 @@ export class WebService {
   }
 
   getCSRFToken() {
-    return this.http.get(`${this.baseURL}/api/users/set-csrf/`, { observe: 'response'})
+    return this.http.get(`${this.baseURL}/api/set-csrf/`, { observe: 'response'})
   }
 
   getAuthenticationStatus(){

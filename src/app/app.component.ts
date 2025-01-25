@@ -92,23 +92,23 @@ export class AppComponent implements AfterViewInit {
         const resp = await this.web.getCSRFToken().toPromise()
         if (resp) {
           if (resp.status === 200) {
+            try {
+              const userSession = await this.web.getAuthenticationStatus().toPromise()
+              if (userSession) {
+                if (userSession.status === 200) {
+                  this.accounts.userSession = userSession
+                  this.accounts.loggedIn = true
+                }
+              }
+            } catch (e) {
+              console.log(e)
+            }
+          }
+        }
+      } catch (e) {
+        console.log(e)
+      }
 
-          }
-        }
-      } catch (e) {
-        console.log(e)
-      }
-      try {
-        const userSession = await this.web.getAuthenticationStatus().toPromise()
-        if (userSession) {
-          if (userSession.status === 200) {
-            this.accounts.userSession = userSession
-            this.accounts.loggedIn = true
-          }
-        }
-      } catch (e) {
-        console.log(e)
-      }
 
     }
     return this.accounts.loggedIn
