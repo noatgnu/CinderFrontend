@@ -20,27 +20,26 @@ import {Title} from "@angular/platform-browser";
 import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
 
 @Component({
-  selector: 'app-project-view',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    MatButton,
-    MatIcon,
-    MatList,
-    MatListItem,
-    MatPaginator,
-    MatListItemTitle,
-    MatSelect,
-    MatSelectionList,
-    MatListOption,
-    MatIconButton,
-    MatSuffix
-  ],
-  templateUrl: './project-view.component.html',
-  styleUrl: './project-view.component.scss'
+    selector: 'app-project-view',
+    imports: [
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        MatButton,
+        MatIcon,
+        MatList,
+        MatListItem,
+        MatPaginator,
+        MatListItemTitle,
+        MatSelect,
+        MatSelectionList,
+        MatListOption,
+        MatIconButton,
+        MatSuffix
+    ],
+    templateUrl: './project-view.component.html',
+    styleUrl: './project-view.component.scss'
 })
 export class ProjectViewComponent {
   private _project?: Project|undefined

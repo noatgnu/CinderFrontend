@@ -19,28 +19,27 @@ import {
 import {ProjectSearchComponent} from "../banner/project-search/project-search.component";
 
 @Component({
-  selector: 'app-search-modal',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    MatLabel,
-    MatInput,
-    MatFormField,
-    ReactiveFormsModule,
-    MatDialogActions,
-    MatButton,
-    MatSelect,
-    MatOption,
-    MatAccordion,
-    MatExpansionPanel,
-    MatExpansionPanelDescription,
-    MatExpansionPanelHeader,
-    MatExpansionPanelTitle,
-    ProjectSearchComponent
-  ],
-  templateUrl: './search-modal.component.html',
-  styleUrl: './search-modal.component.scss'
+    selector: 'app-search-modal',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        MatLabel,
+        MatInput,
+        MatFormField,
+        ReactiveFormsModule,
+        MatDialogActions,
+        MatButton,
+        MatSelect,
+        MatOption,
+        MatAccordion,
+        MatExpansionPanel,
+        MatExpansionPanelDescription,
+        MatExpansionPanelHeader,
+        MatExpansionPanelTitle,
+        ProjectSearchComponent
+    ],
+    templateUrl: './search-modal.component.html',
+    styleUrl: './search-modal.component.scss'
 })
 export class SearchModalComponent {
   @Input() analysisGroupIDs: number[] = []

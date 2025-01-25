@@ -28,37 +28,36 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
-  selector: 'app-project-card-viewer',
-  standalone: true,
-  imports: [
-    MatCardSubtitle,
-    MatCardTitle,
-    MatCardHeader,
-    MatCard,
-    MatCardContent,
-    CdkDragHandle,
-    BarChartComponent,
-    MatCardActions,
-    MatButton,
-    MatIcon,
-    MatIconButton,
-    CdkDrag,
-    CdkDropList,
-    MatCell,
-    MatCellDef,
-    MatColumnDef,
-    MatHeaderCell,
-    MatHeaderRow,
-    MatHeaderRowDef,
-    MatRow,
-    MatRowDef,
-    MatTable,
-    MatHeaderCellDef,
-    MatSlideToggle,
-    MatTooltip
-  ],
-  templateUrl: './project-card-viewer.component.html',
-  styleUrl: './project-card-viewer.component.scss'
+    selector: 'app-project-card-viewer',
+    imports: [
+        MatCardSubtitle,
+        MatCardTitle,
+        MatCardHeader,
+        MatCard,
+        MatCardContent,
+        CdkDragHandle,
+        BarChartComponent,
+        MatCardActions,
+        MatButton,
+        MatIcon,
+        MatIconButton,
+        CdkDrag,
+        CdkDropList,
+        MatCell,
+        MatCellDef,
+        MatColumnDef,
+        MatHeaderCell,
+        MatHeaderRow,
+        MatHeaderRowDef,
+        MatRow,
+        MatRowDef,
+        MatTable,
+        MatHeaderCellDef,
+        MatSlideToggle,
+        MatTooltip
+    ],
+    templateUrl: './project-card-viewer.component.html',
+    styleUrl: './project-card-viewer.component.scss'
 })
 export class ProjectCardViewerComponent {
   private _project: Project | null = null;

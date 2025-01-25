@@ -36,25 +36,24 @@ import {forkJoin} from "rxjs";
 import {MatDivider} from "@angular/material/divider";
 
 @Component({
-  selector: 'app-analysis-group-view',
-  standalone: true,
-  imports: [
-    FormsModule,
-    MatButton,
-    MatFormField,
-    MatIcon,
-    MatInput,
-    MatLabel,
-    ReactiveFormsModule,
-    UploadFileComponent,
-    MatIconButton,
-    VolcanoPlotComponent,
-    MatProgressBar,
-    AnalysisGroupGeneralMetadataComponent,
-    MatDivider
-  ],
-  templateUrl: './analysis-group-view.component.html',
-  styleUrl: './analysis-group-view.component.scss'
+    selector: 'app-analysis-group-view',
+    imports: [
+        FormsModule,
+        MatButton,
+        MatFormField,
+        MatIcon,
+        MatInput,
+        MatLabel,
+        ReactiveFormsModule,
+        UploadFileComponent,
+        MatIconButton,
+        VolcanoPlotComponent,
+        MatProgressBar,
+        AnalysisGroupGeneralMetadataComponent,
+        MatDivider
+    ],
+    templateUrl: './analysis-group-view.component.html',
+    styleUrl: './analysis-group-view.component.scss'
 })
 export class AnalysisGroupViewComponent {
   @ViewChild('generalMetadata') generalMetadata?: AnalysisGroupGeneralMetadataComponent

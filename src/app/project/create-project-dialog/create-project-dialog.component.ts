@@ -7,20 +7,19 @@ import {MatButton} from "@angular/material/button";
 import {WebService} from "../../web.service";
 
 @Component({
-  selector: 'app-create-project-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    MatDialogActions,
-    MatButton
-  ],
-  templateUrl: './create-project-dialog.component.html',
-  styleUrl: './create-project-dialog.component.scss'
+    selector: 'app-create-project-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        MatDialogActions,
+        MatButton
+    ],
+    templateUrl: './create-project-dialog.component.html',
+    styleUrl: './create-project-dialog.component.scss'
 })
 export class CreateProjectDialogComponent {
   @Input() enableProjectSelection: boolean = false

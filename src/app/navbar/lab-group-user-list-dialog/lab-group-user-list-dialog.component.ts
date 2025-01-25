@@ -19,34 +19,33 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 
 @Component({
-  selector: 'app-lab-group-user-list-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    MatLabel,
-    MatInput,
-    MatFormField,
-    MatCell,
-    MatCellDef,
-    MatColumnDef,
-    MatHeaderCell,
-    MatHeaderRow,
-    MatHeaderRowDef,
-    MatRow,
-    MatRowDef,
-    MatTable,
-    MatPaginator,
-    MatDialogActions,
-    MatButton,
-    MatHeaderCellDef,
-    MatIcon,
-    MatIconButton,
-    MatSuffix
-  ],
-  templateUrl: './lab-group-user-list-dialog.component.html',
-  styleUrl: './lab-group-user-list-dialog.component.scss'
+    selector: 'app-lab-group-user-list-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        MatLabel,
+        MatInput,
+        MatFormField,
+        MatCell,
+        MatCellDef,
+        MatColumnDef,
+        MatHeaderCell,
+        MatHeaderRow,
+        MatHeaderRowDef,
+        MatRow,
+        MatRowDef,
+        MatTable,
+        MatPaginator,
+        MatDialogActions,
+        MatButton,
+        MatHeaderCellDef,
+        MatIcon,
+        MatIconButton,
+        MatSuffix
+    ],
+    templateUrl: './lab-group-user-list-dialog.component.html',
+    styleUrl: './lab-group-user-list-dialog.component.scss'
 })
 export class LabGroupUserListDialogComponent {
   private _labGroupID: number = 0

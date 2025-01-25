@@ -11,22 +11,21 @@ import {AnalysisGroup} from "../analysis-group";
 import {MatInput} from "@angular/material/input";
 
 @Component({
-  selector: 'app-file-extra-data-modal',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    MatLabel,
-    MatOption,
-    MatSelect,
-    MatFormField,
-    MatDialogActions,
-    MatButton,
-    MatInput
-  ],
-  templateUrl: './file-extra-data-modal.component.html',
-  styleUrl: './file-extra-data-modal.component.scss'
+    selector: 'app-file-extra-data-modal',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        MatLabel,
+        MatOption,
+        MatSelect,
+        MatFormField,
+        MatDialogActions,
+        MatButton,
+        MatInput
+    ],
+    templateUrl: './file-extra-data-modal.component.html',
+    styleUrl: './file-extra-data-modal.component.scss'
 })
 export class FileExtraDataModalComponent {
   private _file: ProjectFile|undefined = undefined

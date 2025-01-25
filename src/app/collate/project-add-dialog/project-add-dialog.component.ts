@@ -7,17 +7,16 @@ import {ProjectSearchComponent} from "../project-search/project-search.component
 import {MatButton} from "@angular/material/button";
 
 @Component({
-  selector: 'app-project-add-dialog',
-  standalone: true,
-  imports: [
-    ProjectSearchComponent,
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-    MatButton
-  ],
-  templateUrl: './project-add-dialog.component.html',
-  styleUrl: './project-add-dialog.component.scss'
+    selector: 'app-project-add-dialog',
+    imports: [
+        ProjectSearchComponent,
+        MatDialogTitle,
+        MatDialogContent,
+        MatDialogActions,
+        MatButton
+    ],
+    templateUrl: './project-add-dialog.component.html',
+    styleUrl: './project-add-dialog.component.scss'
 })
 export class ProjectAddDialogComponent {
 

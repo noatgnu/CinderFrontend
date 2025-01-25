@@ -14,24 +14,23 @@ import {MatLabel} from "@angular/material/form-field";
 import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
-  selector: 'app-collate-search',
-  standalone: true,
-  imports: [
-    MatInput,
-    MatButton,
-    ReactiveFormsModule,
-    MatFormField,
-    MatIconButton,
-    MatIcon,
-    MatCardContent,
-    MatCard,
-    MatOption,
-    MatSelect,
-    MatLabel,
-    MatProgressBar
-  ],
-  templateUrl: './collate-search.component.html',
-  styleUrl: './collate-search.component.scss'
+    selector: 'app-collate-search',
+    imports: [
+        MatInput,
+        MatButton,
+        ReactiveFormsModule,
+        MatFormField,
+        MatIconButton,
+        MatIcon,
+        MatCardContent,
+        MatCard,
+        MatOption,
+        MatSelect,
+        MatLabel,
+        MatProgressBar
+    ],
+    templateUrl: './collate-search.component.html',
+    styleUrl: './collate-search.component.scss'
 })
 export class CollateSearchComponent {
   @Input() projects: Project[] = [];

@@ -29,28 +29,27 @@ import {
 } from "../collate-project-analysis-group-visibility-dialog/collate-project-analysis-group-visibility-dialog.component";
 
 @Component({
-  selector: 'app-collate-view',
-  standalone: true,
-  imports: [
-    CollateHeaderComponent,
-    CollateSearchComponent,
-    MatTab,
-    MatTabGroup,
-    CollateProjectListComponent,
-    MatIcon,
-    MatIconButton,
-    MatToolbarRow,
-    MatToolbar,
-    CollateTagsComponent,
-    NgOptimizedImage,
-    MatMenu,
-    MatMenuItem,
-    MatMenuTrigger,
-    MatTabLabel,
-    MatTooltip
-  ],
-  templateUrl: './collate-view.component.html',
-  styleUrl: './collate-view.component.scss'
+    selector: 'app-collate-view',
+    imports: [
+        CollateHeaderComponent,
+        CollateSearchComponent,
+        MatTab,
+        MatTabGroup,
+        CollateProjectListComponent,
+        MatIcon,
+        MatIconButton,
+        MatToolbarRow,
+        MatToolbar,
+        CollateTagsComponent,
+        NgOptimizedImage,
+        MatMenu,
+        MatMenuItem,
+        MatMenuTrigger,
+        MatTabLabel,
+        MatTooltip
+    ],
+    templateUrl: './collate-view.component.html',
+    styleUrl: './collate-view.component.scss'
 })
 export class CollateViewComponent {
   _sessionId: number | null = null;

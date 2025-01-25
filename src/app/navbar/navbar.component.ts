@@ -18,21 +18,20 @@ import {LabGroupUserListDialogComponent} from "./lab-group-user-list-dialog/lab-
 import {User} from "../user/user";
 
 @Component({
-  selector: 'app-navbar',
-  standalone: true,
-  imports: [
-    MatToolbarModule,
-    MatIconButton,
-    MatIcon,
-    MatMenu,
-    MatMenuItem,
-    MatMenuTrigger,
-    NgOptimizedImage,
-    MatSlideToggle,
-    MatButton
-  ],
-  templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss'
+    selector: 'app-navbar',
+    imports: [
+        MatToolbarModule,
+        MatIconButton,
+        MatIcon,
+        MatMenu,
+        MatMenuItem,
+        MatMenuTrigger,
+        NgOptimizedImage,
+        MatSlideToggle,
+        MatButton
+    ],
+    templateUrl: './navbar.component.html',
+    styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent implements OnInit {
   labGroups: LabGroup[] = [];

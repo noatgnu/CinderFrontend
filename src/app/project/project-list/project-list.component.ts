@@ -11,18 +11,17 @@ import {
 import {MatDivider} from "@angular/material/divider";
 
 @Component({
-  selector: 'app-project-list',
-  standalone: true,
-  imports: [
-    MatList,
-    MatListItem,
-    MatDivider,
-    MatSelectionList,
-    MatListOption,
-    MatListItemTitle
-  ],
-  templateUrl: './project-list.component.html',
-  styleUrl: './project-list.component.scss'
+    selector: 'app-project-list',
+    imports: [
+        MatList,
+        MatListItem,
+        MatDivider,
+        MatSelectionList,
+        MatListOption,
+        MatListItemTitle
+    ],
+    templateUrl: './project-list.component.html',
+    styleUrl: './project-list.component.scss'
 })
 export class ProjectListComponent implements AfterViewInit {
   @Input() projectQuery?: ProjectQuery

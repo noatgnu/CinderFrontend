@@ -3,16 +3,15 @@ import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "
 import {MatButton} from "@angular/material/button";
 
 @Component({
-  selector: 'app-analysis-group-sdrf-validation-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-    MatButton
-  ],
-  templateUrl: './analysis-group-sdrf-validation-dialog.component.html',
-  styleUrl: './analysis-group-sdrf-validation-dialog.component.scss'
+    selector: 'app-analysis-group-sdrf-validation-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        MatDialogActions,
+        MatButton
+    ],
+    templateUrl: './analysis-group-sdrf-validation-dialog.component.html',
+    styleUrl: './analysis-group-sdrf-validation-dialog.component.scss'
 })
 export class AnalysisGroupSdrfValidationDialogComponent {
   @Input() errors: string[] = []

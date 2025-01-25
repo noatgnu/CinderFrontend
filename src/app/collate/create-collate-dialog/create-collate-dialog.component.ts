@@ -6,20 +6,19 @@ import {MatButton} from "@angular/material/button";
 import {MatLabel} from "@angular/material/form-field";
 
 @Component({
-  selector: 'app-create-collate-dialog',
-  standalone: true,
-  imports: [
-    MatInput,
-    MatFormField,
-    ReactiveFormsModule,
-    MatDialogActions,
-    MatButton,
-    MatDialogContent,
-    MatDialogTitle,
-    MatLabel
-  ],
-  templateUrl: './create-collate-dialog.component.html',
-  styleUrl: './create-collate-dialog.component.scss'
+    selector: 'app-create-collate-dialog',
+    imports: [
+        MatInput,
+        MatFormField,
+        ReactiveFormsModule,
+        MatDialogActions,
+        MatButton,
+        MatDialogContent,
+        MatDialogTitle,
+        MatLabel
+    ],
+    templateUrl: './create-collate-dialog.component.html',
+    styleUrl: './create-collate-dialog.component.scss'
 })
 export class CreateCollateDialogComponent {
   form: FormGroup;

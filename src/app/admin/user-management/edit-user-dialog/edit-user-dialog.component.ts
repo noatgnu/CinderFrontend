@@ -16,20 +16,19 @@ import {MatButton} from "@angular/material/button";
 import {DeleteUserConfirmationComponent} from "../../../delete-user-confirmation/delete-user-confirmation.component";
 
 @Component({
-  selector: 'app-edit-user-dialog',
-  standalone: true,
-  imports: [
-    MatLabel,
-    MatInput,
-    ReactiveFormsModule,
-    MatFormField,
-    MatDialogContent,
-    MatDialogTitle,
-    MatButton,
-    MatDialogActions
-  ],
-  templateUrl: './edit-user-dialog.component.html',
-  styleUrl: './edit-user-dialog.component.scss'
+    selector: 'app-edit-user-dialog',
+    imports: [
+        MatLabel,
+        MatInput,
+        ReactiveFormsModule,
+        MatFormField,
+        MatDialogContent,
+        MatDialogTitle,
+        MatButton,
+        MatDialogActions
+    ],
+    templateUrl: './edit-user-dialog.component.html',
+    styleUrl: './edit-user-dialog.component.scss'
 })
 export class EditUserDialogComponent {
   form: FormGroup;

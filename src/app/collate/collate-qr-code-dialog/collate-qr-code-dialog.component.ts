@@ -4,17 +4,16 @@ import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "
 import {MatButton} from "@angular/material/button";
 
 @Component({
-  selector: 'app-collate-qr-code-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    NgxQrcodeStylingModule,
-    MatDialogActions,
-    MatButton
-  ],
-  templateUrl: './collate-qr-code-dialog.component.html',
-  styleUrl: './collate-qr-code-dialog.component.scss'
+    selector: 'app-collate-qr-code-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        NgxQrcodeStylingModule,
+        MatDialogActions,
+        MatButton
+    ],
+    templateUrl: './collate-qr-code-dialog.component.html',
+    styleUrl: './collate-qr-code-dialog.component.scss'
 })
 export class CollateQrCodeDialogComponent {
   private _url: string = ""

@@ -16,30 +16,29 @@ import {ComparisonMatrix} from "../../comparison-matrix";
 import {NgTemplateOutlet} from "@angular/common";
 
 @Component({
-  selector: 'app-analysis-group-comparison-matrix-modal',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    MatIconButton,
-    MatIcon,
-    ReactiveFormsModule,
-    MatList,
-    MatListItem,
-    MatFormField,
-    MatSelect,
-    MatOption,
-    MatLabel,
-    MatInput,
-    MatTabGroup,
-    MatTab,
-    MatDialogActions,
-    MatButton,
-    MatAutocomplete,
-    NgTemplateOutlet
-  ],
-  templateUrl: './analysis-group-comparison-matrix-modal.component.html',
-  styleUrl: './analysis-group-comparison-matrix-modal.component.scss'
+    selector: 'app-analysis-group-comparison-matrix-modal',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        MatIconButton,
+        MatIcon,
+        ReactiveFormsModule,
+        MatList,
+        MatListItem,
+        MatFormField,
+        MatSelect,
+        MatOption,
+        MatLabel,
+        MatInput,
+        MatTabGroup,
+        MatTab,
+        MatDialogActions,
+        MatButton,
+        MatAutocomplete,
+        NgTemplateOutlet
+    ],
+    templateUrl: './analysis-group-comparison-matrix-modal.component.html',
+    styleUrl: './analysis-group-comparison-matrix-modal.component.scss'
 })
 export class AnalysisGroupComparisonMatrixModalComponent {
   private _comparisonMatrix: ComparisonMatrix|undefined

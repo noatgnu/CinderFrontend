@@ -5,16 +5,15 @@ import {MatListItemLine, MatListOption, MatSelectionList} from "@angular/materia
 import {DataService} from "../../data.service";
 
 @Component({
-  selector: 'app-analysis-group-list',
-  standalone: true,
-  imports: [
-    MatDivider,
-    MatListOption,
-    MatSelectionList,
-    MatListItemLine
-  ],
-  templateUrl: './analysis-group-list.component.html',
-  styleUrl: './analysis-group-list.component.scss'
+    selector: 'app-analysis-group-list',
+    imports: [
+        MatDivider,
+        MatListOption,
+        MatSelectionList,
+        MatListItemLine
+    ],
+    templateUrl: './analysis-group-list.component.html',
+    styleUrl: './analysis-group-list.component.scss'
 })
 export class AnalysisGroupListComponent {
   @Input() analysisGroupQuery?: AnalysisGroupQuery

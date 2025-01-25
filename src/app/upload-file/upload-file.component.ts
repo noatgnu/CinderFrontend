@@ -10,16 +10,15 @@ import {MatProgressBar} from "@angular/material/progress-bar";
 import {ReactiveFormsModule} from "@angular/forms";
 
 @Component({
-  selector: 'app-upload-file',
-  standalone: true,
-  imports: [
-    MatIconButton,
-    MatIcon,
-    MatProgressBar,
-    ReactiveFormsModule
-  ],
-  templateUrl: './upload-file.component.html',
-  styleUrl: './upload-file.component.scss'
+    selector: 'app-upload-file',
+    imports: [
+        MatIconButton,
+        MatIcon,
+        MatProgressBar,
+        ReactiveFormsModule
+    ],
+    templateUrl: './upload-file.component.html',
+    styleUrl: './upload-file.component.scss'
 })
 export class UploadFileComponent {
   fileProgressMap: {[key: string]: {progress: number, total: number}} = {};

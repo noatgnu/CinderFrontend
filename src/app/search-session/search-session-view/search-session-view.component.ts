@@ -17,23 +17,22 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {environment} from "../../../environments/environment";
 
 @Component({
-  selector: 'app-search-session-view',
-  standalone: true,
-  imports: [
-    SearchResultListComponent,
-    MatPaginator,
-    ReactiveFormsModule,
-    MatFormField,
-    MatSelect,
-    MatOption,
-    MatLabel,
-    SelectedResultViewComponent,
-    MatInput,
-    MatIconButton,
-    MatIcon
-  ],
-  templateUrl: './search-session-view.component.html',
-  styleUrl: './search-session-view.component.scss'
+    selector: 'app-search-session-view',
+    imports: [
+        SearchResultListComponent,
+        MatPaginator,
+        ReactiveFormsModule,
+        MatFormField,
+        MatSelect,
+        MatOption,
+        MatLabel,
+        SelectedResultViewComponent,
+        MatInput,
+        MatIconButton,
+        MatIcon
+    ],
+    templateUrl: './search-session-view.component.html',
+    styleUrl: './search-session-view.component.scss'
 })
 export class SearchSessionViewComponent {
   baseUrl = environment.baseURL

@@ -21,31 +21,30 @@ import {
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
 
 @Component({
-  selector: 'app-search-result-list',
-  standalone: true,
-  imports: [
-    DatePipe,
-    MatDivider,
-    MatListOption,
-    MatSelectionList,
-    MatListItemTitle,
-    MatListItemLine,
-    MatTable,
-    MatColumnDef,
-    MatHeaderCell,
-    MatCellDef,
-    MatCell,
-    MatHeaderCellDef,
-    MatHeaderRow,
-    MatRow,
-    MatRowDef,
-    MatHeaderRowDef,
-    MatSort,
-    MatSortHeader,
-    NgClass
-  ],
-  templateUrl: './search-result-list.component.html',
-  styleUrl: './search-result-list.component.scss'
+    selector: 'app-search-result-list',
+    imports: [
+        DatePipe,
+        MatDivider,
+        MatListOption,
+        MatSelectionList,
+        MatListItemTitle,
+        MatListItemLine,
+        MatTable,
+        MatColumnDef,
+        MatHeaderCell,
+        MatCellDef,
+        MatCell,
+        MatHeaderCellDef,
+        MatHeaderRow,
+        MatRow,
+        MatRowDef,
+        MatHeaderRowDef,
+        MatSort,
+        MatSortHeader,
+        NgClass
+    ],
+    templateUrl: './search-result-list.component.html',
+    styleUrl: './search-result-list.component.scss'
 })
 export class SearchResultListComponent {
   displayedColumns: string[] = ['primary_id', 'gene_name', 'uniprot_id', 'search_term', 'condition_A', 'condition_B', 'log2_fc', 'log10_p', 'file','comparison_label', 'analysis_group']

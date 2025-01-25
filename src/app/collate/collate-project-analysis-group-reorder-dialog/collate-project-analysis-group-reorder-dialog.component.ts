@@ -15,26 +15,25 @@ import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from 
 import {MatButton} from "@angular/material/button";
 
 @Component({
-  selector: 'app-collate-project-analysis-group-reorder-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    MatList,
-    MatListSubheaderCssMatStyler,
-    MatListItem,
-    MatDivider,
-    MatIcon,
-    MatListItemLine,
-    CdkDragHandle,
-    CdkDropList,
-    CdkDrag,
-    MatDialogActions,
-    MatButton,
-    MatDialogClose
-  ],
-  templateUrl: './collate-project-analysis-group-reorder-dialog.component.html',
-  styleUrl: './collate-project-analysis-group-reorder-dialog.component.scss'
+    selector: 'app-collate-project-analysis-group-reorder-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        MatList,
+        MatListSubheaderCssMatStyler,
+        MatListItem,
+        MatDivider,
+        MatIcon,
+        MatListItemLine,
+        CdkDragHandle,
+        CdkDropList,
+        CdkDrag,
+        MatDialogActions,
+        MatButton,
+        MatDialogClose
+    ],
+    templateUrl: './collate-project-analysis-group-reorder-dialog.component.html',
+    styleUrl: './collate-project-analysis-group-reorder-dialog.component.scss'
 })
 export class CollateProjectAnalysisGroupReorderDialogComponent {
   private _projectAnalysisGroupMap: {[projectID: number]: AnalysisGroup[]} = {}

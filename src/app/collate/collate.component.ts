@@ -26,35 +26,34 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
-  selector: 'app-collate',
-  standalone: true,
-  imports: [
-    MatFormField,
-    FormsModule,
-    MatInput,
-    MatSelectionList,
-    MatListOption,
-    MatLabel,
-    MatCardContent,
-    MatCard,
-    MatCardHeader,
-    MatCardTitle,
-    MatButton,
-    MatPaginator,
-    MatIcon,
-    MatChipRemove,
-    MatChip,
-    MatChipInput,
-    MatChipGrid,
-    MatChipRow,
-    MatOption,
-    MatAutocomplete,
-    AsyncPipe,
-    ReactiveFormsModule,
-    MatAutocompleteTrigger
-  ],
-  templateUrl: './collate.component.html',
-  styleUrl: './collate.component.scss'
+    selector: 'app-collate',
+    imports: [
+        MatFormField,
+        FormsModule,
+        MatInput,
+        MatSelectionList,
+        MatListOption,
+        MatLabel,
+        MatCardContent,
+        MatCard,
+        MatCardHeader,
+        MatCardTitle,
+        MatButton,
+        MatPaginator,
+        MatIcon,
+        MatChipRemove,
+        MatChip,
+        MatChipInput,
+        MatChipGrid,
+        MatChipRow,
+        MatOption,
+        MatAutocomplete,
+        AsyncPipe,
+        ReactiveFormsModule,
+        MatAutocompleteTrigger
+    ],
+    templateUrl: './collate.component.html',
+    styleUrl: './collate.component.scss'
 })
 export class CollateComponent implements OnInit{
   collates: Collate[] = [];

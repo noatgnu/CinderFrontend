@@ -9,21 +9,20 @@ import {MatChip, MatChipSet} from "@angular/material/chips";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
 
 @Component({
-  selector: 'app-project-search',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    MatChipSet,
-    MatChip,
-    MatSelectionList,
-    MatListOption,
-    MatPaginator
-  ],
-  templateUrl: './project-search.component.html',
-  styleUrl: './project-search.component.scss'
+    selector: 'app-project-search',
+    imports: [
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        MatChipSet,
+        MatChip,
+        MatSelectionList,
+        MatListOption,
+        MatPaginator
+    ],
+    templateUrl: './project-search.component.html',
+    styleUrl: './project-search.component.scss'
 })
 export class ProjectSearchComponent {
   @Input() multipleSelection: boolean = false;

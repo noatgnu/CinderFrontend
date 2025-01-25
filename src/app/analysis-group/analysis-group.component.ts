@@ -20,24 +20,23 @@ import {SearchSession} from "../search-session";
 import {Router} from "@angular/router";
 
 @Component({
-  selector: 'app-analysis-group',
-  standalone: true,
-  imports: [
-    MatFormField,
-    MatIcon,
-    MatIconButton,
-    MatInput,
-    MatLabel,
-    MatPaginator,
-    MatToolbar,
-    MatToolbarRow,
-    ProjectListComponent,
-    ReactiveFormsModule,
-    AnalysisGroupListComponent,
-    AnalysisGroupViewComponent
-  ],
-  templateUrl: './analysis-group.component.html',
-  styleUrl: './analysis-group.component.scss'
+    selector: 'app-analysis-group',
+    imports: [
+        MatFormField,
+        MatIcon,
+        MatIconButton,
+        MatInput,
+        MatLabel,
+        MatPaginator,
+        MatToolbar,
+        MatToolbarRow,
+        ProjectListComponent,
+        ReactiveFormsModule,
+        AnalysisGroupListComponent,
+        AnalysisGroupViewComponent
+    ],
+    templateUrl: './analysis-group.component.html',
+    styleUrl: './analysis-group.component.scss'
 })
 export class AnalysisGroupComponent {
   sidebarOpen = true

@@ -8,22 +8,21 @@ import {MatButton} from "@angular/material/button";
 import {MatDivider} from "@angular/material/divider";
 
 @Component({
-  selector: 'app-collate-plot-settings',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    MatCheckbox,
-    MatDialogActions,
-    MatButton,
-    MatDivider
-  ],
-  templateUrl: './collate-plot-settings.component.html',
-  styleUrl: './collate-plot-settings.component.scss'
+    selector: 'app-collate-plot-settings',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        MatCheckbox,
+        MatDialogActions,
+        MatButton,
+        MatDivider
+    ],
+    templateUrl: './collate-plot-settings.component.html',
+    styleUrl: './collate-plot-settings.component.scss'
 })
 export class CollatePlotSettingsComponent {
   private _settings: any = {}

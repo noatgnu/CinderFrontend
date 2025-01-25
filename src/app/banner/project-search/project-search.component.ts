@@ -12,25 +12,24 @@ import {MatIconButton} from "@angular/material/button";
 import {Species} from "../../species";
 
 @Component({
-  selector: 'app-project-search',
-  standalone: true,
-  imports: [
-    MatSelectionList,
-    MatListOption,
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    MatPaginator,
-    MatChipGrid,
-    MatChipRow,
-    MatIcon,
-    MatIconButton,
-    MatChip,
-    MatChipSet
-  ],
-  templateUrl: './project-search.component.html',
-  styleUrl: './project-search.component.scss'
+    selector: 'app-project-search',
+    imports: [
+        MatSelectionList,
+        MatListOption,
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        MatPaginator,
+        MatChipGrid,
+        MatChipRow,
+        MatIcon,
+        MatIconButton,
+        MatChip,
+        MatChipSet
+    ],
+    templateUrl: './project-search.component.html',
+    styleUrl: './project-search.component.scss'
 })
 export class ProjectSearchComponent {
   @Input() multipleSelection: boolean = false

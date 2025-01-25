@@ -5,16 +5,15 @@ import {MatListOption, MatSelectionList} from "@angular/material/list";
 import {DatePipe} from "@angular/common";
 
 @Component({
-  selector: 'app-search-session-list',
-  standalone: true,
-  imports: [
-    MatDivider,
-    MatListOption,
-    MatSelectionList,
-    DatePipe
-  ],
-  templateUrl: './search-session-list.component.html',
-  styleUrl: './search-session-list.component.scss'
+    selector: 'app-search-session-list',
+    imports: [
+        MatDivider,
+        MatListOption,
+        MatSelectionList,
+        DatePipe
+    ],
+    templateUrl: './search-session-list.component.html',
+    styleUrl: './search-session-list.component.scss'
 })
 export class SearchSessionListComponent {
   private _searchSessionQuery: SearchSessionQuery|undefined = undefined

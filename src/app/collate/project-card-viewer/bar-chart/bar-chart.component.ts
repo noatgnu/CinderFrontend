@@ -8,13 +8,12 @@ import {AccountsService} from "../../../accounts/accounts.service";
 PlotlyModule.plotlyjs = PlotlyJS;
 
 @Component({
-  selector: 'app-bar-chart',
-  standalone: true,
-  imports: [
-    PlotlyModule
-  ],
-  templateUrl: './bar-chart.component.html',
-  styleUrl: './bar-chart.component.scss'
+    selector: 'app-bar-chart',
+    imports: [
+        PlotlyModule
+    ],
+    templateUrl: './bar-chart.component.html',
+    styleUrl: './bar-chart.component.scss'
 })
 export class BarChartComponent {
   private _data: SearchResult|null = null;

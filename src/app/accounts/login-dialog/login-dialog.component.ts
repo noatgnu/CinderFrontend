@@ -8,20 +8,19 @@ import {MatButton} from "@angular/material/button";
 import {WebService} from "../../web.service";
 
 @Component({
-  selector: 'app-login-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatDialogActions,
-    MatButton,
-    MatLabel,
-  ],
-  templateUrl: './login-dialog.component.html',
-  styleUrl: './login-dialog.component.scss'
+    selector: 'app-login-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatDialogActions,
+        MatButton,
+        MatLabel,
+    ],
+    templateUrl: './login-dialog.component.html',
+    styleUrl: './login-dialog.component.scss'
 })
 export class LoginDialogComponent {
 

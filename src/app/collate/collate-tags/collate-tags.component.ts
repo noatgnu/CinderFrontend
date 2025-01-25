@@ -7,18 +7,17 @@ import {MatIcon} from "@angular/material/icon";
 import {AccountsService} from "../../accounts/accounts.service";
 
 @Component({
-  selector: 'app-collate-tags',
-  standalone: true,
-  imports: [
-    CdkDropList,
-    MatChipSet,
-    MatChipRemove,
-    MatIcon,
-    MatChip,
-    CdkDrag
-  ],
-  templateUrl: './collate-tags.component.html',
-  styleUrl: './collate-tags.component.scss'
+    selector: 'app-collate-tags',
+    imports: [
+        CdkDropList,
+        MatChipSet,
+        MatChipRemove,
+        MatIcon,
+        MatChip,
+        CdkDrag
+    ],
+    templateUrl: './collate-tags.component.html',
+    styleUrl: './collate-tags.component.scss'
 })
 export class CollateTagsComponent {
   @Input() collageTags: CollateTag[] = []

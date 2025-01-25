@@ -17,27 +17,26 @@ import {SearchSessionViewComponent} from "./search-session-view/search-session-v
 import {Router} from "@angular/router";
 
 @Component({
-  selector: 'app-search-session',
-  standalone: true,
-  imports: [
-    MatButton,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    ReactiveFormsModule,
-    UploadFileComponent,
-    AnalysisGroupListComponent,
-    AnalysisGroupViewComponent,
-    MatIcon,
-    MatIconButton,
-    MatPaginator,
-    MatToolbar,
-    MatToolbarRow,
-    SearchSessionListComponent,
-    SearchSessionViewComponent
-  ],
-  templateUrl: './search-session.component.html',
-  styleUrl: './search-session.component.scss'
+    selector: 'app-search-session',
+    imports: [
+        MatButton,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        ReactiveFormsModule,
+        UploadFileComponent,
+        AnalysisGroupListComponent,
+        AnalysisGroupViewComponent,
+        MatIcon,
+        MatIconButton,
+        MatPaginator,
+        MatToolbar,
+        MatToolbarRow,
+        SearchSessionListComponent,
+        SearchSessionViewComponent
+    ],
+    templateUrl: './search-session.component.html',
+    styleUrl: './search-session.component.scss'
 })
 export class SearchSessionComponent {
   sidebarOpen = true

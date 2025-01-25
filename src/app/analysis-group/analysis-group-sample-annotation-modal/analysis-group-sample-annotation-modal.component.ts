@@ -23,35 +23,34 @@ import {
 import {SampleAnnotation} from "../../sample-annotation";
 
 @Component({
-  selector: 'app-analysis-group-sample-annotation-modal',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    MatFormField,
-    MatSelect,
-    MatOption,
-    MatLabel,
-    MatInput,
-    FormsModule,
-    MatSelectionList,
-    MatListOption,
-    MatDialogActions,
-    MatButton,
-    MatTable,
-    MatColumnDef,
-    MatHeaderCell,
-    MatCell,
-    MatHeaderRow,
-    MatRow,
-    MatRowDef,
-    MatHeaderRowDef,
-    MatCellDef,
-    MatHeaderCellDef
-  ],
-  templateUrl: './analysis-group-sample-annotation-modal.component.html',
-  styleUrl: './analysis-group-sample-annotation-modal.component.scss'
+    selector: 'app-analysis-group-sample-annotation-modal',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        MatFormField,
+        MatSelect,
+        MatOption,
+        MatLabel,
+        MatInput,
+        FormsModule,
+        MatSelectionList,
+        MatListOption,
+        MatDialogActions,
+        MatButton,
+        MatTable,
+        MatColumnDef,
+        MatHeaderCell,
+        MatCell,
+        MatHeaderRow,
+        MatRow,
+        MatRowDef,
+        MatHeaderRowDef,
+        MatCellDef,
+        MatHeaderCellDef
+    ],
+    templateUrl: './analysis-group-sample-annotation-modal.component.html',
+    styleUrl: './analysis-group-sample-annotation-modal.component.scss'
 })
 export class AnalysisGroupSampleAnnotationModalComponent {
   @ViewChild('table') table: MatTable<any>|undefined

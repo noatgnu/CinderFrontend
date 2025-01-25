@@ -5,16 +5,15 @@ import {UserManagementComponent} from "./user-management/user-management.compone
 import {CollateManagementComponent} from "./collate-management/collate-management.component";
 
 @Component({
-  selector: 'app-admin',
-  standalone: true,
-  imports: [
-    MatTabGroup,
-    MatTab,
-    UserManagementComponent,
-    CollateManagementComponent
-  ],
-  templateUrl: './admin.component.html',
-  styleUrl: './admin.component.scss'
+    selector: 'app-admin',
+    imports: [
+        MatTabGroup,
+        MatTab,
+        UserManagementComponent,
+        CollateManagementComponent
+    ],
+    templateUrl: './admin.component.html',
+    styleUrl: './admin.component.scss'
 })
 export class AdminComponent {
 

@@ -8,22 +8,21 @@ import {FormsModule} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
 
 @Component({
-  selector: 'app-collate-condition-color-editor-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    MatList,
-    MatListSubheaderCssMatStyler,
-    MatListItem,
-    MatListItemLine,
-    NgxColorsModule,
-    FormsModule,
-    MatButton,
-    MatDialogActions
-  ],
-  templateUrl: './collate-condition-color-editor-dialog.component.html',
-  styleUrl: './collate-condition-color-editor-dialog.component.scss'
+    selector: 'app-collate-condition-color-editor-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        MatList,
+        MatListSubheaderCssMatStyler,
+        MatListItem,
+        MatListItemLine,
+        NgxColorsModule,
+        FormsModule,
+        MatButton,
+        MatDialogActions
+    ],
+    templateUrl: './collate-condition-color-editor-dialog.component.html',
+    styleUrl: './collate-condition-color-editor-dialog.component.scss'
 })
 export class CollateConditionColorEditorDialogComponent {
   private _projects: Project[] = []

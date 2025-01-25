@@ -14,29 +14,28 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
-  selector: 'app-user',
-  standalone: true,
-  imports: [
-    MatDivider,
-    ReactiveFormsModule,
-    MatLabel,
-    MatInput,
-    MatFormField,
-    MatButton,
-    MatListOption,
-    MatSelectionList,
-    MatChipRemove,
-    MatChipRow,
-    MatChipGrid,
-    MatIcon,
-    MatChipSet,
-    MatChip,
-    MatPaginator,
-    MatIconButton,
-    MatSuffix
-  ],
-  templateUrl: './user.component.html',
-  styleUrl: './user.component.scss'
+    selector: 'app-user',
+    imports: [
+        MatDivider,
+        ReactiveFormsModule,
+        MatLabel,
+        MatInput,
+        MatFormField,
+        MatButton,
+        MatListOption,
+        MatSelectionList,
+        MatChipRemove,
+        MatChipRow,
+        MatChipGrid,
+        MatIcon,
+        MatChipSet,
+        MatChip,
+        MatPaginator,
+        MatIconButton,
+        MatSuffix
+    ],
+    templateUrl: './user.component.html',
+    styleUrl: './user.component.scss'
 })
 export class UserComponent {
   private _user: User|null = null

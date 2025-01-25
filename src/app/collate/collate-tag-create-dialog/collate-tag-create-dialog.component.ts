@@ -15,24 +15,23 @@ import {CollateService} from "../collate.service";
 import {AsyncPipe} from "@angular/common";
 
 @Component({
-  selector: 'app-collate-tag-create-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    MatLabel,
-    MatInput,
-    MatFormField,
-    MatButton,
-    MatDialogActions,
-    MatOption,
-    AsyncPipe,
-    MatAutocomplete,
-    MatAutocompleteTrigger
-  ],
-  templateUrl: './collate-tag-create-dialog.component.html',
-  styleUrl: './collate-tag-create-dialog.component.scss'
+    selector: 'app-collate-tag-create-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        MatLabel,
+        MatInput,
+        MatFormField,
+        MatButton,
+        MatDialogActions,
+        MatOption,
+        AsyncPipe,
+        MatAutocomplete,
+        MatAutocompleteTrigger
+    ],
+    templateUrl: './collate-tag-create-dialog.component.html',
+    styleUrl: './collate-tag-create-dialog.component.scss'
 })
 export class CollateTagCreateDialogComponent implements OnInit{
 

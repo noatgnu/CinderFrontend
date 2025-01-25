@@ -13,19 +13,18 @@ import {MatInput} from "@angular/material/input";
 import {WebService} from "../../web.service";
 
 @Component({
-  selector: 'app-collate-search-main',
-  standalone: true,
-  imports: [
-    MatListOption,
-    MatSelectionList,
-    MatPaginator,
-    MatFormField,
-    ReactiveFormsModule,
-    MatInput,
-    MatLabel
-  ],
-  templateUrl: './collate-search-main.component.html',
-  styleUrl: './collate-search-main.component.scss'
+    selector: 'app-collate-search-main',
+    imports: [
+        MatListOption,
+        MatSelectionList,
+        MatPaginator,
+        MatFormField,
+        ReactiveFormsModule,
+        MatInput,
+        MatLabel
+    ],
+    templateUrl: './collate-search-main.component.html',
+    styleUrl: './collate-search-main.component.scss'
 })
 export class CollateSearchMainComponent implements OnInit {
   collates: Collate[] = [];

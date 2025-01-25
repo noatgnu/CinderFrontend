@@ -12,28 +12,27 @@ import {MatOption, MatSelect} from "@angular/material/select";
 import {DataService} from "../../data.service";
 
 @Component({
-  selector: 'app-create-analysis-group-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatDialogActions,
-    MatButton,
-    MatSelectionList,
-    MatListOption,
-    MatList,
-    MatListItem,
-    MatLabel,
-    MatListItemTitle,
-    MatSelect,
-    MatPaginator,
-    MatOption
-  ],
-  templateUrl: './create-analysis-group-dialog.component.html',
-  styleUrl: './create-analysis-group-dialog.component.scss'
+    selector: 'app-create-analysis-group-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatDialogActions,
+        MatButton,
+        MatSelectionList,
+        MatListOption,
+        MatList,
+        MatListItem,
+        MatLabel,
+        MatListItemTitle,
+        MatSelect,
+        MatPaginator,
+        MatOption
+    ],
+    templateUrl: './create-analysis-group-dialog.component.html',
+    styleUrl: './create-analysis-group-dialog.component.scss'
 })
 export class CreateAnalysisGroupDialogComponent {
   @Input() enableProjectSelection: boolean = false

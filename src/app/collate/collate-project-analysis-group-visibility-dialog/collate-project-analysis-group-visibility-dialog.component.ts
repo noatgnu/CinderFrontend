@@ -9,21 +9,20 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import {MatButton} from "@angular/material/button";
 
 @Component({
-  selector: 'app-collate-project-analysis-group-visibility-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    MatFormField,
-    MatInput,
-    FormsModule,
-    MatLabel,
-    MatCheckbox,
-    MatDialogActions,
-    MatButton
-  ],
-  templateUrl: './collate-project-analysis-group-visibility-dialog.component.html',
-  styleUrl: './collate-project-analysis-group-visibility-dialog.component.scss'
+    selector: 'app-collate-project-analysis-group-visibility-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        MatFormField,
+        MatInput,
+        FormsModule,
+        MatLabel,
+        MatCheckbox,
+        MatDialogActions,
+        MatButton
+    ],
+    templateUrl: './collate-project-analysis-group-visibility-dialog.component.html',
+    styleUrl: './collate-project-analysis-group-visibility-dialog.component.scss'
 })
 export class CollateProjectAnalysisGroupVisibilityDialogComponent {
   private _projects: Project[] = []

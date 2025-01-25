@@ -5,15 +5,14 @@ import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray} from "@angular/cdk/d
 import {ProjectCardViewerComponent} from "../project-card-viewer/project-card-viewer.component";
 
 @Component({
-  selector: 'app-collate-project-list',
-  standalone: true,
-  imports: [
-    CdkDropList,
-    ProjectCardViewerComponent,
-    CdkDrag
-  ],
-  templateUrl: './collate-project-list.component.html',
-  styleUrl: './collate-project-list.component.scss'
+    selector: 'app-collate-project-list',
+    imports: [
+        CdkDropList,
+        ProjectCardViewerComponent,
+        CdkDrag
+    ],
+    templateUrl: './collate-project-list.component.html',
+    styleUrl: './collate-project-list.component.scss'
 })
 export class CollateProjectListComponent {
   private _searchTerm: string = "";

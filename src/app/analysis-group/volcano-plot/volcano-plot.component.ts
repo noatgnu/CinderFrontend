@@ -9,11 +9,10 @@ import {GraphService} from "../../graph.service";
 PlotlyModule.plotlyjs = PlotlyJS;
 
 @Component({
-  selector: 'app-volcano-plot',
-  standalone: true,
-  imports: [PlotlyModule],
-  templateUrl: './volcano-plot.component.html',
-  styleUrl: './volcano-plot.component.scss'
+    selector: 'app-volcano-plot',
+    imports: [PlotlyModule],
+    templateUrl: './volcano-plot.component.html',
+    styleUrl: './volcano-plot.component.scss'
 })
 export class VolcanoPlotComponent {
   @Input() plotType: string = "proteomics"

@@ -16,23 +16,22 @@ import {AccountsService} from "../accounts/accounts.service";
 import {Router} from "@angular/router";
 
 @Component({
-  selector: 'app-project',
-  standalone: true,
-  imports: [
-    MatToolbar,
-    MatToolbarRow,
-    MatIconButton,
-    MatIcon,
-    ProjectListComponent,
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    MatPaginator,
-    ProjectViewComponent
-  ],
-  templateUrl: './project.component.html',
-  styleUrl: './project.component.scss'
+    selector: 'app-project',
+    imports: [
+        MatToolbar,
+        MatToolbarRow,
+        MatIconButton,
+        MatIcon,
+        ProjectListComponent,
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        MatPaginator,
+        ProjectViewComponent
+    ],
+    templateUrl: './project.component.html',
+    styleUrl: './project.component.scss'
 })
 export class ProjectComponent {
   sidebarOpen = true

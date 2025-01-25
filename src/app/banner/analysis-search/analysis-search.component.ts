@@ -9,19 +9,18 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 
 @Component({
-  selector: 'app-analysis-search',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatSelectionList,
-    MatListOption,
-    MatPaginator,
-    MatLabel,
-    MatFormField,
-    MatInput
-  ],
-  templateUrl: './analysis-search.component.html',
-  styleUrl: './analysis-search.component.scss'
+    selector: 'app-analysis-search',
+    imports: [
+        ReactiveFormsModule,
+        MatSelectionList,
+        MatListOption,
+        MatPaginator,
+        MatLabel,
+        MatFormField,
+        MatInput
+    ],
+    templateUrl: './analysis-search.component.html',
+    styleUrl: './analysis-search.component.scss'
 })
 export class AnalysisSearchComponent {
   formAnalysisGroupSearch = this.fb.group({

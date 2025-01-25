@@ -8,20 +8,19 @@ import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 
 @Component({
-  selector: 'app-lab-group-create-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    MatLabel,
-    MatInput,
-    MatFormField,
-    MatDialogActions,
-    MatButton
-  ],
-  templateUrl: './lab-group-create-dialog.component.html',
-  styleUrl: './lab-group-create-dialog.component.scss'
+    selector: 'app-lab-group-create-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        MatLabel,
+        MatInput,
+        MatFormField,
+        MatDialogActions,
+        MatButton
+    ],
+    templateUrl: './lab-group-create-dialog.component.html',
+    styleUrl: './lab-group-create-dialog.component.scss'
 })
 export class LabGroupCreateDialogComponent {
 

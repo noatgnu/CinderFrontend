@@ -6,20 +6,19 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 
 @Component({
-  selector: 'app-analysis-group-sample-file',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-    MatButton,
-    ReactiveFormsModule,
-    MatFormField,
-    MatLabel,
-    MatInput
-  ],
-  templateUrl: './analysis-group-sample-file.component.html',
-  styleUrl: './analysis-group-sample-file.component.scss'
+    selector: 'app-analysis-group-sample-file',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        MatDialogActions,
+        MatButton,
+        ReactiveFormsModule,
+        MatFormField,
+        MatLabel,
+        MatInput
+    ],
+    templateUrl: './analysis-group-sample-file.component.html',
+    styleUrl: './analysis-group-sample-file.component.scss'
 })
 export class AnalysisGroupSampleFileComponent {
   form = this.fb.group({

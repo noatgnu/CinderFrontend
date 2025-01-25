@@ -13,21 +13,20 @@ import {VerticalBarChartComponent} from "./vertical-bar-chart/vertical-bar-chart
 import {MatButton} from "@angular/material/button";
 
 @Component({
-  selector: 'app-selected-result-view',
-  standalone: true,
-  imports: [
-    MatToolbar,
-    MatToolbarRow,
-    MatTable,
-    MatList,
-    MatListItem,
-    MatListItemTitle,
-    MatListItemLine,
-    VerticalBarChartComponent,
-    MatButton
-  ],
-  templateUrl: './selected-result-view.component.html',
-  styleUrl: './selected-result-view.component.scss'
+    selector: 'app-selected-result-view',
+    imports: [
+        MatToolbar,
+        MatToolbarRow,
+        MatTable,
+        MatList,
+        MatListItem,
+        MatListItemTitle,
+        MatListItemLine,
+        VerticalBarChartComponent,
+        MatButton
+    ],
+    templateUrl: './selected-result-view.component.html',
+    styleUrl: './selected-result-view.component.scss'
 })
 export class SelectedResultViewComponent {
 

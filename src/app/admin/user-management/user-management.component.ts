@@ -24,35 +24,34 @@ import {MatDialog} from "@angular/material/dialog";
 import {EditUserDialogComponent} from "./edit-user-dialog/edit-user-dialog.component";
 
 @Component({
-  selector: 'app-user-management',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatLabel,
-    MatInput,
-    MatFormField,
-    MatButton,
-    MatCard,
-    MatCardContent,
-    MatIcon,
-    FormsModule,
-    MatSuffix,
-    MatIconButton,
-    MatDivider,
-    MatRow,
-    MatHeaderRow,
-    MatCell,
-    MatHeaderCell,
-    MatColumnDef,
-    MatTable,
-    MatCellDef,
-    MatHeaderCellDef,
-    MatHeaderRowDef,
-    MatRowDef,
-    MatPaginator
-  ],
-  templateUrl: './user-management.component.html',
-  styleUrl: './user-management.component.scss'
+    selector: 'app-user-management',
+    imports: [
+        ReactiveFormsModule,
+        MatLabel,
+        MatInput,
+        MatFormField,
+        MatButton,
+        MatCard,
+        MatCardContent,
+        MatIcon,
+        FormsModule,
+        MatSuffix,
+        MatIconButton,
+        MatDivider,
+        MatRow,
+        MatHeaderRow,
+        MatCell,
+        MatHeaderCell,
+        MatColumnDef,
+        MatTable,
+        MatCellDef,
+        MatHeaderCellDef,
+        MatHeaderRowDef,
+        MatRowDef,
+        MatPaginator
+    ],
+    templateUrl: './user-management.component.html',
+    styleUrl: './user-management.component.scss'
 })
 export class UserManagementComponent implements OnInit{
 

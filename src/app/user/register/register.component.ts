@@ -12,25 +12,24 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatDivider} from "@angular/material/divider";
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    MatButton,
-    MatIcon,
-    MatIconButton,
-    MatSuffix,
-    MatHint,
-    MatListOption,
-    MatSelectionList,
-    MatPaginator,
-    MatDivider
-  ],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.scss'
+    selector: 'app-register',
+    imports: [
+        ReactiveFormsModule,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        MatButton,
+        MatIcon,
+        MatIconButton,
+        MatSuffix,
+        MatHint,
+        MatListOption,
+        MatSelectionList,
+        MatPaginator,
+        MatDivider
+    ],
+    templateUrl: './register.component.html',
+    styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
   private _token: string = ''

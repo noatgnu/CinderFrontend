@@ -7,11 +7,10 @@ import {AccountsService} from "../../../accounts/accounts.service";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 @Component({
-  selector: 'app-vertical-bar-chart',
-  standalone: true,
-  imports: [PlotlyModule, MatButton],
-  templateUrl: './vertical-bar-chart.component.html',
-  styleUrl: './vertical-bar-chart.component.scss'
+    selector: 'app-vertical-bar-chart',
+    imports: [PlotlyModule, MatButton],
+    templateUrl: './vertical-bar-chart.component.html',
+    styleUrl: './vertical-bar-chart.component.scss'
 })
 export class VerticalBarChartComponent {
   showOtherConditions = false

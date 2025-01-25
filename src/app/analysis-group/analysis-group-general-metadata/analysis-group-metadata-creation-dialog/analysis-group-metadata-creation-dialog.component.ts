@@ -23,26 +23,25 @@ import {MatSelect} from "@angular/material/select";
 import {DataService} from "../../../data.service";
 
 @Component({
-  selector: 'app-analysis-group-metadata-creation-dialog',
-  standalone: true,
-  imports: [
-    MatDialogTitle,
-    MatDialogContent,
-    ReactiveFormsModule,
-    AsyncPipe,
-    MatAutocomplete,
-    MatOption,
-    MatFormField,
-    MatInput,
-    MatAutocompleteTrigger,
-    MatButton,
-    MatDialogActions,
-    MatLabel,
-    MatSelect,
-    MatHint
-  ],
-  templateUrl: './analysis-group-metadata-creation-dialog.component.html',
-  styleUrl: './analysis-group-metadata-creation-dialog.component.scss'
+    selector: 'app-analysis-group-metadata-creation-dialog',
+    imports: [
+        MatDialogTitle,
+        MatDialogContent,
+        ReactiveFormsModule,
+        AsyncPipe,
+        MatAutocomplete,
+        MatOption,
+        MatFormField,
+        MatInput,
+        MatAutocompleteTrigger,
+        MatButton,
+        MatDialogActions,
+        MatLabel,
+        MatSelect,
+        MatHint
+    ],
+    templateUrl: './analysis-group-metadata-creation-dialog.component.html',
+    styleUrl: './analysis-group-metadata-creation-dialog.component.scss'
 })
 export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   metadataTypeAutocomplete: string[] = ["Characteristics", "Comment", "Factor value", "Other"]

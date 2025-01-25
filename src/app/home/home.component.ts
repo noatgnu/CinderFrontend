@@ -4,14 +4,13 @@ import {FooterComponent} from "../footer/footer.component";
 import {WebService} from "../web.service";
 
 @Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [
-    BannerComponent,
-    FooterComponent
-  ],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+    selector: 'app-home',
+    imports: [
+        BannerComponent,
+        FooterComponent
+    ],
+    templateUrl: './home.component.html',
+    styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit{
 
