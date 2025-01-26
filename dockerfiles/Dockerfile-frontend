@@ -7,7 +7,7 @@ RUN apt install -y git
 #RUN git clone https://github.com/noatgnu/turnoverAtlasNG.git
 COPY . /app/CinderFrontend
 WORKDIR /app/CinderFrontend
-#RUN sed -i 's;https://turnoveratlas.omics.quest;http://localhost;g' src/environments/environment.ts
+RUN sed -i 's;https://localhost:4200;https://cinder.proteo.info;g' src/environments/environment.ts
 RUN npm install
 RUN npm run build
 
