@@ -9,6 +9,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   req = req.clone({
     setHeaders: {"X-Cinder-Instance-Id": webService.cinderInstanceID}
   })
+  const csrf = webService.getCSRFTokenFromCookies()
+  console.log(csrf)
+  if (csrf) {
+    // check if the csrf token is in the headers
+    req = req.clone({
+      setHeaders: {"X-CSRFToken": csrf}
+    })
+  }
+  const session = webService.getSessionIDFromCookies()
+  if (session) {
+    req = req.clone({
+      setHeaders: {"X-Session-Token": session}
+    })
+  }
   if (accountService.loggedIn) {
     req = req.clone({
       withCredentials: true
