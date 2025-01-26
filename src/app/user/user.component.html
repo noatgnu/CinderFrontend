@@ -46,27 +46,31 @@
         <button mat-raised-button color="primary" (click)="updateLabGroups()">Update Lab Groups</button>
       </div>
     </form>
-    <mat-divider></mat-divider>
-    <h1>Change Password</h1>
-    <form [formGroup]="passwordForm" style="display: flex; flex-direction: column; gap: 20px; padding: 20px" (ngSubmit)="updatePassword()">
-      <mat-form-field>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="new_password" placeholder="Password">
-        <mat-label>Password</mat-label>
-        <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
-          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-        </button>
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirm_password" placeholder="Confirm Password">
-        <mat-label>Confirm Password</mat-label>
-        <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="'Hide confirm password'" [attr.aria-pressed]="hideConfirmPassword">
-          <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-        </button>
-      </mat-form-field>
-      <div>
-        <button mat-raised-button color="primary" type="submit">Submit</button>
-      </div>
-    </form>
+    @if (userProfile) {
+      @if (!userProfile.created_by_allauth) {
+        <mat-divider></mat-divider>
+        <h1>Change Password</h1>
+        <form [formGroup]="passwordForm" style="display: flex; flex-direction: column; gap: 20px; padding: 20px" (ngSubmit)="updatePassword()">
+          <mat-form-field>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="new_password" placeholder="Password">
+            <mat-label>Password</mat-label>
+            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirm_password" placeholder="Confirm Password">
+            <mat-label>Confirm Password</mat-label>
+            <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="'Hide confirm password'" [attr.aria-pressed]="hideConfirmPassword">
+              <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </mat-form-field>
+          <div>
+            <button mat-raised-button color="primary" type="submit">Submit</button>
+          </div>
+        </form>
+      }
+    }
   </div>
 
 </div>

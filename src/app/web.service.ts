@@ -11,7 +11,7 @@ import {ComparisonMatrix} from "./comparison-matrix";
 import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from "./search-session";
 import {Species, SpeciesQuery} from "./species";
 import {LabGroup, LabGroupQuery} from "./lab-group";
-import {User, UserQuery, UserSession} from "./user/user";
+import {User, UserProfile, UserQuery, UserSession} from "./user/user";
 import {Tissue, TissueQuery} from "./tissue";
 import {SubcellularLocation, SubcellularLocationQuery} from "./subcellular-location";
 import {HumanDiseaseQuery} from "./human-disease";
@@ -1137,5 +1137,9 @@ export class WebService {
 
   getUserTokenThroughSession() {
     return this.http.get<{token: string}>(`${this.baseURL}/api/users/get_token/`, {responseType: 'json', observe: 'body'})
+  }
+
+  getUserProfile() {
+    return this.http.get<UserProfile>(`${this.baseURL}/api/users/get_profile/`, {responseType: 'json', observe: 'body'})
   }
 }

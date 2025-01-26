@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
-import {User} from "./user";
+import {User, UserProfile} from "./user";
 import {MatDivider} from "@angular/material/divider";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
@@ -63,7 +63,9 @@ export class UserComponent {
         email: this._user.email
       })
     }
-
+    this.web.getUserProfile().subscribe((userProfile) => {
+      this.userProfile = userProfile;
+    })
 
     this.web.getCurrentUserLabGroups().subscribe((labGroups) => {
       this.labGroupForm.controls.lab_group.setValue(labGroups)
@@ -96,9 +98,11 @@ export class UserComponent {
   currentIndex = 0
   size = 5
 
+  userProfile?: UserProfile
+
 
   constructor(private fb: FormBuilder, private web: WebService, private snackBar: MatSnackBar) {
-    // ensure that new_password and confirm_password match
+
 
 
   }

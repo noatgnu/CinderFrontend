@@ -37,3 +37,11 @@ export interface UserSession {
     is_authenticated: boolean
   }
 }
+
+export interface UserProfile {
+  id: number;
+  user: number;
+  created_at: Date;
+  updated_at: Date;
+  created_by_allauth: boolean;
+}
