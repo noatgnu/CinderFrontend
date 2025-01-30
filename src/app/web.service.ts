@@ -1126,6 +1126,13 @@ export class WebService {
     return this.http.delete(`${this.baseURL}/_allauth/browser/v1/auth/session`, {headers: headers, withCredentials: true})
   }
 
+  userLogoutProvider() {
+    let headers = new HttpHeaders()
+    headers = headers.append('X-Session-Token', this.getSessionIDFromCookies() || "")
+    headers = headers.append('X-CSRFToken', this.getCSRFTokenFromCookies() || "")
+    return this.http.post(`${this.baseURL}/api/users/logout_provider/`, {withCredentials: true, headers: headers})
+  }
+
   getSessionIDFromCookies(): string | null {
     const cookies = document.cookie.split(';');
     const sessionID = cookies.find((cookie) => cookie.trim().startsWith('sessionid='));
