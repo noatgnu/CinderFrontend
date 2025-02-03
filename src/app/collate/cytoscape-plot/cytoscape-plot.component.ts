@@ -8,10 +8,10 @@ cytoscape.use(euler);
 function contentFactory(ref:any, content:any) {
   const tooltip = document.createElement('div');
   // add position to position of the node
-  tooltip.style.position = 'absolute';
-  tooltip.style.left = ref.x + 'px';
-  tooltip.style.top = ref.y + 'px';
-  tooltip.style.zIndex = '1000';
+  //tooltip.style.position = 'absolute';
+  //tooltip.style.left = ref.x + 'px';
+  //tooltip.style.top = ref.y + 'px';
+  //tooltip.style.zIndex = '1000';
   //tooltip.classList.add('cy-tooltip');
   //tooltip.innerHTML = content;
   //tooltip.style.display = 'block';
@@ -40,6 +40,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     } } = {};
 
   cy!: cytoscape.Core
+  currentPopperRef: any;
 
   ngAfterViewInit() {
     this.initCytoscape()
@@ -65,29 +66,33 @@ export class CytoscapePlotComponent implements AfterViewInit{
       });
 
       this.cy.nodes().forEach(node => {
-        const tooltip = document.createElement('div');
-        tooltip.classList.add('cy-tooltip');
-        tooltip.innerHTML = node.data('label');
+
         //tooltip.style.display = 'none';
         //tooltip.style.position = 'absolute';
-        tooltip.style.zIndex = '1000';
+
         //tooltip.style.left = node.renderedPosition().x + 'px';
         //tooltip.style.top = node.renderedPosition().y + 'px';
-        document.body.appendChild(tooltip);
 
-        const popperInstance = node.popper({
-          content: () => tooltip,
-          popper: {
-            placement: 'bottom'
-          },
-        });
-
-        node.on('mouseover', () => {
-          tooltip.style.display = 'block';
+        node.on('mouseover', (event) => {
+          this.currentPopperRef = event.target.popper({
+            content: () => {
+              const tooltip = document.createElement('div');
+              tooltip.classList.add('cy-tooltip');
+              tooltip.innerHTML = node.data('label');
+              document.body.appendChild(tooltip);
+              return tooltip;
+            },
+            popper: {
+              placement: 'bottom',
+              removeOnDestroy: true,
+            },
+          });
         });
 
         node.on('mouseout', () => {
-          tooltip.style.display = 'none';
+          if (this.currentPopperRef) {
+            this.currentPopperRef.destroy();
+          }
         });
       });
     }
