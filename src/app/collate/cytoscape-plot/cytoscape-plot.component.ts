@@ -7,6 +7,11 @@ import cytoscapePopper from 'cytoscape-popper';
 cytoscape.use(euler);
 function contentFactory(ref:any, content:any) {
   const tooltip = document.createElement('div');
+  // add position to position of the node
+  tooltip.style.position = 'absolute';
+  tooltip.style.left = ref.x + 'px';
+  tooltip.style.top = ref.y + 'px';
+  tooltip.style.zIndex = '1000';
   //tooltip.classList.add('cy-tooltip');
   //tooltip.innerHTML = content;
   //tooltip.style.display = 'block';
