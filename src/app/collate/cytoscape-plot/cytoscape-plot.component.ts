@@ -23,10 +23,15 @@ function popperFactory(ref: any, content: any, opts: any) {
   console.log(opts)
   function update() {
     computePosition(ref, content, popperOptions).then(({x, y}) => {
-      Object.assign(content.style, {
+      console.log(x, y)
+      const result = Object.assign(content.style, {
         left: `${x}px`,
         top: `${y}px`,
+        position: 'absolute',
+        transform: 'translate(-50%, -50%)'
       });
+      console.log(result)
+      return result;
     });
   }
   update();
@@ -77,33 +82,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         //@ts-ignore
         layout: { name: 'euler', animate: true }
       });
-      let popper1 = this.cy.nodes()[0].popper({
-        content: () => {
-          let div = document.createElement('div');
 
-          div.innerHTML = 'Popper content';
-
-          document.body.appendChild(div);
-
-          return div;
-        }
-      });
-
-      let popper2 = this.cy.popper({
-        content: () => {
-          let div = document.createElement('div');
-
-          div.innerHTML = 'Popper content';
-
-          document.body.appendChild(div);
-
-          return div;
-        },
-        renderedPosition: () => ({ x: 100, y: 200 }),
-        popper: {
-          placement: 'bottom',
-        } // @flaoting-ui options (https://floating-ui.com/docs/middleware)
-      });
       this.cy.nodes().forEach(node => {
 
         //tooltip.style.display = 'none';
