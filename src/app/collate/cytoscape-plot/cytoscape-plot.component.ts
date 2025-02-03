@@ -3,10 +3,11 @@ import cytoscape from "cytoscape";
 import {SearchResult, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import euler from 'cytoscape-euler';
-import popper from 'cytoscape-popper';
+import cytoscapePopper from 'cytoscape-popper';
 cytoscape.use(euler);
+
 // @ts-ignore
-cytoscape.use(popper);
+cytoscape.use(cytoscapePopper);
 
 
 @Component({
@@ -48,8 +49,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
         layout: { name: 'euler', animate: true }
       });
       this.cy.nodes().forEach(node => {
-        const ref = node.popperRef(); // used only for positioning
-
         const tooltip = document.createElement('div');
         tooltip.classList.add('cy-tooltip');
         tooltip.innerHTML = node.data('label');
