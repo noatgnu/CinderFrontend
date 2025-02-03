@@ -8,6 +8,7 @@ cytoscape.use(euler);
 function contentFactory(ref:any, content:any) {
   const tooltip = document.createElement('div');
   tooltip.classList.add('cy-tooltip');
+  tooltip.innerHTML = content;
   console.log(ref)
   console.log(content)
   document.body.appendChild(tooltip);
@@ -58,12 +59,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
       this.cy.nodes().forEach(node => {
         console.log(node)
-        node.popper({
-          content: () => {
-            return node.data('label');
-          }
-        });
-      });
+        console.log(node.popper)
+      })
     }
   }
 
