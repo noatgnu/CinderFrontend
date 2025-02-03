@@ -5,9 +5,16 @@ import {Project} from "../../project/project";
 import euler from 'cytoscape-euler';
 import cytoscapePopper from 'cytoscape-popper';
 cytoscape.use(euler);
+function contentFactory(ref:any, content:any) {
+  const tooltip = document.createElement('div');
+  tooltip.classList.add('cy-tooltip');
+  console.log(ref)
+  console.log(content)
+  document.body.appendChild(tooltip);
+  return tooltip;
+}
 
-// @ts-ignore
-cytoscape.use(cytoscapePopper);
+cytoscape.use(cytoscapePopper(contentFactory));
 
 
 @Component({
@@ -47,28 +54,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
         ],
         //@ts-ignore
         layout: { name: 'euler', animate: true }
-      });
-      this.cy.nodes().forEach(node => {
-        const tooltip = document.createElement('div');
-        tooltip.classList.add('cy-tooltip');
-        tooltip.innerHTML = node.data('label');
-        document.body.appendChild(tooltip);
-
-        const popperInstance = node.popper({
-          content: () => tooltip,
-          popper: {}
-        });
-
-        node.on('mouseover', () => {
-          tooltip.style.display = 'block';
-        });
-
-        node.on('mouseout', () => {
-          tooltip.style.display = 'none';
-          // @ts-ignore
-          popperInstance.destroy();
-          document.body.removeChild(tooltip);
-        });
       });
     }
   }
