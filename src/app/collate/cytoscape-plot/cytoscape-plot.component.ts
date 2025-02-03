@@ -29,7 +29,14 @@ function popperFactory(ref: any, content: any, opts: any) {
         left: `${bounded.left}px`,
         top: `${y}px`,
         position: 'absolute',
-        transform: 'translate(-50%, -50%)'
+        transform: 'translate(-50%, -50%)',
+        "background-color": "#333",
+        color: "#fff",
+        padding: "5px 10px",
+        "border-radius": "4px",
+        "font-size": "12px",
+        "box-shadow": "0 2px 10px rgba(0, 0, 0, 0.2)",
+        "pointer-events": "none",
       });
       console.log(result)
       return result;
