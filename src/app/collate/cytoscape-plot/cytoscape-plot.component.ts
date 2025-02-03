@@ -56,7 +56,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
   cy!: cytoscape.Core
   currentPopperRef: PopperInstance | null = null;
-
+  currentTooltip: HTMLElement | null = null;
   ngAfterViewInit() {
     cytoscape.use(euler);
     cytoscape.use(popper(popperFactory));
@@ -99,6 +99,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
               tooltip.classList.add('cy-tooltip');
               tooltip.innerHTML = node.data('label');
               document.body.appendChild(tooltip);
+              this.currentTooltip = tooltip;
               return tooltip;
             },
             popper: {
@@ -109,7 +110,10 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
 
         node.on('mouseout', () => {
-
+          if (this.currentTooltip) {
+            document.body.removeChild(this.currentTooltip);
+            this.currentTooltip = null;
+          }
         });
       });
     }
