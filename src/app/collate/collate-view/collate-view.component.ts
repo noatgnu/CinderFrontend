@@ -55,7 +55,7 @@ import {CytoscapePlotComponent} from "../cytoscape-plot/cytoscape-plot.component
     styleUrl: './collate-view.component.scss'
 })
 export class CollateViewComponent {
-  showCytoscapePlot: boolean = true;
+  showCytoscapePlot: boolean = false;
   _sessionId: number | null = null;
   @Input() set sessionId(value: number | null) {
     if (value && this.collate) {

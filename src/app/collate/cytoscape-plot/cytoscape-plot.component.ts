@@ -3,8 +3,11 @@ import cytoscape from "cytoscape";
 import {SearchResult, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import euler from 'cytoscape-euler';
+//@ts-ignore
+import qtip from 'cytoscape-qtip';
 
 cytoscape.use(euler);
+cytoscape.use(qtip);
 
 @Component({
   selector: 'app-cytoscape-plot',
@@ -38,11 +41,29 @@ export class CytoscapePlotComponent implements AfterViewInit{
           { selector: '.protein', style: { 'background-color': '#FF5733' } },
           { selector: '.project', style: { 'background-color': '#33A8FF' } },
           { selector: '.analysis', style: { 'background-color': '#33FF57' } },
-          { selector: '.file', style: { 'background-color': '#FFD700' } },
           { selector: '.condition', style: { 'background-color': '#FF33A1' } },
           { selector: 'edge', style: { 'width': 2, 'line-color': '#ccc' } }
         ],
-        layout: { name: 'cose', animate: true }
+        //@ts-ignore
+        layout: { name: 'euler', animate: true }
+      });
+
+      this.cy.nodes().forEach(node => {
+        //@ts-ignore
+        node.qtip({
+          content: node.data('label'),
+          position: {
+            my: 'top center',
+            at: 'bottom center'
+          },
+          style: {
+            classes: 'qtip-bootstrap',
+            tip: {
+              width: 16,
+              height: 8
+            }
+          }
+        });
       });
     }
   }
@@ -63,7 +84,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
       searchResults.forEach(result => {
         const proteinId = result.gene_name || result.uniprot_id || result.primary_id;
         const analysisGroupId = `AG_${result.analysis_group.id}`;
-        const fileId = `File_${result.file.id}`;
         let conditionAId = `Cond_${result.condition_A}`;
         let conditionBId = `Cond_${result.condition_B}`;
         // replace condition names with renamed conditions
@@ -90,12 +110,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
           addedNodes.add(analysisGroupId);
         }
 
-        // Add File Node
-        if (!addedNodes.has(fileId)) {
-          elements.push({ data: { id: fileId, label: result.file.name }, classes: 'file' });
-          addedNodes.add(fileId);
-        }
-
         // Add Condition Nodes
         if (!addedNodes.has(conditionAId)) {
           elements.push({ data: { id: conditionAId, label: result.condition_A }, classes: 'condition' });
@@ -110,9 +124,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
         // Add Edges
         elements.push({ data: { source: proteinId, target: project.id } }); // Protein → Project
         elements.push({ data: { source: proteinId, target: analysisGroupId } }); // Protein → Analysis Group
-        elements.push({ data: { source: analysisGroupId, target: fileId } }); // Analysis Group → File
-        elements.push({ data: { source: fileId, target: conditionAId } }); // File → Condition A
-        elements.push({ data: { source: fileId, target: conditionBId } }); // File → Condition B
+        elements.push({ data: { source: analysisGroupId, target: conditionAId } }); // Analysis Group → Condition A
+        elements.push({ data: { source: analysisGroupId, target: conditionBId } }); // Analysis Group → Condition B
       });
     });
 
