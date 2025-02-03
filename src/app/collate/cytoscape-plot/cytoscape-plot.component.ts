@@ -57,7 +57,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         layout: { name: 'euler', animate: true }
       });
 
-      this.cy.nodes().forEach(node => {
+      /*this.cy.nodes().forEach(node => {
         const tooltip = document.createElement('div');
         tooltip.classList.add('cy-tooltip');
         tooltip.innerHTML = node.data('label');
@@ -76,7 +76,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           tooltip.style.display = 'none';
           document.body.removeChild(tooltip);
         });
-      });
+      });*/
     }
   }
 
