@@ -27,27 +27,29 @@ import {Title} from "@angular/platform-browser";
 import {
   CollateProjectAnalysisGroupVisibilityDialogComponent
 } from "../collate-project-analysis-group-visibility-dialog/collate-project-analysis-group-visibility-dialog.component";
+import {CytoscapePlotComponent} from "../cytoscape-plot/cytoscape-plot.component";
 
 @Component({
     selector: 'app-collate-view',
-    imports: [
-        CollateHeaderComponent,
-        CollateSearchComponent,
-        MatTab,
-        MatTabGroup,
-        CollateProjectListComponent,
-        MatIcon,
-        MatIconButton,
-        MatToolbarRow,
-        MatToolbar,
-        CollateTagsComponent,
-        NgOptimizedImage,
-        MatMenu,
-        MatMenuItem,
-        MatMenuTrigger,
-        MatTabLabel,
-        MatTooltip
-    ],
+  imports: [
+    CollateHeaderComponent,
+    CollateSearchComponent,
+    MatTab,
+    MatTabGroup,
+    CollateProjectListComponent,
+    MatIcon,
+    MatIconButton,
+    MatToolbarRow,
+    MatToolbar,
+    CollateTagsComponent,
+    NgOptimizedImage,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
+    MatTabLabel,
+    MatTooltip,
+    CytoscapePlotComponent
+  ],
     templateUrl: './collate-view.component.html',
     styleUrl: './collate-view.component.scss'
 })

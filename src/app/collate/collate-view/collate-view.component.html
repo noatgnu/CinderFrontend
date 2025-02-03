@@ -65,7 +65,9 @@
       }
     </mat-tab-group>
   </div>
+
   @if (collate) {
+    <app-cytoscape-plot [projects]="projects" [searchResultsMap]="filteredResults"></app-cytoscape-plot>
     <app-collate-project-list [searchTerm]="selectedSearchTerm" [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
   }
 

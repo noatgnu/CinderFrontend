@@ -142,6 +142,7 @@ export class NavbarComponent implements OnInit {
   logout() {
     this.webService.userLogoutProvider().subscribe({
       next: (response) => {
+        this.webService.logoutProvider().subscribe()
         this.accounts.logout();
       },
       error: (err) => {
