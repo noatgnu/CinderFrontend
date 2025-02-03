@@ -55,6 +55,15 @@ export class CytoscapePlotComponent implements AfterViewInit{
         //@ts-ignore
         layout: { name: 'euler', animate: true }
       });
+
+      this.cy.nodes().forEach(node => {
+        console.log(node)
+        node.popper({
+          content: () => {
+            return node.data('label');
+          }
+        });
+      });
     }
   }
 
