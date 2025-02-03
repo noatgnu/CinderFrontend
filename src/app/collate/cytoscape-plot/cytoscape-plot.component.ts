@@ -3,11 +3,12 @@ import cytoscape from "cytoscape";
 import {SearchResult, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import euler from 'cytoscape-euler';
-import cytoscapePopper, {PopperInstance} from 'cytoscape-popper';
+import popper, {PopperInstance} from 'cytoscape-popper';
 import {computePosition, flip, shift, limitShift} from "@floating-ui/dom";
 
-cytoscape.use(euler);
-function contentFactory(ref:any, content:any, opts:any) {
+
+function popperFactory(ref: any, content: any, opts: any) {
+  // see https://floating-ui.com/docs/computePosition#options
   const popperOptions = {
     // matching the default behaviour from Popper@2
     // https://floating-ui.com/docs/migration#configure-middleware
@@ -17,7 +18,9 @@ function contentFactory(ref:any, content:any, opts:any) {
     ],
     ...opts,
   }
-
+  console.log(ref)
+  console.log(content)
+  console.log(opts)
   function update() {
     computePosition(ref, content, popperOptions).then(({x, y}) => {
       Object.assign(content.style, {
@@ -29,9 +32,6 @@ function contentFactory(ref:any, content:any, opts:any) {
   update();
   return { update };
 }
-
-// @ts-ignore
-cytoscape.use(cytoscapePopper(contentFactory));
 
 
 @Component({
@@ -52,8 +52,12 @@ export class CytoscapePlotComponent implements AfterViewInit{
   currentPopperRef: PopperInstance | null = null;
 
   ngAfterViewInit() {
+    cytoscape.use(euler);
+    cytoscape.use(popper(popperFactory));
     this.initCytoscape()
   }
+
+
 
   initCytoscape() {
     if (this.cyElement) {
@@ -81,19 +85,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
         //tooltip.style.left = node.renderedPosition().x + 'px';
         //tooltip.style.top = node.renderedPosition().y + 'px';
-        this.currentPopperRef = node.popper({
-          content: () => {
-            const tooltip = document.createElement('div');
-            tooltip.classList.add('cy-tooltip');
-            tooltip.innerHTML = node.data('label');
-            document.body.appendChild(tooltip);
-            return tooltip;
-          },
-          popper: {
-            placement: 'bottom',
-            removeOnDestroy: true,
-          },
-        });
+
         node.on('mouseover', (event) => {
           this.currentPopperRef = event.target.popper({
             content: () => {
