@@ -22,11 +22,11 @@ function popperFactory(ref: any, content: any, opts: any) {
   console.log(content)
   console.log(opts)
   function update() {
-    console.log(ref.getBoundingClientRect())
+    const bounded = ref.getBoundingClientRect()
     computePosition(ref, content, popperOptions).then(({x, y}) => {
       console.log(x, y)
       const result = Object.assign(content.style, {
-        left: `${x}px`,
+        left: `${bounded.left}px`,
         top: `${y}px`,
         position: 'absolute',
         transform: 'translate(-50%, -50%)'
