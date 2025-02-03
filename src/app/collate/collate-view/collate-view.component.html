@@ -51,7 +51,7 @@
 
 @if (searchTerms.length > 0) {
   <button mat-icon-button (click)="toggleCytoscapePlot()" matTooltip="Toggle Cytoscape Plot">
-    <mat-icon [ngClass]="{'disabled-icon': !showCytoscapePlot}">graph_4</mat-icon>
+    <mat-icon [ngClass]="{'disabled-icon': !showCytoscapePlot}">account_tree</mat-icon>
   </button>
   @if (collate && showCytoscapePlot) {
     <app-cytoscape-plot [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [searchResultsMap]="filteredResults"></app-cytoscape-plot>

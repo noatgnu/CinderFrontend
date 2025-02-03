@@ -3,11 +3,9 @@ import cytoscape from "cytoscape";
 import {SearchResult, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import euler from 'cytoscape-euler';
-//@ts-ignore
-import qtip from 'cytoscape-qtip';
 
 cytoscape.use(euler);
-cytoscape.use(qtip);
+
 
 @Component({
   selector: 'app-cytoscape-plot',
@@ -46,24 +44,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
         ],
         //@ts-ignore
         layout: { name: 'euler', animate: true }
-      });
-
-      this.cy.nodes().forEach(node => {
-        //@ts-ignore
-        node.qtip({
-          content: node.data('label'),
-          position: {
-            my: 'top center',
-            at: 'bottom center'
-          },
-          style: {
-            classes: 'qtip-bootstrap',
-            tip: {
-              width: 16,
-              height: 8
-            }
-          }
-        });
       });
     }
   }
