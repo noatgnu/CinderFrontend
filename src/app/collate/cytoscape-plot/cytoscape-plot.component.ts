@@ -2,6 +2,9 @@ import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/c
 import cytoscape from "cytoscape";
 import {SearchResult, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
+import euler from 'cytoscape-euler';
+
+cytoscape.use(euler);
 
 @Component({
   selector: 'app-cytoscape-plot',
