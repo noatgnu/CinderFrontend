@@ -69,6 +69,10 @@ export class CytoscapePlotComponent implements AfterViewInit{
         tooltip.classList.add('cy-tooltip');
         tooltip.innerHTML = node.data('label');
         tooltip.style.display = 'none';
+        tooltip.style.position = 'absolute';
+        tooltip.style.zIndex = '1000';
+        tooltip.style.left = node.renderedPosition().x + 'px';
+        tooltip.style.top = node.renderedPosition().y + 'px';
         document.body.appendChild(tooltip);
 
         const popperInstance = node.popper({
