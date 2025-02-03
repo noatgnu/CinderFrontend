@@ -3,22 +3,31 @@ import cytoscape from "cytoscape";
 import {SearchResult, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import euler from 'cytoscape-euler';
-import cytoscapePopper from 'cytoscape-popper';
+import cytoscapePopper, {PopperInstance} from 'cytoscape-popper';
+import {computePosition, flip, shift, limitShift} from "@floating-ui/dom";
+
 cytoscape.use(euler);
-function contentFactory(ref:any, content:any) {
-  const tooltip = document.createElement('div');
-  // add position to position of the node
-  //tooltip.style.position = 'absolute';
-  //tooltip.style.left = ref.x + 'px';
-  //tooltip.style.top = ref.y + 'px';
-  //tooltip.style.zIndex = '1000';
-  //tooltip.classList.add('cy-tooltip');
-  //tooltip.innerHTML = content;
-  //tooltip.style.display = 'block';
-  //console.log(ref)
-  //console.log(content)
-  //document.body.appendChild(tooltip);
-  return tooltip;
+function contentFactory(ref:any, content:any, opts:any) {
+  const popperOptions = {
+    // matching the default behaviour from Popper@2
+    // https://floating-ui.com/docs/migration#configure-middleware
+    middleware: [
+      flip(),
+      shift({limiter: limitShift()})
+    ],
+    ...opts,
+  }
+
+  function update() {
+    computePosition(ref, content, popperOptions).then(({x, y}) => {
+      Object.assign(content.style, {
+        left: `${x}px`,
+        top: `${y}px`,
+      });
+    });
+  }
+  update();
+  return { update };
 }
 
 // @ts-ignore
@@ -40,7 +49,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     } } = {};
 
   cy!: cytoscape.Core
-  currentPopperRef: any;
+  currentPopperRef: PopperInstance | null = null;
 
   ngAfterViewInit() {
     this.initCytoscape()
@@ -90,9 +99,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
 
         node.on('mouseout', () => {
-          if (this.currentPopperRef) {
-            this.currentPopperRef.destroy();
-          }
+
         });
       });
     }
