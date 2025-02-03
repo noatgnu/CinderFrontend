@@ -22,7 +22,7 @@ function contentFactory(ref:any, content:any) {
 }
 
 // @ts-ignore
-cytoscape.use(cytoscapePopper);
+cytoscape.use(cytoscapePopper(contentFactory));
 
 
 @Component({
