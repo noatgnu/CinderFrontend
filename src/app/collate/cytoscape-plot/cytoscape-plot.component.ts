@@ -58,6 +58,15 @@ export class CytoscapePlotComponent implements AfterViewInit{
       });
 
       this.cy.nodes().forEach(node => {
+        let popperRef = node.popperRef();
+        console.log(popperRef)
+        node.on('mouseover', (event, extraParams) => {
+          // display the tooltip at the position of the mouseover event
+          console.log(event)
+        })
+        node.on('mouseout', (event, extraParams) => {
+          console.log(event)
+        })
         console.log(node)
         console.log(node.popper)
       })
