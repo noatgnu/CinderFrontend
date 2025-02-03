@@ -74,8 +74,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
         node.on('mouseout', () => {
           tooltip.style.display = 'none';
-          // @ts-ignore
-          popperInstance.destroy();
           document.body.removeChild(tooltip);
         });
       });
