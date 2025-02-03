@@ -68,11 +68,11 @@ export class CytoscapePlotComponent implements AfterViewInit{
         const tooltip = document.createElement('div');
         tooltip.classList.add('cy-tooltip');
         tooltip.innerHTML = node.data('label');
-        tooltip.style.display = 'none';
-        tooltip.style.position = 'absolute';
+        //tooltip.style.display = 'none';
+        //tooltip.style.position = 'absolute';
         tooltip.style.zIndex = '1000';
-        tooltip.style.left = node.renderedPosition().x + 'px';
-        tooltip.style.top = node.renderedPosition().y + 'px';
+        //tooltip.style.left = node.renderedPosition().x + 'px';
+        //tooltip.style.top = node.renderedPosition().y + 'px';
         document.body.appendChild(tooltip);
 
         const popperInstance = node.popper({
@@ -80,12 +80,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
           popper: {
             placement: 'bottom'
           },
-          renderedPosition: () => {
-            return {
-              x: node.renderedPosition().x,
-              y: node.renderedPosition().y
-            };
-          }
         });
 
         node.on('mouseover', () => {
