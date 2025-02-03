@@ -16,7 +16,8 @@ function contentFactory(ref:any, content:any) {
   return tooltip;
 }
 
-cytoscape.use(cytoscapePopper(contentFactory));
+// @ts-ignore
+cytoscape.use(cytoscapePopper);
 
 
 @Component({
