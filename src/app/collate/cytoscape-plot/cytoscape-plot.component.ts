@@ -58,15 +58,24 @@ export class CytoscapePlotComponent implements AfterViewInit{
         layout: { name: 'euler', animate: true }
       });
 
-      /*this.cy.nodes().forEach(node => {
+      this.cy.nodes().forEach(node => {
         const tooltip = document.createElement('div');
         tooltip.classList.add('cy-tooltip');
         tooltip.innerHTML = node.data('label');
+        tooltip.style.display = 'none';
         document.body.appendChild(tooltip);
 
         const popperInstance = node.popper({
           content: () => tooltip,
-          popper: {}
+          popper: {
+            placement: 'bottom'
+          },
+          renderedPosition: () => {
+            return {
+              x: node.renderedPosition().x,
+              y: node.renderedPosition().y
+            };
+          }
         });
 
         node.on('mouseover', () => {
@@ -75,9 +84,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
         node.on('mouseout', () => {
           tooltip.style.display = 'none';
-          document.body.removeChild(tooltip);
         });
-      });*/
+      });
     }
   }
 
