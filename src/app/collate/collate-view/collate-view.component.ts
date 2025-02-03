@@ -17,7 +17,7 @@ import {Router} from "@angular/router";
 import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
 import {MatDialog} from "@angular/material/dialog";
 import {CollateQrCodeDialogComponent} from "../collate-qr-code-dialog/collate-qr-code-dialog.component";
-import {NgOptimizedImage} from "@angular/common";
+import {NgClass, NgOptimizedImage} from "@angular/common";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {Observable} from "rxjs";
 import {WebsocketService} from "../../websocket.service";
@@ -48,7 +48,8 @@ import {CytoscapePlotComponent} from "../cytoscape-plot/cytoscape-plot.component
     MatMenuTrigger,
     MatTabLabel,
     MatTooltip,
-    CytoscapePlotComponent
+    CytoscapePlotComponent,
+    NgClass
   ],
     templateUrl: './collate-view.component.html',
     styleUrl: './collate-view.component.scss'

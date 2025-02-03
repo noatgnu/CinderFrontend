@@ -58,7 +58,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       // Process Search Results for each project
       const searchResults = this.searchResultsMap[project.id] || [];
       searchResults.forEach(result => {
-        const proteinId = result.primary_id || result.gene_name || result.uniprot_id;
+        const proteinId = result.gene_name || result.uniprot_id || result.primary_id;
         const analysisGroupId = `AG_${result.analysis_group.id}`;
         const fileId = `File_${result.file.id}`;
         let conditionAId = `Cond_${result.condition_A}`;
