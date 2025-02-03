@@ -58,18 +58,27 @@ export class CytoscapePlotComponent implements AfterViewInit{
       });
 
       this.cy.nodes().forEach(node => {
-        let popperRef = node.popperRef();
-        console.log(popperRef.getBoundingClientRect())
-        node.on('mouseover', (event, extraParams) => {
-          // display the tooltip at the position of the mouseover event
-          console.log(event)
-        })
-        node.on('mouseout', (event, extraParams) => {
-          console.log(event)
-        })
-        console.log(node)
-        console.log(node.popper)
-      })
+        const tooltip = document.createElement('div');
+        tooltip.classList.add('cy-tooltip');
+        tooltip.innerHTML = node.data('label');
+        document.body.appendChild(tooltip);
+
+        const popperInstance = node.popper({
+          content: () => tooltip,
+          popper: {}
+        });
+
+        node.on('mouseover', () => {
+          tooltip.style.display = 'block';
+        });
+
+        node.on('mouseout', () => {
+          tooltip.style.display = 'none';
+          // @ts-ignore
+          popperInstance.destroy();
+          document.body.removeChild(tooltip);
+        });
+      });
     }
   }
 
