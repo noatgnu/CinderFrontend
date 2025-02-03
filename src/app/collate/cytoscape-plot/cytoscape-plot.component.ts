@@ -13,6 +13,9 @@ export class CytoscapePlotComponent implements AfterViewInit{
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() projects: Project[] = [];
   @Input() searchResultsMap: { [projectID: string]: SearchResult[] } = {};
+  @Input() renameCondition: { [projectID: number]: {
+      [key: string]: string
+    } } = {};
 
   cy!: cytoscape.Core
 
@@ -58,8 +61,19 @@ export class CytoscapePlotComponent implements AfterViewInit{
         const proteinId = result.primary_id || result.gene_name || result.uniprot_id;
         const analysisGroupId = `AG_${result.analysis_group.id}`;
         const fileId = `File_${result.file.id}`;
-        const conditionAId = `Cond_${result.condition_A}`;
-        const conditionBId = `Cond_${result.condition_B}`;
+        let conditionAId = `Cond_${result.condition_A}`;
+        let conditionBId = `Cond_${result.condition_B}`;
+        // replace condition names with renamed conditions
+        if (!this.renameCondition[project.id]) {
+          if (!this.renameCondition[project.id][result.condition_A] ) {
+            const conditionA = this.renameCondition[project.id][result.condition_A] || result.condition_A;
+            conditionAId = `Cond_${conditionA}`;
+          }
+          if (!this.renameCondition[project.id][result.condition_B] ) {
+            const conditionB = this.renameCondition[project.id][result.condition_B] || result.condition_B;
+            conditionBId = `Cond_${conditionB}`;
+          }
+        }
 
         // Add Protein Node
         if (!addedNodes.has(proteinId)) {

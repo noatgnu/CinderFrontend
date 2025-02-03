@@ -48,7 +48,14 @@
 <div style="display: flex; justify-content: center">
   <app-collate-search [projects]="projects" (searchResultID)="_sessionId=$event;getSearchFromID($event)"></app-collate-search>
 </div>
+
 @if (searchTerms.length > 0) {
+  <button mat-icon-button (click)="toggleCytoscapePlot()" matTooltip="Toggle Cytoscape Plot">
+    <mat-icon>{{ showCytoscapePlot ? 'visibility_off' : 'visibility' }}</mat-icon>
+  </button>
+  @if (collate && showCytoscapePlot) {
+    <app-cytoscape-plot [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [searchResultsMap]="filteredResults"></app-cytoscape-plot>
+  }
   <div style="padding: 20px">
     <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">
       @for (term of searchTerms; track term) {
@@ -67,10 +74,8 @@
   </div>
 
   @if (collate) {
-    <app-cytoscape-plot [projects]="projects" [searchResultsMap]="filteredResults"></app-cytoscape-plot>
     <app-collate-project-list [searchTerm]="selectedSearchTerm" [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
   }
-
 }
 
 
