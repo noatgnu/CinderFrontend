@@ -77,7 +77,33 @@ export class CytoscapePlotComponent implements AfterViewInit{
         //@ts-ignore
         layout: { name: 'euler', animate: true }
       });
+      let popper1 = this.cy.nodes()[0].popper({
+        content: () => {
+          let div = document.createElement('div');
 
+          div.innerHTML = 'Popper content';
+
+          document.body.appendChild(div);
+
+          return div;
+        }
+      });
+
+      let popper2 = this.cy.popper({
+        content: () => {
+          let div = document.createElement('div');
+
+          div.innerHTML = 'Popper content';
+
+          document.body.appendChild(div);
+
+          return div;
+        },
+        renderedPosition: () => ({ x: 100, y: 200 }),
+        popper: {
+          placement: 'bottom',
+        } // @flaoting-ui options (https://floating-ui.com/docs/middleware)
+      });
       this.cy.nodes().forEach(node => {
 
         //tooltip.style.display = 'none';
