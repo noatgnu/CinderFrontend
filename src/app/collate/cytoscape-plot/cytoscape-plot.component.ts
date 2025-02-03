@@ -3,8 +3,10 @@ import cytoscape from "cytoscape";
 import {SearchResult, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import euler from 'cytoscape-euler';
-
+import popper from 'cytoscape-popper';
 cytoscape.use(euler);
+// @ts-ignore
+cytoscape.use(popper);
 
 
 @Component({
@@ -45,6 +47,30 @@ export class CytoscapePlotComponent implements AfterViewInit{
         //@ts-ignore
         layout: { name: 'euler', animate: true }
       });
+      this.cy.nodes().forEach(node => {
+        const ref = node.popperRef(); // used only for positioning
+
+        const tooltip = document.createElement('div');
+        tooltip.classList.add('cy-tooltip');
+        tooltip.innerHTML = node.data('label');
+        document.body.appendChild(tooltip);
+
+        const popperInstance = node.popper({
+          content: () => tooltip,
+          popper: {}
+        });
+
+        node.on('mouseover', () => {
+          tooltip.style.display = 'block';
+        });
+
+        node.on('mouseout', () => {
+          tooltip.style.display = 'none';
+          // @ts-ignore
+          popperInstance.destroy();
+          document.body.removeChild(tooltip);
+        });
+      });
     }
   }
 
@@ -67,14 +93,12 @@ export class CytoscapePlotComponent implements AfterViewInit{
         let conditionAId = `Cond_${result.condition_A}`;
         let conditionBId = `Cond_${result.condition_B}`;
         // replace condition names with renamed conditions
-        if (!this.renameCondition[project.id]) {
-          if (!this.renameCondition[project.id][result.condition_A] ) {
-            const conditionA = this.renameCondition[project.id][result.condition_A] || result.condition_A;
-            conditionAId = `Cond_${conditionA}`;
+        if (this.renameCondition[project.id]) {
+          if (this.renameCondition[project.id][result.condition_A]) {
+            conditionAId = `Cond_${this.renameCondition[project.id][result.condition_A]}`;
           }
-          if (!this.renameCondition[project.id][result.condition_B] ) {
-            const conditionB = this.renameCondition[project.id][result.condition_B] || result.condition_B;
-            conditionBId = `Cond_${conditionB}`;
+          if (this.renameCondition[project.id][result.condition_B]) {
+            conditionBId = `Cond_${this.renameCondition[project.id][result.condition_B]}`;
           }
         }
 
