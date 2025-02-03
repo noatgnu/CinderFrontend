@@ -9,6 +9,7 @@ function contentFactory(ref:any, content:any) {
   const tooltip = document.createElement('div');
   tooltip.classList.add('cy-tooltip');
   tooltip.innerHTML = content;
+  tooltip.style.display = 'block';
   console.log(ref)
   console.log(content)
   document.body.appendChild(tooltip);
