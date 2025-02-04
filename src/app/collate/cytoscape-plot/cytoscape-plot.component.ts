@@ -148,36 +148,45 @@ export class CytoscapePlotComponent implements AfterViewInit{
   buildGraphElements() {
     const elements: any[] = [];
     const addedNodes = new Set();
-    const comparisonColorMap: { [comparison: string]: string } = {};
+    const projectColorMap: { [projectId: string]: string } = {};
 
     this.projects.forEach(project => {
       const searchResults = this.searchResultsMap[project.id] || [];
+      if (!projectColorMap[project.id]) {
+        projectColorMap[project.id] = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+      }
+      const projectColor = projectColorMap[project.id];
+
       searchResults.forEach(result => {
         const proteinId = result.gene_name || result.uniprot_id || result.primary_id;
-        const comparisonId = `comparison-${result.condition_A}-${result.condition_B}`;
 
         if (!addedNodes.has(proteinId)) {
           elements.push({ data: { id: proteinId, label: proteinId, size: 25 }, classes: 'protein' });
           addedNodes.add(proteinId);
         }
 
+        let conditionA = result.condition_A;
+        let conditionB = result.condition_B;
+        if (this.renameCondition[project.id]) {
+          if (this.renameCondition[project.id][result.condition_A]) {
+            conditionA = this.renameCondition[project.id][result.condition_A];
+          }
+          if (this.renameCondition[project.id][result.condition_B]) {
+            conditionB = this.renameCondition[project.id][result.condition_B];
+          }
+        }
+        const comparisonId = `${conditionA} vs ${conditionB}`;
         if (!addedNodes.has(comparisonId)) {
-          elements.push({ data: { id: comparisonId, label: `${result.condition_A} vs ${result.condition_B}`, size: 25 }, classes: 'comparison' });
+          elements.push({ data: { id: comparisonId, label: `${conditionA} vs ${conditionB}`, size: 25 }, classes: 'comparison' });
           addedNodes.add(comparisonId);
         }
 
-        const comparisonKey = `${result.condition_A}-${result.condition_B}`;
-        if (!comparisonColorMap[comparisonKey]) {
-          comparisonColorMap[comparisonKey] = `#${Math.floor(Math.random()*16777215).toString(16)}`;
-        }
-        const color = comparisonColorMap[comparisonKey];
         elements.push({
           data: {
-            id: `${proteinId}-${comparisonId}-${comparisonKey}`,
+            id: `${proteinId}-${comparisonId}-${project.id}`,
             source: proteinId,
             target: comparisonId,
-            color: color,
-            comparisonKey: comparisonKey,
+            color: projectColor,
             conditionA: result.condition_A,
             conditionB: result.condition_B,
             intensityA: result.searched_data.find(data => data.Condition === result.condition_A)?.Value,
@@ -186,7 +195,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
       });
     });
-
     return elements;
   }
 
