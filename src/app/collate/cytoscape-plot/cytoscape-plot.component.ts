@@ -145,7 +145,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
       const searchResults = this.searchResultsMap[project.id] || [];
       searchResults.forEach(result => {
         const proteinId = result.gene_name || result.uniprot_id || result.primary_id;
-        const analysisGroupId = `AG_${result.analysis_group.id}`;
         let conditionAId = `${result.condition_A}`;
         let conditionBId = `${result.condition_B}`;
 
@@ -163,9 +162,14 @@ export class CytoscapePlotComponent implements AfterViewInit{
           addedNodes.add(proteinId);
         }
 
-        if (!addedNodes.has(analysisGroupId)) {
-          elements.push({ data: { id: analysisGroupId, label: result.analysis_group.name, size: 25 }, classes: 'analysis' });
-          addedNodes.add(analysisGroupId);
+        if (!addedNodes.has(conditionAId)) {
+          elements.push({ data: { id: conditionAId, label: conditionAId, size: 25 }, classes: 'condition' });
+          addedNodes.add(conditionAId);
+        }
+
+        if (!addedNodes.has(conditionBId)) {
+          elements.push({ data: { id: conditionBId, label: conditionBId, size: 25 }, classes: 'condition' });
+          addedNodes.add(conditionBId);
         }
 
         if (!conditionProjectMap[conditionAId]) {
@@ -178,9 +182,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
         }
         conditionProjectMap[conditionBId].add(project.name);
 
-        elements.push({ data: { source: proteinId, target: analysisGroupId } });
-        elements.push({ data: { source: analysisGroupId, target: conditionAId } });
-        elements.push({ data: { source: analysisGroupId, target: conditionBId } });
+        elements.push({ data: { source: conditionAId, target: proteinId, magnitude: result.log2_fc} });
+        elements.push({ data: { source: proteinId, target: conditionBId, magnitude: result.log2_fc} });
       });
     });
 
