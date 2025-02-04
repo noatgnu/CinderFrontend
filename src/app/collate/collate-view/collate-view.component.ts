@@ -55,7 +55,6 @@ import {CytoscapePlotComponent} from "../cytoscape-plot/cytoscape-plot.component
     styleUrl: './collate-view.component.scss'
 })
 export class CollateViewComponent {
-  showCytoscapePlot: boolean = false;
   _sessionId: number | null = null;
   @Input() set sessionId(value: number | null) {
     if (value && this.collate) {
@@ -150,9 +149,7 @@ export class CollateViewComponent {
 
   pastSearches: {searchQuery: SearchResultQuery|null, termFounds: string[], collate: number, searchID:number}[] = [];
   waitingForDownload = false
-  toggleCytoscapePlot() {
-    this.showCytoscapePlot = !this.showCytoscapePlot;
-  }
+
 
   constructor(private title: Title, private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
     const pastSearches = localStorage.getItem('cinderPastSearches');

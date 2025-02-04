@@ -5,6 +5,10 @@ import {Project} from "../../project/project";
 import euler from 'cytoscape-euler';
 import popper, {PopperInstance} from 'cytoscape-popper';
 import {computePosition, flip, shift, limitShift} from "@floating-ui/dom";
+import {MatIcon} from "@angular/material/icon";
+import {MatIconButton} from "@angular/material/button";
+import {MatTooltip} from "@angular/material/tooltip";
+import {NgClass} from "@angular/common";
 
 
 function popperFactory(ref: any, content: any, opts: any) {
@@ -49,11 +53,17 @@ function popperFactory(ref: any, content: any, opts: any) {
 
 @Component({
   selector: 'app-cytoscape-plot',
-  imports: [],
+  imports: [
+    MatIcon,
+    MatIconButton,
+    MatTooltip,
+    NgClass
+  ],
   templateUrl: './cytoscape-plot.component.html',
   styleUrl: './cytoscape-plot.component.scss'
 })
 export class CytoscapePlotComponent implements AfterViewInit{
+  showCytoscapePlot: boolean = false;
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() projects: Project[] = [];
   @Input() searchResultsMap: { [projectID: string]: SearchResult[] } = {};
@@ -80,9 +90,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
         container: this.cyElement.nativeElement,
         elements: elements,
         style: [
-          { selector: 'node', style: { 'label': 'data(label)', 'background-color': '#666', 'width': 25, 'height': 25 } },
+          { selector: 'node', style: { 'label': 'data(label)', 'background-color': '#666', 'width': 'data(size)', 'height': 'data(size)' } },
           { selector: '.protein', style: { 'background-color': '#FF5733' } },
-          { selector: '.project', style: { 'background-color': '#33A8FF' } },
           { selector: '.analysis', style: { 'background-color': '#33FF57' } },
           { selector: '.condition', style: { 'background-color': '#FF33A1' } },
           { selector: 'edge', style: { 'width': 2, 'line-color': '#ccc' } }
@@ -92,28 +101,24 @@ export class CytoscapePlotComponent implements AfterViewInit{
       });
 
       this.cy.nodes().forEach(node => {
-
-        //tooltip.style.display = 'none';
-        //tooltip.style.position = 'absolute';
-
-        //tooltip.style.left = node.renderedPosition().x + 'px';
-        //tooltip.style.top = node.renderedPosition().y + 'px';
-
         node.on('mouseover', (event) => {
-          this.currentPopperRef = event.target.popper({
-            content: () => {
-              const tooltip = document.createElement('div');
-              tooltip.classList.add('cy-tooltip');
-              tooltip.innerHTML = node.data('label');
-              document.body.appendChild(tooltip);
-              this.currentTooltip = tooltip;
-              return tooltip;
-            },
-            popper: {
-              placement: 'bottom',
-              removeOnDestroy: true,
-            },
-          });
+          if (node.hasClass('condition')) {
+            this.currentPopperRef = event.target.popper({
+              content: () => {
+                const tooltip = document.createElement('div');
+                tooltip.classList.add('cy-tooltip');
+                const projects = node.data('projects') || [];
+                tooltip.innerHTML = `${node.data('label')}<br>Projects: ${projects.join(', ')}`;
+                document.body.appendChild(tooltip);
+                this.currentTooltip = tooltip;
+                return tooltip;
+              },
+              popper: {
+                placement: 'bottom',
+                removeOnDestroy: true,
+              },
+            });
+          }
         });
 
         node.on('mouseout', () => {
@@ -126,25 +131,20 @@ export class CytoscapePlotComponent implements AfterViewInit{
     }
   }
 
+
   buildGraphElements() {
     const elements: any[] = [];
     const addedNodes = new Set();
+    const conditionProjectMap: { [condition: string]: Set<string> } = {};
 
-    // Add Project Nodes
     this.projects.forEach(project => {
-      if (!addedNodes.has(project.id)) {
-        elements.push({ data: { id: project.id, label: project.name }, classes: 'project' });
-        addedNodes.add(project.id);
-      }
-
-      // Process Search Results for each project
       const searchResults = this.searchResultsMap[project.id] || [];
       searchResults.forEach(result => {
         const proteinId = result.gene_name || result.uniprot_id || result.primary_id;
         const analysisGroupId = `AG_${result.analysis_group.id}`;
         let conditionAId = `Cond_${result.condition_A}`;
         let conditionBId = `Cond_${result.condition_B}`;
-        // replace condition names with renamed conditions
+
         if (this.renameCondition[project.id]) {
           if (this.renameCondition[project.id][result.condition_A]) {
             conditionAId = `Cond_${this.renameCondition[project.id][result.condition_A]}`;
@@ -154,37 +154,42 @@ export class CytoscapePlotComponent implements AfterViewInit{
           }
         }
 
-        // Add Protein Node
         if (!addedNodes.has(proteinId)) {
-          elements.push({ data: { id: proteinId, label: proteinId }, classes: 'protein' });
+          elements.push({ data: { id: proteinId, label: proteinId, size: 25 }, classes: 'protein' });
           addedNodes.add(proteinId);
         }
 
-        // Add Analysis Group Node
         if (!addedNodes.has(analysisGroupId)) {
-          elements.push({ data: { id: analysisGroupId, label: result.analysis_group.name }, classes: 'analysis' });
+          elements.push({ data: { id: analysisGroupId, label: result.analysis_group.name, size: 25 }, classes: 'analysis' });
           addedNodes.add(analysisGroupId);
         }
 
-        // Add Condition Nodes
-        if (!addedNodes.has(conditionAId)) {
-          elements.push({ data: { id: conditionAId, label: result.condition_A }, classes: 'condition' });
-          addedNodes.add(conditionAId);
+        if (!conditionProjectMap[conditionAId]) {
+          conditionProjectMap[conditionAId] = new Set();
         }
+        conditionProjectMap[conditionAId].add(project.id.toString());
 
-        if (!addedNodes.has(conditionBId)) {
-          elements.push({ data: { id: conditionBId, label: result.condition_B }, classes: 'condition' });
-          addedNodes.add(conditionBId);
+        if (!conditionProjectMap[conditionBId]) {
+          conditionProjectMap[conditionBId] = new Set();
         }
+        conditionProjectMap[conditionBId].add(project.id.toString());
 
-        // Add Edges
-        elements.push({ data: { source: proteinId, target: project.id } }); // Protein → Project
-        elements.push({ data: { source: proteinId, target: analysisGroupId } }); // Protein → Analysis Group
-        elements.push({ data: { source: analysisGroupId, target: conditionAId } }); // Analysis Group → Condition A
-        elements.push({ data: { source: analysisGroupId, target: conditionBId } }); // Analysis Group → Condition B
+        elements.push({ data: { source: proteinId, target: analysisGroupId } });
+        elements.push({ data: { source: analysisGroupId, target: conditionAId } });
+        elements.push({ data: { source: analysisGroupId, target: conditionBId } });
       });
     });
 
+    Object.keys(conditionProjectMap).forEach(conditionId => {
+      const projects = Array.from(conditionProjectMap[conditionId]);
+      const size = 25 + projects.length * 5;
+      elements.push({ data: { id: conditionId, label: conditionId, size: size, projects: projects }, classes: 'condition' });
+    });
+
     return elements;
+  }
+
+  toggleCytoscapePlot() {
+    this.showCytoscapePlot = !this.showCytoscapePlot;
   }
 }
