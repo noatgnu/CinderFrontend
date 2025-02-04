@@ -166,8 +166,17 @@ export class CytoscapePlotComponent implements AfterViewInit{
           const y = (start.y + end.y) / 2;
           const w = Math.abs(start.x - end.x);
           const h = Math.abs(start.y - end.y);
-          // draw bar chart, max width is 30 max height is 50
-          
+          ctx.fillStyle = 'white';
+          ctx.fillRect(x, y, 30, 50);
+          ctx.strokeStyle = 'black';
+          // normalize intensity values to 0-1
+          const maxIntensity = Math.max(intensityA, intensityB);
+          const normIntensityA = intensityA / maxIntensity;
+          const normIntensityB = intensityB / maxIntensity;
+          ctx.fillStyle = 'red';
+          this.renderBar(ctx, normIntensityA, y, 30, 25);
+          ctx.fillStyle = 'blue';
+          this.renderBar(ctx, normIntensityB, y + 25, 30, 25);
         }
       );
     }
