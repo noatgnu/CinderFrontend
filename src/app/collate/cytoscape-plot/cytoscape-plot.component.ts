@@ -117,7 +117,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       this.cy.edges().forEach(edge => {
         edge.on('mouseover', (event) => {
           const data = event.target.data();
-          const tooltipContent = `Comparison: ${data.conditionA} vs ${data.conditionB}<br>Intensity A: ${data.intensityA}<br>Intensity B: ${data.intensityB}`;
+          const tooltipContent = `Comparison: ${data.conditionA} vs ${data.conditionB}<br>Intensity ${data.conditionA}: ${data.intensityA}<br>Intensity ${data.conditionB}: ${data.intensityB}`;
           this.currentPopperRef = event.target.popper({
             content: () => {
               const tooltip = document.createElement('div');
@@ -187,8 +187,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
             source: proteinId,
             target: comparisonId,
             color: projectColor,
-            conditionA: result.condition_A,
-            conditionB: result.condition_B,
+            conditionA: conditionA,
+            conditionB: conditionB,
             intensityA: result.searched_data.find(data => data.Condition === result.condition_A)?.Value,
             intensityB: result.searched_data.find(data => data.Condition === result.condition_B)?.Value,
           }
