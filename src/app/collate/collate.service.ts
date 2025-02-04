@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Collate, CollateQuery, CollateTag, CollateTagQuery} from "./collate";
+import {Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class CollateService {
   baseURL = environment.baseURL;
+  collateRedrawSubject = new Subject<boolean>()
 
   constructor(private http: HttpClient) { }
 

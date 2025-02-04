@@ -9,6 +9,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
+import {CollateService} from "../collate.service";
 
 
 function popperFactory(ref: any, content: any, opts: any) {
@@ -74,12 +75,26 @@ export class CytoscapePlotComponent implements AfterViewInit{
   cy!: cytoscape.Core
   currentPopperRef: PopperInstance | null = null;
   currentTooltip: HTMLElement | null = null;
+
+  constructor(private collateService: CollateService) {
+
+  }
+
   ngAfterViewInit() {
     cytoscape.use(euler);
     cytoscape.use(popper(popperFactory));
     this.initCytoscape()
+    this.collateService.collateRedrawSubject.subscribe(() => {
+      this.updateCytoscape()
+    })
   }
 
+  updateCytoscape() {
+    const elements = this.buildGraphElements();
+    this.cy.json({ elements: elements });
+    //@ts-ignore
+    this.cy.layout({ name: 'euler', animate: true }).run();
+  }
 
 
   initCytoscape() {
@@ -95,7 +110,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
           { selector: '.analysis', style: { 'background-color': '#33FF57', 'label': '' } },
           { selector: '.condition', style: { 'background-color': '#FF33A1' } },
           { selector: 'edge', style: { 'width': 2, 'line-color': 'data(color)', 'target-arrow-color': 'data(color)', 'target-arrow-shape': 'triangle' } }
-
         ],
         //@ts-ignore
         layout: { name: 'euler', animate: true }
@@ -190,8 +204,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
         }
 
         const color = comparisonColorMap[comparisonKey];
-        elements.push({ data: { source: conditionAId, target: proteinId, magnitude: result.log2_fc, color: color } });
-        elements.push({ data: { source: proteinId, target: conditionBId, magnitude: result.log2_fc, color: color } });
+        elements.push({ data: { source: conditionAId, target: proteinId, magnitude: result.log2_fc, color: color, projects: conditionProjectMap[conditionAId] } });
+        elements.push({ data: { source: proteinId, target: conditionBId, magnitude: result.log2_fc, color: color, projects: conditionProjectMap[conditionBId] } });
       });
     });
 

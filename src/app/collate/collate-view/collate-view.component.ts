@@ -272,7 +272,7 @@ export class CollateViewComponent {
   filterDataBySearchTerm() {
     this.selectedSearchTerm = this.searchTerms[this.selectedIndex];
     this.filteredResults = this.getFilteredSearchResults();
-    console.log(this.filteredResults);
+    this.collateService.collateRedrawSubject.next(true);
   }
 
   getSearchFromID(id: number) {
