@@ -174,9 +174,9 @@ export class CytoscapePlotComponent implements AfterViewInit{
           const normIntensityA = intensityA / maxIntensity;
           const normIntensityB = intensityB / maxIntensity;
           ctx.fillStyle = 'red';
-          this.renderBar(ctx, normIntensityA, y, 30, 25);
+          ctx.fillRect(x, y, 30*intensityA, 50);
           ctx.fillStyle = 'blue';
-          this.renderBar(ctx, normIntensityB, y + 25, 30, 25);
+          ctx.fillRect(x, y + 25*intensityB, 30, 25);
         }
       );
     }
