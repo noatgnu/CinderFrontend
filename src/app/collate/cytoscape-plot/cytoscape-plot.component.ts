@@ -123,6 +123,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       });
       //@ts-ignore
       const layers: any = this.cy.layers()
+      console.log(layers)
       this.cy.edges().forEach(edge => {
 
         edge.on('mouseover', (event) => {
@@ -153,7 +154,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
       });
       layers.renderPerEdge(
-        layers.insertAfter('canvas'),
+        layers.edgeLayer.insertAfter('canvas'),
         (ctx: CanvasRenderingContext2D, edge: any, bb: any) => {
           console.log(edge)
           console.log(bb)
