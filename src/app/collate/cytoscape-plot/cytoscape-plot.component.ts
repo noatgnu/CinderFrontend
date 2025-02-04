@@ -92,7 +92,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         style: [
           { selector: 'node', style: { 'label': 'data(label)', 'background-color': '#666', 'width': 'data(size)', 'height': 'data(size)' } },
           { selector: '.protein', style: { 'background-color': '#FF5733' } },
-          { selector: '.analysis', style: { 'background-color': '#33FF57' } },
+          { selector: '.analysis', style: { 'background-color': '#33FF57', 'label': '' } },
           { selector: '.condition', style: { 'background-color': '#FF33A1' } },
           { selector: 'edge', style: { 'width': 2, 'line-color': '#ccc' } }
         ],
@@ -142,15 +142,15 @@ export class CytoscapePlotComponent implements AfterViewInit{
       searchResults.forEach(result => {
         const proteinId = result.gene_name || result.uniprot_id || result.primary_id;
         const analysisGroupId = `AG_${result.analysis_group.id}`;
-        let conditionAId = `Cond_${result.condition_A}`;
-        let conditionBId = `Cond_${result.condition_B}`;
+        let conditionAId = `${result.condition_A}`;
+        let conditionBId = `${result.condition_B}`;
 
         if (this.renameCondition[project.id]) {
           if (this.renameCondition[project.id][result.condition_A]) {
-            conditionAId = `Cond_${this.renameCondition[project.id][result.condition_A]}`;
+            conditionAId = `${this.renameCondition[project.id][result.condition_A]}`;
           }
           if (this.renameCondition[project.id][result.condition_B]) {
-            conditionBId = `Cond_${this.renameCondition[project.id][result.condition_B]}`;
+            conditionBId = `${this.renameCondition[project.id][result.condition_B]}`;
           }
         }
 
@@ -167,12 +167,12 @@ export class CytoscapePlotComponent implements AfterViewInit{
         if (!conditionProjectMap[conditionAId]) {
           conditionProjectMap[conditionAId] = new Set();
         }
-        conditionProjectMap[conditionAId].add(project.id.toString());
+        conditionProjectMap[conditionAId].add(project.name);
 
         if (!conditionProjectMap[conditionBId]) {
           conditionProjectMap[conditionBId] = new Set();
         }
-        conditionProjectMap[conditionBId].add(project.id.toString());
+        conditionProjectMap[conditionBId].add(project.name);
 
         elements.push({ data: { source: proteinId, target: analysisGroupId } });
         elements.push({ data: { source: analysisGroupId, target: conditionAId } });
