@@ -128,27 +128,23 @@ export class CytoscapePlotComponent implements AfterViewInit{
       });
       this.cy.nodes().forEach(node => {
         node.on('mouseover', (event) => {
-          if (node.hasClass('condition')) {
-            this.currentPopperRef = event.target.popper({
-              content: () => {
-                const tooltip = document.createElement('div');
-                tooltip.classList.add('cy-tooltip');
-                if (node.hasClass('condition')) {
-                  const projects = node.data('projects') || [];
-                  tooltip.innerHTML = `${node.data('label')}<br>Projects: ${projects.join(', ')}`;
-                } else if (node.hasClass('analysis')) {
-                  tooltip.innerHTML = node.data('label');
-                }
-                document.body.appendChild(tooltip);
-                this.currentTooltip = tooltip;
-                return tooltip;
-              },
-              popper: {
-                placement: 'bottom',
-                removeOnDestroy: true,
-              },
-            });
-          }
+          this.currentPopperRef = event.target.popper({
+            content: () => {
+              const tooltip = document.createElement('div');
+              tooltip.classList.add('cy-tooltip');
+              if (node.hasClass('condition')) {
+                const projects = node.data('projects') || [];
+                tooltip.innerHTML = `${node.data('label')}<br>Projects: ${projects.join(', ')}`;
+              }
+              document.body.appendChild(tooltip);
+              this.currentTooltip = tooltip;
+              return tooltip;
+            },
+            popper: {
+              placement: 'bottom',
+              removeOnDestroy: true,
+            },
+          });
         });
 
         node.on('mouseout', () => {
