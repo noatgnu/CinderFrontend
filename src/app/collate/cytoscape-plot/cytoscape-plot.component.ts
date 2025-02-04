@@ -153,13 +153,14 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
       });
       layers.renderPerEdge(
-        layers.append('canvas'),
+        layers.insertAfter('canvas'),
         (ctx: CanvasRenderingContext2D, edge: any, bb: any) => {
           console.log(edge)
           console.log(bb)
           const intensityA = edge.data('intensityA');
           const intensityB = edge.data('intensityB');
-
+          console.log(intensityA)
+          console.log(intensityB)
           const barWidth = 10;
           const barHeightA = intensityA * 10; // Scale the intensity value
           const barHeightB = intensityB * 10; // Scale the intensity value
