@@ -168,7 +168,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           const normIntensityB = (intensityB / maxIntensity) * maxBarHeight;
 
           const x = (start.x + end.x) / 2 - barWidth;
-          const y = (start.y + end.y) / 2 - maxBarHeight;
+          const y = (start.y + end.y) / 2;
 
           ctx.fillStyle = 'white';
           ctx.fillRect(x - barWidth - 2, y - maxBarHeight, barWidth * 2 + 4, maxBarHeight * 2);
@@ -176,10 +176,10 @@ export class CytoscapePlotComponent implements AfterViewInit{
           ctx.strokeRect(x - barWidth - 2, y - maxBarHeight, barWidth * 2 + 4, maxBarHeight * 2);
 
           ctx.fillStyle = 'red';
-          ctx.fillRect(x - barWidth, y, barWidth, normIntensityA);
+          ctx.fillRect(x - barWidth, y - normIntensityA, barWidth, normIntensityA);
 
           ctx.fillStyle = 'blue';
-          ctx.fillRect(x + 2, y, barWidth, normIntensityB);
+          ctx.fillRect(x + 2, y - normIntensityB, barWidth, normIntensityB);
         }
       );
     }
