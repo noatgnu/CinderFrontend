@@ -154,7 +154,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
       });
       layers.renderPerEdge(
-        layers.edgeLayer.insertAfter('canvas'),
+        layers.noderLayer.insertAfter('canvas'),
         (ctx: CanvasRenderingContext2D, edge: any, bb: any) => {
           console.log(edge)
           console.log(bb)
