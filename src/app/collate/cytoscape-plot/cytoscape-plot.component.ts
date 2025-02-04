@@ -127,14 +127,28 @@ export class CytoscapePlotComponent implements AfterViewInit{
       console.log(layers)
       this.cy.on('ready', () => {
         layers.renderPerEdge(
-          layers.nodeLayer.insertAfter('canvas'),
+          layers.edgeLayer.insertAfter('canvas'),
           (ctx: CanvasRenderingContext2D, edge: any, bb: any) => {
-            const conditionA = edge.data('conditionA');
-            const conditionB = edge.data('conditionB');
             console.log(edge)
+            console.log(bb)
+            const intensityA = edge.data('intensityA');
+            const intensityB = edge.data('intensityB');
+
+            const barWidth = 10;
+            const barHeightA = intensityA * 10; // Scale the intensity value
+            const barHeightB = intensityB * 10; // Scale the intensity value
+
+            const x = bb.x1 + (bb.w / 2) - barWidth;
+            const y = bb.y1 + (bb.h / 2);
+
+            ctx.fillStyle = '#FF5733';
+            ctx.fillRect(x, y - barHeightA, barWidth, barHeightA);
+
+            ctx.fillStyle = '#33A1FF';
+            ctx.fillRect(x + barWidth + 2, y - barHeightB, barWidth, barHeightB);
           }
-        )
-      })
+        );
+      });
       this.cy.edges().forEach(edge => {
 
         edge.on('mouseover', (event) => {
