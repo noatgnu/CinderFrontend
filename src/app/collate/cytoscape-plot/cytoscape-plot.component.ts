@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, ViewChild, ViewEncapsulation} from '@angular/core';
 import cytoscape from "cytoscape";
 import {SearchResult, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
@@ -61,7 +61,8 @@ function popperFactory(ref: any, content: any, opts: any) {
     NgClass
   ],
   templateUrl: './cytoscape-plot.component.html',
-  styleUrl: './cytoscape-plot.component.scss'
+  styleUrl: './cytoscape-plot.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class CytoscapePlotComponent implements AfterViewInit{
   showCytoscapePlot: boolean = false;
