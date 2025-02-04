@@ -133,6 +133,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
               const tooltip = document.createElement('div');
               tooltip.classList.add('cy-tooltip');
               if (node.hasClass('condition')) {
+                console.log(node.data('projects'))
+                console.log(node.data)
                 const projects = node.data('projects') || [];
                 tooltip.innerHTML = `${node.data('label')}<br>Projects: ${projects.join(', ')}`;
               }
