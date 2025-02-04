@@ -94,7 +94,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
           { selector: '.protein', style: { 'background-color': '#FF5733' } },
           { selector: '.analysis', style: { 'background-color': '#33FF57', 'label': '' } },
           { selector: '.condition', style: { 'background-color': '#FF33A1' } },
-          { selector: 'edge', style: { 'width': 2, 'line-color': '#ccc' } }
+          { selector: 'edge', style: { 'width': 2, 'line-color': 'data(color)', 'target-arrow-color': 'data(color)', 'target-arrow-shape': 'triangle' } }
+
         ],
         //@ts-ignore
         layout: { name: 'euler', animate: true }
@@ -140,6 +141,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const elements: any[] = [];
     const addedNodes = new Set();
     const conditionProjectMap: { [condition: string]: Set<string> } = {};
+    const comparisonColorMap: { [comparison: string]: string } = {};
 
     this.projects.forEach(project => {
       const searchResults = this.searchResultsMap[project.id] || [];
@@ -182,8 +184,14 @@ export class CytoscapePlotComponent implements AfterViewInit{
         }
         conditionProjectMap[conditionBId].add(project.name);
 
-        elements.push({ data: { source: conditionAId, target: proteinId, magnitude: result.log2_fc} });
-        elements.push({ data: { source: proteinId, target: conditionBId, magnitude: result.log2_fc} });
+        const comparisonKey = `${conditionAId}-${conditionBId}`;
+        if (!comparisonColorMap[comparisonKey]) {
+          comparisonColorMap[comparisonKey] = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+        }
+
+        const color = comparisonColorMap[comparisonKey];
+        elements.push({ data: { source: conditionAId, target: proteinId, magnitude: result.log2_fc, color: color } });
+        elements.push({ data: { source: proteinId, target: conditionBId, magnitude: result.log2_fc, color: color } });
       });
     });
 
