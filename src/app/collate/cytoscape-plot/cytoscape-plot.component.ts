@@ -153,16 +153,16 @@ export class CytoscapePlotComponent implements AfterViewInit{
       const searchResults = this.searchResultsMap[project.id] || [];
       searchResults.forEach(result => {
         const proteinId = result.gene_name || result.uniprot_id || result.primary_id;
-        const analysisGroupId = `analysis-${result.analysis_group}`;
+        const comparisonId = `comparison-${result.condition_A}-${result.condition_B}`;
 
         if (!addedNodes.has(proteinId)) {
           elements.push({ data: { id: proteinId, label: proteinId, size: 25 }, classes: 'protein' });
           addedNodes.add(proteinId);
         }
 
-        if (!addedNodes.has(analysisGroupId)) {
-          elements.push({ data: { id: analysisGroupId, label: result.analysis_group, size: 25 }, classes: 'analysis' });
-          addedNodes.add(analysisGroupId);
+        if (!addedNodes.has(comparisonId)) {
+          elements.push({ data: { id: comparisonId, label: `${result.condition_A} vs ${result.condition_B}`, size: 25 }, classes: 'comparison' });
+          addedNodes.add(comparisonId);
         }
 
         const comparisonKey = `${result.condition_A}-${result.condition_B}`;
@@ -172,8 +172,9 @@ export class CytoscapePlotComponent implements AfterViewInit{
         const color = comparisonColorMap[comparisonKey];
         elements.push({
           data: {
+            id: `${proteinId}-${comparisonId}-${comparisonKey}`,
             source: proteinId,
-            target: analysisGroupId,
+            target: comparisonId,
             color: color,
             comparisonKey: comparisonKey,
             conditionA: result.condition_A,
