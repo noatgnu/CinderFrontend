@@ -90,10 +90,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
   updateCytoscape() {
-    const elements = this.buildGraphElements();
-    this.cy.json({ elements: elements });
-    //@ts-ignore
-    this.cy.layout({ name: 'euler', animate: true }).run();
+    this.cy.destroy();
+    this.initCytoscape();
   }
 
 
@@ -114,7 +112,17 @@ export class CytoscapePlotComponent implements AfterViewInit{
         //@ts-ignore
         layout: { name: 'euler', animate: true }
       });
+      this.cy.edges().forEach(edge => {
+        edge.on('mouseover', (event) => {
+          const comparisonKey = event.target.data('comparisonKey');
+          this.cy.edges(`[comparisonKey = "${comparisonKey}"]`).addClass('edge-hover');
+        });
 
+        edge.on('mouseout', (event) => {
+          const comparisonKey = event.target.data('comparisonKey');
+          this.cy.edges(`[comparisonKey = "${comparisonKey}"]`).removeClass('edge-hover');
+        });
+      });
       this.cy.nodes().forEach(node => {
         node.on('mouseover', (event) => {
           if (node.hasClass('condition')) {
@@ -204,8 +212,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
         }
 
         const color = comparisonColorMap[comparisonKey];
-        elements.push({ data: { source: conditionAId, target: proteinId, magnitude: result.log2_fc, color: color, projects: conditionProjectMap[conditionAId] } });
-        elements.push({ data: { source: proteinId, target: conditionBId, magnitude: result.log2_fc, color: color, projects: conditionProjectMap[conditionBId] } });
+        elements.push({ data: { source: conditionAId, target: proteinId, magnitude: result.log2_fc, color: color, comparisonKey: comparisonKey, projects: conditionProjectMap[conditionAId] } });
+        elements.push({ data: { source: proteinId, target: conditionBId, magnitude: result.log2_fc, color: color, comparisonKey: comparisonKey, projects: conditionProjectMap[conditionBId] } });
       });
     });
 

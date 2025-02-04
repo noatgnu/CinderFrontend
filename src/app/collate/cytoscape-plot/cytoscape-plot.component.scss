@@ -3,3 +3,8 @@
   height: 600px;
   border: 1px solid #ccc;
 }
+.edge-hover {
+  transition: stroke-width 0.3s, stroke 0.3s;
+  stroke-width: 4px !important;
+  stroke: #ff0000 !important;
+}
