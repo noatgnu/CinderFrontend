@@ -24,6 +24,7 @@
     "angular-plotly.js": "^5.2.2",
     "cytoscape": "^3.31.0",
     "cytoscape-euler": "^1.2.3",
+    "cytoscape-layers": "^3.0.0",
     "cytoscape-popper": "^4.0.1",
     "jsdom": "^26.0.0",
     "jssha": "^3.3.1",

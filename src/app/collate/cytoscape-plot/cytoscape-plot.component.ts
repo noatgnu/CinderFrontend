@@ -10,7 +10,7 @@ import {MatIconButton} from "@angular/material/button";
 import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
 import {CollateService} from "../collate.service";
-
+import Layers from 'cytoscape-layers';
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -84,6 +84,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
   ngAfterViewInit() {
     cytoscape.use(euler);
     cytoscape.use(popper(popperFactory));
+    cytoscape.use(Layers);
+
     this.initCytoscape()
     this.collateService.collateRedrawSubject.subscribe(() => {
       this.updateCytoscape()
@@ -93,6 +95,11 @@ export class CytoscapePlotComponent implements AfterViewInit{
   updateCytoscape() {
     this.cy.destroy();
     this.initCytoscape();
+  }
+
+  renderBar(ctx: CanvasRenderingContext2D, value: number, y: number, w: number, h: number) {
+    ctx.fillRect(0, y, w*value, h);
+    ctx.strokeRect(0, y, w, h);
   }
 
 
@@ -113,7 +120,9 @@ export class CytoscapePlotComponent implements AfterViewInit{
         //@ts-ignore
         layout: { name: 'euler', animate: true, avoidOverlap: true},
       });
-
+      //@ts-ignore
+      const layers = this.cy.layers()
+      console.log(layers)
       this.cy.edges().forEach(edge => {
         edge.on('mouseover', (event) => {
           const data = event.target.data();
