@@ -107,37 +107,21 @@ export class CytoscapePlotComponent implements AfterViewInit{
           { selector: 'node', style: { 'label': 'data(label)', 'background-color': '#666', 'width': 'data(size)', 'height': 'data(size)' } },
           { selector: '.protein', style: { 'background-color': '#FF5733' } },
           { selector: '.analysis', style: { 'background-color': '#33FF57', 'label': '' } },
-          { selector: '.condition', style: { 'background-color': '#FF33A1' } },
           { selector: 'edge[color]', style: { 'width': 2, 'line-color': 'data(color)', 'target-arrow-color': 'data(color)', 'target-arrow-shape': 'triangle' } }
         ],
         //@ts-ignore
         layout: { name: 'euler', animate: true }
       });
+
       this.cy.edges().forEach(edge => {
         edge.on('mouseover', (event) => {
-          const comparisonKey = event.target.data('comparisonKey');
-          this.cy.edges(`[comparisonKey = "${comparisonKey}"]`).addClass('edge-hover');
-          console.log(comparisonKey)
-        });
-
-        edge.on('mouseout', (event) => {
-          const comparisonKey = event.target.data('comparisonKey');
-          this.cy.edges(`[comparisonKey = "${comparisonKey}"]`).removeClass('edge-hover');
-          console.log(comparisonKey)
-        });
-      });
-      this.cy.nodes().forEach(node => {
-        node.on('mouseover', (event) => {
+          const data = event.target.data();
+          const tooltipContent = `Comparison: ${data.conditionA} vs ${data.conditionB}<br>Intensity A: ${data.intensityA}<br>Intensity B: ${data.intensityB}`;
           this.currentPopperRef = event.target.popper({
             content: () => {
               const tooltip = document.createElement('div');
               tooltip.classList.add('cy-tooltip');
-              if (node.hasClass('condition')) {
-                console.log(node.data('projects'))
-                console.log(node.data)
-                const projects = node.data('projects') || [];
-                tooltip.innerHTML = `${node.data('label')}<br>Projects: ${projects.join(', ')}`;
-              }
+              tooltip.innerHTML = tooltipContent;
               document.body.appendChild(tooltip);
               this.currentTooltip = tooltip;
               return tooltip;
@@ -149,7 +133,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           });
         });
 
-        node.on('mouseout', () => {
+        edge.on('mouseout', () => {
           if (this.currentTooltip) {
             document.body.removeChild(this.currentTooltip);
             this.currentTooltip = null;
@@ -163,66 +147,42 @@ export class CytoscapePlotComponent implements AfterViewInit{
   buildGraphElements() {
     const elements: any[] = [];
     const addedNodes = new Set();
-    const conditionProjectMap: { [condition: string]: Set<string> } = {};
     const comparisonColorMap: { [comparison: string]: string } = {};
 
     this.projects.forEach(project => {
       const searchResults = this.searchResultsMap[project.id] || [];
       searchResults.forEach(result => {
         const proteinId = result.gene_name || result.uniprot_id || result.primary_id;
-        let conditionAId = `${result.condition_A}`;
-        let conditionBId = `${result.condition_B}`;
-
-        if (this.renameCondition[project.id]) {
-          if (this.renameCondition[project.id][result.condition_A]) {
-            conditionAId = `${this.renameCondition[project.id][result.condition_A]}`;
-          }
-          if (this.renameCondition[project.id][result.condition_B]) {
-            conditionBId = `${this.renameCondition[project.id][result.condition_B]}`;
-          }
-        }
+        const analysisGroupId = `analysis-${result.analysis_group}`;
 
         if (!addedNodes.has(proteinId)) {
           elements.push({ data: { id: proteinId, label: proteinId, size: 25 }, classes: 'protein' });
           addedNodes.add(proteinId);
         }
 
-        if (!addedNodes.has(conditionAId)) {
-          elements.push({ data: { id: conditionAId, label: conditionAId, size: 25 }, classes: 'condition' });
-          addedNodes.add(conditionAId);
+        if (!addedNodes.has(analysisGroupId)) {
+          elements.push({ data: { id: analysisGroupId, label: result.analysis_group, size: 25 }, classes: 'analysis' });
+          addedNodes.add(analysisGroupId);
         }
 
-        if (!addedNodes.has(conditionBId)) {
-          elements.push({ data: { id: conditionBId, label: conditionBId, size: 25 }, classes: 'condition' });
-          addedNodes.add(conditionBId);
-        }
-
-        if (!conditionProjectMap[conditionAId]) {
-          conditionProjectMap[conditionAId] = new Set();
-        }
-        conditionProjectMap[conditionAId].add(project.name);
-
-        if (!conditionProjectMap[conditionBId]) {
-          conditionProjectMap[conditionBId] = new Set();
-        }
-        conditionProjectMap[conditionBId].add(project.name);
-
-        const comparisonKey = `${conditionAId}-${conditionBId}`;
+        const comparisonKey = `${result.condition_A}-${result.condition_B}`;
         if (!comparisonColorMap[comparisonKey]) {
           comparisonColorMap[comparisonKey] = `#${Math.floor(Math.random()*16777215).toString(16)}`;
         }
-
-        const color = comparisonColorMap[comparisonKey] || this.getRandomColor();
-        comparisonColorMap[comparisonKey] = color;
-        elements.push({ data: { source: conditionAId, target: proteinId, magnitude: result.log2_fc, color: color, comparisonKey: comparisonKey, projects: conditionProjectMap[conditionAId] } });
-        elements.push({ data: { source: proteinId, target: conditionBId, magnitude: result.log2_fc, color: color, comparisonKey: comparisonKey, projects: conditionProjectMap[conditionBId] } });
+        const color = comparisonColorMap[comparisonKey];
+        elements.push({
+          data: {
+            source: proteinId,
+            target: analysisGroupId,
+            color: color,
+            comparisonKey: comparisonKey,
+            conditionA: result.condition_A,
+            conditionB: result.condition_B,
+            intensityA: result.searched_data.find(data => data.Condition === result.condition_A)?.Value,
+            intensityB: result.searched_data.find(data => data.Condition === result.condition_B)?.Value,
+          }
+        });
       });
-    });
-
-    Object.keys(conditionProjectMap).forEach(conditionId => {
-      const projects = Array.from(conditionProjectMap[conditionId]);
-      const size = 25 + projects.length * 5;
-      elements.push({ data: { id: conditionId, label: conditionId, size: size, projects: projects }, classes: 'condition' });
     });
 
     return elements;
