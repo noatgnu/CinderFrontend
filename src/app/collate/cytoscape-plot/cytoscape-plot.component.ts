@@ -161,22 +161,25 @@ export class CytoscapePlotComponent implements AfterViewInit{
           const data = edge.data();
           const intensityA = parseFloat(data.intensityA);
           const intensityB = parseFloat(data.intensityB);
-          console.log(data)
+          const barWidth = 10;
+          const maxBarHeight = 50; // Maximum height for the bars
+          const maxIntensity = Math.max(intensityA, intensityB);
+          const normIntensityA = (intensityA / maxIntensity) * maxBarHeight;
+          const normIntensityB = (intensityB / maxIntensity) * maxBarHeight;
+
           const x = (start.x + end.x) / 2;
           const y = (start.y + end.y) / 2;
-          const w = Math.abs(start.x - end.x);
-          const h = Math.abs(start.y - end.y);
           ctx.fillStyle = 'white';
-          ctx.fillRect(x, y, 30, 50);
+          ctx.fillRect(x - barWidth - 2, y - maxBarHeight, barWidth * 2 + 4, maxBarHeight * 2);
           ctx.strokeStyle = 'black';
-          // normalize intensity values to 0-1
-          const maxIntensity = Math.max(intensityA, intensityB);
-          const normIntensityA = intensityA / maxIntensity;
-          const normIntensityB = intensityB / maxIntensity;
+          ctx.strokeRect(x - barWidth - 2, y - maxBarHeight, barWidth * 2 + 4, maxBarHeight * 2);
+
           ctx.fillStyle = 'red';
-          ctx.fillRect(x, y, 30*normIntensityA, 50);
+          ctx.fillRect(x - barWidth, y - normIntensityA, barWidth, normIntensityA);
+
           ctx.fillStyle = 'blue';
-          ctx.fillRect(x, y + 25, 30*normIntensityB, 25);
+          ctx.fillRect(x + 2, y - normIntensityB, barWidth, normIntensityB);
+
         }
       );
     }
