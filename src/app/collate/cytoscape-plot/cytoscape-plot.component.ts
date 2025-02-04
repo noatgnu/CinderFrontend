@@ -106,7 +106,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
         style: [
           { selector: 'node', style: { 'label': 'data(label)', 'background-color': '#666', 'width': 'data(size)', 'height': 'data(size)' } },
           { selector: '.protein', style: { 'background-color': '#FF5733' } },
-          { selector: '.analysis', style: { 'background-color': '#33FF57', 'label': '' } },
+          { selector: '.analysis', style: { 'background-color': '#ba0000', 'label': '' } },
+          { selector: '.comparison', style: { 'background-color': '#33A1FF' } },
           { selector: 'edge[color]', style: { 'width': 2, 'line-color': 'data(color)', 'target-arrow-color': 'data(color)', 'target-arrow-shape': 'triangle' } }
         ],
         //@ts-ignore
