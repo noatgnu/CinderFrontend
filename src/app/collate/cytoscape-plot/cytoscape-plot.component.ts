@@ -117,11 +117,13 @@ export class CytoscapePlotComponent implements AfterViewInit{
         edge.on('mouseover', (event) => {
           const comparisonKey = event.target.data('comparisonKey');
           this.cy.edges(`[comparisonKey = "${comparisonKey}"]`).addClass('edge-hover');
+          console.log(comparisonKey)
         });
 
         edge.on('mouseout', (event) => {
           const comparisonKey = event.target.data('comparisonKey');
           this.cy.edges(`[comparisonKey = "${comparisonKey}"]`).removeClass('edge-hover');
+          console.log(comparisonKey)
         });
       });
       this.cy.nodes().forEach(node => {
