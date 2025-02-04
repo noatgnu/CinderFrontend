@@ -10,8 +10,9 @@ import {MatIconButton} from "@angular/material/button";
 import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
 import {CollateService} from "../collate.service";
-import Layers from 'cytoscape-layers';
+import Layers, {IPoint} from 'cytoscape-layers';
 import {ILayer} from "cytoscape-layers";
+import cy from "cytoscape";
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -154,26 +155,19 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
       });
       layers.renderPerEdge(
-        layers.noderLayer.insertAfter('canvas'),
-        (ctx: CanvasRenderingContext2D, edge: any, bb: any) => {
-          console.log(edge)
-          console.log(bb)
-          const intensityA = edge.data('intensityA');
-          const intensityB = edge.data('intensityB');
-          console.log(intensityA)
-          console.log(intensityB)
-          const barWidth = 10;
-          const barHeightA = intensityA * 10; // Scale the intensity value
-          const barHeightB = intensityB * 10; // Scale the intensity value
+        layers.nodeLayer.insertAfter('canvas'),
+        (ctx: CanvasRenderingContext2D, edge: cy.EdgeSingular, path: Path2D, start: IPoint, end: IPoint) => {
 
-          const x = bb.x1 + (bb.w / 2) - barWidth;
-          const y = bb.y1 + (bb.h / 2);
-
-          ctx.fillStyle = '#FF5733';
-          ctx.fillRect(x, y - barHeightA, barWidth, barHeightA);
-
-          ctx.fillStyle = '#33A1FF';
-          ctx.fillRect(x + barWidth + 2, y - barHeightB, barWidth, barHeightB);
+          const data = edge.data();
+          const intensityA = parseFloat(data.intensityA);
+          const intensityB = parseFloat(data.intensityB);
+          console.log(data)
+          const x = (start.x + end.x) / 2;
+          const y = (start.y + end.y) / 2;
+          const w = Math.abs(start.x - end.x);
+          const h = Math.abs(start.y - end.y);
+          // draw bar chart, max width is 30 max height is 50
+          
         }
       );
     }
