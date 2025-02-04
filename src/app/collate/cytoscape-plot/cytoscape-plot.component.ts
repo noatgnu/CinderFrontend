@@ -11,6 +11,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
 import {CollateService} from "../collate.service";
 import Layers from 'cytoscape-layers';
+import {ILayer} from "cytoscape-layers";
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -121,10 +122,23 @@ export class CytoscapePlotComponent implements AfterViewInit{
         layout: { name: 'euler', animate: true, avoidOverlap: true},
       });
       //@ts-ignore
-      const layers = this.cy.layers()
+      const layers: any = this.cy.layers()
+
       console.log(layers)
+      this.cy.on('ready', () => {
+        layers.renderPerEdge(
+          layers.nodeLayer.insertAfter('canvas'),
+          (ctx: CanvasRenderingContext2D, edge: any, bb: any) => {
+            const conditionA = edge.data('conditionA');
+            const conditionB = edge.data('conditionB');
+            console.log(edge)
+          }
+        )
+      })
       this.cy.edges().forEach(edge => {
+
         edge.on('mouseover', (event) => {
+
           const data = event.target.data();
           const tooltipContent = `Comparison: ${data.conditionA} vs ${data.conditionB}<br>Intensity ${data.conditionA}: ${data.intensityA}<br>Intensity ${data.conditionB}: ${data.intensityB}`;
           this.currentPopperRef = event.target.popper({
