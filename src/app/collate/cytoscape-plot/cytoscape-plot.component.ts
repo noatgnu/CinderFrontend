@@ -10,7 +10,7 @@ import {MatIconButton} from "@angular/material/button";
 import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
 import {CollateService} from "../collate.service";
-import Layers, {IPoint} from 'cytoscape-layers';
+import Layers, {ICanvasLayer, IPoint} from 'cytoscape-layers';
 import {ILayer} from "cytoscape-layers";
 import cy from "cytoscape";
 
@@ -79,6 +79,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   cy!: cytoscape.Core
   currentPopperRef: PopperInstance | null = null;
   currentTooltip: HTMLElement | null = null;
+  barChartLayers: Map<string, ICanvasLayer> = new Map();
 
   constructor(private collateService: CollateService) {
 
@@ -126,8 +127,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
           const targetEdge = event.target
           const showBarChart = targetEdge.data('showBarChart')
           targetEdge.data('showBarChart', !showBarChart)
-          console.log(targetEdge.data());
-          this.updateBarChartVisibility();
+          console.log(targetEdge.data())
+          this.drawBarChartOnEdges(layers);
         })
 
         edge.on('mouseover', (event) => {
@@ -262,7 +263,15 @@ export class CytoscapePlotComponent implements AfterViewInit{
     this.showBarChart = !this.showBarChart;
     this.updateCytoscape();
   }
-  updateBarChartVisibility() {
+  updateBarChartVisibility(edge: cy.EdgeSingular) {
+    const edgeId = edge.id();
+    if (!this.showBarChart || !edge.data('showBarChart')) {
+      if (this.barChartLayers.has(edgeId)) {
+        const layer = this.barChartLayers.get(edgeId);
+
+        this.barChartLayers.delete(edgeId);
+      }
+    }
     // @ts-ignore
     const layers: any = this.cy.layers();
     this.cy.edges().forEach(edge => {
