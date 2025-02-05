@@ -31,7 +31,6 @@ function popperFactory(ref: any, content: any, opts: any) {
   function update() {
     const bounded = ref.getBoundingClientRect()
     computePosition(ref, content, popperOptions).then(({x, y}) => {
-      console.log(x, y)
       const result = Object.assign(content.style, {
         left: `${bounded.left}px`,
         top: `${y}px`,
@@ -45,7 +44,6 @@ function popperFactory(ref: any, content: any, opts: any) {
         "box-shadow": "0 2px 10px rgba(0, 0, 0, 0.2)",
         "pointer-events": "none",
       });
-      console.log(result)
       return result;
     });
   }
@@ -127,9 +125,12 @@ export class CytoscapePlotComponent implements AfterViewInit{
           const targetEdge = event.target
           const showBarChart = targetEdge.data('showBarChart')
           targetEdge.data('showBarChart', !showBarChart)
-          console.log(targetEdge.data())
           this.drawBarChartOnEdges(layers);
-          this.cy.trigger('render')
+          this.cy.batch(() => {
+            this.cy.nodes().forEach(node => {
+              node.trigger('position')
+            })
+          })
         })
 
         edge.on('mouseover', (event) => {
