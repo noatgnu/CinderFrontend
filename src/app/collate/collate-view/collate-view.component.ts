@@ -410,8 +410,8 @@ export class CollateViewComponent {
       if (result) {
         console.log(result);
         if ( result.searchTerms.length > 0) {
-          this.cytoscapePlotFilteredResults = this.getFilteredSearchResults(result.searchTerms);
-          this.cytoscapePlotFilteredResults = Object.assign({}, this.cytoscapePlotFilteredResults);
+          const filterResults = this.getFilteredSearchResults(result.searchTerms);
+          this.cytoscapePlotFilteredResults = { ...filterResults };
         } else {
           this.cytoscapePlotFilteredResults = {};
         }
