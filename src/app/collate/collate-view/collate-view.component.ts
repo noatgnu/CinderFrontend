@@ -279,7 +279,7 @@ export class CollateViewComponent {
   filterDataBySearchTerm() {
     this.selectedSearchTerm = this.searchTerms[this.selectedIndex];
     this.filteredResults = this.getFilteredSearchResults([this.selectedSearchTerm]);
-    if (!this.cytoscapePlotFilteredResults && this.filteredResults) {
+    if (Object.keys(this.cytoscapePlotFilteredResults).length === 0 && this.filteredResults) {
       console.log(this.filteredResults);
       this.cytoscapePlotFilteredResults = Object.assign({}, this.filteredResults) ;
     }
