@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectorRef, Component, Input} from '@angular/core';
 import {SearchResult, SearchResultQuery, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import {Collate} from "../collate";
@@ -160,7 +160,7 @@ export class CollateViewComponent {
     console.log(this.cytoscapePlotFilteredResults)
   }
 
-  constructor(private title: Title, private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
+  constructor(private cdr: ChangeDetectorRef, private title: Title, private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
     const pastSearches = localStorage.getItem('cinderPastSearches');
     if (pastSearches) {
       this.pastSearches = JSON.parse(pastSearches);
@@ -416,6 +416,7 @@ export class CollateViewComponent {
           this.cytoscapePlotFilteredResults = {};
         }
         console.log(this.cytoscapePlotFilteredResults);
+        this.cdr.detectChanges()
         this.collateService.collateRedrawSubject.next(true);
 
       }
