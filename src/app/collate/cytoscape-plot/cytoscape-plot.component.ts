@@ -77,7 +77,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   barChartLayers: Map<string, ICanvasLayer> = new Map();
   projectColorMap: { [projectId: string]: string } = {};
 
-  constructor(private collateService: CollateService) {
+  constructor(private collateService: CollateService, private cdr: ChangeDetectorRef) {
 
   }
 
@@ -93,6 +93,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
   updateCytoscape() {
+    this.cdr.detectChanges();
     this.cy.destroy();
     this.initCytoscape();
   }
