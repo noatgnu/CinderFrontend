@@ -99,11 +99,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
     this.initCytoscape();
   }
 
-  renderBar(ctx: CanvasRenderingContext2D, value: number, y: number, w: number, h: number) {
-    ctx.fillRect(0, y, w*value, h);
-    ctx.strokeRect(0, y, w, h);
-  }
-
 
   initCytoscape() {
     if (this.cyElement) {
@@ -126,6 +121,12 @@ export class CytoscapePlotComponent implements AfterViewInit{
       const layers: any = this.cy.layers()
       console.log(layers)
       this.cy.edges().forEach(edge => {
+        edge.on('click', (event) => {
+          const targetEdge = event.target
+          const showBarChart = targetEdge.data('showBarChart')
+          targetEdge.data('showBarChart', !showBarChart)
+          this.cy.trigger('render')
+        })
 
         edge.on('mouseover', (event) => {
 
@@ -157,34 +158,42 @@ export class CytoscapePlotComponent implements AfterViewInit{
       layers.renderPerEdge(
         layers.nodeLayer.insertAfter('canvas'),
         (ctx: CanvasRenderingContext2D, edge: cy.EdgeSingular, path: Path2D, start: IPoint, end: IPoint) => {
-          const data = edge.data();
-          const intensityA = parseFloat(data.intensityA);
-          const intensityB = parseFloat(data.intensityB);
-
-          const barWidth = 10;
-          const maxBarHeight = 50; // Maximum height for the bars
-          const maxIntensity = Math.max(intensityA, intensityB);
-          const normIntensityA = (intensityA / maxIntensity) * maxBarHeight;
-          const normIntensityB = (intensityB / maxIntensity) * maxBarHeight;
-
-          const x = (start.x + end.x) / 2 - barWidth;
-          const y = (start.y + end.y) / 2 + maxBarHeight;
-
-          ctx.fillStyle = 'white';
-          ctx.fillRect(x - barWidth - 2, y - maxBarHeight-3, barWidth * 2 + 8, maxBarHeight+5);
-          ctx.strokeStyle = 'black';
-          ctx.strokeRect(x - barWidth - 2, y - maxBarHeight-3, barWidth * 2 + 8, maxBarHeight+5);
-
-          ctx.fillStyle = 'red';
-          ctx.fillRect(x - barWidth, y - normIntensityA, barWidth, normIntensityA);
-
-          ctx.fillStyle = 'blue';
-          ctx.fillRect(x + 2, y - normIntensityB, barWidth, normIntensityB);
+          // draw bar chart in middle of edge
+          if (!edge.data('showBarChart')) {
+            return;
+          }
+          this.renderBarChart(edge, start, end, ctx);
         }
       );
     }
   }
 
+
+  private renderBarChart(edge: cytoscape.EdgeSingular, start: IPoint, end: IPoint, ctx: CanvasRenderingContext2D) {
+    const data = edge.data();
+    const intensityA = parseFloat(data.intensityA);
+    const intensityB = parseFloat(data.intensityB);
+
+    const barWidth = 10;
+    const maxBarHeight = 50; // Maximum height for the bars
+    const maxIntensity = Math.max(intensityA, intensityB);
+    const normIntensityA = (intensityA / maxIntensity) * maxBarHeight;
+    const normIntensityB = (intensityB / maxIntensity) * maxBarHeight;
+
+    const x = (start.x + end.x) / 2 - barWidth;
+    const y = (start.y + end.y) / 2 + maxBarHeight;
+
+    ctx.fillStyle = 'white';
+    ctx.fillRect(x - barWidth - 2, y - maxBarHeight - 3, barWidth * 2 + 6, maxBarHeight + 5);
+    ctx.strokeStyle = 'black';
+    ctx.strokeRect(x - barWidth - 2, y - maxBarHeight - 3, barWidth * 2 + 6, maxBarHeight + 5);
+
+    ctx.fillStyle = 'red';
+    ctx.fillRect(x - barWidth, y - normIntensityA, barWidth, normIntensityA);
+
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(x + 2, y - normIntensityB, barWidth, normIntensityB);
+  }
 
   buildGraphElements() {
     const elements: any[] = [];
