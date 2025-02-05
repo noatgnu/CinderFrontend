@@ -50,11 +50,17 @@
 </div>
 
 @if (searchTerms.length > 0) {
-  <button mat-icon-button (click)="toggleCytoscapePlot()" matTooltip="Toggle Cytoscape Plot">
-    <mat-icon [ngClass]="{'disabled-icon': !showCytoscapePlot}">account_tree</mat-icon>
-  </button>
-  @if (collate && showCytoscapePlot) {
-    <app-cytoscape-plot [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [searchResultsMap]="filteredResults"></app-cytoscape-plot>
+  <div style="display: flex; gap: 20px">
+    <button mat-icon-button (click)="toggleCytoscapePlot()" matTooltip="Toggle Cytoscape Plot">
+      <mat-icon [ngClass]="{'disabled-icon': !showCytoscapePlot}">account_tree</mat-icon>
+    </button>
+    <button mat-icon-button (click)="filterCytoscapePlot()" matTooltip="Filter Cytoscape Plot Search Terms">
+      <mat-icon>filter_list</mat-icon>
+    </button>
+  </div>
+
+  @if (collate && showCytoscapePlot && cytoscapePlotFilteredResults) {
+    <app-cytoscape-plot [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [searchResultsMap]="cytoscapePlotFilteredResults"></app-cytoscape-plot>
   }
   <div style="padding: 20px">
     <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">

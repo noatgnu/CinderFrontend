@@ -28,6 +28,9 @@ import {
   CollateProjectAnalysisGroupVisibilityDialogComponent
 } from "../collate-project-analysis-group-visibility-dialog/collate-project-analysis-group-visibility-dialog.component";
 import {CytoscapePlotComponent} from "../cytoscape-plot/cytoscape-plot.component";
+import {
+  CollateCytoscapeTermResultFilterDialogComponent
+} from "../collate-cytoscape-term-result-filter-dialog/collate-cytoscape-term-result-filter-dialog.component";
 
 @Component({
     selector: 'app-collate-view',
@@ -150,6 +153,7 @@ export class CollateViewComponent {
 
   pastSearches: {searchQuery: SearchResultQuery|null, termFounds: string[], collate: number, searchID:number}[] = [];
   waitingForDownload = false
+  cytoscapePlotFilteredResults: { [projectId: number]: SearchResult[] } = {};
   toggleCytoscapePlot() {
     this.showCytoscapePlot = !this.showCytoscapePlot;
   }
@@ -224,13 +228,16 @@ export class CollateViewComponent {
     })
     this.selectedSearchTerm = this.searchTerms[0];
     this.filterDataBySearchTerm();
+    if (!this.cytoscapePlotFilteredResults && this.filteredResults) {
+      this.cytoscapePlotFilteredResults = this.filteredResults;
+    }
   }
 
-  getFilteredSearchResults(): { [projectId: number]: SearchResult[] } {
+  getFilteredSearchResults(searchTerms: string[]): { [projectId: number]: SearchResult[] } {
     const filteredResults: { [projectId: number]: SearchResult[] } = {};
     Object.keys(this.searchResults).forEach(projectId => {
       // @ts-ignore
-      filteredResults[projectId] = this.searchResults[projectId].filter(result => result.search_term === this.selectedSearchTerm);
+      filteredResults[projectId] = this.searchResults[projectId].filter(result => searchTerms.includes(result.search_term));
       if (this.collate?.settings?.analysisGroupOrderMap) {
         console.log(this.collate.settings.analysisGroupOrderMap);
         Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
@@ -271,7 +278,7 @@ export class CollateViewComponent {
 
   filterDataBySearchTerm() {
     this.selectedSearchTerm = this.searchTerms[this.selectedIndex];
-    this.filteredResults = this.getFilteredSearchResults();
+    this.filteredResults = this.getFilteredSearchResults([this.selectedSearchTerm]);
     this.collateService.collateRedrawSubject.next(true);
   }
 
@@ -388,7 +395,17 @@ export class CollateViewComponent {
     ref.afterClosed().subscribe((result: { [projectID: number]: { [analysisGroupID: number]: boolean } }) => {
       if (this.collate && result) {
         this.collate.settings.projectAnalysisGroupVisibility = result;
-        this.filteredResults = this.getFilteredSearchResults();
+        this.filteredResults = this.getFilteredSearchResults([this.selectedSearchTerm]);
+      }
+    })
+  }
+
+  filterCytoscapePlot() {
+    const ref = this.dialog.open(CollateCytoscapeTermResultFilterDialogComponent)
+    ref.componentInstance.searchTerms = this.searchTerms;
+    ref.afterClosed().subscribe((result: {searchTerms: string[]}|undefined|null) => {
+      if (result) {
+        this.cytoscapePlotFilteredResults = this.getFilteredSearchResults(result);
       }
     })
   }

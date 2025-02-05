@@ -11,7 +11,6 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
 import {CollateService} from "../collate.service";
 import Layers, {ICanvasLayer, IPoint} from 'cytoscape-layers';
-import {ILayer} from "cytoscape-layers";
 import cy from "cytoscape";
 
 function popperFactory(ref: any, content: any, opts: any) {
@@ -26,8 +25,6 @@ function popperFactory(ref: any, content: any, opts: any) {
     ...opts,
   }
 
-  console.log(content)
-  console.log(opts)
   function update() {
     const bounded = ref.getBoundingClientRect()
     computePosition(ref, content, popperOptions).then(({x, y}) => {
@@ -153,7 +150,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
       });
       //@ts-ignore
       const layers: any = this.cy.layers()
-      console.log(layers)
       this.cy.edges().forEach(edge => {
         edge.on('click', (event) => {
           const targetEdge = event.target
@@ -203,7 +199,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     layers.renderPerEdge(
       layers.nodeLayer.insertAfter('canvas'),
       (ctx: CanvasRenderingContext2D, edge: cy.EdgeSingular, path: Path2D, start: IPoint, end: IPoint) => {
-        console.log(edge, "drawEdgeBarChart");
+
         // draw bar chart in middle of edge
         if (!this.showBarChart || !edge.data('showBarChart')) {
           return;
