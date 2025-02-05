@@ -78,6 +78,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   currentPopperRef: PopperInstance | null = null;
   currentTooltip: HTMLElement | null = null;
   barChartLayers: Map<string, ICanvasLayer> = new Map();
+  projectColorMap: { [projectId: string]: string } = {};
 
   constructor(private collateService: CollateService) {
 
@@ -116,6 +117,39 @@ export class CytoscapePlotComponent implements AfterViewInit{
         ],
         //@ts-ignore
         layout: { name: 'euler', animate: true, avoidOverlap: true, minDist: 400, avoidOverlapPadding: 50},
+      });
+      this.cy.nodes('.comparison').forEach(node => {
+        node.on('mouseover', (event) => {
+          const data = event.target.data();
+          const tooltipContent = data.label;
+          this.currentPopperRef = event.target.popper({
+            content: () => {
+              const tooltip = document.createElement('div');
+              tooltip.classList.add('cy-tooltip');
+              tooltip.innerHTML = tooltipContent;
+              document.body.appendChild(tooltip);
+              this.currentTooltip = tooltip;
+              return tooltip;
+            },
+            popper: {
+              placement: 'bottom',
+              removeOnDestroy: true,
+            },
+          });
+        });
+
+        node.on('mouseout', () => {
+          if (this.currentTooltip) {
+            document.body.removeChild(this.currentTooltip);
+            this.currentTooltip = null;
+          }
+        });
+
+        node.on('click', (event) => {
+          const targetNode = event.target;
+          const currentLabel = targetNode.style('label');
+          targetNode.style('label', currentLabel ? '' : targetNode.data('label'));
+        });
       });
       //@ts-ignore
       const layers: any = this.cy.layers()
@@ -255,6 +289,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
       });
     });
+    this.projectColorMap = projectColorMap;
     return elements;
   }
 
@@ -269,5 +304,9 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
   getRandomColor(): string {
     return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+  }
+
+  getProjectColor(projectId: string): string {
+    return this.projectColorMap[projectId] || '#000000';
   }
 }
