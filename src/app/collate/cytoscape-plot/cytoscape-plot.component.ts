@@ -125,7 +125,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           const targetEdge = event.target
           const showBarChart = targetEdge.data('showBarChart')
           targetEdge.data('showBarChart', !showBarChart)
-          this.cy.trigger('render')
+          console.log(targetEdge.data())
         })
 
         edge.on('mouseover', (event) => {
