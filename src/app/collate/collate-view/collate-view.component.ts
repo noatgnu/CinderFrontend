@@ -405,7 +405,13 @@ export class CollateViewComponent {
     ref.componentInstance.searchTerms = this.searchTerms;
     ref.afterClosed().subscribe((result: {searchTerms: string[]}|undefined|null) => {
       if (result) {
-        this.cytoscapePlotFilteredResults = this.getFilteredSearchResults(result);
+        if ( result.searchTerms.length > 0) {
+          this.cytoscapePlotFilteredResults = this.getFilteredSearchResults(result.searchTerms);
+        } else {
+          this.cytoscapePlotFilteredResults = {};
+        }
+        this.collateService.collateRedrawSubject.next(true);
+
       }
     })
   }
