@@ -239,7 +239,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const elements: any[] = [];
     const addedNodes = new Set();
     const projectColorMap: { [projectId: string]: string } = {};
-
+    console.log(this.searchResultsMap)
     this.projects.forEach(project => {
       const searchResults = this.searchResultsMap[project.id] || [];
       if (!projectColorMap[project.id]) {
