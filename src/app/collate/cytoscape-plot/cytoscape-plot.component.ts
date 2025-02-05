@@ -115,7 +115,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           { selector: 'edge[color]', style: { 'width': 2, 'line-color': 'data(color)', 'target-arrow-color': 'data(color)', 'target-arrow-shape': 'triangle' } }
         ],
         //@ts-ignore
-        layout: { name: 'euler', animate: true, animationDuration: 1000,
+        layout: { name: 'fcose', animate: true, animationDuration: 1000,
           fit: true,
           padding: 30,
           nodeSeparation: 200,
