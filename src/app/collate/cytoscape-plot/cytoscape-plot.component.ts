@@ -168,6 +168,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     layers.renderPerEdge(
       layers.nodeLayer.insertAfter('canvas'),
       (ctx: CanvasRenderingContext2D, edge: cy.EdgeSingular, path: Path2D, start: IPoint, end: IPoint) => {
+        console.log(edge, "drawEdgeBarChart");
         // draw bar chart in middle of edge
         if (!this.showBarChart || !edge.data('showBarChart')) {
           return;
