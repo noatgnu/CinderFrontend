@@ -12,6 +12,7 @@ import {NgClass} from "@angular/common";
 import {CollateService} from "../collate.service";
 import Layers, {ICanvasLayer, IPoint} from 'cytoscape-layers';
 import cy from "cytoscape";
+import fcose from 'cytoscape-fcose';
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -82,7 +83,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
   ngAfterViewInit() {
-    cytoscape.use(euler);
+    cytoscape.use(fcose);
     cytoscape.use(popper(popperFactory));
     cytoscape.use(Layers);
 
@@ -114,7 +115,22 @@ export class CytoscapePlotComponent implements AfterViewInit{
           { selector: 'edge[color]', style: { 'width': 2, 'line-color': 'data(color)', 'target-arrow-color': 'data(color)', 'target-arrow-shape': 'triangle' } }
         ],
         //@ts-ignore
-        layout: { name: 'euler', animate: true, avoidOverlap: true, minDist: 400, avoidOverlapPadding: 50},
+        layout: { name: 'euler', animate: true, animationDuration: 1000,
+          fit: true,
+          padding: 30,
+          nodeSeparation: 200,
+          idealEdgeLength: 100,
+          nodeRepulsion: 4500,
+          edgeElasticity: 0.45,
+          gravity: 0.25,
+          numIter: 2500,
+          tile: true,
+          tilingPaddingVertical: 10,
+          tilingPaddingHorizontal: 10,
+          gravityRangeCompound: 1.5,
+          gravityCompound: 1.0,
+          gravityRange: 3.8,
+          initialEnergyOnIncremental: 0.5},
       });
       this.cy.nodes('.comparison').forEach(node => {
         node.on('mouseover', (event) => {
