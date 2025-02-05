@@ -129,6 +129,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           targetEdge.data('showBarChart', !showBarChart)
           console.log(targetEdge.data())
           this.drawBarChartOnEdges(layers);
+          this.cy.trigger('render')
         })
 
         edge.on('mouseover', (event) => {
@@ -263,21 +264,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     this.showBarChart = !this.showBarChart;
     this.updateCytoscape();
   }
-  updateBarChartVisibility(edge: cy.EdgeSingular) {
-    const edgeId = edge.id();
-    if (!this.showBarChart || !edge.data('showBarChart')) {
-      if (this.barChartLayers.has(edgeId)) {
-        const layer = this.barChartLayers.get(edgeId);
 
-        this.barChartLayers.delete(edgeId);
-      }
-    }
-    // @ts-ignore
-    const layers: any = this.cy.layers();
-    this.cy.edges().forEach(edge => {
-      this.drawBarChartOnEdges(layers);
-    });
-  }
   getRandomColor(): string {
     return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
   }
