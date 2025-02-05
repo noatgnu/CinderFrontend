@@ -280,7 +280,8 @@ export class CollateViewComponent {
     this.selectedSearchTerm = this.searchTerms[this.selectedIndex];
     this.filteredResults = this.getFilteredSearchResults([this.selectedSearchTerm]);
     if (!this.cytoscapePlotFilteredResults && this.filteredResults) {
-      this.cytoscapePlotFilteredResults = this.filteredResults;
+      console.log(this.filteredResults);
+      this.cytoscapePlotFilteredResults = Object.assign({}, this.filteredResults) ;
     }
   }
 
@@ -408,11 +409,13 @@ export class CollateViewComponent {
     ref.componentInstance.selectedSearchTerms = this.selectedCytoscapePlotSearchTerm;
     ref.afterClosed().subscribe((result: {searchTerms: string[]}|undefined|null) => {
       if (result) {
+        console.log(result);
         if ( result.searchTerms.length > 0) {
           this.cytoscapePlotFilteredResults = this.getFilteredSearchResults(result.searchTerms);
         } else {
           this.cytoscapePlotFilteredResults = {};
         }
+        console.log(this.cytoscapePlotFilteredResults);
         this.collateService.collateRedrawSubject.next(true);
 
       }
