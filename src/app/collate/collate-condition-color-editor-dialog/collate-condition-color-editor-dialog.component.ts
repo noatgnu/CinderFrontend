@@ -26,6 +26,7 @@ import {MatButton} from "@angular/material/button";
 })
 export class CollateConditionColorEditorDialogComponent {
   private _projects: Project[] = []
+
   @Input() set projects(value: Project[]) {
     this._projects = value
     for (const project of value) {

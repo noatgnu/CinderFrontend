@@ -23,8 +23,12 @@ import {MatButton} from "@angular/material/button";
 })
 export class CollateCytoscapeTermResultFilterDialogComponent {
   @Input() searchTerms: string[] = []
+  @Input() set selectedSearchTerms(value: string[]) {
+    // @ts-ignore
+    this.form.controls.searchTerms.setValue(value)
+  }
   form = this.fb.group({
-    searchTerms: this.fb.control([''],),
+    searchTerms: this.fb.control([],),
   })
 
   constructor(private fb: FormBuilder, private dialogRef: MatDialogRef<CollateCytoscapeTermResultFilterDialogComponent>) {

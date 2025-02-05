@@ -58,6 +58,7 @@ import {
     styleUrl: './collate-view.component.scss'
 })
 export class CollateViewComponent {
+  selectedCytoscapePlotSearchTerm: string[] = [];
   showCytoscapePlot: boolean = false;
   _sessionId: number | null = null;
   @Input() set sessionId(value: number | null) {
@@ -156,6 +157,7 @@ export class CollateViewComponent {
   cytoscapePlotFilteredResults: { [projectId: number]: SearchResult[] } = {};
   toggleCytoscapePlot() {
     this.showCytoscapePlot = !this.showCytoscapePlot;
+    console.log(this.cytoscapePlotFilteredResults)
   }
 
   constructor(private title: Title, private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
@@ -228,9 +230,7 @@ export class CollateViewComponent {
     })
     this.selectedSearchTerm = this.searchTerms[0];
     this.filterDataBySearchTerm();
-    if (!this.cytoscapePlotFilteredResults && this.filteredResults) {
-      this.cytoscapePlotFilteredResults = this.filteredResults;
-    }
+
   }
 
   getFilteredSearchResults(searchTerms: string[]): { [projectId: number]: SearchResult[] } {
@@ -279,7 +279,9 @@ export class CollateViewComponent {
   filterDataBySearchTerm() {
     this.selectedSearchTerm = this.searchTerms[this.selectedIndex];
     this.filteredResults = this.getFilteredSearchResults([this.selectedSearchTerm]);
-    this.collateService.collateRedrawSubject.next(true);
+    if (!this.cytoscapePlotFilteredResults && this.filteredResults) {
+      this.cytoscapePlotFilteredResults = this.filteredResults;
+    }
   }
 
   getSearchFromID(id: number) {
@@ -403,6 +405,7 @@ export class CollateViewComponent {
   filterCytoscapePlot() {
     const ref = this.dialog.open(CollateCytoscapeTermResultFilterDialogComponent)
     ref.componentInstance.searchTerms = this.searchTerms;
+    ref.componentInstance.selectedSearchTerms = this.selectedCytoscapePlotSearchTerm;
     ref.afterClosed().subscribe((result: {searchTerms: string[]}|undefined|null) => {
       if (result) {
         if ( result.searchTerms.length > 0) {
