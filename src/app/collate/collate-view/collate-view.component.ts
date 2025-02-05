@@ -235,11 +235,11 @@ export class CollateViewComponent {
 
   getFilteredSearchResults(searchTerms: string[]): { [projectId: number]: SearchResult[] } {
     const filteredResults: { [projectId: number]: SearchResult[] } = {};
+    console.log(searchTerms)
     Object.keys(this.searchResults).forEach(projectId => {
       // @ts-ignore
       filteredResults[projectId] = this.searchResults[projectId].filter(result => searchTerms.includes(result.search_term));
       if (this.collate?.settings?.analysisGroupOrderMap) {
-        console.log(this.collate.settings.analysisGroupOrderMap);
         Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
           const id = parseInt(projectId);
           const analysisGroupOrder = this.collate?.settings.analysisGroupOrderMap[id];
@@ -250,7 +250,6 @@ export class CollateViewComponent {
           if (!analysisGroupOrder) {
             return;
           }
-          console.log(analysisGroupOrder);
           const notInOrder = filteredResults[id].filter(result => !analysisGroupOrder.includes(result.analysis_group.id));
           filteredResults[id] = filteredResults[id].filter(result => analysisGroupOrder.includes(result.analysis_group.id));
           filteredResults[id] = filteredResults[id].sort((a, b) => {
@@ -272,7 +271,7 @@ export class CollateViewComponent {
         });
       }
     });
-
+    console.log(filteredResults);
     return filteredResults;
   }
 
