@@ -67,6 +67,7 @@ function popperFactory(ref: any, content: any, opts: any) {
   encapsulation: ViewEncapsulation.None
 })
 export class CytoscapePlotComponent implements AfterViewInit{
+  showBarChart: boolean = true;
   showCytoscapePlot: boolean = false;
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() projects: Project[] = [];
@@ -126,6 +127,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           const showBarChart = targetEdge.data('showBarChart')
           targetEdge.data('showBarChart', !showBarChart)
           console.log(targetEdge.data())
+          this.drawBarChartOnEdges(layers);
         })
 
         edge.on('mouseover', (event) => {
@@ -155,19 +157,23 @@ export class CytoscapePlotComponent implements AfterViewInit{
           }
         });
       });
-      layers.renderPerEdge(
-        layers.nodeLayer.insertAfter('canvas'),
-        (ctx: CanvasRenderingContext2D, edge: cy.EdgeSingular, path: Path2D, start: IPoint, end: IPoint) => {
-          // draw bar chart in middle of edge
-          if (!edge.data('showBarChart')) {
-            return;
-          }
-          this.renderBarChart(edge, start, end, ctx);
-        }
-      );
+
     }
   }
 
+
+  private drawBarChartOnEdges(layers: any) {
+    layers.renderPerEdge(
+      layers.nodeLayer.insertAfter('canvas'),
+      (ctx: CanvasRenderingContext2D, edge: cy.EdgeSingular, path: Path2D, start: IPoint, end: IPoint) => {
+        // draw bar chart in middle of edge
+        if (!this.showBarChart || !edge.data('showBarChart')) {
+          return;
+        }
+        this.renderBarChart(edge, start, end, ctx);
+      }
+    );
+  }
 
   private renderBarChart(edge: cytoscape.EdgeSingular, start: IPoint, end: IPoint, ctx: CanvasRenderingContext2D) {
     const data = edge.data();
@@ -250,6 +256,11 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
   toggleCytoscapePlot() {
     this.showCytoscapePlot = !this.showCytoscapePlot;
+  }
+
+  toggleBarChart() {
+    this.showBarChart = !this.showBarChart;
+    this.updateCytoscape();
   }
 
   getRandomColor(): string {
