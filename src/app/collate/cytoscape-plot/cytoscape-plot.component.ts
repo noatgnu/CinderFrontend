@@ -401,4 +401,9 @@ export class CytoscapePlotComponent implements AfterViewInit{
     })
     //this.updateCytoscape();
   }
+
+  resetZoomAndCenter() {
+    this.cy.fit();
+    this.cy.center();
+  }
 }

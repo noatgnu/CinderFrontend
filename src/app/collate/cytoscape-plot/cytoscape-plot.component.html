@@ -5,6 +5,9 @@
   <button matTooltip="Toggle off labels" mat-icon-button [matMenuTriggerFor]="labelOff">
     <mat-icon>label_off</mat-icon>
   </button>
+  <button matTooltip="Reset and center plot" mat-icon-button (click)="resetZoomAndCenter()">
+    <mat-icon>center_focus_strong</mat-icon>
+  </button>
 </div>
 <mat-menu #labelOn>
   <button mat-menu-item (click)="toggleAllComparisons(true, '.comparison')">
