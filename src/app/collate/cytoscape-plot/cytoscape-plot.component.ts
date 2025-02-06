@@ -13,6 +13,7 @@ import {CollateService} from "../collate.service";
 import Layers, {ICanvasLayer, IPoint} from 'cytoscape-layers';
 import cy from "cytoscape";
 import fcose from 'cytoscape-fcose';
+import edgehandles from 'cytoscape-edgehandles';
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -86,7 +87,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     cytoscape.use(fcose);
     cytoscape.use(popper(popperFactory));
     cytoscape.use(Layers);
-
+    cytoscape.use(edgehandles);
     this.initCytoscape()
     this.collateService.collateRedrawSubject.subscribe(() => {
       this.updateCytoscape()
@@ -139,6 +140,12 @@ export class CytoscapePlotComponent implements AfterViewInit{
           gravityRange: 3.8,
           initialEnergyOnIncremental: 0.5},
       });
+      const edgeHandleOptions: edgehandles.EdgeHandlesOptions = {
+
+
+      }
+      this.cy.edgehandles({
+      })
       this.cy.nodes('.comparison').forEach(node => {
         node.on('mouseover', (event) => {
           const data = event.target.data();
