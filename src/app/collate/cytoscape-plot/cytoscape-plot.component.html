@@ -7,12 +7,12 @@
   </button>
 </div>
 <mat-menu #labelOn>
-  <button mat-menu-item (click)="toggleAllComparisons(true)">
+  <button mat-menu-item (click)="toggleAllComparisons(true, '.comparison')">
     <span>Comparison</span>
   </button>
 </mat-menu>
 <mat-menu #labelOff>
-  <button mat-menu-item (click)="toggleAllComparisons(false)">
+  <button mat-menu-item (click)="toggleAllComparisons(false,'.comparison')">
     <span>Comparison</span>
   </button>
 </mat-menu>

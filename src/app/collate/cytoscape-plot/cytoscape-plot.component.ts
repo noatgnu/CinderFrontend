@@ -391,10 +391,14 @@ export class CytoscapePlotComponent implements AfterViewInit{
     return this.projectColorMap[projectId] || '#000000';
   }
 
-  toggleAllComparisons(show: boolean) {
-    this.cy.edges().forEach(edge => {
-      edge.data('showBarChart', show);
-    });
+  toggleAllComparisons(show: boolean, nodeClass: string) {
+    this.cy.nodes(nodeClass).forEach(node => {
+      if (show) {
+        node.style('label', node.data('label'));
+      } else {
+        node.style('label', '');
+      }
+    })
     //this.updateCytoscape();
   }
 }
