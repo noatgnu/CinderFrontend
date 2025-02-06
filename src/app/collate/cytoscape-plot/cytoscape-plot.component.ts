@@ -87,7 +87,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     cytoscape.use(fcose);
     cytoscape.use(popper(popperFactory));
     cytoscape.use(Layers);
-    cytoscape.use(edgehandles);
+    //cytoscape.use(edgehandles);
     this.initCytoscape()
     this.collateService.collateRedrawSubject.subscribe(() => {
       this.updateCytoscape()
@@ -140,12 +140,23 @@ export class CytoscapePlotComponent implements AfterViewInit{
           gravityRange: 3.8,
           initialEnergyOnIncremental: 0.5},
       });
-      const edgeHandleOptions: edgehandles.EdgeHandlesOptions = {
-
-
-      }
-      this.cy.edgehandles({
-      })
+      /*const edgeHandleOptions: edgehandles.EdgeHandlesOptions = {
+        canConnect: (source, target) => source !== target, // Disable self loops
+        edgeParams: (source, target) => ({
+          data: {
+            source: source.id(),
+            target: target.id(),
+            color: '#000000' // Default color for new edges
+          }
+        }),
+        hoverDelay: 150,
+        snap: true,
+        snapThreshold: 50,
+        snapFrequency: 15,
+        noEdgeEventsInDraw: true,
+        disableBrowserGestures: true
+      };*/
+      //this.cy.edgehandles(edgeHandleOptions)
       this.cy.nodes('.comparison').forEach(node => {
         node.on('mouseover', (event) => {
           const data = event.target.data();
@@ -220,6 +231,31 @@ export class CytoscapePlotComponent implements AfterViewInit{
             this.currentTooltip = null;
           }
         });
+
+        let isDragging = false;
+        let dragStartPos = { x: 0, y: 0 };
+
+        edge.on('mousedown', (event) => {
+          isDragging = true;
+          dragStartPos = event.position;
+        });
+        this.cy.on('mousemove', (event) => {
+          if (isDragging) {
+            const dragEndPos = event.position;
+            const midX = (dragStartPos.x + dragEndPos.x) / 2;
+            const midY = (dragStartPos.y + dragEndPos.y) / 2;
+            edge.data('barChartPos', { x: midX, y: midY });
+            this.cy.batch(() => {
+              this.cy.nodes().forEach(node => {
+                node.trigger('position')
+              })
+            })
+          }
+        });
+
+        this.cy.on('mouseup', () => {
+          isDragging = false;
+        });
       });
 
     }
@@ -250,9 +286,11 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const maxIntensity = Math.max(intensityA, intensityB);
     const normIntensityA = (intensityA / maxIntensity) * maxBarHeight;
     const normIntensityB = (intensityB / maxIntensity) * maxBarHeight;
-
-    const x = (start.x + end.x) / 2 - barWidth;
-    const y = (start.y + end.y) / 2 + maxBarHeight;
+    const barChartPos = data.barChartPos || { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+    const x = barChartPos.x - barWidth;
+    const y = barChartPos.y + maxBarHeight;
+    //const x = (start.x + end.x) / 2 - barWidth;
+    //const y = (start.y + end.y) / 2 + maxBarHeight;
 
     ctx.fillStyle = 'white';
     ctx.fillRect(x - barWidth - 2, y - maxBarHeight - 3, barWidth * 2 + 6, maxBarHeight + 5);
