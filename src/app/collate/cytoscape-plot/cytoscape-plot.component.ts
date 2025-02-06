@@ -252,6 +252,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     ctx.fillRect(x + 2, y - normIntensityB, barWidth, normIntensityB);
   }
 
+
   buildGraphElements() {
     const elements: any[] = [];
     const addedNodes = new Set();
@@ -287,7 +288,18 @@ export class CytoscapePlotComponent implements AfterViewInit{
           elements.push({ data: { id: comparisonId, label: `${conditionA} vs ${conditionB}`, size: 25 }, classes: 'comparison' });
           addedNodes.add(comparisonId);
         }
-
+        const conditionAValues = result.searched_data.filter(data => data.Condition === result.condition_A && data.Value);
+        const conditionBValues = result.searched_data.filter(data => data.Condition === result.condition_B && data.Value);
+        let intensityA = 0;
+        let intensityB = 0;
+        // calculate average intensity for each condition if multiple values are present and ignore NaN or undefined or null or empty values
+        if (conditionAValues.length > 0) {
+          intensityA = conditionAValues.reduce((acc, curr) => acc + curr.Value, 0) / conditionAValues.length;
+        }
+        if (conditionBValues.length > 0) {
+          intensityB = conditionBValues.reduce((acc, curr) => acc + curr.Value, 0) / conditionBValues.length;
+        }
+        
         elements.push({
           data: {
             id: `${proteinId}-${comparisonId}-${project.id}`,
@@ -296,8 +308,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
             color: projectColor,
             conditionA: conditionA,
             conditionB: conditionB,
-            intensityA: result.searched_data.find(data => data.Condition === result.condition_A)?.Value,
-            intensityB: result.searched_data.find(data => data.Condition === result.condition_B)?.Value,
+            intensityA: intensityA,
+            intensityB: intensityB,
           }
         });
       });
