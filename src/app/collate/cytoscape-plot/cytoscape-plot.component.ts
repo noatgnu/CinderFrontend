@@ -281,16 +281,14 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const intensityA = parseFloat(data.intensityA);
     const intensityB = parseFloat(data.intensityB);
 
-    const barWidth = 10;
-    const maxBarHeight = 50; // Maximum height for the bars
+    const barWidth = 5;
+    const maxBarHeight = 25;
     const maxIntensity = Math.max(intensityA, intensityB);
     const normIntensityA = (intensityA / maxIntensity) * maxBarHeight;
     const normIntensityB = (intensityB / maxIntensity) * maxBarHeight;
     const barChartPos = data.barChartPos || { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
     const x = barChartPos.x - barWidth;
     const y = barChartPos.y + maxBarHeight;
-    //const x = (start.x + end.x) / 2 - barWidth;
-    //const y = (start.y + end.y) / 2 + maxBarHeight;
 
     ctx.fillStyle = 'white';
     ctx.fillRect(x - barWidth - 2, y - maxBarHeight - 3, barWidth * 2 + 6, maxBarHeight + 5);
