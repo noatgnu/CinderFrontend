@@ -14,6 +14,7 @@ import Layers, {ICanvasLayer, IPoint} from 'cytoscape-layers';
 import cy from "cytoscape";
 import fcose from 'cytoscape-fcose';
 import edgehandles from 'cytoscape-edgehandles';
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -57,7 +58,10 @@ function popperFactory(ref: any, content: any, opts: any) {
     MatIcon,
     MatIconButton,
     MatTooltip,
-    NgClass
+    NgClass,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger
   ],
   templateUrl: './cytoscape-plot.component.html',
   styleUrl: './cytoscape-plot.component.scss',
@@ -385,5 +389,12 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
   getProjectColor(projectId: string): string {
     return this.projectColorMap[projectId] || '#000000';
+  }
+
+  toggleAllComparisons(show: boolean) {
+    this.cy.edges().forEach(edge => {
+      edge.data('showBarChart', show);
+    });
+    //this.updateCytoscape();
   }
 }

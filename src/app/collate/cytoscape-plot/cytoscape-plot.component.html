@@ -1,1 +1,19 @@
+<div style="display: flex; gap: 20px">
+  <button matTooltip="Toggle on labels" mat-icon-button [matMenuTriggerFor]="labelOn">
+    <mat-icon>label</mat-icon>
+  </button>
+  <button matTooltip="Toggle off labels" mat-icon-button [matMenuTriggerFor]="labelOff">
+    <mat-icon>label_off</mat-icon>
+  </button>
+</div>
+<mat-menu #labelOn>
+  <button mat-menu-item (click)="toggleAllComparisons(true)">
+    <span>Comparison</span>
+  </button>
+</mat-menu>
+<mat-menu #labelOff>
+  <button mat-menu-item (click)="toggleAllComparisons(false)">
+    <span>Comparison</span>
+  </button>
+</mat-menu>
 <div #cy class="cy-container"></div>
