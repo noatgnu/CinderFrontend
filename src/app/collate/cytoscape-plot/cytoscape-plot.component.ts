@@ -112,11 +112,18 @@ export class CytoscapePlotComponent implements AfterViewInit{
           { selector: '.protein', style: { 'background-color': '#FF5733' } },
           { selector: '.analysis', style: { 'background-color': '#ba0000', 'label': '' } },
           { selector: '.comparison', style: { 'background-color': '#33A1FF', 'label': '' } },
-          { selector: 'edge[color]', style: { 'width': 2, 'line-color': 'data(color)', 'target-arrow-color': 'data(color)', 'target-arrow-shape': 'triangle' } }
+          { selector: 'edge[color]', style: {
+              'width': 2,
+              'line-color': 'data(color)',
+              'target-arrow-color': 'data(color)',
+              'target-arrow-shape': 'triangle',
+              'curve-style': 'bezier',
+              'control-point-step-size': 40
+            }
+          }
         ],
         //@ts-ignore
         layout: { name: 'fcose', animate: true, animationDuration: 1000,
-          fit: true,
           padding: 30,
           nodeSeparation: 200,
           idealEdgeLength: 100,
@@ -183,7 +190,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         edge.on('mouseover', (event) => {
 
           const data = event.target.data();
-          const tooltipContent = `Comparison: ${data.conditionA} vs ${data.conditionB}<br>Intensity ${data.conditionA}: ${data.intensityA}<br>Intensity ${data.conditionB}: ${data.intensityB}`;
+          const tooltipContent = `Comparison: ${data.conditionA} vs ${data.conditionB}<br>Project: ${data.project}<br>Analysis Group: ${data.analysis_group} <br>Intensity ${data.conditionA}: ${data.intensityA}<br>Intensity ${data.conditionB}: ${data.intensityB}`;
           this.currentPopperRef = event.target.popper({
             content: () => {
               const tooltip = document.createElement('div');
@@ -285,7 +292,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         }
         const comparisonId = `${conditionA} vs ${conditionB}`;
         if (!addedNodes.has(comparisonId)) {
-          elements.push({ data: { id: comparisonId, label: `${conditionA} vs ${conditionB}`, size: 25 }, classes: 'comparison' });
+          elements.push({ data: { id: comparisonId, label: `${conditionA} vs ${conditionB}`, size: 25}, classes: 'comparison' });
           addedNodes.add(comparisonId);
         }
         const conditionAValues = result.searched_data.filter(data => data.Condition === result.condition_A && data.Value);
@@ -299,10 +306,10 @@ export class CytoscapePlotComponent implements AfterViewInit{
         if (conditionBValues.length > 0) {
           intensityB = conditionBValues.reduce((acc, curr) => acc + curr.Value, 0) / conditionBValues.length;
         }
-        
+
         elements.push({
           data: {
-            id: `${proteinId}-${comparisonId}-${project.id}`,
+            id: `${proteinId}-${comparisonId}-${project.id}-${result.analysis_group.id}`,
             source: proteinId,
             target: comparisonId,
             color: projectColor,
@@ -310,6 +317,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
             conditionB: conditionB,
             intensityA: intensityA,
             intensityB: intensityB,
+            analysis_group: result.analysis_group.name,
+            project: project.name
           }
         });
       });
