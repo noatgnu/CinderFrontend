@@ -239,17 +239,12 @@ export class CytoscapePlotComponent implements AfterViewInit{
           isDragging = true;
           dragStartPos = event.position;
         });
+
         this.cy.on('mousemove', (event) => {
           if (isDragging) {
             const dragEndPos = event.position;
-            const midX = (dragStartPos.x + dragEndPos.x) / 2;
-            const midY = (dragStartPos.y + dragEndPos.y) / 2;
-            edge.data('barChartPos', { x: midX, y: midY });
-            this.cy.batch(() => {
-              this.cy.nodes().forEach(node => {
-                node.trigger('position')
-              })
-            })
+            edge.data('barChartPos', dragEndPos);
+            this.cy.trigger('render');
           }
         });
 
@@ -281,14 +276,19 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const intensityA = parseFloat(data.intensityA);
     const intensityB = parseFloat(data.intensityB);
 
-    const barWidth = 5;
-    const maxBarHeight = 25;
+    const barWidth = 5; // Reduced bar width
+    const maxBarHeight = 25; // Reduced max bar height
     const maxIntensity = Math.max(intensityA, intensityB);
     const normIntensityA = (intensityA / maxIntensity) * maxBarHeight;
     const normIntensityB = (intensityB / maxIntensity) * maxBarHeight;
+
     const barChartPos = data.barChartPos || { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
-    const x = barChartPos.x - barWidth;
-    const y = barChartPos.y + maxBarHeight;
+    const sourcePos = edge.source().position();
+    const targetPos = edge.target().position();
+    const edgeLength = Math.sqrt(Math.pow(targetPos.x - sourcePos.x, 2) + Math.pow(targetPos.y - sourcePos.y, 2));
+    const t = ((barChartPos.x - sourcePos.x) * (targetPos.x - sourcePos.x) + (barChartPos.y - sourcePos.y) * (targetPos.y - sourcePos.y)) / Math.pow(edgeLength, 2);
+    const x = sourcePos.x + t * (targetPos.x - sourcePos.x) - barWidth;
+    const y = sourcePos.y + t * (targetPos.y - sourcePos.y) + maxBarHeight;
 
     ctx.fillStyle = 'white';
     ctx.fillRect(x - barWidth - 2, y - maxBarHeight - 3, barWidth * 2 + 6, maxBarHeight + 5);
