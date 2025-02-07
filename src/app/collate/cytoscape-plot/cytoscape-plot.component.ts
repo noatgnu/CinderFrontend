@@ -460,7 +460,16 @@ export class CytoscapePlotComponent implements AfterViewInit{
           addedElements.push(node)
         }
       })
-      this.cy.add(addedElements)
+      filteredEdges.forEach(edge => {
+        if (!addedElements.includes(edge)) {
+          this.cy.add(edge)
+        }
+      })
+      filteredNodes.forEach(node => {
+        if (!addedElements.includes(node)) {
+          this.cy.add(node)
+        }
+      })
     })
     //@ts-ignore
     this.cy.layout({ name: 'fcose', animate: true, animationDuration: 1000}).run()
