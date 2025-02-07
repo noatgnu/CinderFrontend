@@ -446,29 +446,25 @@ export class CytoscapePlotComponent implements AfterViewInit{
       const addedElements: any[] = []
       this.cy.edges().forEach(edge => {
         const data = edge.data();
+        addedElements.push(data.id)
         if (!filteredEdgeIds.has(data.id)) {
           edge.remove()
-          addedElements.push(edge)
-        } else {
-          addedElements.push(edge)
         }
       })
       this.cy.nodes().forEach(node => {
         const data = node.data();
+        addedElements.push(data.id)
         if (!filteredNodeIds.has(data.id)) {
           node.remove()
-          addedElements.push(node)
-        } else {
-          addedElements.push(node)
         }
       })
       filteredEdges.forEach(edge => {
-        if (!addedElements.includes(edge)) {
+        if (!addedElements.includes(edge.data.id)) {
           this.cy.add(edge)
         }
       })
       filteredNodes.forEach(node => {
-        if (!addedElements.includes(node)) {
+        if (!addedElements.includes(node.data.id)) {
           this.cy.add(node)
         }
       })
