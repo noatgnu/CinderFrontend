@@ -84,6 +84,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   currentTooltip: HTMLElement | null = null;
   barChartLayers: Map<string, ICanvasLayer> = new Map();
   projectColorMap: { [projectId: string]: string } = {};
+  cytoscapeElements: any[] = [];
 
   constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog) {
 
@@ -110,7 +111,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   initCytoscape() {
     if (this.cyElement) {
       const elements = this.buildGraphElements();
-
+      this.cytoscapeElements = elements;
       this.cy = cytoscape({
         container: this.cyElement.nativeElement,
         elements: elements,
@@ -423,20 +424,45 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
   applyFilter(log2fc: number, pvalue: number) {
+    const filteredElements = this.cytoscapeElements.filter(
+      (element: any) => {
+      if (element.data.fc !== undefined && element.data.p_value !== undefined) {
+        const absLog2FC = Math.abs(element.data.fc);
+        const absFilter = Math.abs(log2fc);
+        return absLog2FC >= absFilter && element.data.p_value >= pvalue;
+      }
+      return true;
+    });
+    const filteredEdges = filteredElements.filter((element: any) => element.data.source !== undefined && element.data.target !== undefined);
+    const nodeList = new Set(filteredEdges.map((element: any) => element.data.source).concat(filteredEdges.map((element: any) => element.data.target)));
+    const filteredEdgeIds = new Set(filteredEdges.map((element: any) => element.data.id));
+    const filteredNodes = filteredElements.filter((element: any) => {
+      return nodeList.has(element.data.id);
+    })
+    const filteredNodeIds = new Set(filteredNodes.map((element: any) => element.data.id));
+
+
+
     this.cy.batch(() => {
+      const addedElements = []
       this.cy.edges().forEach(edge => {
         const data = edge.data();
-        const absLog2FC = Math.abs(data.fc);
-        const absFilter = Math.abs(log2fc);
-        if (absLog2FC < absFilter && data.p_value < pvalue) {
-          edge.removed()
+        if (!filteredEdgeIds.has(data.id)) {
+          edge.remove()
+        } else {
+          addedElements.push(edge)
         }
       })
       this.cy.nodes().forEach(node => {
-        if (node.connectedEdges().length === 0) {
-          node.removed()
+        const data = node.data();
+        if (!filteredNodeIds.has(data.id)) {
+          node.remove()
+        } else {
+          addedElements.push(node)
         }
       })
+      this.cy.add(addedElements)
     })
+    this.cy.layout({ name: 'fcose', animate: true, animationDuration: 1000}).run()
   }
 }
