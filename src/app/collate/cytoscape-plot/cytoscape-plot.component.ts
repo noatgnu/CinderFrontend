@@ -441,8 +441,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     })
     const filteredNodeIds = new Set(filteredNodes.map((element: any) => element.data.id));
 
-
-
+    console.log(filteredNodeIds)
     this.cy.batch(() => {
       const addedElements: any[] = []
       this.cy.edges().forEach(edge => {
