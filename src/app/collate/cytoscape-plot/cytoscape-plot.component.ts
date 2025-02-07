@@ -15,6 +15,10 @@ import cy from "cytoscape";
 import fcose from 'cytoscape-fcose';
 import edgehandles from 'cytoscape-edgehandles';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {MatDialog} from "@angular/material/dialog";
+import {
+  CytoscapePlotFilterDialogComponent
+} from "./cytoscape-plot-filter-dialog/cytoscape-plot-filter-dialog.component";
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -51,14 +55,12 @@ function popperFactory(ref: any, content: any, opts: any) {
   return { update };
 }
 
-
 @Component({
   selector: 'app-cytoscape-plot',
   imports: [
     MatIcon,
     MatIconButton,
     MatTooltip,
-    NgClass,
     MatMenu,
     MatMenuItem,
     MatMenuTrigger
@@ -83,7 +85,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   barChartLayers: Map<string, ICanvasLayer> = new Map();
   projectColorMap: { [projectId: string]: string } = {};
 
-  constructor(private collateService: CollateService, private cdr: ChangeDetectorRef) {
+  constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog) {
 
   }
 
@@ -212,7 +214,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         edge.on('mouseover', (event) => {
 
           const data = event.target.data();
-          const tooltipContent = `Comparison: ${data.conditionA} vs ${data.conditionB}<br>Project: ${data.project}<br>Analysis Group: ${data.analysis_group} <br>Intensity ${data.conditionA}: ${data.intensityA}<br>Intensity ${data.conditionB}: ${data.intensityB}`;
+          const tooltipContent = `Comparison: ${data.conditionA} vs ${data.conditionB}<br>Project: ${data.project}<br>Analysis Group: ${data.analysis_group} <br>Log2FC: ${data.fc}<br>-Log10(p): ${data.p_value}<br> Intensity ${data.conditionA}: ${data.intensityA}<br>Intensity ${data.conditionB}: ${data.intensityB}`;
           this.currentPopperRef = event.target.popper({
             content: () => {
               const tooltip = document.createElement('div');
@@ -238,6 +240,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
         let isDragging = false;
         let dragStartPos = { x: 0, y: 0 };
+
+
 
         edge.on('mousedown', (event) => {
           isDragging = true;
@@ -365,7 +369,9 @@ export class CytoscapePlotComponent implements AfterViewInit{
             intensityA: intensityA,
             intensityB: intensityB,
             analysis_group: result.analysis_group.name,
-            project: project.name
+            project: project.name,
+            fc: result.log2_fc,
+            p_value: result.log10_p
           }
         });
       });
@@ -405,5 +411,32 @@ export class CytoscapePlotComponent implements AfterViewInit{
   resetZoomAndCenter() {
     this.cy.fit();
     this.cy.center();
+  }
+
+  openFilterDialog() {
+    const ref = this.dialog.open(CytoscapePlotFilterDialogComponent)
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        this.applyFilter(result.log2fc, result.pvalue)
+      }
+    })
+  }
+
+  applyFilter(log2fc: number, pvalue: number) {
+    this.cy.batch(() => {
+      this.cy.edges().forEach(edge => {
+        const data = edge.data();
+        const absLog2FC = Math.abs(data.fc);
+        const absFilter = Math.abs(log2fc);
+        if (absLog2FC < absFilter && data.p_value < pvalue) {
+          edge.removed()
+        }
+      })
+      this.cy.nodes().forEach(node => {
+        if (node.connectedEdges().length === 0) {
+          node.removed()
+        }
+      })
+    })
   }
 }

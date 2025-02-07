@@ -1,4 +1,4 @@
-<div style="display: flex; gap: 20px">
+<div style="display: flex">
   <button matTooltip="Toggle on labels" mat-icon-button [matMenuTriggerFor]="labelOn">
     <mat-icon>label</mat-icon>
   </button>
@@ -7,6 +7,9 @@
   </button>
   <button matTooltip="Reset and center plot" mat-icon-button (click)="resetZoomAndCenter()">
     <mat-icon>center_focus_strong</mat-icon>
+  </button>
+  <button matTooltip="Filter Cytoscape Plot" mat-icon-button (click)="openFilterDialog()">
+    <mat-icon>filter_list</mat-icon>
   </button>
 </div>
 <mat-menu #labelOn>

@@ -50,13 +50,16 @@
 </div>
 
 @if (searchTerms.length > 0) {
-  <div style="display: flex; gap: 20px">
+  <div style="display: flex">
     <button mat-icon-button (click)="toggleCytoscapePlot()" matTooltip="Toggle Cytoscape Plot">
       <mat-icon [ngClass]="{'disabled-icon': !showCytoscapePlot}">account_tree</mat-icon>
     </button>
-    <button mat-icon-button (click)="filterCytoscapePlot()" matTooltip="Filter Cytoscape Plot Search Terms">
-      <mat-icon>filter_list</mat-icon>
-    </button>
+    @if (showCytoscapePlot) {
+      <button mat-icon-button (click)="filterCytoscapePlot()" matTooltip="Filter Cytoscape Plot Search Terms">
+        <mat-icon>filter_list</mat-icon>
+      </button>
+    }
+
   </div>
 
   @if (collate && showCytoscapePlot && cytoscapePlotFilteredResults) {
