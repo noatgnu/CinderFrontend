@@ -85,6 +85,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   barChartLayers: Map<string, ICanvasLayer> = new Map();
   projectColorMap: { [projectId: string]: string } = {};
   cytoscapeElements: any[] = [];
+  currentFilter: { log2fc: number, pvalue: number, projectNames: string[], analysisGroupNames: string[] } = { log2fc: 0, pvalue: 0, projectNames: [], analysisGroupNames: [] };
 
   constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog) {
 
@@ -415,20 +416,33 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
   openFilterDialog() {
-    const ref = this.dialog.open(CytoscapePlotFilterDialogComponent)
+    const projectNames = Array.from(new Set(this.cytoscapeElements.map((element: any) => element.data.project)));
+    const analysisGroupNames = Array.from(new Set(this.cytoscapeElements.map((element: any) => element.data.analysis_group)));
+
+    const ref = this.dialog.open(CytoscapePlotFilterDialogComponent, {
+      data: { projects: projectNames, analysisGroups: analysisGroupNames, currentFilter: this.currentFilter }
+    });
+
     ref.afterClosed().subscribe((result) => {
       if (result) {
-        this.applyFilter(result.log2fc, result.pvalue)
+        this.applyFilter(result.log2fc, result.pvalue, result.projectNames, result.analysisGroupNames);
+        this.currentFilter = result;
       }
-    })
+    });
   }
 
-  applyFilter(log2fc: number, pvalue: number) {
+  applyFilter(log2fc: number, pvalue: number, projectNames: string[] = [], analysisGroupNames: string[] = []) {
     const filteredElements = this.cytoscapeElements.filter(
       (element: any) => {
       if (element.data.fc !== undefined && element.data.p_value !== undefined) {
         const absLog2FC = Math.abs(element.data.fc);
         const absFilter = Math.abs(log2fc);
+        if (projectNames.length > 0 && !projectNames.includes(element.data.project)) {
+          return false;
+        }
+        if (analysisGroupNames.length > 0 && !analysisGroupNames.includes(element.data.analysis_group)) {
+          return false;
+        }
         return absLog2FC >= absFilter && element.data.p_value >= pvalue;
       }
       return true;

@@ -9,6 +9,22 @@
       <input matInput type="number" formControlName="pvalue">
       <mat-label>-log10(P Value)</mat-label>
     </mat-form-field>
+    <mat-form-field>
+      <mat-label>Project Names</mat-label>
+      <mat-select formControlName="projectNames" multiple>
+        @for (project of projects; track project) {
+          <mat-option [value]="project">{{ project }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Analysis Group Names</mat-label>
+      <mat-select formControlName="analysisGroupNames" multiple>
+        @for (analysisGroup of analysisGroups; track analysisGroup) {
+          <mat-option [value]="analysisGroup">{{ analysisGroup }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
   </form>
 </div>
 <div mat-dialog-actions>
