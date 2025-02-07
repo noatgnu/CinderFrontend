@@ -448,6 +448,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         const data = edge.data();
         if (!filteredEdgeIds.has(data.id)) {
           edge.remove()
+          addedElements.push(edge)
         } else {
           addedElements.push(edge)
         }
@@ -456,6 +457,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         const data = node.data();
         if (!filteredNodeIds.has(data.id)) {
           node.remove()
+          addedElements.push(node)
         } else {
           addedElements.push(node)
         }
