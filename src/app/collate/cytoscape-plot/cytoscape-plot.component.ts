@@ -444,7 +444,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
 
     this.cy.batch(() => {
-      const addedElements = []
+      const addedElements: any[] = []
       this.cy.edges().forEach(edge => {
         const data = edge.data();
         if (!filteredEdgeIds.has(data.id)) {
@@ -463,6 +463,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       })
       this.cy.add(addedElements)
     })
+    //@ts-ignore
     this.cy.layout({ name: 'fcose', animate: true, animationDuration: 1000}).run()
   }
 }
