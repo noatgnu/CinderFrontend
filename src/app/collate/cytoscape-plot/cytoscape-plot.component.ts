@@ -362,11 +362,15 @@ export class CytoscapePlotComponent implements AfterViewInit{
           intensityB = conditionBValues.reduce((acc, curr) => acc + curr.Value, 0) / conditionBValues.length;
         }
 
+        // Determine the direction of the edge based on the fold change
+        const source = result.log2_fc > 0 ? proteinId : comparisonId;
+        const target = result.log2_fc > 0 ? comparisonId : proteinId;
+
         elements.push({
           data: {
             id: `${proteinId}-${comparisonId}-${project.id}-${result.analysis_group.id}`,
-            source: proteinId,
-            target: comparisonId,
+            source: source,
+            target: target,
             color: projectColor,
             conditionA: conditionA,
             conditionB: conditionB,
