@@ -70,7 +70,8 @@ export class StringDbDialogComponent {
   }
 
   selectOrganism(species: Species) {
-    this.form.controls.organism.setValue(species.code.toString());
+    // @ts-ignore
+    this.form.controls.organism.setValue(species);
   }
 
   close() {
