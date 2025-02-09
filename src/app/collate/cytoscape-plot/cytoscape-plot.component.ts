@@ -520,36 +520,48 @@ export class CytoscapePlotComponent implements AfterViewInit{
     data.forEach(interaction => {
       const { preferredName_A, preferredName_B, score } = interaction;
 
-      // Check if nodes already exist
-      const nodeAExists = this.cy.nodes().some(node => node.data('id').split(';').includes(preferredName_A));
-      const nodeBExists = this.cy.nodes().some(node => node.data('id').split(';').includes(preferredName_B));
+      // Find existing nodes that match preferredName_A or preferredName_B
+      let nodeAId = preferredName_A;
+      let nodeBId = preferredName_B;
+
+      this.cy.nodes().forEach(node => {
+        const nodeId = node.data('id');
+        const nodeIds = nodeId.split(';');
+
+        if (nodeIds.includes(preferredName_A)) {
+          nodeAId = nodeId;
+        }
+        if (nodeIds.includes(preferredName_B)) {
+          nodeBId = nodeId;
+        }
+      });
 
       // Add node A if it doesn't exist
-      if (!nodeAExists && !addedNodes.has(preferredName_A)) {
+      if (!this.cy.getElementById(nodeAId).length && !addedNodes.has(nodeAId)) {
         this.cy.add({
-          data: { id: preferredName_A, label: preferredName_A, size: 25 },
+          data: { id: nodeAId, label: preferredName_A, size: 25 },
           classes: 'string-protein'
         });
-        addedNodes.add(preferredName_A);
+        addedNodes.add(nodeAId);
       }
 
       // Add node B if it doesn't exist
-      if (!nodeBExists && !addedNodes.has(preferredName_B)) {
+      if (!this.cy.getElementById(nodeBId).length && !addedNodes.has(nodeBId)) {
         this.cy.add({
-          data: { id: preferredName_B, label: preferredName_B, size: 25 },
+          data: { id: nodeBId, label: preferredName_B, size: 25 },
           classes: 'string-protein'
         });
-        addedNodes.add(preferredName_B);
+        addedNodes.add(nodeBId);
       }
 
       // Add edge if it doesn't exist
-      const edgeId = `${preferredName_A}-${preferredName_B}`;
+      const edgeId = `${nodeAId}-${nodeBId}`;
       if (!addedEdges.has(edgeId)) {
         this.cy.add({
           data: {
             id: edgeId,
-            source: preferredName_A,
-            target: preferredName_B,
+            source: nodeAId,
+            target: nodeBId,
             score: score
           },
           classes: 'string-edge'
@@ -563,13 +575,13 @@ export class CytoscapePlotComponent implements AfterViewInit{
         const nodeIds = nodeId.split(';');
 
         if (nodeIds.includes(preferredName_A) && !nodeIds.includes(preferredName_B)) {
-          const newEdgeId = `${nodeId}-${preferredName_B}`;
+          const newEdgeId = `${nodeId}-${nodeBId}`;
           if (!addedEdges.has(newEdgeId)) {
             this.cy.add({
               data: {
                 id: newEdgeId,
                 source: nodeId,
-                target: preferredName_B,
+                target: nodeBId,
                 score: score
               },
               classes: 'string-edge'
@@ -579,13 +591,13 @@ export class CytoscapePlotComponent implements AfterViewInit{
         }
 
         if (nodeIds.includes(preferredName_B) && !nodeIds.includes(preferredName_A)) {
-          const newEdgeId = `${nodeId}-${preferredName_A}`;
+          const newEdgeId = `${nodeId}-${nodeAId}`;
           if (!addedEdges.has(newEdgeId)) {
             this.cy.add({
               data: {
                 id: newEdgeId,
                 source: nodeId,
-                target: preferredName_A,
+                target: nodeAId,
                 score: score
               },
               classes: 'string-edge'
