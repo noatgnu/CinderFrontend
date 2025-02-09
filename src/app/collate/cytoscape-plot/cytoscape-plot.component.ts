@@ -299,22 +299,19 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const normIntensityA = (intensityA / maxIntensity) * maxBarHeight;
     const normIntensityB = (intensityB / maxIntensity) * maxBarHeight;
 
+    const barChartPos = data.barChartPos || { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+    const sourcePos = edge.source().position();
+    const targetPos = edge.target().position();
+    const edgeLength = Math.sqrt(Math.pow(targetPos.x - sourcePos.x, 2) + Math.pow(targetPos.y - sourcePos.y, 2));
+    const t = ((barChartPos.x - sourcePos.x) * (targetPos.x - sourcePos.x) + (barChartPos.y - sourcePos.y) * (targetPos.y - sourcePos.y)) / Math.pow(edgeLength, 2);
+
+    let x, y;
     const controlPoints = edge.controlPoints();
-    let x = 0;
-    let y = 0;
-    if (controlPoints) {
-      if (controlPoints.length > 0) {
-        const controlPoint = controlPoints[0];
-        const t = 0.5;
-        x = (1 - t) * (1 - t) * start.x + 2 * (1 - t) * t * controlPoint.x + t * t * end.x;
-        y = (1 - t) * (1 - t) * start.y + 2 * (1 - t) * t * controlPoint.y + t * t * end.y;
-      }
+    if (controlPoints && controlPoints.length > 0) {
+      const controlPoint = controlPoints[0];
+      x = (1 - t) * (1 - t) * start.x + 2 * (1 - t) * t * controlPoint.x + t * t * end.x;
+      y = (1 - t) * (1 - t) * start.y + 2 * (1 - t) * t * controlPoint.y + t * t * end.y;
     } else {
-      const barChartPos = data.barChartPos || { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
-      const sourcePos = edge.source().position();
-      const targetPos = edge.target().position();
-      const edgeLength = Math.sqrt(Math.pow(targetPos.x - sourcePos.x, 2) + Math.pow(targetPos.y - sourcePos.y, 2));
-      const t = ((barChartPos.x - sourcePos.x) * (targetPos.x - sourcePos.x) + (barChartPos.y - sourcePos.y) * (targetPos.y - sourcePos.y)) / Math.pow(edgeLength, 2);
       x = sourcePos.x + t * (targetPos.x - sourcePos.x) - barWidth;
       y = sourcePos.y + t * (targetPos.y - sourcePos.y) + maxBarHeight;
     }
