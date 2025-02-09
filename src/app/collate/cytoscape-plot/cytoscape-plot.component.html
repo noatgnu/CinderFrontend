@@ -14,7 +14,9 @@
   <button mat-icon-button (click)="openStringDBDialog()" matTooltip="Add STRING DB Interactions">
     <mat-icon>add_circle</mat-icon>
   </button>
-
+  <button mat-icon-button (click)="exportToSvg()" matTooltip="Export to SVG">
+    <mat-icon>save_alt</mat-icon>
+  </button>
 </div>
 <mat-menu #labelOn>
   <button mat-menu-item (click)="toggleAllComparisons(true, '.comparison')">

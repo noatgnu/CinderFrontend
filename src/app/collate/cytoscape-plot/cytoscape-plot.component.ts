@@ -21,6 +21,8 @@ import {
 } from "./cytoscape-plot-filter-dialog/cytoscape-plot-filter-dialog.component";
 import {StringDbDialogComponent} from "./string-db-dialog/string-db-dialog.component";
 import {WebService} from "../../web.service";
+// @ts-ignore
+import * as canvasToSvg from 'canvas-to-svg';
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -633,4 +635,25 @@ export class CytoscapePlotComponent implements AfterViewInit{
     //@ts-ignore
     this.cy.layout({ name: 'fcose', animate: true, animationDuration: 1000}).run()
   }
+
+  exportToSvg() {
+    if (!this.cy) {
+      return;
+    }
+    if (!this.cy.container()) {
+      return;
+    }
+    // @ts-ignore
+    const canvas = this.cy.container().querySelector('canvas');
+    const svg = canvasToSvg.canvasToSvg(canvas);
+    const svgBlob = new Blob([svg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(svgBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cytoscape-plot.svg';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+
 }
