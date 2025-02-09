@@ -643,65 +643,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
     if (!this.cy.container()) {
       return;
     }
-    const svgContext = new C2S(this.cy.width(), this.cy.height());
+    console.log(this.cy.json())
 
-    // Calculate the bounding box of the graph
-    const boundingBox = this.cy.elements().boundingBox();
-    const offsetX = -boundingBox.x1;
-    const offsetY = -boundingBox.y1;
-
-    // Draw nodes
-    this.cy.nodes().forEach(node => {
-      const position = node.position();
-      const x = position.x + offsetX;
-      const y = position.y + offsetY;
-
-      svgContext.beginPath();
-      if (node.hasClass('string-protein')) {
-        svgContext.rect(x - 15, y - 15, 30, 30); // Rectangle for STRING nodes
-      } else {
-        svgContext.arc(x, y, 15, 0, 2 * Math.PI); // Circle for normal nodes
-      }
-      svgContext.fillStyle = node.style('background-color');
-      svgContext.fill();
-      svgContext.stroke();
-      svgContext.closePath();
-
-      // Draw labels
-      svgContext.font = '12px Arial';
-      svgContext.fillStyle = '#000';
-      svgContext.fillText(node.data('label'), x - 15, y - 20); // Adjust position as needed
-    });
-
-    // Draw edges
-    this.cy.edges().forEach(edge => {
-      const sourcePosition = edge.source().position();
-      const targetPosition = edge.target().position();
-      const sourceX = sourcePosition.x + offsetX;
-      const sourceY = sourcePosition.y + offsetY;
-      const targetX = targetPosition.x + offsetX;
-      const targetY = targetPosition.y + offsetY;
-
-      svgContext.beginPath();
-      svgContext.moveTo(sourceX, sourceY);
-      svgContext.lineTo(targetX, targetY);
-      svgContext.strokeStyle = edge.style('line-color');
-      svgContext.lineWidth = parseFloat(edge.style('width'));
-      svgContext.stroke();
-      svgContext.closePath();
-    });
-
-    // Get the SVG string
-    const svgString = svgContext.getSerializedSvg();
-
-    // Create a Blob from the SVG string
-    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'cytoscape-plot.svg';
-    a.click();
-    URL.revokeObjectURL(url);
   }
 
 
