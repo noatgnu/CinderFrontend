@@ -741,7 +741,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       a.click();
       URL.revokeObjectURL(url);
     });
-
+  }
   dataURItoBlob(dataURI: string) {
     const byteString = atob(dataURI.split(',')[1]);
     const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
