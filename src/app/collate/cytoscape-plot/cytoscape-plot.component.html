@@ -11,6 +11,10 @@
   <button matTooltip="Filter Cytoscape Plot" mat-icon-button (click)="openFilterDialog()">
     <mat-icon>filter_list</mat-icon>
   </button>
+  <button mat-icon-button (click)="openStringDBDialog()" matTooltip="Add STRING DB Interactions">
+    <mat-icon>add_circle</mat-icon>
+  </button>
+
 </div>
 <mat-menu #labelOn>
   <button mat-menu-item (click)="toggleAllComparisons(true, '.comparison')">

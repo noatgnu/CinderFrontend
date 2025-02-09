@@ -1,0 +1,35 @@
+<h5 mat-dialog-title>Request STRING DB Interactions</h5>
+<div mat-dialog-content>
+  <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
+    <mat-form-field>
+      <input matInput formControlName="organism" [matAutocomplete]="auto">
+      <mat-label>Organism</mat-label>
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="selectOrganism($event.option.value)">
+        @if (filteredSpecies$.asObservable() | async; as species) {
+          @for (s of species; track s.id) {
+            <mat-option [value]="s">{{ s.official_name }}</mat-option>
+          }
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="number" formControlName="score">
+      <mat-label>Score Cutoff</mat-label>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Network Type</mat-label>
+      <mat-select formControlName="networkType">
+        <mat-option value="functional">Functional</mat-option>
+        <mat-option value="physical">Physical</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="number" formControlName="addNodes">
+      <mat-label>Additional Nodes</mat-label>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-button (click)="submit()">Request</button>
+</div>

@@ -19,6 +19,8 @@ import {MatDialog} from "@angular/material/dialog";
 import {
   CytoscapePlotFilterDialogComponent
 } from "./cytoscape-plot-filter-dialog/cytoscape-plot-filter-dialog.component";
+import {StringDbDialogComponent} from "./string-db-dialog/string-db-dialog.component";
+import {WebService} from "../../web.service";
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -87,7 +89,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   cytoscapeElements: any[] = [];
   currentFilter: { log2fc: number, pvalue: number, projectNames: string[], analysisGroupNames: string[] } = { log2fc: 0, pvalue: 0, projectNames: [], analysisGroupNames: [] };
 
-  constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog) {
+  constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog, private webService: WebService) {
 
   }
 
@@ -486,5 +488,22 @@ export class CytoscapePlotComponent implements AfterViewInit{
     })
     //@ts-ignore
     this.cy.layout({ name: 'fcose', animate: true, animationDuration: 1000}).run()
+  }
+
+  openStringDBDialog() {
+    const ref = this.dialog.open(StringDbDialogComponent);
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        const genes = this.cy.nodes().map(node => node.data('id'));
+        this.requestStringDBInteractions(genes, result.organism, result.score, result.networkType, result.addNodes);
+      }
+    });
+  }
+
+  requestStringDBInteractions(genes: string[], organism: string, score: number, networkType: string, addNodes: number) {
+    this.webService.getStringDBInteractions(genes, organism, score, networkType, addNodes).subscribe(response => {
+      // Handle the response and update the Cytoscape plot
+      console.log(response);
+    });
   }
 }

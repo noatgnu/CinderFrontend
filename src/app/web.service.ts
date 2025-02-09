@@ -1149,4 +1149,22 @@ export class WebService {
   getUserProfile() {
     return this.http.get<UserProfile>(`${this.baseURL}/api/users/get_profile/`, {responseType: 'json', observe: 'body'})
   }
+
+  getStringDBInteractions(genes: string[], organism: string, score: number = 400, networkType: string = "functional", add_nodes: number = 0, show_query_node_labels: boolean = true) {
+    let params = new HttpParams();
+    params = params.append("identifiers", genes.join("%0d"));
+    params = params.append("required_score", score.toString());
+    params = params.append("species", organism);
+    params = params.append("network_type", networkType);
+    if (add_nodes !== 0) {
+      params = params.append("add_nodes", add_nodes.toString());
+    }
+    if (show_query_node_labels) {
+      params = params.append("show_query_node_labels", "1");
+    }
+    return this.http.get(
+      "https://string-db.org/api/tsv/network?",
+      {responseType: "text", params: params, observe: "response"}
+    )
+  }
 }
