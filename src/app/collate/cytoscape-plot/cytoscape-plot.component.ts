@@ -92,7 +92,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   projectColorMap: { [projectId: string]: string } = {};
   cytoscapeElements: any[] = [];
   currentFilter: { log2fc: number, pvalue: number, projectNames: string[], analysisGroupNames: string[] } = { log2fc: 0, pvalue: 0, projectNames: [], analysisGroupNames: [] };
-
+  layers: any;
   constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog, private webService: WebService) {
 
   }
@@ -207,6 +207,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       });
       //@ts-ignore
       const layers: any = this.cy.layers()
+      this.layers = layers;
       this.cy.edges().forEach(edge => {
         edge.on('click', (event) => {
           const targetEdge = event.target
@@ -759,7 +760,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     a.download = 'cytoscape-plot.pdf';
     a.click();
     URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+
   }
 
   exportToPng2() {
@@ -769,9 +770,21 @@ export class CytoscapePlotComponent implements AfterViewInit{
     if (!this.cy.container()) {
       return;
     }
+    const blob = this.layers.png({
+      output: 'blob-promise',
+      ignoreUnsupportedLayerOrder: true,
+      full: true,
+    }).then((blob: Blob) => {
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      a.href = url;
+      a.click();
+      URL.revokeObjectURL(url);
+    })
+
 
     // Create a temporary canvas to draw the Cytoscape elements and the bar chart
-    const tempCanvas = document.createElement('canvas');
+    /*const tempCanvas = document.createElement('canvas');
     tempCanvas.width = this.cy.width();
     tempCanvas.height = this.cy.height();
     const tempCtx = tempCanvas.getContext('2d');
@@ -797,7 +810,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         a.download = 'cytoscape-plot.png';
         a.click();
       };
-    }
+    }*/
 
   }
 }
