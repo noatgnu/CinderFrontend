@@ -28,6 +28,7 @@
     "cytoscape-euler": "^1.2.3",
     "cytoscape-fcose": "^2.2.0",
     "cytoscape-layers": "^3.0.0",
+    "cytoscape-pdf-export": "^0.0.3",
     "cytoscape-popper": "^4.0.1",
     "jsdom": "^26.0.0",
     "jssha": "^3.3.1",

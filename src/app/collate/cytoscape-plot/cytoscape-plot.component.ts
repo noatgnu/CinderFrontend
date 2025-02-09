@@ -23,6 +23,7 @@ import {StringDbDialogComponent} from "./string-db-dialog/string-db-dialog.compo
 import {WebService} from "../../web.service";
 // @ts-ignore
 import C2S from 'canvas-to-svg';
+import pdf from 'cytoscape-pdf-export';
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -99,6 +100,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     cytoscape.use(fcose);
     cytoscape.use(popper(popperFactory));
     cytoscape.use(Layers);
+    cytoscape.use(pdf);
     //cytoscape.use(edgehandles);
     this.initCytoscape()
     this.collateService.collateRedrawSubject.subscribe(() => {
@@ -713,35 +715,16 @@ export class CytoscapePlotComponent implements AfterViewInit{
     if (!this.cy.container()) {
       return;
     }
-
-    // Create a canvas to combine Cytoscape and layers
-    const combinedCanvas = document.createElement('canvas');
-    combinedCanvas.width = this.cy.width();
-    combinedCanvas.height = this.cy.height();
-    const combinedContext = combinedCanvas.getContext('2d');
-
-    // Draw Cytoscape canvas onto the combined canvas
-    const cyCanvas = this.cy.container().querySelector('canvas');
-    if (cyCanvas) {
-      combinedContext.drawImage(cyCanvas, 0, 0);
-    }
-
-    // Draw layers onto the combined canvas
-    const layersCanvas = this.cy.container().querySelector('.cy-layers canvas');
-    if (layersCanvas) {
-      combinedContext.drawImage(layersCanvas, 0, 0);
-    }
-
-    // Export the combined canvas as PNG
-    combinedCanvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'cytoscape-plot.png';
-      a.click();
-      URL.revokeObjectURL(url);
-    });
+    const pngContext = this.cy.png({ full: true });
+    const blob = this.dataURItoBlob(pngContext);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cytoscape-plot.png';
+    a.click();
+    URL.revokeObjectURL(url);
   }
+
   dataURItoBlob(dataURI: string) {
     const byteString = atob(dataURI.split(',')[1]);
     const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
@@ -753,5 +736,17 @@ export class CytoscapePlotComponent implements AfterViewInit{
     return new Blob([ab], { type: mimeString });
   }
 
+  async exportToPDF() {
+    const blobPromise = this.cy.pdf({ paperSize: 'LETTER', orientation: 'landscape', full: true });
+    const blob = await blobPromise;
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cytoscape-plot.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
 
 }
