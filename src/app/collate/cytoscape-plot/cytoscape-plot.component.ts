@@ -206,7 +206,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
       });
       //@ts-ignore
-      const layers: any = this.cy.layers({ignoreUnsupportedLayerOrder: true})
+      const layers: any = this.cy.layers()
       this.cy.edges().forEach(edge => {
         edge.on('click', (event) => {
           const targetEdge = event.target
@@ -777,7 +777,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const tempCtx = tempCanvas.getContext('2d');
     if (tempCtx) {
       // Draw Cytoscape elements onto the temporary canvas
-      const cytoscapePng = this.cy.png({ full: true, output: 'base64' });
+      const cytoscapePng = this.cy.png({ full: true, output: 'base64', ignoreUnsupportedLayerOrder: true });
       const img = new Image();
       img.src = 'data:image/png;base64,' + cytoscapePng.split(',')[1];
       img.onload = () => {
