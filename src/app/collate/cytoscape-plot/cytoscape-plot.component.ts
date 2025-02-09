@@ -645,11 +645,23 @@ export class CytoscapePlotComponent implements AfterViewInit{
     }
     const svgContext = new C2S(this.cy.width(), this.cy.height());
 
+    // Calculate the bounding box of the graph
+    const boundingBox = this.cy.elements().boundingBox();
+    const offsetX = -boundingBox.x1;
+    const offsetY = -boundingBox.y1;
+
     // Draw nodes
     this.cy.nodes().forEach(node => {
       const position = node.position();
+      const x = position.x + offsetX;
+      const y = position.y + offsetY;
+
       svgContext.beginPath();
-      svgContext.rect(position.x - 15, position.y - 15, 30, 30); // Adjust size as needed
+      if (node.hasClass('string-protein')) {
+        svgContext.rect(x - 15, y - 15, 30, 30); // Rectangle for STRING nodes
+      } else {
+        svgContext.arc(x, y, 15, 0, 2 * Math.PI); // Circle for normal nodes
+      }
       svgContext.fillStyle = node.style('background-color');
       svgContext.fill();
       svgContext.stroke();
@@ -658,16 +670,21 @@ export class CytoscapePlotComponent implements AfterViewInit{
       // Draw labels
       svgContext.font = '12px Arial';
       svgContext.fillStyle = '#000';
-      svgContext.fillText(node.data('label'), position.x - 15, position.y - 20); // Adjust position as needed
+      svgContext.fillText(node.data('label'), x - 15, y - 20); // Adjust position as needed
     });
 
     // Draw edges
     this.cy.edges().forEach(edge => {
       const sourcePosition = edge.source().position();
       const targetPosition = edge.target().position();
+      const sourceX = sourcePosition.x + offsetX;
+      const sourceY = sourcePosition.y + offsetY;
+      const targetX = targetPosition.x + offsetX;
+      const targetY = targetPosition.y + offsetY;
+
       svgContext.beginPath();
-      svgContext.moveTo(sourcePosition.x, sourcePosition.y);
-      svgContext.lineTo(targetPosition.x, targetPosition.y);
+      svgContext.moveTo(sourceX, sourceY);
+      svgContext.lineTo(targetX, targetY);
       svgContext.strokeStyle = edge.style('line-color');
       svgContext.lineWidth = parseFloat(edge.style('width'));
       svgContext.stroke();
