@@ -23,6 +23,7 @@ import {StringDbDialogComponent} from "./string-db-dialog/string-db-dialog.compo
 import {WebService} from "../../web.service";
 // @ts-ignore
 import C2S from 'canvas-to-svg';
+// @ts-ignore
 import pdf from 'cytoscape-pdf-export';
 
 function popperFactory(ref: any, content: any, opts: any) {

@@ -14,7 +14,7 @@
   <button mat-icon-button (click)="openStringDBDialog()" matTooltip="Add STRING DB Interactions">
     <mat-icon>add_circle</mat-icon>
   </button>
-  <button mat-icon-button (click)="exportToPDF()" matTooltip="Export to PDF">
+  <button mat-icon-button matTooltip="Export" [matMenuTriggerFor]="exportPlot">
     <mat-icon>save_alt</mat-icon>
   </button>
 </div>
@@ -26,6 +26,14 @@
 <mat-menu #labelOff>
   <button mat-menu-item (click)="toggleAllComparisons(false,'.comparison')">
     <span>Comparison</span>
+  </button>
+</mat-menu>
+<mat-menu #exportPlot>
+  <button mat-menu-item (click)="exportToPng()">
+    <span>Export to PNG</span>
+  </button>
+  <button mat-menu-item (click)="exportToPDF()">
+    <span>Export to PDF</span>
   </button>
 </mat-menu>
 <div #cy class="cy-container"></div>
