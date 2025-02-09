@@ -738,6 +738,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
   async exportToPDF() {
+    // @ts-ignore
     const blobPromise = this.cy.pdf({ paperSize: 'LETTER', orientation: 'landscape', full: true });
     const blob = await blobPromise;
     const url = URL.createObjectURL(blob);
