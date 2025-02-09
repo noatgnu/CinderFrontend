@@ -494,8 +494,11 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const ref = this.dialog.open(StringDbDialogComponent);
     ref.afterClosed().subscribe((result) => {
       if (result) {
-        const genes = this.cy.nodes().map(node => node.data('id'));
-        this.requestStringDBInteractions(genes, result.organism, result.score, result.networkType, result.addNodes);
+        const genes = this.cy.nodes('proteins').map(node => node.data('id').split(';'));
+        // flatten the array
+        const flattenedGenes = [].concat.apply([], genes);
+        const uniqueGenes = Array.from(new Set(flattenedGenes));
+        this.requestStringDBInteractions(uniqueGenes, result.organism.taxon, result.score, result.networkType, result.addNodes);
       }
     });
   }
@@ -503,7 +506,10 @@ export class CytoscapePlotComponent implements AfterViewInit{
   requestStringDBInteractions(genes: string[], organism: string, score: number, networkType: string, addNodes: number) {
     this.webService.getStringDBInteractions(genes, organism, score, networkType, addNodes).subscribe(response => {
       // Handle the response and update the Cytoscape plot
-      console.log(response);
+      const data = response;
+      if (data) {
+        console.log(data)
+      }
     });
   }
 }

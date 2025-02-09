@@ -49,7 +49,7 @@ export class StringDbDialogComponent {
     this.form.controls.organism.valueChanges.pipe(
       debounceTime(300),
       switchMap(value => {
-        if (value) {
+        if (value && typeof value === 'string') {
           return this.webService.getSpecies(undefined, 5, 0, value)
         } else {
           return of({results: []})

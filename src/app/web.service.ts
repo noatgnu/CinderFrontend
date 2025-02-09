@@ -1163,8 +1163,8 @@ export class WebService {
       params = params.append("show_query_node_labels", "1");
     }
     return this.http.get(
-      "https://string-db.org/api/tsv/network?",
-      {responseType: "text", params: params, observe: "response"}
+      "https://string-db.org/api/json/network?",
+      {responseType: "json", params: params, observe: "body"}
     )
   }
 }
