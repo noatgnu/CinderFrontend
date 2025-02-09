@@ -751,7 +751,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
   async exportToPDF() {
     // @ts-ignore
-    const blobPromise = this.cy.pdf({ paperSize: 'LETTER', orientation: 'landscape', full: true });
+    const blobPromise = this.cy.pdf({
+      paperSize: 'LETTER', orientation: 'landscape', full: true, ignoreUnsupportedLayerOrder: true });
     const blob = await blobPromise;
     const url = URL.createObjectURL(blob);
 
@@ -778,39 +779,10 @@ export class CytoscapePlotComponent implements AfterViewInit{
       const a = document.createElement('a');
       const url = URL.createObjectURL(blob);
       a.href = url;
+      a.download = 'cytoscape-plot.png';
       a.click();
       URL.revokeObjectURL(url);
     })
-
-
-    // Create a temporary canvas to draw the Cytoscape elements and the bar chart
-    /*const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = this.cy.width();
-    tempCanvas.height = this.cy.height();
-    const tempCtx = tempCanvas.getContext('2d');
-    if (tempCtx) {
-      // Draw Cytoscape elements onto the temporary canvas
-      const cytoscapePng = this.cy.png({ full: true, output: 'base64', ignoreUnsupportedLayerOrder: true });
-      const img = new Image();
-      img.src = 'data:image/png;base64,' + cytoscapePng.split(',')[1];
-      img.onload = () => {
-        tempCtx.drawImage(img, 0, 0);
-        // Draw the bar chart on top of the Cytoscape elements
-        this.cy.edges().forEach(edge => {
-          if (edge.data('showBarChart')) {
-            const start = edge.sourceEndpoint();
-            const end = edge.targetEndpoint();
-            this.renderBarChart(edge, start, end, tempCtx);
-          }
-        });
-        // Export the combined canvas as a PNG
-        const combinedPng = tempCanvas.toDataURL('image/png');
-        const a = document.createElement('a');
-        a.href = combinedPng;
-        a.download = 'cytoscape-plot.png';
-        a.click();
-      };
-    }*/
 
   }
 }
