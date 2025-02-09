@@ -206,7 +206,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         });
       });
       //@ts-ignore
-      const layers: any = this.cy.layers()
+      const layers: any = this.cy.layers({ignoreUnsupportedLayerOrder: true})
       this.cy.edges().forEach(edge => {
         edge.on('click', (event) => {
           const targetEdge = event.target
@@ -782,7 +782,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
       img.src = 'data:image/png;base64,' + cytoscapePng.split(',')[1];
       img.onload = () => {
         tempCtx.drawImage(img, 0, 0);
-
         // Draw the bar chart on top of the Cytoscape elements
         this.cy.edges().forEach(edge => {
           if (edge.data('showBarChart')) {
@@ -791,7 +790,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
             this.renderBarChart(edge, start, end, tempCtx);
           }
         });
-
         // Export the combined canvas as a PNG
         const combinedPng = tempCanvas.toDataURL('image/png');
         const a = document.createElement('a');
