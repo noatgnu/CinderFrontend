@@ -1162,7 +1162,7 @@ export class WebService {
     if (show_query_node_labels) {
       params = params.append("show_query_node_labels", "1");
     }
-    return this.http.get(
+    return this.http.get<any[]>(
       "https://string-db.org/api/json/network?",
       {responseType: "json", params: params, observe: "body"}
     )

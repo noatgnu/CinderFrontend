@@ -508,8 +508,111 @@ export class CytoscapePlotComponent implements AfterViewInit{
       // Handle the response and update the Cytoscape plot
       const data = response;
       if (data) {
-        console.log(data)
+        this.addStringDBInteractions(data);
       }
     });
+  }
+
+  addStringDBInteractions(data: any[]) {
+    const addedNodes = new Set<string>();
+    const addedEdges = new Set<string>();
+
+    data.forEach(interaction => {
+      const { preferredName_A, preferredName_B, score } = interaction;
+
+      // Check if nodes already exist
+      const nodeAExists = this.cy.nodes().some(node => node.data('id').split(';').includes(preferredName_A));
+      const nodeBExists = this.cy.nodes().some(node => node.data('id').split(';').includes(preferredName_B));
+
+      // Add node A if it doesn't exist
+      if (!nodeAExists && !addedNodes.has(preferredName_A)) {
+        this.cy.add({
+          data: { id: preferredName_A, label: preferredName_A, size: 25 },
+          classes: 'string-protein'
+        });
+        addedNodes.add(preferredName_A);
+      }
+
+      // Add node B if it doesn't exist
+      if (!nodeBExists && !addedNodes.has(preferredName_B)) {
+        this.cy.add({
+          data: { id: preferredName_B, label: preferredName_B, size: 25 },
+          classes: 'string-protein'
+        });
+        addedNodes.add(preferredName_B);
+      }
+
+      // Add edge if it doesn't exist
+      const edgeId = `${preferredName_A}-${preferredName_B}`;
+      if (!addedEdges.has(edgeId)) {
+        this.cy.add({
+          data: {
+            id: edgeId,
+            source: preferredName_A,
+            target: preferredName_B,
+            score: score
+          },
+          classes: 'string-edge'
+        });
+        addedEdges.add(edgeId);
+      }
+
+      // Identify and add interactions with existing non-STRING nodes
+      this.cy.nodes().forEach(node => {
+        const nodeId = node.data('id');
+        const nodeIds = nodeId.split(';');
+
+        if (nodeIds.includes(preferredName_A) && !nodeIds.includes(preferredName_B)) {
+          const newEdgeId = `${nodeId}-${preferredName_B}`;
+          if (!addedEdges.has(newEdgeId)) {
+            this.cy.add({
+              data: {
+                id: newEdgeId,
+                source: nodeId,
+                target: preferredName_B,
+                score: score
+              },
+              classes: 'string-edge'
+            });
+            addedEdges.add(newEdgeId);
+          }
+        }
+
+        if (nodeIds.includes(preferredName_B) && !nodeIds.includes(preferredName_A)) {
+          const newEdgeId = `${nodeId}-${preferredName_A}`;
+          if (!addedEdges.has(newEdgeId)) {
+            this.cy.add({
+              data: {
+                id: newEdgeId,
+                source: nodeId,
+                target: preferredName_A,
+                score: score
+              },
+              classes: 'string-edge'
+            });
+            addedEdges.add(newEdgeId);
+          }
+        }
+      });
+    });
+
+    // Apply specific styles for STRING added data
+    this.cy.style()
+      .selector('.string-protein')
+      .style({
+        'shape': 'rectangle',
+        'background-color': '#FF5733',
+        'label': 'data(label)',
+        'width': 30,
+        'height': 30
+      })
+      .selector('.string-edge')
+      .style({
+        'line-color': '#FF5733',
+        'width': 2,
+        'line-style': 'dashed',
+        'target-arrow-shape': 'none'
+      })
+      .update();
   }
 }
