@@ -22,7 +22,7 @@ import {
 import {StringDbDialogComponent} from "./string-db-dialog/string-db-dialog.component";
 import {WebService} from "../../web.service";
 // @ts-ignore
-import * as canvasToSvg from 'canvas-to-svg';
+import C2S from 'canvas-to-svg';
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -643,11 +643,43 @@ export class CytoscapePlotComponent implements AfterViewInit{
     if (!this.cy.container()) {
       return;
     }
-    // @ts-ignore
-    const canvas = this.cy.container().querySelector('canvas');
-    const svg = canvasToSvg.canvasToSvg(canvas);
-    const svgBlob = new Blob([svg], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(svgBlob);
+    const svgContext = new C2S(this.cy.width(), this.cy.height());
+
+    // Draw nodes
+    this.cy.nodes().forEach(node => {
+      const position = node.position();
+      svgContext.beginPath();
+      svgContext.rect(position.x - 15, position.y - 15, 30, 30); // Adjust size as needed
+      svgContext.fillStyle = node.style('background-color');
+      svgContext.fill();
+      svgContext.stroke();
+      svgContext.closePath();
+
+      // Draw labels
+      svgContext.font = '12px Arial';
+      svgContext.fillStyle = '#000';
+      svgContext.fillText(node.data('label'), position.x - 15, position.y - 20); // Adjust position as needed
+    });
+
+    // Draw edges
+    this.cy.edges().forEach(edge => {
+      const sourcePosition = edge.source().position();
+      const targetPosition = edge.target().position();
+      svgContext.beginPath();
+      svgContext.moveTo(sourcePosition.x, sourcePosition.y);
+      svgContext.lineTo(targetPosition.x, targetPosition.y);
+      svgContext.strokeStyle = edge.style('line-color');
+      svgContext.lineWidth = parseFloat(edge.style('width'));
+      svgContext.stroke();
+      svgContext.closePath();
+    });
+
+    // Get the SVG string
+    const svgString = svgContext.getSerializedSvg();
+
+    // Create a Blob from the SVG string
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'cytoscape-plot.svg';
