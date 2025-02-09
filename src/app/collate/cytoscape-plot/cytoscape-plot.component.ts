@@ -626,5 +626,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
         'target-arrow-shape': 'none'
       })
       .update();
+    //@ts-ignore
+    this.cy.layout({ name: 'fcose', animate: true, animationDuration: 1000}).run()
   }
 }
