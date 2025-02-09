@@ -706,5 +706,22 @@ export class CytoscapePlotComponent implements AfterViewInit{
     URL.revokeObjectURL(url);
   }
 
+  exportToPng() {
+    if (!this.cy) {
+      return;
+    }
+    if (!this.cy.container()) {
+      return;
+    }
+    const pngContext = this.cy.png({ full: true });
+    const blob = this.dataURItoBlob(pngContext);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cytoscape-plot.png';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
 
 }
