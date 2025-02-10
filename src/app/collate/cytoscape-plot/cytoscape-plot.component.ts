@@ -691,36 +691,33 @@ export class CytoscapePlotComponent implements AfterViewInit{
     });
 
     // Draw edges
+    console.log(this.cy.json())
     this.cy.edges().forEach(edge => {
       const controlPoints = edge.controlPoints();
+      const sourcePosition = edge.source().position();
+      const targetPosition = edge.target().position();
+      const sourceX = sourcePosition.x + offsetX;
+      const sourceY = sourcePosition.y + offsetY;
+      const targetX = targetPosition.x + offsetX;
+      const targetY = targetPosition.y + offsetY;
+
+      svgContext.beginPath();
       if (controlPoints) {
-        controlPoints.forEach(point => {
-          const x = point.x + offsetX;
-          const y = point.y + offsetY;
-
-          svgContext.beginPath();
-          svgContext.arc(x, y, 5, 0, 2 * Math.PI);
-          svgContext.strokeStyle = edge.style('line-color');
-          svgContext.lineWidth = parseFloat(edge.style('width'));
-          svgContext.stroke();
-          svgContext.closePath();
-        });
+        if (controlPoints.length > 1) {
+          const controlPoint = controlPoints[0];
+          const controlX = controlPoint.x + offsetX;
+          const controlY = controlPoint.y + offsetY;
+          svgContext.moveTo(sourceX, sourceY);
+          svgContext.quadraticCurveTo(controlX, controlY, targetX, targetY);
+        }
       } else {
-        const sourcePosition = edge.source().position();
-        const targetPosition = edge.target().position();
-        const sourceX = sourcePosition.x + offsetX;
-        const sourceY = sourcePosition.y + offsetY;
-        const targetX = targetPosition.x + offsetX;
-        const targetY = targetPosition.y + offsetY;
-
-        svgContext.beginPath();
         svgContext.moveTo(sourceX, sourceY);
         svgContext.lineTo(targetX, targetY);
-        svgContext.strokeStyle = edge.style('line-color');
-        svgContext.lineWidth = parseFloat(edge.style('width'));
-        svgContext.stroke();
-        svgContext.closePath();
       }
+      svgContext.strokeStyle = edge.style('line-color');
+      svgContext.lineWidth = parseFloat(edge.style('width'));
+      svgContext.stroke();
+      svgContext.closePath();
     });
 
     // Get the SVG string
