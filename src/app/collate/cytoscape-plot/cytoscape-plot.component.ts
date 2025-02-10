@@ -692,20 +692,35 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
     // Draw edges
     this.cy.edges().forEach(edge => {
-      const sourcePosition = edge.source().position();
-      const targetPosition = edge.target().position();
-      const sourceX = sourcePosition.x + offsetX;
-      const sourceY = sourcePosition.y + offsetY;
-      const targetX = targetPosition.x + offsetX;
-      const targetY = targetPosition.y + offsetY;
+      const controlPoints = edge.controlPoints();
+      if (controlPoints) {
+        controlPoints.forEach(point => {
+          const x = point.x + offsetX;
+          const y = point.y + offsetY;
 
-      svgContext.beginPath();
-      svgContext.moveTo(sourceX, sourceY);
-      svgContext.lineTo(targetX, targetY);
-      svgContext.strokeStyle = edge.style('line-color');
-      svgContext.lineWidth = parseFloat(edge.style('width'));
-      svgContext.stroke();
-      svgContext.closePath();
+          svgContext.beginPath();
+          svgContext.arc(x, y, 5, 0, 2 * Math.PI);
+          svgContext.strokeStyle = edge.style('line-color');
+          svgContext.lineWidth = parseFloat(edge.style('width'));
+          svgContext.stroke();
+          svgContext.closePath();
+        });
+      } else {
+        const sourcePosition = edge.source().position();
+        const targetPosition = edge.target().position();
+        const sourceX = sourcePosition.x + offsetX;
+        const sourceY = sourcePosition.y + offsetY;
+        const targetX = targetPosition.x + offsetX;
+        const targetY = targetPosition.y + offsetY;
+
+        svgContext.beginPath();
+        svgContext.moveTo(sourceX, sourceY);
+        svgContext.lineTo(targetX, targetY);
+        svgContext.strokeStyle = edge.style('line-color');
+        svgContext.lineWidth = parseFloat(edge.style('width'));
+        svgContext.stroke();
+        svgContext.closePath();
+      }
     });
 
     // Get the SVG string
@@ -775,6 +790,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       output: 'blob-promise',
       ignoreUnsupportedLayerOrder: true,
       full: true,
+      scale: 5,
     }).then((blob: Blob) => {
       const a = document.createElement('a');
       const url = URL.createObjectURL(blob);
