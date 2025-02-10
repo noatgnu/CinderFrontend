@@ -680,7 +680,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       svgContext.fillStyle = node.style('background-color');
       svgContext.fill();
       svgContext.strokeStyle = node.style('border-color') || '#FFF';
-      svgContext.lineWidth = parseFloat(node.style('border-width')) || 1;
+      //svgContext.lineWidth = parseFloat(node.style('border-width')) || 1;
       svgContext.stroke();
       svgContext.closePath();
 
