@@ -25,6 +25,7 @@ import {WebService} from "../../web.service";
 import C2S from 'canvas-to-svg';
 // @ts-ignore
 import pdf from 'cytoscape-pdf-export';
+import {HeatmapPlotComponent} from "./heatmap-plot/heatmap-plot.component";
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -69,7 +70,8 @@ function popperFactory(ref: any, content: any, opts: any) {
     MatTooltip,
     MatMenu,
     MatMenuItem,
-    MatMenuTrigger
+    MatMenuTrigger,
+    HeatmapPlotComponent
   ],
   templateUrl: './cytoscape-plot.component.html',
   styleUrl: './cytoscape-plot.component.scss',
@@ -78,6 +80,15 @@ function popperFactory(ref: any, content: any, opts: any) {
 export class CytoscapePlotComponent implements AfterViewInit{
   showBarChart: boolean = true;
   showCytoscapePlot: boolean = false;
+  heatmapData: {
+    project: string
+    analysis_group: string,
+    conditionA: string,
+    conditionB: string,
+    log2fc: number,
+    p_value: number,
+    comparison: string
+  }[] = [];
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() projects: Project[] = [];
   @Input() searchResultsMap: { [projectID: string]: SearchResult[] } = {};
@@ -336,7 +347,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const elements: any[] = [];
     const addedNodes = new Set();
     const projectColorMap: { [projectId: string]: string } = {};
-    console.log(this.searchResultsMap)
+    const heatmapData: any[] = [];
     this.projects.forEach(project => {
       const searchResults = this.searchResultsMap[project.id] || [];
       if (!projectColorMap[project.id]) {
@@ -399,8 +410,18 @@ export class CytoscapePlotComponent implements AfterViewInit{
             p_value: result.log10_p
           }
         });
+        heatmapData.push({
+          project: project.name,
+          analysis_group: result.analysis_group.name,
+          conditionA: conditionA,
+          conditionB: conditionB,
+          log2fc: result.log2_fc,
+          p_value: result.log10_p,
+          comparison: comparisonId
+        })
       });
     });
+    this.heatmapData = heatmapData;
     this.projectColorMap = projectColorMap;
     return elements;
   }
@@ -478,7 +499,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
     })
     const filteredNodeIds = new Set(filteredNodes.map((element: any) => element.data.id));
 
-    console.log(filteredNodeIds)
     this.cy.batch(() => {
       const addedElements: any[] = []
       this.cy.edges().forEach(edge => {
@@ -509,6 +529,23 @@ export class CytoscapePlotComponent implements AfterViewInit{
     })
     //@ts-ignore
     this.cy.layout({ name: 'fcose', animate: true, animationDuration: 1000}).run()
+    // update heatmap data
+    const heatmapData: any[] = [];
+    this.cy.edges().forEach(edge => {
+      const data = edge.data();
+      if (data.conditionA && data.conditionB) {
+        this.heatmapData.push({
+          project: data.project,
+          analysis_group: data.analysis_group,
+          conditionA: data.conditionA,
+          conditionB: data.conditionB,
+          log2fc: data.fc,
+          p_value: data.p_value,
+          comparison: `${data.conditionA} vs ${data.conditionB}`
+        })
+      }
+    })
+    this.heatmapData = heatmapData;
   }
 
   openStringDBDialog() {
@@ -796,6 +833,15 @@ export class CytoscapePlotComponent implements AfterViewInit{
       a.click();
       URL.revokeObjectURL(url);
     })
+  }
 
+  updateHeatmapData() {
+    this.heatmapData = this.cy.nodes(".protein").map(node => {
+      return {
+        protein: node.data('label'),
+        analysis: node.data('analysis_group'),
+        value: node.data('fc')
+      };
+    });
   }
 }

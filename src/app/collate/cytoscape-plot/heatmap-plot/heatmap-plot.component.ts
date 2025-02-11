@@ -1,0 +1,65 @@
+import {AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {PlotlyModule} from "angular-plotly.js";
+import * as PlotlyJS from "plotly.js-dist-min";
+
+PlotlyModule.plotlyjs = PlotlyJS;
+
+@Component({
+  selector: 'app-heatmap-plot',
+  imports: [PlotlyModule],
+  templateUrl: './heatmap-plot.component.html',
+  styleUrl: './heatmap-plot.component.scss'
+})
+export class HeatmapPlotComponent {
+  private _data: {
+    project: string
+    analysis_group: string,
+    conditionA: string,
+    conditionB: string,
+    log2fc: number,
+    p_value: number,
+    comparison: string
+  }[] = []
+  @Input() set data (value: {
+    project: string
+    analysis_group: string,
+    conditionA: string,
+    conditionB: string,
+    log2fc: number,
+    p_value: number,
+    comparison: string
+  }[]) {
+    this._data = value;
+    this.drawHeatmap();
+  }
+  get data() {
+    return this._data;
+  }
+
+  layout: any = {}
+  graphData: any = {}
+  revision = 0
+  drawHeatmap() {
+    // transform data to heatmap
+    const x = this.data.map(d => d.comparison);
+    const y = this.data.map(d => d.analysis_group);
+    const z = this.data.map(d => d.log2fc);
+
+    const trace = {
+      x: x,
+      y: y,
+      z: z,
+      type: 'heatmap',
+      colorscale: 'Viridis'
+    };
+
+    const layout = {
+      title: 'Heatmap of Protein Changes',
+      xaxis: { title: 'Analysis Result' },
+      yaxis: { title: 'Protein' }
+    };
+    this.graphData = [trace];
+    this.layout = layout;
+    this.revision++
+  }
+}

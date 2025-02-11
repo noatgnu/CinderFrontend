@@ -40,3 +40,6 @@
   </button>-->
 </mat-menu>
 <div #cy class="cy-container"></div>
+@if (heatmapData.length >0) {
+  <app-heatmap-plot [data]="heatmapData"></app-heatmap-plot>
+}
