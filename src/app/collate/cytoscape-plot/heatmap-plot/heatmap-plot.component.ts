@@ -157,7 +157,7 @@ export class HeatmapPlotComponent {
     this.reversePointIndexToProject[shapeIndex].line.color = 'white';
     const shape = this.reversePointIndexToColumn[shapeIndex];
     shape.line.color = 'white';
-    shape.reversePointIndexToColumn[shapeIndex].line.width = 2;
+    shape.line.width = 2;
     shape.blinkingInterval = setInterval(() => {
       shape.opacity = shape.opacity === 1 ? 0.5 : 1;
     }, 500)
