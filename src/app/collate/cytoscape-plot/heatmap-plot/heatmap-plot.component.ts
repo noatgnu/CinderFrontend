@@ -156,7 +156,7 @@ export class HeatmapPlotComponent {
     const shapeIndex = event.points[0].pointIndex;
     this.reversePointIndexToProject[shapeIndex].line.color = 'white';
     this.reversePointIndexToColumn[shapeIndex].line.color = 'white';
-    this.reversePointIndexToColumn[shapeIndex].opacity = 1;
+    this.reversePointIndexToColumn[shapeIndex].line.width = 2;
     this.reversePointIndexToColumn[shapeIndex].className = 'blinking';
     this.revision++;
   }
@@ -166,7 +166,6 @@ export class HeatmapPlotComponent {
     this.reversePointIndexToProject[shapeIndex].line.color = 'red';
     this.reversePointIndexToColumn[shapeIndex].line.color = 'rgba(0,0,0,0)';
     this.reversePointIndexToColumn[shapeIndex].className = '';
-    this.reversePointIndexToColumn[shapeIndex].opacity = 0;
     this.revision++;
   }
 }
