@@ -534,7 +534,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     this.cy.edges().forEach(edge => {
       const data = edge.data();
       if (data.conditionA && data.conditionB) {
-        this.heatmapData.push({
+        heatmapData.push({
           project: data.project,
           analysis_group: data.analysis_group,
           conditionA: data.conditionA,
@@ -833,15 +833,5 @@ export class CytoscapePlotComponent implements AfterViewInit{
       a.click();
       URL.revokeObjectURL(url);
     })
-  }
-
-  updateHeatmapData() {
-    this.heatmapData = this.cy.nodes(".protein").map(node => {
-      return {
-        protein: node.data('label'),
-        analysis: node.data('analysis_group'),
-        value: node.data('fc')
-      };
-    });
   }
 }
