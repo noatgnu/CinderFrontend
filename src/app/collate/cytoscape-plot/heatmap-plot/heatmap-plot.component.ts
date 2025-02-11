@@ -42,13 +42,28 @@ export class HeatmapPlotComponent {
   graphData: any = {}
   revision = 0
   drawHeatmap() {
-    // reorder data based on project
-    this.data = this.data.sort((a, b) => a.project.localeCompare(b.project));
+    // Group data by project
+    const projectGroups: any = {}
+    for (const d of this.data) {
+      if (!projectGroups[d.project]) {
+        projectGroups[d.project] = []
+      }
+      projectGroups[d.project].push(d)
+    }
     // transform data to heatmap
-    const x = this.data.map(d => `${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`);
-    const y = this.data.map(d => d.protein);
-    const z = this.data.map(d => d.log2fc);
-    const text = this.data.map(d => `${d.comparison}<br>p-value: ${d.p_value}<br>log2fc: ${d.log2fc}<br>project: ${d.project}<br>analysis_group: ${d.analysis_group}<br>conditionA: ${d.conditionA}<br>conditionB: ${d.conditionB}`);
+    const x: string[] = []
+    const y: string[] = []
+    const text: string[] = []
+    const z: number[] = []
+    for (const project in projectGroups) {
+      const group = projectGroups[project]
+      for (const d of group) {
+        x.push(`${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`)
+        y.push(d.protein)
+        z.push(d.log2fc)
+        text.push(`${d.comparison}<br>p-value: ${d.p_value}<br>log2fc: ${d.log2fc}<br>project: ${d.project}<br>analysis_group: ${d.analysis_group}<br>conditionA: ${d.conditionA}<br>conditionB: ${d.conditionB}`)
+      }
+    }
 
     const trace = {
       x: x,
@@ -58,15 +73,6 @@ export class HeatmapPlotComponent {
       type: 'heatmap',
       colorscale: 'Viridis'
     };
-
-    // Group data by project
-    const projectGroups: any = {}
-    for (const d of this.data) {
-      if (!projectGroups[d.project]) {
-        projectGroups[d.project] = []
-      }
-      projectGroups[d.project].push(d)
-    }
 
     // Calculate annotations for each project group
     const annotations = [];
