@@ -155,17 +155,21 @@ export class HeatmapPlotComponent {
   handleHoverIn(event: any) {
     const shapeIndex = event.points[0].pointIndex;
     this.reversePointIndexToProject[shapeIndex].line.color = 'white';
-    this.reversePointIndexToColumn[shapeIndex].line.color = 'white';
-    this.reversePointIndexToColumn[shapeIndex].line.width = 2;
-    this.reversePointIndexToColumn[shapeIndex].className = 'blinking';
+    const shape = this.reversePointIndexToColumn[shapeIndex];
+    shape.line.color = 'white';
+    shape.reversePointIndexToColumn[shapeIndex].line.width = 2;
+    shape.blinkingInterval = setInterval(() => {
+      shape.opacity = shape.opacity === 1 ? 0.5 : 1;
+    }, 500)
     this.revision++;
   }
 
   handleHoverOut(event: any) {
     const shapeIndex = event.points[0].pointIndex;
     this.reversePointIndexToProject[shapeIndex].line.color = 'red';
-    this.reversePointIndexToColumn[shapeIndex].line.color = 'rgba(0,0,0,0)';
-    this.reversePointIndexToColumn[shapeIndex].className = '';
+    const shape = this.reversePointIndexToColumn[shapeIndex];
+    shape.line.color = 'rgba(0,0,0,0)';
+    clearInterval(shape.blinkingInterval);
     this.revision++;
   }
 }
