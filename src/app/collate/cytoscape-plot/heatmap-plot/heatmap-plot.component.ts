@@ -60,13 +60,13 @@ export class HeatmapPlotComponent {
     };
 
     // Group data by project
-    const projectGroups = this.data.reduce((acc: any, d) => {
-      if (!acc[d.project]) {
-        acc[d.project] = [];
+    const projectGroups: any = {}
+    for (const d of this.data) {
+      if (!projectGroups[d.project]) {
+        projectGroups[d.project] = []
       }
-      acc[d.project].push(d);
-      return acc;
-    }, {});
+      projectGroups[d.project].push(d)
+    }
 
     // Calculate annotations for each project group
     const annotations = [];
