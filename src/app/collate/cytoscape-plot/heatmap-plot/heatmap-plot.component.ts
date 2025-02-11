@@ -1,4 +1,14 @@
-import {AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {PlotlyModule} from "angular-plotly.js";
 import * as PlotlyJS from "plotly.js-dist-min";
 
@@ -34,6 +44,9 @@ export class HeatmapPlotComponent {
     this._data = value;
     this.drawHeatmap();
   }
+
+  @Output() currentHoverTarget: EventEmitter<string> = new EventEmitter<string>();
+
   get data() {
     return this._data;
   }
@@ -42,6 +55,7 @@ export class HeatmapPlotComponent {
   graphData: any = {}
   revision = 0
   reversePointIndexToProject: any = {}
+  reversePointIndexToColumn: any = {}
   drawHeatmap() {
     // Group data by project
     const projectGroups: any = {}
@@ -51,29 +65,6 @@ export class HeatmapPlotComponent {
       }
       projectGroups[d.project].push(d)
     }
-    // transform data to heatmap
-    const x: string[] = []
-    const y: string[] = []
-    const text: string[] = []
-    const z: number[] = []
-    for (const project in projectGroups) {
-      const group = projectGroups[project]
-      for (const d of group) {
-        x.push(`${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`)
-        y.push(d.protein)
-        z.push(d.log2fc)
-        text.push(`${d.project}`)
-      }
-    }
-
-    const trace = {
-      x: x,
-      y: y,
-      z: z,
-      text: text,
-      type: 'heatmap',
-      colorscale: 'Viridis'
-    };
 
     // Calculate annotations for each project group
     const shapes = [];
@@ -102,6 +93,52 @@ export class HeatmapPlotComponent {
       currentIndex += groupSize;
     }
 
+    // transform data to heatmap
+    const x: string[] = []
+    const y: string[] = []
+    const text: string[] = []
+    const z: number[] = []
+    currentIndex = 0
+    for (const project in projectGroups) {
+      const group = projectGroups[project]
+      for (let i = 0; i < group.length; i++) {
+        const d = group[i]
+        x.push(`${d.analysis_group} ${d.conditionA} vs ${d.conditionB} ${d.project}`)
+        y.push(d.protein)
+        z.push(d.log2fc)
+        text.push(`${d.project}`)
+        const projectShape = this.reversePointIndexToProject[x.length - 1]
+        const shape = {
+          type: 'rect',
+          x0: projectShape.x0+i,
+          x1: projectShape.x0+i+1,
+          y0: 1,
+          y1: 0,
+          xref: 'x',
+          yref: 'paper',
+          line: {
+            color: "rgba(0,0,0,0)",
+            width: 1
+          },
+        }
+        this.reversePointIndexToColumn[currentIndex] = shape
+        shapes.push(shape)
+        currentIndex++
+
+      }
+    }
+
+    const trace = {
+      x: x,
+      y: y,
+      z: z,
+      text: text,
+      type: 'heatmap',
+      colorscale: 'Viridis'
+    };
+
+
+
     const layout: any = {
       title: 'Heatmap of Protein Changes',
       xaxis: { title: 'Analysis', showticklabels: false},
@@ -118,12 +155,14 @@ export class HeatmapPlotComponent {
   handleHoverIn(event: any) {
     const shapeIndex = event.points[0].pointIndex;
     this.reversePointIndexToProject[shapeIndex].line.color = 'white';
+    this.reversePointIndexToColumn[shapeIndex].line.color = 'white';
     this.revision++;
   }
 
   handleHoverOut(event: any) {
     const shapeIndex = event.points[0].pointIndex;
     this.reversePointIndexToProject[shapeIndex].line.color = 'red';
+    this.reversePointIndexToColumn[shapeIndex].line.color = 'rgba(0,0,0,0)';
     this.revision++;
   }
 }
