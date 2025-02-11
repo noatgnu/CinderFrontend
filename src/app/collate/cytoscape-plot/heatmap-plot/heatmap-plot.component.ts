@@ -60,73 +60,27 @@ export class HeatmapPlotComponent {
   reversePointIndexToColumn: any = {}
   drawHeatmap() {
     // Group data by project
-    const projectGroups: any = {}
+    const projectGroups: any = {};
     for (const d of this.data) {
       if (!projectGroups[d.project]) {
-        projectGroups[d.project] = []
+        projectGroups[d.project] = [];
       }
-      projectGroups[d.project].push(d)
+      projectGroups[d.project].push(d);
     }
 
-    // Calculate annotations for each project group
-    const shapes = [];
-    let currentIndex = 0;
+    // Transform data to heatmap
+    const x: string[] = [];
+    const y: string[] = [];
+    const text: string[] = [];
+    const z: number[] = [];
     for (const project in projectGroups) {
-      const groupSize = projectGroups[project].length;
-      const midIndex = currentIndex + Math.floor(groupSize / 2);
-      const shape = {
-        type: 'rect',
-        x0: currentIndex - 0.5,
-        x1: currentIndex + groupSize - 0.5,
-        y0: 1,
-        y1: 0,
-        xref: 'x',
-        yref: 'paper',
-        line: {
-          color: 'red',
-          width: 1
-        },
-        fillcolor: 'rgba(0,0,0,0)' // Transparent fill
-      }
-      shapes.push(shape);
-      for (let i = 0; i < groupSize; i++) {
-        this.reversePointIndexToProject[currentIndex + i] = shape
-      }
-      currentIndex += groupSize;
-    }
-
-    // transform data to heatmap
-    const x: string[] = []
-    const y: string[] = []
-    const text: string[] = []
-    const z: number[] = []
-    currentIndex = 0
-    for (const project in projectGroups) {
-      const group = projectGroups[project]
-      for (let i = 0; i < group.length; i++) {
-        const d = group[i]
-        x.push(`${d.project} ${d.analysis_group} ${d.conditionA} vs ${d.conditionB} (${d.searchTerm})`)
-        y.push(d.protein)
-        z.push(d.log2fc)
-        text.push(`${d.project}`)
-        const projectShape = this.reversePointIndexToProject[x.length - 1]
-        const shape = {
-          type: 'rect',
-          x0: projectShape.x0+i,
-          x1: projectShape.x0+i+1,
-          y0: 1,
-          y1: 0,
-          xref: 'x',
-          yref: 'paper',
-          line: {
-            color: "rgba(0,0,0,0)",
-            width: 1
-          },
-        }
-        this.reversePointIndexToColumn[currentIndex] = shape
-        shapes.push(shape)
-        currentIndex++
-
+      const group = projectGroups[project];
+      for (const d of group) {
+        const comparison = `${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`;
+        x.push(`${comparison} ${d.project}`);
+        y.push(d.protein);
+        z.push(d.log2fc);
+        text.push(`${d.project}`);
       }
     }
 
@@ -139,21 +93,65 @@ export class HeatmapPlotComponent {
       colorscale: 'Viridis'
     };
 
-
-    console.log(trace)
+    // Calculate shapes for each project and individual columns
+    const shapes = [];
+    let currentIndex = 0;
+    for (const project in projectGroups) {
+      const groupSize = projectGroups[project].length;
+      const projectShape = {
+        type: 'rect',
+        x0: currentIndex - 0.5,
+        x1: currentIndex + groupSize - 0.5,
+        y0: 1,
+        y1: 0,
+        xref: 'x',
+        yref: 'paper',
+        line: {
+          color: 'red',
+          width: 1
+        },
+        fillcolor: 'rgba(0,0,0,0)', // Transparent fill
+        opacity: 0.5,
+        hoverinfo: 'none',
+        hoveron: 'fills'
+      };
+      shapes.push(projectShape);
+      for (let i = 0; i < groupSize; i++) {
+        const columnShape = {
+          type: 'rect',
+          x0: currentIndex + i - 0.5,
+          x1: currentIndex + i + 0.5,
+          y0: 1,
+          y1: 0,
+          xref: 'x',
+          yref: 'paper',
+          line: {
+            color: 'rgba(0,0,0,0)',
+            width: 1
+          },
+          fillcolor: 'rgba(0,0,0,0)', // Transparent fill
+          opacity: 0.5,
+          hoverinfo: 'none',
+          hoveron: 'fills'
+        };
+        shapes.push(columnShape);
+        this.reversePointIndexToProject[currentIndex + i] = projectShape;
+        this.reversePointIndexToColumn[currentIndex + i] = columnShape;
+      }
+      currentIndex += groupSize;
+    }
 
     const layout: any = {
       title: 'Heatmap of Protein Changes',
-      xaxis: { title: 'Analysis', showticklabels: false},
-      yaxis: { title: 'Protein'},
+      xaxis: { title: 'Analysis', showticklabels: false },
+      yaxis: { title: 'Protein' },
       shapes: shapes
     };
-    console.log(layout)
+
     this.graphData = [trace];
     this.layout = layout;
-    this.revision++
+    this.revision++;
   }
-
   handleHoverIn(event: any) {
     const shapeIndex = event.points[0].pointIndex;
     this.reversePointIndexToProject[shapeIndex].line.color = 'white';
@@ -168,7 +166,6 @@ export class HeatmapPlotComponent {
     this.reversePointIndexToProject[shapeIndex].line.color = 'red';
     const shape = this.reversePointIndexToColumn[shapeIndex];
     shape.line.color = 'rgba(0,0,0,0)';
-    clearInterval(shape.blinkingInterval);
     this.revision++;
   }
 }
