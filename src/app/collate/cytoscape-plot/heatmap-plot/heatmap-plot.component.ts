@@ -140,6 +140,7 @@ export class HeatmapPlotComponent {
     };
 
 
+    console.log(trace)
 
     const layout: any = {
       title: 'Heatmap of Protein Changes',
@@ -147,8 +148,7 @@ export class HeatmapPlotComponent {
       yaxis: { title: 'Protein'},
       shapes: shapes
     };
-
-
+    console.log(layout)
     this.graphData = [trace];
     this.layout = layout;
     this.revision++
@@ -160,9 +160,6 @@ export class HeatmapPlotComponent {
     const shape = this.reversePointIndexToColumn[shapeIndex];
     shape.line.color = 'white';
     shape.line.width = 2;
-    shape.blinkingInterval = setInterval(() => {
-      shape.opacity = shape.opacity === 1 ? 0.5 : 1;
-    }, 500)
     this.revision++;
   }
 
