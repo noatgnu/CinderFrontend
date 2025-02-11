@@ -103,7 +103,7 @@ export class HeatmapPlotComponent {
         xref: 'x',
         yref: 'paper',
         line: {
-          color: 'black',
+          color: 'red',
           width: 1
         },
         fillcolor: 'rgba(0,0,0,0)' // Transparent fill
@@ -123,5 +123,17 @@ export class HeatmapPlotComponent {
     this.graphData = [trace];
     this.layout = layout;
     this.revision++
+  }
+
+  handleHoverIn(event: any) {
+    const shapeIndex = event.points[0].pointIndex;
+    this.layout.shapes[shapeIndex].line.color = 'white';
+    this.revision++;
+  }
+
+  handleHoverOut(event: any) {
+    const shapeIndex = event.points[0].pointIndex;
+    this.layout.shapes[shapeIndex].line.color = 'red';
+    this.revision++;
   }
 }

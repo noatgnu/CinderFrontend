@@ -1,1 +1,1 @@
-<plotly-plot [data]="graphData" [layout]="layout" [updateOnlyWithRevision]="true" [revision]="revision"></plotly-plot>
+<plotly-plot (hover)="handleHoverIn($event)" (unhover)="handleHoverOut($event)" [data]="graphData" [layout]="layout" [updateOnlyWithRevision]="true" [revision]="revision"></plotly-plot>
