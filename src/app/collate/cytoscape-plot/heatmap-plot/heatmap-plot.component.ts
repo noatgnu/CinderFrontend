@@ -51,41 +51,43 @@ export class HeatmapPlotComponent {
       }
       projectGroups[d.project].push(d)
     }
-    // transform data to heatmap
-    const x: string[] = []
-    const y: string[] = []
-    const text: string[] = []
-    const z: number[] = []
-    for (const project in projectGroups) {
-      const group = projectGroups[project]
-      for (const d of group) {
-        x.push(`${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`)
-        y.push(d.protein)
-        z.push(d.log2fc)
-        text.push(`${d.comparison}<br>p-value: ${d.p_value}<br>log2fc: ${d.log2fc}<br>project: ${d.project}<br>analysis_group: ${d.analysis_group}<br>conditionA: ${d.conditionA}<br>conditionB: ${d.conditionB}`)
-      }
-    }
 
-    const trace = {
-      x: x,
-      y: y,
-      z: z,
-      text: text,
-      type: 'heatmap',
-      colorscale: 'Viridis'
-    };
-
-    // Calculate annotations for each project group
+    // Create subplots
+    const subplots = [];
     const annotations = [];
     const shapes = [];
     let currentIndex = 0;
+    let subplotIndex = 1;
     for (const project in projectGroups) {
-      const groupSize = projectGroups[project].length;
-      const midIndex = currentIndex + Math.floor(groupSize / 2);
+      const group = projectGroups[project];
+      const x: string[] = [];
+      const y: string[] = [];
+      const z: number[] = [];
+      const text: string[] = [];
+      for (const d of group) {
+        x.push(`${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`);
+        y.push(d.protein);
+        z.push(d.log2fc);
+        text.push(`${d.comparison}<br>p-value: ${d.p_value}<br>log2fc: ${d.log2fc}<br>project: ${d.project}<br>analysis_group: ${d.analysis_group}<br>conditionA: ${d.conditionA}<br>conditionB: ${d.conditionB}`);
+      }
+
+      const trace = {
+        x: x,
+        y: y,
+        z: z,
+        text: text,
+        type: 'heatmap',
+        colorscale: 'Viridis',
+        xaxis: `x${subplotIndex}`,
+        yaxis: 'y'
+      };
+
+      subplots.push(trace);
+
       annotations.push({
         x: currentIndex,
         y: 1.05, // Position above the x-axis
-        xref: 'x',
+        xref: `x${subplotIndex}`,
         yref: 'paper',
         text: project,
         showarrow: false,
@@ -95,39 +97,38 @@ export class HeatmapPlotComponent {
         },
         textangle: 0 // Horizontal text
       });
-      const shape = {
+
+      shapes.push({
         type: 'rect',
         x0: currentIndex - 0.5,
-        x1: currentIndex + groupSize - 0.5,
+        x1: currentIndex + group.length - 0.5,
         y0: 1,
         y1: 0,
-        xref: 'x',
+        xref: `x${subplotIndex}`,
         yref: 'paper',
         line: {
           color: 'red',
           width: 1
         },
         fillcolor: 'rgba(0,0,0,0)' // Transparent fill
-      }
-      shapes.push(shape);
-      for (let i = 0; i < groupSize; i++) {
-        this.reversePointIndexToProject[currentIndex + i] = shape
-      }
-      currentIndex += groupSize;
+      });
+
+      currentIndex += group.length;
+      subplotIndex++;
     }
 
     const layout: any = {
       title: 'Heatmap of Protein Changes',
-      xaxis: { title: 'Analysis', showticklabels: false},
-      yaxis: { title: 'Protein'},
+      grid: { rows: 1, columns: subplots.length, pattern: 'independent' },
+      yaxis: { title: 'Protein' }, // Shared y-axis
       annotations: annotations,
-      shapes: shapes
+      shapes: shapes,
+      coloraxis: { colorscale: 'Viridis' } // Shared color scale
     };
 
-
-    this.graphData = [trace];
+    this.graphData = subplots;
     this.layout = layout;
-    this.revision++
+    this.revision++;
   }
 
   handleHoverIn(event: any) {
