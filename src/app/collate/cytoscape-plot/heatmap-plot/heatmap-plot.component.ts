@@ -41,6 +41,7 @@ export class HeatmapPlotComponent {
   layout: any = {}
   graphData: any = {}
   revision = 0
+  reversePointIndexToProject: any = {}
   drawHeatmap() {
     // Group data by project
     const projectGroups: any = {}
@@ -94,7 +95,7 @@ export class HeatmapPlotComponent {
         },
         textangle: 0 // Horizontal text
       });
-      shapes.push({
+      const shape = {
         type: 'rect',
         x0: currentIndex - 0.5,
         x1: currentIndex + groupSize - 0.5,
@@ -107,7 +108,11 @@ export class HeatmapPlotComponent {
           width: 1
         },
         fillcolor: 'rgba(0,0,0,0)' // Transparent fill
-      });
+      }
+      shapes.push(shape);
+      for (let i = 0; i < groupSize; i++) {
+        this.reversePointIndexToProject[currentIndex + i] = shape
+      }
       currentIndex += groupSize;
     }
 
@@ -127,14 +132,13 @@ export class HeatmapPlotComponent {
 
   handleHoverIn(event: any) {
     const shapeIndex = event.points[0].pointIndex;
-    console.log(event.points);
-    this.layout.shapes[shapeIndex].line.color = 'white';
+    this.reversePointIndexToProject[shapeIndex].line.color = 'white';
     this.revision++;
   }
 
   handleHoverOut(event: any) {
     const shapeIndex = event.points[0].pointIndex;
-    this.layout.shapes[shapeIndex].line.color = 'red';
+    this.reversePointIndexToProject[shapeIndex].line.color = 'red';
     this.revision++;
   }
 }
