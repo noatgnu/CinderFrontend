@@ -43,8 +43,8 @@ export class HeatmapPlotComponent {
   revision = 0
   drawHeatmap() {
     // transform data to heatmap
-    const x = this.data.map(d => d.protein);
-    const y = this.data.map(d => d.analysis_group);
+    const x = this.data.map(d => `${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`);
+    const y = this.data.map(d => d.protein);
     const z = this.data.map(d => d.log2fc);
 
     const trace = {
@@ -54,12 +54,15 @@ export class HeatmapPlotComponent {
       type: 'heatmap',
       colorscale: 'Viridis'
     };
-
-    const layout = {
+    const layout: any = {
       title: 'Heatmap of Protein Changes',
       xaxis: { title: 'Analysis Result' },
       yaxis: { title: 'Protein' }
     };
+    // set layout to now show x labels
+    if (x.length > 10) {
+      layout.xaxis = { title: 'Analysis Result', showticklabels: false }
+    }
     this.graphData = [trace];
     this.layout = layout;
     this.revision++
