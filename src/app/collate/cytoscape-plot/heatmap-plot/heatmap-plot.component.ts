@@ -151,6 +151,8 @@ export class HeatmapPlotComponent {
     this.graphData = [trace];
     this.layout = layout;
     this.revision++;
+    console.log(this.graphData);
+    console.log(this.layout);
   }
   handleHoverIn(event: any) {
     const shapeIndex = event.points[0].pointIndex;
