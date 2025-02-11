@@ -77,7 +77,7 @@ export class HeatmapPlotComponent {
       const group = projectGroups[project];
       for (const d of group) {
         const comparison = `${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`;
-        x.push(`${comparison} ${d.project}`);
+        x.push(`${comparison} ${d.project} ${d.searchTerm}`);
         y.push(d.protein);
         z.push(d.log2fc);
         text.push(`${d.project}`);
