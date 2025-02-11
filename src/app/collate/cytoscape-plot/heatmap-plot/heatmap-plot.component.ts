@@ -76,6 +76,7 @@ export class HeatmapPlotComponent {
 
     // Calculate annotations for each project group
     const annotations = [];
+    const shapes = [];
     let currentIndex = 0;
     for (const project in projectGroups) {
       const groupSize = projectGroups[project].length;
@@ -90,6 +91,20 @@ export class HeatmapPlotComponent {
         font: {
           size: 12,
           color: 'black'
+        },
+        textangle: -90 // Rotate text to be vertical
+      });
+      shapes.push({
+        type: 'line',
+        x0: currentIndex - 0.5,
+        x1: currentIndex + groupSize - 0.5,
+        y0: 1,
+        y1: 1,
+        xref: 'x',
+        yref: 'paper',
+        line: {
+          color: 'black',
+          width: 1
         }
       });
       currentIndex += groupSize;
@@ -97,8 +112,8 @@ export class HeatmapPlotComponent {
 
     const layout: any = {
       title: 'Heatmap of Protein Changes',
-      xaxis: { title: 'Analysis' },
-      yaxis: { title: 'Protein', showticklabels: false },
+      xaxis: { title: 'Analysis', showticklabels: false},
+      yaxis: { title: 'Protein'},
       annotations: annotations
     };
 
