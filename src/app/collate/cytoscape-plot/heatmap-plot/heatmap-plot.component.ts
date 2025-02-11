@@ -82,7 +82,7 @@ export class HeatmapPlotComponent {
       const groupSize = projectGroups[project].length;
       const midIndex = currentIndex + Math.floor(groupSize / 2);
       annotations.push({
-        x: x[midIndex],
+        x: currentIndex,
         y: 1.05, // Position above the x-axis
         xref: 'x',
         yref: 'paper',
@@ -92,20 +92,21 @@ export class HeatmapPlotComponent {
           size: 12,
           color: 'black'
         },
-        textangle: -90 // Rotate text to be vertical
+        textangle: 0 // Horizontal text
       });
       shapes.push({
-        type: 'line',
+        type: 'rect',
         x0: currentIndex - 0.5,
         x1: currentIndex + groupSize - 0.5,
         y0: 1,
-        y1: 1,
+        y1: 0,
         xref: 'x',
         yref: 'paper',
         line: {
           color: 'black',
           width: 1
-        }
+        },
+        fillcolor: 'rgba(0,0,0,0)' // Transparent fill
       });
       currentIndex += groupSize;
     }
@@ -114,7 +115,8 @@ export class HeatmapPlotComponent {
       title: 'Heatmap of Protein Changes',
       xaxis: { title: 'Analysis', showticklabels: false},
       yaxis: { title: 'Protein'},
-      annotations: annotations
+      annotations: annotations,
+      shapes: shapes
     };
 
 
