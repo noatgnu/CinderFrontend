@@ -127,6 +127,7 @@ export class HeatmapPlotComponent {
 
   handleHoverIn(event: any) {
     const shapeIndex = event.points[0].pointIndex;
+    console.log(event.points);
     this.layout.shapes[shapeIndex].line.color = 'white';
     this.revision++;
   }
