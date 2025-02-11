@@ -18,7 +18,8 @@ export class HeatmapPlotComponent {
     conditionB: string,
     log2fc: number,
     p_value: number,
-    comparison: string
+    comparison: string,
+    protein: string
   }[] = []
   @Input() set data (value: {
     project: string
@@ -27,7 +28,8 @@ export class HeatmapPlotComponent {
     conditionB: string,
     log2fc: number,
     p_value: number,
-    comparison: string
+    comparison: string,
+    protein: string
   }[]) {
     this._data = value;
     this.drawHeatmap();
@@ -41,7 +43,7 @@ export class HeatmapPlotComponent {
   revision = 0
   drawHeatmap() {
     // transform data to heatmap
-    const x = this.data.map(d => d.comparison);
+    const x = this.data.map(d => d.protein);
     const y = this.data.map(d => d.analysis_group);
     const z = this.data.map(d => d.log2fc);
 

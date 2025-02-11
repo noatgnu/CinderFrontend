@@ -87,7 +87,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
     conditionB: string,
     log2fc: number,
     p_value: number,
-    comparison: string
+    comparison: string,
+    protein: string
   }[] = [];
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() projects: Project[] = [];
@@ -407,7 +408,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
             analysis_group: result.analysis_group.name,
             project: project.name,
             fc: result.log2_fc,
-            p_value: result.log10_p
+            p_value: result.log10_p,
+            protein: proteinId,
           }
         });
         heatmapData.push({
@@ -417,7 +419,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
           conditionB: conditionB,
           log2fc: result.log2_fc,
           p_value: result.log10_p,
-          comparison: comparisonId
+          comparison: comparisonId,
+          protein: proteinId
         })
       });
     });
@@ -533,7 +536,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     const heatmapData: any[] = [];
     this.cy.edges().forEach(edge => {
       const data = edge.data();
-      if (data.conditionA && data.conditionB) {
+      if (data.conditionA && data.conditionB && data.protein) {
         heatmapData.push({
           project: data.project,
           analysis_group: data.analysis_group,
@@ -541,7 +544,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
           conditionB: data.conditionB,
           log2fc: data.fc,
           p_value: data.p_value,
-          comparison: `${data.conditionA} vs ${data.conditionB}`
+          comparison: `${data.conditionA} vs ${data.conditionB}`,
+          protein: data.protein
         })
       }
     })
