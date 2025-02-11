@@ -88,7 +88,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
     log2fc: number,
     p_value: number,
     comparison: string,
-    protein: string
+    protein: string,
+    searchTerm: string,
   }[] = [];
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() projects: Project[] = [];
@@ -420,7 +421,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
           log2fc: result.log2_fc,
           p_value: result.log10_p,
           comparison: comparisonId,
-          protein: proteinId
+          protein: proteinId,
+          searchTerm: result.search_term
         })
       });
     });
@@ -545,7 +547,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
           log2fc: data.fc,
           p_value: data.p_value,
           comparison: `${data.conditionA} vs ${data.conditionB}`,
-          protein: data.protein
+          protein: data.protein,
+          searchTerm: data.searchTerm
         })
       }
     })

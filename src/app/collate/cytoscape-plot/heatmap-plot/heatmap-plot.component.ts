@@ -29,7 +29,8 @@ export class HeatmapPlotComponent {
     log2fc: number,
     p_value: number,
     comparison: string,
-    protein: string
+    protein: string,
+    searchTerm: string
   }[] = []
   @Input() set data (value: {
     project: string
@@ -39,7 +40,8 @@ export class HeatmapPlotComponent {
     log2fc: number,
     p_value: number,
     comparison: string,
-    protein: string
+    protein: string,
+    searchTerm: string
   }[]) {
     this._data = value;
     this.drawHeatmap();
@@ -103,7 +105,7 @@ export class HeatmapPlotComponent {
       const group = projectGroups[project]
       for (let i = 0; i < group.length; i++) {
         const d = group[i]
-        x.push(`${d.analysis_group} ${d.conditionA} vs ${d.conditionB} ${d.project}`)
+        x.push(`${d.project} ${d.analysis_group} ${d.conditionA} vs ${d.conditionB} (${d.searchTerm})`)
         y.push(d.protein)
         z.push(d.log2fc)
         text.push(`${d.project}`)
