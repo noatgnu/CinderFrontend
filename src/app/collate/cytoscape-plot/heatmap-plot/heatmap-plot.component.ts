@@ -58,15 +58,45 @@ export class HeatmapPlotComponent {
       type: 'heatmap',
       colorscale: 'Viridis'
     };
+
+    // Group data by project
+    const projectGroups = this.data.reduce((acc: any, d) => {
+      if (!acc[d.project]) {
+        acc[d.project] = [];
+      }
+      acc[d.project].push(d);
+      return acc;
+    }, {});
+
+    // Calculate annotations for each project group
+    const annotations = [];
+    let currentIndex = 0;
+    for (const project in projectGroups) {
+      const groupSize = projectGroups[project].length;
+      const midIndex = currentIndex + Math.floor(groupSize / 2);
+      annotations.push({
+        x: x[midIndex],
+        y: 1.05, // Position above the x-axis
+        xref: 'x',
+        yref: 'paper',
+        text: project,
+        showarrow: false,
+        font: {
+          size: 12,
+          color: 'black'
+        }
+      });
+      currentIndex += groupSize;
+    }
+
     const layout: any = {
       title: 'Heatmap of Protein Changes',
-      xaxis: { title: 'Analysis Result' },
-      yaxis: { title: 'Protein' }
+      xaxis: { title: 'Analysis' },
+      yaxis: { title: 'Protein', showticklabels: false },
+      annotations: annotations
     };
-    // set layout to now show x labels
-    if (x.length > 10) {
-      layout.xaxis = { title: 'Analysis Result', showticklabels: false }
-    }
+
+
     this.graphData = [trace];
     this.layout = layout;
     this.revision++
