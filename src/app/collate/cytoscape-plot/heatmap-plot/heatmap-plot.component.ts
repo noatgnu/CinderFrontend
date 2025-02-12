@@ -129,7 +129,7 @@ export class HeatmapPlotComponent {
 
     // Calculate shapes for each project and individual columns
     const shapes = [];
-    let startComparisonHorizontalLine = 0.25;
+    let startComparisonHorizontalLine = -0.25;
     let currentIndex = 0;
     for (const project in projectGroups) {
       const group = projectGroups[project];
