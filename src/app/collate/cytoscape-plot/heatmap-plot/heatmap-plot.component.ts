@@ -155,7 +155,7 @@ export class HeatmapPlotComponent {
       let lastComparison = group[0].comparison;
       let startComparisonHorizontalLine = 0.25;
       for (let i = 1; i < groupSize; i++) {
-        if (group[i].comparison !== lastComparison) {
+        if (group[i].comparison !== lastComparison || groupSize === 1) {
           const verticalLine = {
             type: 'line',
             x0: currentIndex + i - 0.5,
