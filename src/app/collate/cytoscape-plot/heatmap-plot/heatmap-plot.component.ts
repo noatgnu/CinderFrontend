@@ -68,6 +68,11 @@ export class HeatmapPlotComponent {
       projectGroups[d.project].push(d);
     }
 
+    // Sort data within each project by comparison
+    for (const project in projectGroups) {
+      projectGroups[project].sort((a: any, b: any) => a.comparison.localeCompare(b.comparison));
+    }
+
     // Transform data to heatmap
     const x: string[] = [];
     const y: string[] = [];
@@ -102,7 +107,8 @@ export class HeatmapPlotComponent {
     const shapes = [];
     let currentIndex = 0;
     for (const project in projectGroups) {
-      const groupSize = projectGroups[project].length;
+      const group = projectGroups[project];
+      const groupSize = group.length;
       const projectShape = {
         type: 'rect',
         x0: currentIndex - 0.5,
@@ -121,6 +127,29 @@ export class HeatmapPlotComponent {
         hoveron: 'fills'
       };
       shapes.push(projectShape);
+
+      // Add vertical lines between groups of the same comparison
+      let lastComparison = group[0].comparison;
+      for (let i = 1; i < groupSize; i++) {
+        if (group[i].comparison !== lastComparison) {
+          const verticalLine = {
+            type: 'line',
+            x0: currentIndex + i - 0.5,
+            x1: currentIndex + i - 0.5,
+            y0: 1,
+            y1: 0,
+            xref: 'x',
+            yref: 'paper',
+            line: {
+              color: 'red',
+              width: 2
+            }
+          };
+          shapes.push(verticalLine);
+          lastComparison = group[i].comparison;
+        }
+      }
+
       for (let i = 0; i < groupSize; i++) {
         const columnShape = {
           type: 'rect',
@@ -132,7 +161,7 @@ export class HeatmapPlotComponent {
           yref: 'paper',
           line: {
             color: 'rgba(0,0,0,0)',
-            width: 1
+            width: 2
           },
           fillcolor: 'rgba(0,0,0,0)',
           opacity: 0.5,
@@ -159,7 +188,7 @@ export class HeatmapPlotComponent {
       width: width,
       height: height,
       margin: margin,
-      xaxis: { title: 'Analysis', showticklabels: false, showgrid: false, scaleanchor: 'y', scaleratio: 1 },
+      xaxis: { title: 'Analysis', showticklabels: true, showgrid: false, scaleanchor: 'y', scaleratio: 1 },
       yaxis: { title: 'Protein', showgrid: false },
       shapes: shapes
     };
