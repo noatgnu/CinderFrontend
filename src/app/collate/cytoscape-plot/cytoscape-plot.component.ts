@@ -439,7 +439,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     });
     this.heatmapData = heatmapData;
     this.projectColorMap = projectColorMap;
-    this.convertHeatmapDataToHeatmapGroupData()
+    this.heatMapGroupData = this.convertHeatmapDataToHeatmapGroupData()
     return elements;
   }
 
@@ -565,7 +565,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       }
     })
     this.heatmapData = heatmapData;
-    this.convertHeatmapDataToHeatmapGroupData()
+    this.heatMapGroupData = this.convertHeatmapDataToHeatmapGroupData()
   }
 
   openStringDBDialog() {
