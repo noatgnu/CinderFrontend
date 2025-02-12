@@ -197,7 +197,7 @@ export class HeatmapPlotComponent {
     const cellSize = 50;
     const uniqueX = Array.from(new Set(x)).length;
     const uniqueY = Array.from(new Set(y)).length;
-    const margin = { l: 300, r: 50, t: 100, b: 100 };
+    const margin = { l: 300, r: 50, t: 100, b: 300 };
     const width = uniqueX * cellSize + margin.l + margin.r;
     const height = uniqueY * cellSize + margin.t + margin.b;
 
@@ -208,7 +208,6 @@ export class HeatmapPlotComponent {
       margin: margin,
       xaxis: {
         title: 'Analysis',
-        showticklabels: true,
         showgrid: false,
         scaleanchor: 'y',
         scaleratio: 1,
@@ -217,7 +216,7 @@ export class HeatmapPlotComponent {
       },yaxis: { title: 'Protein', showgrid: false },
       shapes: shapes
     };
-
+    console.log(layout)
     this.graphData = [trace];
     this.layout = layout;
     this.revision++;
