@@ -916,6 +916,15 @@ export class CytoscapePlotComponent implements AfterViewInit{
 
   toggleExpand() {
     this.isExpanded = !this.isExpanded;
+    if (this.isExpanded) {
+      if (this.cyElement) {
+        this.cyElement.nativeElement.style.height = '800px';
+      }
+    } else {
+      if (this.cyElement) {
+        this.cyElement.nativeElement.style.height = '300px';
+      }
+    }
     this.cy.resize();
     this.cy.fit();
   }
