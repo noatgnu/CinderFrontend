@@ -169,21 +169,28 @@ export class HeatmapPlotComponent {
           }
         }
         if (i === 0) {
-          horizontalLine.x0 -= 0.4
+          horizontalLine.x0 = currentIndex +i - 0.4
+        }
+        if (i - 1 >=0) {
+          if (group[i].comparison !== group[i-1].comparison) {
+            horizontalLine.x0 = currentIndex +i- 0.4
+          } else {
+            horizontalLine.x0 = currentIndex +i- 0.5
+          }
         }
         if (group[i+1]) {
-          
+
           if (group[i].comparison !== group[i+1].comparison) {
-            horizontalLine.x1 += 0.4
+            horizontalLine.x0 = currentIndex +i - 0.4
+            horizontalLine.x1 = currentIndex +i+ 0.4
           } else {
-            horizontalLine.x1 += 0.5
+            horizontalLine.x1 = currentIndex +i+ 0.5
           }
         } else {
-          horizontalLine.x0 -= 0.4
           if (group[i].comparison !== lastComparison) {
-            horizontalLine.x1 += 0.4
+            horizontalLine.x1 = currentIndex +i+ 0.4
           } else {
-            horizontalLine.x1 += 0.5
+            horizontalLine.x1 = currentIndex +i+ 0.5
           }
         }
         shapes.push(horizontalLine)
