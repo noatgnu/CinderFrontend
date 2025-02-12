@@ -141,7 +141,7 @@ export class HeatmapPlotComponent {
             xref: 'x',
             yref: 'paper',
             line: {
-              color: 'red',
+              color: "rgba(186,104,166,0.64)",
               width: 2
             }
           };
