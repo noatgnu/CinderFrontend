@@ -173,7 +173,7 @@ export class HeatmapPlotComponent {
           lastComparison = group[i].comparison;
           const horizontalLine = {
             type: 'line',
-            x0: startComparisonHorizontalLine,
+            x0: startComparisonHorizontalLine - 0.25,
             x1: currentIndex + i - 0.25,
             y0: -0.1,
             y1: -0.1,
@@ -184,7 +184,8 @@ export class HeatmapPlotComponent {
               width: 2
             }
           };
-          startComparisonHorizontalLine = currentIndex + i + 0.25;
+          console.log(horizontalLine.x0, currentIndex, i, horizontalLine.x1)
+          startComparisonHorizontalLine = currentIndex + i;
           shapes.push(horizontalLine);
         }
       }
