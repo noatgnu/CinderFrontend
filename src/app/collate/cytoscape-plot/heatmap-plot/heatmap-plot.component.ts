@@ -151,22 +151,31 @@ export class HeatmapPlotComponent {
         hoveron: 'fills'
       };
       shapes.push(projectShape);
-      const horizontalLine = {
-        type: 'line',
-        x0: currentIndex - 0.25,
-        x1: currentIndex + groupSize - 0.75,
-        y0: -0.1,
-        y1: -0.1,
-        xref: 'x',
-        yref: 'paper',
-        line: {
-          color: 'purple',
-          width: 2
-        }
-      };
-      shapes.push(horizontalLine);
-      // Add vertical lines between groups of the same comparison
+      let comparisonStartIndex = 0;
+
       let lastComparison = group[0].comparison;
+      for (let i = 0; i < groupSize; i++) {
+        if (i === 0 || group[i].comparison !== lastComparison) {
+          const horizontalLine = {
+            type: 'line',
+            x0: comparisonStartIndex + 0.25,
+            x1: currentIndex + i - 0.75,
+            y0: -0.1,
+            y1: -0.1,
+            xref: 'x',
+            yref: 'paper',
+            line: {
+              color: 'purple',
+              width: 2
+            }
+          }
+          shapes.push(horizontalLine);
+          if (i < groupSize) {
+            comparisonStartIndex = currentIndex + i;
+            lastComparison = group[i].comparison;
+          }
+        }
+      }
       for (let i = 1; i < groupSize; i++) {
         if (group[i].comparison !== lastComparison) {
           const verticalLine = {
