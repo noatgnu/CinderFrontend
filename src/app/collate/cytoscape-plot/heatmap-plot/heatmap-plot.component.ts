@@ -147,13 +147,15 @@ export class HeatmapPlotComponent {
     const cellSize = 50;
     const uniqueX = Array.from(new Set(x)).length;
     const uniqueY = Array.from(new Set(y)).length;
-    const width = uniqueX * cellSize;
-    const height = uniqueY * cellSize;
+    const margin = { l: 300, r: 50, t: 50, b: 100 };
+    const width = uniqueX * cellSize + margin.l + margin.r;
+    const height = uniqueY * cellSize + margin.t + margin.b;
 
     const layout: any = {
       title: 'Heatmap of Protein Changes',
       width: width,
       height: height,
+      margin: margin,
       xaxis: { title: 'Analysis', showticklabels: false, showgrid: false, scaleanchor: 'y', scaleratio: 1 },
       yaxis: { title: 'Protein', showgrid: false },
       shapes: shapes
