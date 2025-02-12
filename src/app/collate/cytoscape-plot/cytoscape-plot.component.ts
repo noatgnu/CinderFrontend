@@ -123,6 +123,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   currentFilter: { log2fc: number, pvalue: number, projectNames: string[], analysisGroupNames: string[] } = { log2fc: 0, pvalue: 0, projectNames: [], analysisGroupNames: [] };
   layers: any;
   defaultSticky = true;
+  isExpanded = false;
   constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog, private webService: WebService) {
 
   }
@@ -911,5 +912,11 @@ export class CytoscapePlotComponent implements AfterViewInit{
       this.cytoscapePlotContainer.nativeElement.style.position = 'sticky';
       this.cytoscapePlotContainer.nativeElement.style.top = '0';
     }
+  }
+
+  toggleExpand() {
+    this.isExpanded = !this.isExpanded;
+    this.cy.resize();
+    this.cy.fit();
   }
 }
