@@ -78,16 +78,33 @@ export class HeatmapPlotComponent {
     const y: string[] = [];
     const text: string[] = [];
     const z: number[] = [];
+    const tickvals: number[] = [];
+    const ticktext: string[] = [];
+    let tickIndex = 0;
+
+
     for (const project in projectGroups) {
       const group = projectGroups[project];
       let inGroupIndex = 0;
+      let lastComparison = '';
+
       for (const d of group) {
         const comparison = `${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`;
         x.push(`${comparison} ${d.project} ${inGroupIndex}`);
         y.push(d.protein);
         z.push(d.log2fc);
         text.push(`${d.project}`);
+
+        if (comparison !== lastComparison) {
+          tickvals.push(tickIndex);
+          ticktext.push(comparison);
+          lastComparison = comparison;
+        } else {
+          ticktext.push('');
+        }
+
         inGroupIndex++;
+        tickIndex++;
       }
     }
     // disable hoverinfo
@@ -189,8 +206,15 @@ export class HeatmapPlotComponent {
       width: width,
       height: height,
       margin: margin,
-      xaxis: { title: 'Analysis', showticklabels: true, showgrid: false, scaleanchor: 'y', scaleratio: 1 },
-      yaxis: { title: 'Protein', showgrid: false },
+      xaxis: {
+        title: 'Analysis',
+        showticklabels: true,
+        showgrid: false,
+        scaleanchor: 'y',
+        scaleratio: 1,
+        tickvals: tickvals,
+        ticktext: ticktext
+      },yaxis: { title: 'Protein', showgrid: false },
       shapes: shapes
     };
 
