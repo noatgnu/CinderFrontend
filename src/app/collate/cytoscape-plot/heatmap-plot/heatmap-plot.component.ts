@@ -106,6 +106,7 @@ export class HeatmapPlotComponent {
           ticktext.push(d.comparison);
           lastComparison = d.comparison;
         } else {
+          tickvals.push(tickIndex);
           ticktext.push('');
         }
 
