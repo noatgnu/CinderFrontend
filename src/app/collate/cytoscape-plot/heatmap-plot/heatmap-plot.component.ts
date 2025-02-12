@@ -95,7 +95,8 @@ export class HeatmapPlotComponent {
         y.push(d.protein);
         z.push(d.log2fc);
         text.push(`${d.project}`);
-
+        console.log(d.comparison, lastComparison)
+        console.log(d.project, lastProject)
         if (d.comparison !== lastComparison || d.project !== lastProject) {
           tickvals.push(tickIndex);
           ticktext.push(d.comparison);
