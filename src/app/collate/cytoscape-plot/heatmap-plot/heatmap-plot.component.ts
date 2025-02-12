@@ -97,7 +97,11 @@ export class HeatmapPlotComponent {
         text.push(`${d.project}`);
         console.log(d.comparison, lastComparison)
         console.log(d.project, lastProject)
-        if (d.comparison !== lastComparison || d.project !== lastProject) {
+        if (inGroupIndex === 0) {
+          tickvals.push(tickIndex);
+          ticktext.push(d.comparison);
+          lastComparison = d.comparison;
+        } else if (d.comparison !== lastComparison) {
           tickvals.push(tickIndex);
           ticktext.push(d.comparison);
           lastComparison = d.comparison;
