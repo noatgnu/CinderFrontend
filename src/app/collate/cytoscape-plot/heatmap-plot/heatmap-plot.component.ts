@@ -82,11 +82,12 @@ export class HeatmapPlotComponent {
     const ticktext: string[] = [];
     let tickIndex = 0;
 
-
+    let lastProject = '';
     for (const project in projectGroups) {
       const group = projectGroups[project];
       let inGroupIndex = 0;
       let lastComparison = '';
+
 
       for (const d of group) {
         const comparison = `${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`;
@@ -95,7 +96,7 @@ export class HeatmapPlotComponent {
         z.push(d.log2fc);
         text.push(`${d.project}`);
 
-        if (d.comparison !== lastComparison) {
+        if (d.comparison !== lastComparison && project !== lastProject) {
           tickvals.push(tickIndex);
           ticktext.push(d.comparison);
           lastComparison = d.comparison;
@@ -106,6 +107,7 @@ export class HeatmapPlotComponent {
         inGroupIndex++;
         tickIndex++;
       }
+      lastProject = project;
     }
     // disable hoverinfo
     const trace = {
