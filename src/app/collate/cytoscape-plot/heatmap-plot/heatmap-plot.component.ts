@@ -95,8 +95,6 @@ export class HeatmapPlotComponent {
         y.push(d.protein);
         z.push(d.log2fc);
         text.push(`${d.project}`);
-        console.log(d.comparison, lastComparison)
-        console.log(d.project, lastProject)
         if (inGroupIndex === 0) {
           tickvals.push(tickIndex);
           ticktext.push(d.comparison);
@@ -153,7 +151,20 @@ export class HeatmapPlotComponent {
         hoveron: 'fills'
       };
       shapes.push(projectShape);
-
+      const horizontalLine = {
+        type: 'line',
+        x0: currentIndex - 0.25,
+        x1: currentIndex + groupSize - 0.75,
+        y0: -0.1,
+        y1: -0.1,
+        xref: 'x',
+        yref: 'paper',
+        line: {
+          color: 'purple',
+          width: 2
+        }
+      };
+      shapes.push(horizontalLine);
       // Add vertical lines between groups of the same comparison
       let lastComparison = group[0].comparison;
       for (let i = 1; i < groupSize; i++) {
@@ -172,7 +183,22 @@ export class HeatmapPlotComponent {
             }
           };
           shapes.push(verticalLine);
+
           lastComparison = group[i].comparison;
+          const horizontalLine = {
+            type: 'line',
+            x0: currentIndex - 0.25,
+            x1: currentIndex + groupSize - 0.75,
+            y0: -0.1,
+            y1: -0.1,
+            xref: 'x',
+            yref: 'paper',
+            line: {
+              color: 'purple',
+              width: 2
+            }
+          };
+          shapes.push(horizontalLine);
         }
       }
 
