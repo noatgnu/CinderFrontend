@@ -204,7 +204,7 @@ export class HeatmapPlotComponent {
     if (this.reversePointIndexToProject[shapeIndex]) {
       this.reversePointIndexToProject[shapeIndex].line.color = 'white';
       const shape = this.reversePointIndexToColumn[shapeIndex];
-      shape.line.color = 'white';
+      shape.line.color = 'black';
       shape.line.width = 2;
       this.revision++;
     }
