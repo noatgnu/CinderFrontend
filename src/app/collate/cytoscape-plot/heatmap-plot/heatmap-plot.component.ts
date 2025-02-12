@@ -119,7 +119,7 @@ export class HeatmapPlotComponent {
         yref: 'paper',
         line: {
           color: 'red',
-          width: 1
+          width: 4
         },
         fillcolor: 'rgba(0,0,0,0)',
         opacity: 0.5,
@@ -142,7 +142,7 @@ export class HeatmapPlotComponent {
             yref: 'paper',
             line: {
               color: "rgba(186,104,166,0.64)",
-              width: 2
+              width: 3
             }
           };
           shapes.push(verticalLine);
