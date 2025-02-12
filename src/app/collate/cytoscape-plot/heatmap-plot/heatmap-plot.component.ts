@@ -82,7 +82,7 @@ export class HeatmapPlotComponent {
         y.push(d.protein);
         z.push(d.log2fc);
         text.push(`${d.project}`);
-        inGroupIndex++
+        inGroupIndex++;
       }
     }
 
@@ -112,7 +112,7 @@ export class HeatmapPlotComponent {
           color: 'red',
           width: 1
         },
-        fillcolor: 'rgba(0,0,0,0)', // Transparent fill
+        fillcolor: 'rgba(0,0,0,0)',
         opacity: 0.5,
         hoverinfo: 'none',
         hoveron: 'fills'
@@ -131,7 +131,7 @@ export class HeatmapPlotComponent {
             color: 'rgba(0,0,0,0)',
             width: 1
           },
-          fillcolor: 'rgba(0,0,0,0)', // Transparent fill
+          fillcolor: 'rgba(0,0,0,0)',
           opacity: 0.5,
           hoverinfo: 'none',
           hoveron: 'fills'
@@ -143,9 +143,18 @@ export class HeatmapPlotComponent {
       currentIndex += groupSize;
     }
 
+    // Calculate width and height based on the number of unique cells
+    const cellSize = 50;
+    const uniqueX = Array.from(new Set(x)).length;
+    const uniqueY = Array.from(new Set(y)).length;
+    const width = uniqueX * cellSize;
+    const height = uniqueY * cellSize;
+
     const layout: any = {
       title: 'Heatmap of Protein Changes',
-      xaxis: { title: 'Analysis', showticklabels: false, showgrid: false },
+      width: width,
+      height: height,
+      xaxis: { title: 'Analysis', showticklabels: false, showgrid: false, scaleanchor: 'y', scaleratio: 1 },
       yaxis: { title: 'Protein', showgrid: false },
       shapes: shapes
     };
@@ -159,18 +168,24 @@ export class HeatmapPlotComponent {
 
   handleHoverIn(event: any) {
     const shapeIndex = event.points[0].pointIndex;
-    this.reversePointIndexToProject[shapeIndex].line.color = 'white';
-    const shape = this.reversePointIndexToColumn[shapeIndex];
-    shape.line.color = 'white';
-    shape.line.width = 2;
-    this.revision++;
+    if (this.reversePointIndexToProject[shapeIndex]) {
+      this.reversePointIndexToProject[shapeIndex].line.color = 'white';
+      const shape = this.reversePointIndexToColumn[shapeIndex];
+      shape.line.color = 'white';
+      shape.line.width = 2;
+      this.revision++;
+    }
+
   }
 
   handleHoverOut(event: any) {
     const shapeIndex = event.points[0].pointIndex;
-    this.reversePointIndexToProject[shapeIndex].line.color = 'red';
-    const shape = this.reversePointIndexToColumn[shapeIndex];
-    shape.line.color = 'rgba(0,0,0,0)';
-    this.revision++;
+    if (this.reversePointIndexToProject[shapeIndex]) {
+      this.reversePointIndexToProject[shapeIndex].line.color = 'red';
+      const shape = this.reversePointIndexToColumn[shapeIndex];
+      shape.line.color = 'rgba(0,0,0,0)';
+      this.revision++;
+    }
+
   }
 }
