@@ -40,8 +40,11 @@
   </button>-->
 </mat-menu>
 <div #cy class="cy-container"></div>
-@if (heatmapData.length >0) {
-  @for (g of heatMapGroupData; track g) {
-    <app-heatmap-plot [data]="g"></app-heatmap-plot>
+<div #heatmapContainer>
+  @if (heatmapData.length >0) {
+    @for (g of heatMapGroupData; track g) {
+      <app-heatmap-plot [data]="g"></app-heatmap-plot>
+    }
   }
-}
+</div>
+

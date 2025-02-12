@@ -103,6 +103,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     searchTerm: string
   }[][] = [];
   @ViewChild('cy') cyElement!: ElementRef;
+  @ViewChild('heatmapContainer') heatmapContainer!: ElementRef;
   @Input() projects: Project[] = [];
   @Input() searchResultsMap: { [projectID: string]: SearchResult[] } = {};
   @Input() renameCondition: { [projectID: number]: {
@@ -122,6 +123,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
   ngAfterViewInit() {
+    window.addEventListener('scroll', this.onScroll.bind(this));
     cytoscape.use(fcose);
     cytoscape.use(popper(popperFactory));
     cytoscape.use(Layers);
@@ -875,5 +877,22 @@ export class CytoscapePlotComponent implements AfterViewInit{
       groupedData[data.searchTerm].push(data);
     })
     return Object.values(groupedData);
+  }
+
+  onScroll() {
+    if (this.cyElement) {
+      const cyContainer = this.cyElement.nativeElement;
+      const heatmapContainer = this.heatmapContainer.nativeElement;
+      const heatmapRect = heatmapContainer.getBoundingClientRect();
+      const cyRect = cyContainer.getBoundingClientRect();
+
+      if (heatmapRect.bottom < 0) {
+        cyContainer.style.position = 'relative';
+      } else {
+        cyContainer.style.position = 'sticky';
+        cyContainer.style.top = '0';
+      }
+    }
+
   }
 }
