@@ -1,28 +1,30 @@
 
 <div #cytoscapePlotContainer class="cytoscape-plot-container">
-  <div style="display: flex">
-    <button matTooltip="Toggle on labels" mat-icon-button [matMenuTriggerFor]="labelOn">
-      <mat-icon>label</mat-icon>
-    </button>
-    <button matTooltip="Toggle off labels" mat-icon-button [matMenuTriggerFor]="labelOff">
-      <mat-icon>label_off</mat-icon>
-    </button>
-    <button matTooltip="Reset and center plot" mat-icon-button (click)="resetZoomAndCenter()">
-      <mat-icon>center_focus_strong</mat-icon>
-    </button>
-    <button matTooltip="Filter Cytoscape Plot" mat-icon-button (click)="openFilterDialog()">
-      <mat-icon>filter_list</mat-icon>
-    </button>
-    <button mat-icon-button (click)="openStringDBDialog()" matTooltip="Add STRING DB Interactions">
-      <mat-icon>add_circle</mat-icon>
-    </button>
-    <button mat-icon-button matTooltip="Export" [matMenuTriggerFor]="exportPlot">
-      <mat-icon>save_alt</mat-icon>
-    </button>
-    <button mat-icon-button matTooltip="Toggle sticky of cytoscape plot" (click)="toggleSticky()">
-      <mat-icon [ngClass]="{'disabled-icon': !defaultSticky}">push_bin</mat-icon>
-    </button>
-  </div>
+  <mat-toolbar>
+    <mat-toolbar-row>
+      <button matTooltip="Toggle on labels" mat-icon-button [matMenuTriggerFor]="labelOn">
+        <mat-icon>label</mat-icon>
+      </button>
+      <button matTooltip="Toggle off labels" mat-icon-button [matMenuTriggerFor]="labelOff">
+        <mat-icon>label_off</mat-icon>
+      </button>
+      <button matTooltip="Reset and center plot" mat-icon-button (click)="resetZoomAndCenter()">
+        <mat-icon>center_focus_strong</mat-icon>
+      </button>
+      <button matTooltip="Filter Cytoscape Plot" mat-icon-button (click)="openFilterDialog()">
+        <mat-icon>filter_list</mat-icon>
+      </button>
+      <button mat-icon-button (click)="openStringDBDialog()" matTooltip="Add STRING DB Interactions">
+        <mat-icon>add_circle</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Export" [matMenuTriggerFor]="exportPlot">
+        <mat-icon>save_alt</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Toggle sticky of cytoscape plot" (click)="toggleSticky()">
+        <mat-icon [ngClass]="{'disabled-icon': !defaultSticky}">pin_drop</mat-icon>
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
   <mat-menu #labelOn>
     <button mat-menu-item (click)="toggleAllComparisons(true, '.comparison')">
       <span>Comparison</span>

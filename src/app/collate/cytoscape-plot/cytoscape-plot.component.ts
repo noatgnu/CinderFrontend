@@ -26,6 +26,7 @@ import C2S from 'canvas-to-svg';
 // @ts-ignore
 import pdf from 'cytoscape-pdf-export';
 import {HeatmapPlotComponent} from "./heatmap-plot/heatmap-plot.component";
+import {MatToolbar} from "@angular/material/toolbar";
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -72,7 +73,8 @@ function popperFactory(ref: any, content: any, opts: any) {
     MatMenuItem,
     MatMenuTrigger,
     HeatmapPlotComponent,
-    NgClass
+    NgClass,
+    MatToolbar
   ],
   templateUrl: './cytoscape-plot.component.html',
   styleUrl: './cytoscape-plot.component.scss',
