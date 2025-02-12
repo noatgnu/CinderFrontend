@@ -92,7 +92,10 @@ export class HeatmapPlotComponent {
       z: z,
       text: text,
       type: 'heatmap',
-      colorscale: 'Viridis'
+      colorscale: 'Viridis',
+      colorbar: {
+        orientation: 'h',
+      }
     };
 
     // Calculate shapes for each project and individual columns
@@ -164,8 +167,6 @@ export class HeatmapPlotComponent {
     this.graphData = [trace];
     this.layout = layout;
     this.revision++;
-    console.log(this.graphData);
-    console.log(this.layout);
   }
 
   handleHoverIn(event: any) {
