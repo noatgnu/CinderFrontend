@@ -129,6 +129,7 @@ export class HeatmapPlotComponent {
 
     // Calculate shapes for each project and individual columns
     const shapes = [];
+    let startComparisonHorizontalLine = 0.25;
     let currentIndex = 0;
     for (const project in projectGroups) {
       const group = projectGroups[project];
@@ -153,7 +154,7 @@ export class HeatmapPlotComponent {
       shapes.push(projectShape);
 
       let lastComparison = group[0].comparison;
-      let startComparisonHorizontalLine = 0.25;
+
       for (let i = 1; i < groupSize; i++) {
         if (group[i].comparison !== lastComparison || groupSize === 1) {
           const verticalLine = {
