@@ -95,10 +95,10 @@ export class HeatmapPlotComponent {
         z.push(d.log2fc);
         text.push(`${d.project}`);
 
-        if (comparison !== lastComparison) {
+        if (d.comparison !== lastComparison) {
           tickvals.push(tickIndex);
-          ticktext.push(comparison);
-          lastComparison = comparison;
+          ticktext.push(d.comparison);
+          lastComparison = d.comparison;
         } else {
           ticktext.push('');
         }
