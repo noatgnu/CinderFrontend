@@ -122,7 +122,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   cytoscapeElements: any[] = [];
   currentFilter: { log2fc: number, pvalue: number, projectNames: string[], analysisGroupNames: string[] } = { log2fc: 0, pvalue: 0, projectNames: [], analysisGroupNames: [] };
   layers: any;
-  defaultSticky = false;
+  defaultSticky = true;
   constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog, private webService: WebService) {
 
   }
