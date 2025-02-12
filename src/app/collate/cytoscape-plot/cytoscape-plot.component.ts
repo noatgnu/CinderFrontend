@@ -71,7 +71,8 @@ function popperFactory(ref: any, content: any, opts: any) {
     MatMenu,
     MatMenuItem,
     MatMenuTrigger,
-    HeatmapPlotComponent
+    HeatmapPlotComponent,
+    NgClass
   ],
   templateUrl: './cytoscape-plot.component.html',
   styleUrl: './cytoscape-plot.component.scss',
@@ -104,6 +105,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }[][] = [];
   @ViewChild('cy') cyElement!: ElementRef;
   @ViewChild('heatmapContainer') heatmapContainer!: ElementRef;
+  @ViewChild('cytoscapePlotContainer') cytoscapePlotContainer!: ElementRef;
   @Input() projects: Project[] = [];
   @Input() searchResultsMap: { [projectID: string]: SearchResult[] } = {};
   @Input() renameCondition: { [projectID: number]: {
@@ -118,6 +120,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   cytoscapeElements: any[] = [];
   currentFilter: { log2fc: number, pvalue: number, projectNames: string[], analysisGroupNames: string[] } = { log2fc: 0, pvalue: 0, projectNames: [], analysisGroupNames: [] };
   layers: any;
+  defaultSticky = false;
   constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog, private webService: WebService) {
 
   }
@@ -880,12 +883,10 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
   onScroll() {
-    if (this.cyElement) {
-      const cyContainer = this.cyElement.nativeElement;
+    if (this.cyElement && this.cytoscapePlotContainer && this.heatmapContainer) {
+      const cyContainer = this.cytoscapePlotContainer.nativeElement;
       const heatmapContainer = this.heatmapContainer.nativeElement;
       const heatmapRect = heatmapContainer.getBoundingClientRect();
-      const cyRect = cyContainer.getBoundingClientRect();
-
       if (heatmapRect.bottom < 0) {
         cyContainer.style.position = 'relative';
       } else {
@@ -893,6 +894,17 @@ export class CytoscapePlotComponent implements AfterViewInit{
         cyContainer.style.top = '0';
       }
     }
+  }
 
+  toggleSticky() {
+    this.defaultSticky = !this.defaultSticky;
+    if (!this.defaultSticky) {
+      if (this.cytoscapePlotContainer) {
+        this.cytoscapePlotContainer.nativeElement.style.position = 'relative';
+      }
+    } else {
+      this.cytoscapePlotContainer.nativeElement.style.position = 'sticky';
+      this.cytoscapePlotContainer.nativeElement.style.top = '0';
+    }
   }
 }

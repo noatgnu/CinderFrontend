@@ -1,45 +1,52 @@
-<div style="display: flex">
-  <button matTooltip="Toggle on labels" mat-icon-button [matMenuTriggerFor]="labelOn">
-    <mat-icon>label</mat-icon>
-  </button>
-  <button matTooltip="Toggle off labels" mat-icon-button [matMenuTriggerFor]="labelOff">
-    <mat-icon>label_off</mat-icon>
-  </button>
-  <button matTooltip="Reset and center plot" mat-icon-button (click)="resetZoomAndCenter()">
-    <mat-icon>center_focus_strong</mat-icon>
-  </button>
-  <button matTooltip="Filter Cytoscape Plot" mat-icon-button (click)="openFilterDialog()">
-    <mat-icon>filter_list</mat-icon>
-  </button>
-  <button mat-icon-button (click)="openStringDBDialog()" matTooltip="Add STRING DB Interactions">
-    <mat-icon>add_circle</mat-icon>
-  </button>
-  <button mat-icon-button matTooltip="Export" [matMenuTriggerFor]="exportPlot">
-    <mat-icon>save_alt</mat-icon>
-  </button>
+
+<div #cytoscapePlotContainer class="cytoscape-plot-container">
+  <div style="display: flex">
+    <button matTooltip="Toggle on labels" mat-icon-button [matMenuTriggerFor]="labelOn">
+      <mat-icon>label</mat-icon>
+    </button>
+    <button matTooltip="Toggle off labels" mat-icon-button [matMenuTriggerFor]="labelOff">
+      <mat-icon>label_off</mat-icon>
+    </button>
+    <button matTooltip="Reset and center plot" mat-icon-button (click)="resetZoomAndCenter()">
+      <mat-icon>center_focus_strong</mat-icon>
+    </button>
+    <button matTooltip="Filter Cytoscape Plot" mat-icon-button (click)="openFilterDialog()">
+      <mat-icon>filter_list</mat-icon>
+    </button>
+    <button mat-icon-button (click)="openStringDBDialog()" matTooltip="Add STRING DB Interactions">
+      <mat-icon>add_circle</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Export" [matMenuTriggerFor]="exportPlot">
+      <mat-icon>save_alt</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Toggle sticky of cytoscape plot" (click)="toggleSticky()">
+      <mat-icon [ngClass]="{'disabled-icon': !defaultSticky}">push_bin</mat-icon>
+    </button>
+  </div>
+  <mat-menu #labelOn>
+    <button mat-menu-item (click)="toggleAllComparisons(true, '.comparison')">
+      <span>Comparison</span>
+    </button>
+  </mat-menu>
+  <mat-menu #labelOff>
+    <button mat-menu-item (click)="toggleAllComparisons(false,'.comparison')">
+      <span>Comparison</span>
+    </button>
+  </mat-menu>
+  <mat-menu #exportPlot>
+    <button mat-menu-item (click)="exportToPng2()">
+      <span>Export to PNG</span>
+    </button>
+    <button mat-menu-item (click)="exportToPDF()">
+      <span>Export to PDF (without bar charts)</span>
+    </button>
+    <!--  <button mat-menu-item (click)="exportToSvg()">
+        <span>Export to SVG</span>
+      </button>-->
+  </mat-menu>
+  <div #cy class="cy-container"></div>
 </div>
-<mat-menu #labelOn>
-  <button mat-menu-item (click)="toggleAllComparisons(true, '.comparison')">
-    <span>Comparison</span>
-  </button>
-</mat-menu>
-<mat-menu #labelOff>
-  <button mat-menu-item (click)="toggleAllComparisons(false,'.comparison')">
-    <span>Comparison</span>
-  </button>
-</mat-menu>
-<mat-menu #exportPlot>
-  <button mat-menu-item (click)="exportToPng2()">
-    <span>Export to PNG</span>
-  </button>
-  <button mat-menu-item (click)="exportToPDF()">
-    <span>Export to PDF (without bar charts)</span>
-  </button>
-<!--  <button mat-menu-item (click)="exportToSvg()">
-    <span>Export to SVG</span>
-  </button>-->
-</mat-menu>
-<div #cy class="cy-container"></div>
+
 <div #heatmapContainer>
   @if (heatmapData.length >0) {
     @for (g of heatMapGroupData; track g) {
