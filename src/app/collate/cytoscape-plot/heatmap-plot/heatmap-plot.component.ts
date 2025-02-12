@@ -220,7 +220,8 @@ export class HeatmapPlotComponent {
         scaleanchor: 'y',
         scaleratio: 1,
         tickvals: tickvals,
-        ticktext: ticktext
+        ticktext: ticktext,
+        ticklen: 0
       },yaxis: { title: 'Protein', showgrid: false },
       shapes: shapes
     };
