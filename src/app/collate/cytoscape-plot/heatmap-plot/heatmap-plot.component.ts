@@ -145,8 +145,8 @@ export class HeatmapPlotComponent {
 
     const layout: any = {
       title: 'Heatmap of Protein Changes',
-      xaxis: { title: 'Analysis', showticklabels: false },
-      yaxis: { title: 'Protein' },
+      xaxis: { title: 'Analysis', showticklabels: false, showgrid: false },
+      yaxis: { title: 'Protein', showgrid: false },
       shapes: shapes
     };
 
