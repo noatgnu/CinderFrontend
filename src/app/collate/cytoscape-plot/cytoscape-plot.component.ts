@@ -883,17 +883,20 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
   onScroll() {
-    if (this.cyElement && this.cytoscapePlotContainer && this.heatmapContainer) {
-      const cyContainer = this.cytoscapePlotContainer.nativeElement;
-      const heatmapContainer = this.heatmapContainer.nativeElement;
-      const heatmapRect = heatmapContainer.getBoundingClientRect();
-      if (heatmapRect.bottom < 0) {
-        cyContainer.style.position = 'relative';
-      } else {
-        cyContainer.style.position = 'sticky';
-        cyContainer.style.top = '0';
+    if (this.defaultSticky) {
+      if (this.cyElement && this.cytoscapePlotContainer && this.heatmapContainer) {
+        const cyContainer = this.cytoscapePlotContainer.nativeElement;
+        const heatmapContainer = this.heatmapContainer.nativeElement;
+        const heatmapRect = heatmapContainer.getBoundingClientRect();
+        if (heatmapRect.bottom < 0) {
+          cyContainer.style.position = 'relative';
+        } else {
+          cyContainer.style.position = 'sticky';
+          cyContainer.style.top = '0';
+        }
       }
     }
+
   }
 
   toggleSticky() {
