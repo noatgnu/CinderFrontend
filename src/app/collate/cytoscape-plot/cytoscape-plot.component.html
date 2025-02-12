@@ -1,7 +1,7 @@
 
 <div #cytoscapePlotContainer class="cytoscape-plot-container">
   <mat-toolbar>
-    <mat-toolbar-row>
+
       <button matTooltip="Toggle on labels" mat-icon-button [matMenuTriggerFor]="labelOn">
         <mat-icon>label</mat-icon>
       </button>
@@ -23,7 +23,6 @@
       <button mat-icon-button matTooltip="Toggle sticky of cytoscape plot" (click)="toggleSticky()">
         <mat-icon [ngClass]="{'disabled-icon': !defaultSticky}">pin_drop</mat-icon>
       </button>
-    </mat-toolbar-row>
   </mat-toolbar>
   <mat-menu #labelOn>
     <button mat-menu-item (click)="toggleAllComparisons(true, '.comparison')">
