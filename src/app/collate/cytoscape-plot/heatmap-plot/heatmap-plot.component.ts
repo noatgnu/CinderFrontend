@@ -174,7 +174,7 @@ export class HeatmapPlotComponent {
           const horizontalLine = {
             type: 'line',
             x0: startComparisonHorizontalLine,
-            x1: currentIndex + i - 0.75,
+            x1: currentIndex + i - 0.25,
             y0: -0.1,
             y1: -0.1,
             xref: 'x',
