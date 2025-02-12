@@ -75,12 +75,14 @@ export class HeatmapPlotComponent {
     const z: number[] = [];
     for (const project in projectGroups) {
       const group = projectGroups[project];
+      let inGroupIndex = 0;
       for (const d of group) {
         const comparison = `${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`;
-        x.push(`${comparison} ${d.project}`);
+        x.push(`${comparison} ${d.project} ${inGroupIndex}`);
         y.push(d.protein);
         z.push(d.log2fc);
         text.push(`${d.project}`);
+        inGroupIndex++
       }
     }
 
