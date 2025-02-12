@@ -91,6 +91,17 @@ export class CytoscapePlotComponent implements AfterViewInit{
     protein: string,
     searchTerm: string,
   }[] = [];
+  heatMapGroupData: {
+    project: string,
+    analysis_group: string,
+    conditionA: string,
+    conditionB: string,
+    log2fc: number,
+    p_value: number,
+    comparison: string,
+    protein: string,
+    searchTerm: string
+  }[][] = [];
   @ViewChild('cy') cyElement!: ElementRef;
   @Input() projects: Project[] = [];
   @Input() searchResultsMap: { [projectID: string]: SearchResult[] } = {};
@@ -428,6 +439,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     });
     this.heatmapData = heatmapData;
     this.projectColorMap = projectColorMap;
+    this.convertHeatmapDataToHeatmapGroupData()
     return elements;
   }
 
@@ -553,6 +565,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
       }
     })
     this.heatmapData = heatmapData;
+    this.convertHeatmapDataToHeatmapGroupData()
   }
 
   openStringDBDialog() {
@@ -840,5 +853,27 @@ export class CytoscapePlotComponent implements AfterViewInit{
       a.click();
       URL.revokeObjectURL(url);
     })
+  }
+
+  convertHeatmapDataToHeatmapGroupData() {
+    // group by searchTerm
+    const groupedData: { [searchTerm: string]: {
+        project: string,
+        analysis_group: string,
+        conditionA: string,
+        conditionB: string,
+        log2fc: number,
+        p_value: number,
+        comparison: string,
+        protein: string,
+        searchTerm: string
+      }[] } = {};
+    this.heatmapData.forEach(data => {
+      if (!groupedData[data.searchTerm]) {
+        groupedData[data.searchTerm] = [];
+      }
+      groupedData[data.searchTerm].push(data);
+    })
+    return Object.values(groupedData);
   }
 }
