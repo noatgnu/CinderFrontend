@@ -168,6 +168,18 @@ export class HeatmapPlotComponent {
             width: 4
           }
         }
+        if (i === 0) {
+          horizontalLine.x0 -= 0.4
+        }
+        if (group[i+1]) {
+          if (group[i].comparison !== group[i+1].comparison) {
+            horizontalLine.x1 += 0.4
+          } else {
+            horizontalLine.x1 += 0.5
+          }
+        } else {
+          horizontalLine.x1 += 0.4
+        }
         shapes.push(horizontalLine)
       }
 
