@@ -129,7 +129,6 @@ export class HeatmapPlotComponent {
 
     // Calculate shapes for each project and individual columns
     const shapes = [];
-    let startComparisonHorizontalLine = -0.25;
     let currentIndex = 0;
     for (const project in projectGroups) {
       const group = projectGroups[project];
@@ -155,76 +154,21 @@ export class HeatmapPlotComponent {
 
       let lastComparison = group[0].comparison
       for (let i = 0; i < groupSize; i++) {
-        if (i === 0) {
-          if (group[i+1]) {
-            if (group[i].comparison !== group[i+1].comparison) {
-              const horizontalLine = {
-                type: 'line',
-                x0: currentIndex - 0.1,
-                x1: currentIndex + .8,
-                y0: -0.1,
-                y1: -0.1,
-                xref: 'x',
-                yref: 'paper',
-                line: {
-                  color: "rgba(186,104,166)",
-                  width: 4
-                }
-              }
-              shapes.push(horizontalLine);
-            } else {
-              const horizontalLine = {
-                type: 'line',
-                x0: currentIndex,
-                x1: currentIndex + 1,
-                y0: -0.1,
-                y1: -0.1,
-                xref: 'x',
-                yref: 'paper',
-                line: {
-                  color: "rgba(186,104,166)",
-                  width: 4
-                }
-              }
-              shapes.push(horizontalLine);
-            }
-          }
-        } else {
-          if (group[i+1]) {
-            if (group[i].comparison !== group[i+1].comparison) {
-              const horizontalLine = {
-                type: 'line',
-                x0: currentIndex + i,
-                x1: currentIndex + i + .8,
-                y0: -0.1,
-                y1: -0.1,
-                xref: 'x',
-                yref: 'paper',
-                line: {
-                  color: "rgba(186,104,166)",
-                  width: 4
-                }
-              }
-              shapes.push(horizontalLine);
-            } else {
-              const horizontalLine = {
-                type: 'line',
-                x0: currentIndex + i,
-                x1: currentIndex + i + 1,
-                y0: -0.1,
-                y1: -0.1,
-                xref: 'x',
-                yref: 'paper',
-                line: {
-                  color: "rgba(186,104,166)",
-                  width: 4
-                }
-              }
-              shapes.push(horizontalLine);
-            }
+        console.log(group[i])
+        const horizontalLine = {
+          type: 'line',
+          x0: currentIndex,
+          x1: currentIndex + i + 0.5,
+          y0: -0.1,
+          y1: -0.1,
+          xref: 'x',
+          yref: 'paper',
+          line: {
+            color: 'red',
+            width: 4
           }
         }
-
+        shapes.push(horizontalLine)
       }
 
       for (let i = 1; i < groupSize; i++) {
