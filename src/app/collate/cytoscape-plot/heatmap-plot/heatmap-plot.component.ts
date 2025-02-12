@@ -150,7 +150,7 @@ export class HeatmapPlotComponent {
     const cellSize = 50;
     const uniqueX = Array.from(new Set(x)).length;
     const uniqueY = Array.from(new Set(y)).length;
-    const margin = { l: 300, r: 50, t: 50, b: 100 };
+    const margin = { l: 300, r: 50, t: 100, b: 100 };
     const width = uniqueX * cellSize + margin.l + margin.r;
     const height = uniqueY * cellSize + margin.t + margin.b;
 
