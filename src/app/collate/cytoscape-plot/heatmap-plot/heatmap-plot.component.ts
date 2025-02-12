@@ -90,7 +90,7 @@ export class HeatmapPlotComponent {
         inGroupIndex++;
       }
     }
-
+    // disable hoverinfo
     const trace = {
       x: x,
       y: y,
@@ -100,7 +100,8 @@ export class HeatmapPlotComponent {
       colorscale: 'Viridis',
       colorbar: {
         orientation: 'h',
-      }
+      },
+      hoverinfo: 'none'
     };
 
     // Calculate shapes for each project and individual columns
