@@ -185,7 +185,7 @@ export class HeatmapPlotComponent {
             }
           };
           console.log(horizontalLine.x0, currentIndex, i, horizontalLine.x1)
-          startComparisonHorizontalLine = currentIndex + i;
+          startComparisonHorizontalLine = currentIndex + i + 0.5;
           shapes.push(horizontalLine);
         }
       }
