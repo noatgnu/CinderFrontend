@@ -153,10 +153,45 @@ export class HeatmapPlotComponent {
       };
       shapes.push(projectShape);
 
-      let lastComparison = group[0].comparison;
+      let lastComparison = group[0].comparison
+      for (let i = 0; i < groupSize; i++) {
+        if (group[i+1]) {
+          if (group[i].comparison !== group[i+1].comparison) {
+            const horizontalLine = {
+              type: 'line',
+              x0: currentIndex + i,
+              x1: currentIndex + i + .8,
+              y0: -0.1,
+              y1: -0.1,
+              xref: 'x',
+              yref: 'paper',
+              line: {
+                color: "rgba(186,104,166)",
+                width: 4
+              }
+            }
+            shapes.push(horizontalLine);
+          } else {
+            const horizontalLine = {
+              type: 'line',
+              x0: currentIndex + i,
+              x1: currentIndex + i + 1,
+              y0: -0.1,
+              y1: -0.1,
+              xref: 'x',
+              yref: 'paper',
+              line: {
+                color: "rgba(186,104,166)",
+                width: 4
+              }
+            }
+            shapes.push(horizontalLine);
+          }
+        }
+      }
 
       for (let i = 1; i < groupSize; i++) {
-        if (group[i].comparison !== lastComparison || groupSize === 1) {
+        if (group[i].comparison !== lastComparison) {
           const verticalLine = {
             type: 'line',
             x0: currentIndex + i - 0.5,
@@ -166,28 +201,12 @@ export class HeatmapPlotComponent {
             xref: 'x',
             yref: 'paper',
             line: {
-              color: "rgba(186,104,166,0.64)",
+              color: "rgba(186,104,166)",
               width: 3
             }
           };
           shapes.push(verticalLine);
           lastComparison = group[i].comparison;
-          const horizontalLine = {
-            type: 'line',
-            x0: startComparisonHorizontalLine - 0.25,
-            x1: currentIndex + i - 0.25,
-            y0: -0.1,
-            y1: -0.1,
-            xref: 'x',
-            yref: 'paper',
-            line: {
-              color: 'purple',
-              width: 2
-            }
-          };
-          console.log(horizontalLine.x0, currentIndex, i, horizontalLine.x1)
-          startComparisonHorizontalLine = currentIndex + i + 0.5;
-          shapes.push(horizontalLine);
         }
       }
 
