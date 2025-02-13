@@ -40,14 +40,16 @@
   color: red;
 }
 
-@keyframes blink {
-  0% { stroke-opacity: 1; }
-  50% { stroke-opacity: 0; }
-  100% { stroke-opacity: 1; }
-}
 
-:host ::ng-deep .blinking-edge {
-  animation: blink 1s infinite;
-}
 
+:host ::ng-deep {
+  .blinking-edge {
+    animation: blink 1s infinite;
+  }
+  @keyframes blink {
+    0% { stroke-opacity: 1; }
+    50% { stroke-opacity: 0; }
+    100% { stroke-opacity: 1; }
+  }
+}
 
