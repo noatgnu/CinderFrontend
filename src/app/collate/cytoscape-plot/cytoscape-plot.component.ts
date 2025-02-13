@@ -446,6 +446,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
       });
     });
     this.heatmapData = heatmapData;
+    console.log(this.heatmapData)
+    console.log(elements)
     this.projectColorMap = projectColorMap;
     this.heatMapGroupData = this.convertHeatmapDataToHeatmapGroupData()
     return elements;
