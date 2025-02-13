@@ -40,13 +40,13 @@
   color: red;
 }
 
-::ng-deep :host @keyframes blink {
+:host ::ng-deep @keyframes blink {
   0% { stroke-opacity: 1; }
   50% { stroke-opacity: 0; }
   100% { stroke-opacity: 1; }
 }
 
-::ng-deep :host .blinking-edge {
+:host ::ng-deep .blinking-edge {
   animation: blink 1s infinite;
 }
 
