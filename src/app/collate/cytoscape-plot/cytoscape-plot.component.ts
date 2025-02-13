@@ -940,14 +940,16 @@ export class CytoscapePlotComponent implements AfterViewInit{
     protein: string,
     searchTerm: string
   }|undefined) {
-    console.log(data)
+
     this.cy.edges().forEach(edge => {
       edge.removeClass('blinking-edge');
     });
 
     if (data) {
+      console.log(data)
       // Apply blinking effect to the targeted edge
       this.cy.edges().forEach(edge => {
+        console.log(edge)
         const edgeData = edge.data();
         console.log(edgeData)
         if (
