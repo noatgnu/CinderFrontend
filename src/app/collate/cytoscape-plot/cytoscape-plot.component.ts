@@ -942,9 +942,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     searchTerm: string
   }|undefined) {
 
-    this.cy.edges().forEach(edge => {
-      edge.removeClass('blinking-edge');
-    });
+    this.cy.edges().stop(true).style('opacity', 1);
 
     if (data) {
       // Apply blinking effect to the targeted edge
@@ -960,8 +958,19 @@ export class CytoscapePlotComponent implements AfterViewInit{
           edgeData.protein === data.protein &&
           edgeData.searchTerm === data.searchTerm
         ) {
+          const blink = () => {
+            edge.animate({ style: { opacity: 0 } }, {
+              duration: 500,
+              complete: () => {
+                edge.animate({ style: { opacity: 1 } }, {
+                  duration: 500,
+                  complete: blink
+                });
+              }
+            })
+          }
           console.log(edge)
-          edge.addClass('blinking-edge');
+          blink();
         }
       });
     }
