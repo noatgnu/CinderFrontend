@@ -940,6 +940,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     protein: string,
     searchTerm: string
   }|undefined) {
+    console.log(data)
     this.cy.edges().forEach(edge => {
       edge.removeClass('blinking-edge');
     });
@@ -957,6 +958,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           edgeData.searchTerm === data.searchTerm
         ) {
           edge.addClass('blinking-edge');
+          console.log(edge)
         }
       });
     }
