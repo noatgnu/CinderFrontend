@@ -948,12 +948,10 @@ export class CytoscapePlotComponent implements AfterViewInit{
     });
 
     if (data) {
-
+      console.log(data)
       // Apply blinking effect to the targeted edge
       this.cy.edges().forEach(edge => {
-        console.log(data)
         const edgeData = edge.data();
-        console.log(edgeData)
         if (
           edgeData.project === data.project &&
           edgeData.analysis_group === data.analysis_group &&
@@ -963,7 +961,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
           edgeData.searchTerm === data.searchTerm
         ) {
           edge.addClass('blinking-edge');
-          console.log(edge)
         }
       });
     }

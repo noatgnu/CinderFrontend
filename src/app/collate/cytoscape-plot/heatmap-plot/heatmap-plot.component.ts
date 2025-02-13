@@ -175,7 +175,6 @@ export class HeatmapPlotComponent {
 
       let lastComparison = group[0].comparison
       for (let i = 0; i < groupSize; i++) {
-        console.log(group[i])
         const horizontalLine = {
           type: 'line',
           x0: currentIndex +i,
