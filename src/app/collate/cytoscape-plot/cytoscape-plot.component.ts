@@ -758,8 +758,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
       svgContext.fillText(node.data('label'), x - 15, y - 20); // Adjust position as needed
     });
 
-    // Draw edges
-    console.log(this.cy.json())
     this.cy.edges().forEach(edge => {
       const controlPoints = edge.controlPoints();
       const sourcePosition = edge.source().position();
@@ -949,10 +947,11 @@ export class CytoscapePlotComponent implements AfterViewInit{
     });
 
     if (data) {
-      console.log(data)
       // Apply blinking effect to the targeted edge
       this.cy.edges().forEach(edge => {
         const edgeData = edge.data();
+        console.log(edgeData.project === data.project, edgeData.analysis_group === data.analysis_group, edgeData.conditionA === data.conditionA, edgeData.conditionB === data.conditionB, edgeData.protein === data.protein, edgeData.searchTerm === data.searchTerm)
+
         if (
           edgeData.project === data.project &&
           edgeData.analysis_group === data.analysis_group &&
