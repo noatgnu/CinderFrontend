@@ -430,6 +430,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
             fc: result.log2_fc,
             p_value: result.log10_p,
             protein: proteinId,
+            searchTerm: result.search_term
           }
         });
         heatmapData.push({
