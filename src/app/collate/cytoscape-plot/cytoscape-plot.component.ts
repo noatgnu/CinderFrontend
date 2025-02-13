@@ -960,6 +960,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           edgeData.protein === data.protein &&
           edgeData.searchTerm === data.searchTerm
         ) {
+          console.log(edge)
           edge.addClass('blinking-edge');
         }
       });
