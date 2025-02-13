@@ -53,7 +53,7 @@
 <div #heatmapContainer>
   @if (heatmapData.length >0) {
     @for (g of heatMapGroupData; track g) {
-      <app-heatmap-plot [data]="g"></app-heatmap-plot>
+      <app-heatmap-plot [data]="g" (currentHoverTarget)="handleHoverTarget($event)"></app-heatmap-plot>
     }
   }
 </div>

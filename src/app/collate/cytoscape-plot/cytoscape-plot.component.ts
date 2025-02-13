@@ -928,4 +928,37 @@ export class CytoscapePlotComponent implements AfterViewInit{
     this.cy.resize();
     this.cy.fit();
   }
+
+  handleHoverTarget(data: {
+    project: string,
+    analysis_group: string,
+    conditionA: string,
+    conditionB: string,
+    log2fc: number,
+    p_value: number,
+    comparison: string,
+    protein: string,
+    searchTerm: string
+  }|undefined) {
+    this.cy.edges().forEach(edge => {
+      edge.removeClass('blinking-edge');
+    });
+
+    if (data) {
+      // Apply blinking effect to the targeted edge
+      this.cy.edges().forEach(edge => {
+        const edgeData = edge.data();
+        if (
+          edgeData.project === data.project &&
+          edgeData.analysis_group === data.analysis_group &&
+          edgeData.conditionA === data.conditionA &&
+          edgeData.conditionB === data.conditionB &&
+          edgeData.protein === data.protein &&
+          edgeData.searchTerm === data.searchTerm
+        ) {
+          edge.addClass('blinking-edge');
+        }
+      });
+    }
+  }
 }

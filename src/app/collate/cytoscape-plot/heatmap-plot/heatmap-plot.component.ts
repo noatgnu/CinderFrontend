@@ -47,7 +47,27 @@ export class HeatmapPlotComponent {
     this.drawHeatmap();
   }
 
-  @Output() currentHoverTarget: EventEmitter<string> = new EventEmitter<string>();
+  @Output() currentHoverTarget: EventEmitter<{
+    project: string
+    analysis_group: string,
+    conditionA: string,
+    conditionB: string,
+    log2fc: number,
+    p_value: number,
+    comparison: string,
+    protein: string,
+    searchTerm: string
+  }> = new EventEmitter<{
+    project: string
+    analysis_group: string,
+    conditionA: string,
+    conditionB: string,
+    log2fc: number,
+    p_value: number,
+    comparison: string,
+    protein: string,
+    searchTerm: string
+  }>();
 
   get data() {
     return this._data;
@@ -58,6 +78,7 @@ export class HeatmapPlotComponent {
   revision = 0
   reversePointIndexToProject: any = {}
   reversePointIndexToColumn: any = {}
+  reversePointIndexToData: any = {}
   drawHeatmap() {
     // Group data by project
     const projectGroups: any = {};
@@ -238,6 +259,7 @@ export class HeatmapPlotComponent {
         shapes.push(columnShape);
         this.reversePointIndexToProject[currentIndex + i] = projectShape;
         this.reversePointIndexToColumn[currentIndex + i] = columnShape;
+        this.reversePointIndexToData[currentIndex + i] = group[i];
       }
       currentIndex += groupSize;
     }
@@ -279,6 +301,7 @@ export class HeatmapPlotComponent {
       const shape = this.reversePointIndexToColumn[shapeIndex];
       shape.line.color = 'black';
       shape.line.width = 2;
+      this.currentHoverTarget.emit(this.reversePointIndexToData[shapeIndex]);
       this.revision++;
     }
 
@@ -290,6 +313,7 @@ export class HeatmapPlotComponent {
       this.reversePointIndexToProject[shapeIndex].line.color = 'red';
       const shape = this.reversePointIndexToColumn[shapeIndex];
       shape.line.color = 'rgba(0,0,0,0)';
+      this.currentHoverTarget.emit(undefined);
       this.revision++;
     }
 
