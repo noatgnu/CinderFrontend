@@ -104,6 +104,7 @@ export class HeatmapPlotComponent {
     let tickIndex = 0;
 
     let lastProject = '';
+    const searchTerm = this.data[0].searchTerm;
     for (const project in projectGroups) {
       const group = projectGroups[project];
       let inGroupIndex = 0;
@@ -272,7 +273,7 @@ export class HeatmapPlotComponent {
     const height = uniqueY * cellSize + margin.t + margin.b;
 
     const layout: any = {
-      title: 'Heatmap of Protein Changes',
+      title: `Search term: ${searchTerm}`,
       width: width,
       height: height,
       margin: margin,
