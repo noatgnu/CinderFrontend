@@ -171,7 +171,7 @@
                                 <button type="button" mat-menu-item (click)="navigateToSourceFile(c.column_position, index, 'next')" [matTooltip]="'Navigate to position '+c.column_position+' in the next file'">Next file</button>
                                 <button type="button" mat-menu-item (click)="navigateToSourceFile(c.column_position, index, 'previous')" [matTooltip]="'Navigate to position '+c.column_position+' in the previous file'">Previous file</button>
                               </mat-menu>
-
+                              <button mat-icon-button type="button" (click)="openMetadataEditorDialog(c)"><mat-icon>edit</mat-icon></button>
                             </div>
                           </div>
 

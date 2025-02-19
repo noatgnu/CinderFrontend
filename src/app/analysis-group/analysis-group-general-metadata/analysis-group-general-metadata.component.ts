@@ -685,4 +685,24 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       }
     }
   }
+
+  openMetadataEditorDialog(metadata: MetadataColumn) {
+    const ref = this.dialog.open(AnalysisGroupMetadataCreationDialogComponent)
+    ref.componentInstance.metadataType = metadata.type
+    ref.componentInstance.metadataName = metadata.name
+    ref.componentInstance.readonlyName = true
+    ref.componentInstance.readonlyType = true
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        this.web.updateMetaDataColumn(metadata.id, result.name, result.type, metadata.value).subscribe((data) => {
+          this.metadata = this.metadata.map((m) => {
+            if (m.id === metadata.id) {
+              return data
+            }
+            return m
+          })
+        })
+      }
+    })
+  }
 }

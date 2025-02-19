@@ -59,6 +59,7 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
     metadataTA: "",
     metadataTS: "",
     metadataMM: 0,
+    metadataAC: "",
   })
 
   availableSpecs: any[] = []
@@ -71,6 +72,35 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   }
   @Input() set metadataName(value: string) {
     this.form.controls.metadataName.setValue(value)
+  }
+
+  @Input() set metadataValue(value: string) {
+    this.form.controls.metadataValue.setValue(value)
+    if (this.form.value.metadataName === "Modification parameters") {
+      const valueSplitted = value.split(";")
+      valueSplitted.forEach((v) => {
+        const subSplitted = v.split("=")
+        if (subSplitted.length === 2) {
+          switch (subSplitted[0].trim().toLowerCase()) {
+            case "mt":
+              this.form.controls.metadataMT.setValue(subSplitted[1].trim())
+              break
+            case "pp":
+              this.form.controls.metadataPP.setValue(subSplitted[1].trim())
+              break
+            case "ta":
+              this.form.controls.metadataTA.setValue(subSplitted[1].trim())
+              break
+            case "ts":
+              this.form.controls.metadataTS.setValue(subSplitted[1].trim())
+              break
+            case "mm":
+              this.form.controls.metadataMM.setValue(parseFloat(subSplitted[1].trim()))
+              break
+          }
+        }
+      })
+    }
   }
 
   selectedData: Unimod|undefined = undefined
@@ -171,7 +201,7 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
         this.selectedData = this.optionsArray.find((option) => option.name === data.option.value)
         if (this.selectedData) {
           const mapData: any = {}
-
+          this.form.controls.metadataAC.setValue(this.selectedData.accession)
           for (const a of this.selectedData.additional_data) {
             console.log(a)
             if (a["id"] === "delta_mono_mass") {

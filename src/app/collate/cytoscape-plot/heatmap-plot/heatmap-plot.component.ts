@@ -213,9 +213,6 @@ export class HeatmapPlotComponent {
           }
         }
         shapes.push(horizontalLine)
-        console.log(horizontalLine)
-        console.log(group[i])
-        console.log(i)
       }
 
       for (let i = 1; i < groupSize; i++) {

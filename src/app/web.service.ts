@@ -899,6 +899,9 @@ export class WebService {
       if (metadataColumn.metadataMT) {
         payload["value"] += `;MT=${metadataColumn.metadataMT}`
       }
+      if (metadataColumn.metadataAC) {
+        payload["value"] += `;AC=${metadataColumn.metadataAC}`
+      }
     }
     if (source_file) {
       payload["source_file"] = source_file
