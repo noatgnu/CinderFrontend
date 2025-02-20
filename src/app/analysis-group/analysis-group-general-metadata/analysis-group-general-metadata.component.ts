@@ -690,6 +690,7 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     const ref = this.dialog.open(AnalysisGroupMetadataCreationDialogComponent)
     ref.componentInstance.metadataType = metadata.type
     ref.componentInstance.metadataName = metadata.name
+    ref.componentInstance.metadataValue = metadata.value
     ref.componentInstance.readonlyName = true
     ref.componentInstance.readonlyType = true
     ref.afterClosed().subscribe((result) => {

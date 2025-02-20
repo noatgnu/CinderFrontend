@@ -48,7 +48,7 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   metadataNameAutocomplete: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Instrument", "Label", "Cleavage agent details", "Dissociation method", "Modification parameters", "Cell type", "Enrichment process"]
   metadataOtherAutocomplete: string[] = ["Source name", "Material type", "Assay name", "Technology type"]
   metadataCharacteristics: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Cell type", "Cell line", "Developmental stage", "Ancestry category", "Sex", "Age", "Biological replicate", "Enrichment process"]
-  metadataComment: string[] = ["Data file", "File uri", "Technical replicate", "Fraction identifier", "Label", "Cleavage agent details", "Instrument", "Modification parameters", "Dissociation method", "Precursor mass tolerance", "Fragment mass tolerance", ""]
+  metadataComment: string[] = ["Data file", "File uri", "Technical replicate", "Fraction identifier", "Label", "Cleavage agent details", "Instrument", "Modification parameters", "Dissociation method", "Precursor mass tolerance", "Fragment mass tolerance", "Fractionation method", ""]
 
   form = this.fb.group({
     metadataType: "Characteristics",
@@ -75,32 +75,53 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   }
 
   @Input() set metadataValue(value: string) {
-    this.form.controls.metadataValue.setValue(value)
-    if (this.form.value.metadataName === "Modification parameters") {
-      const valueSplitted = value.split(";")
-      valueSplitted.forEach((v) => {
-        const subSplitted = v.split("=")
-        if (subSplitted.length === 2) {
-          switch (subSplitted[0].trim().toLowerCase()) {
-            case "mt":
-              this.form.controls.metadataMT.setValue(subSplitted[1].trim())
-              break
-            case "pp":
-              this.form.controls.metadataPP.setValue(subSplitted[1].trim())
-              break
-            case "ta":
-              this.form.controls.metadataTA.setValue(subSplitted[1].trim())
-              break
-            case "ts":
-              this.form.controls.metadataTS.setValue(subSplitted[1].trim())
-              break
-            case "mm":
-              this.form.controls.metadataMM.setValue(parseFloat(subSplitted[1].trim()))
-              break
-          }
+    const valueSplitted = value.split(";")
+    valueSplitted.forEach((v) => {
+      const subSplitted = v.split("=")
+      if (subSplitted.length === 2) {
+        switch (subSplitted[0].trim().toLowerCase()) {
+          case "mt":
+            this.form.controls.metadataMT.setValue(subSplitted[1].trim())
+            break
+          case "pp":
+            this.form.controls.metadataPP.setValue(subSplitted[1].trim())
+            break
+          case "ta":
+            this.form.controls.metadataTA.setValue(subSplitted[1].trim())
+            break
+          case "ts":
+            this.form.controls.metadataTS.setValue(subSplitted[1].trim())
+            break
+          case "mm":
+            this.form.controls.metadataMM.setValue(parseFloat(subSplitted[1].trim()))
+            break
+          case "ac":
+            this.form.controls.metadataAC.setValue(subSplitted[1].trim())
+            break
+          case "nt":
+            this.form.controls.metadataValue.setValue(subSplitted[1].trim())
+            if (this.form.controls.metadataName.value === "Modification parameters") {
+              this.web.getUnimod(undefined, 5, 0, subSplitted[1].trim()).pipe(
+                map((response) => {
+                  this.optionsArray = response.results
+                  return response.results
+                })
+              ).subscribe()
+            }
+            break
         }
-      })
-    }
+      } else {
+        this.form.controls.metadataValue.setValue(subSplitted[0].trim())
+        if (this.form.controls.metadataName.value === "Modification parameters") {
+          this.web.getUnimod(undefined, 5, 0, subSplitted[0].trim()).pipe(
+            map((response) => {
+              this.optionsArray = response.results
+              return response.results
+            })
+          ).subscribe()
+        }
+      }
+    })
   }
 
   selectedData: Unimod|undefined = undefined
