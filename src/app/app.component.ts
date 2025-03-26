@@ -68,7 +68,7 @@ export class AppComponent implements AfterViewInit {
               }
             }
           })
-          this.ws.connectCurtainWS(this.web.searchSessionID)
+          //this.ws.connectCurtainWS(this.web.searchSessionID)
           this.ws.curtainWSConnection?.subscribe((data) => {
             if (data) {}
           })

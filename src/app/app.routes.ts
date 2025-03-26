@@ -6,6 +6,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import {ProjectModule} from "./project/project.module";
 import {AnalysisGroupModule} from "./analysis-group/analysis-group.module";
 import {UserModule} from "./user/user.module";
+import {AdminModule} from "./admin/admin.module";
 
 export const routes: Routes = [
   {
@@ -35,7 +36,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
+    loadChildren: () => AdminModule
   },
   {
     path: 'user',
