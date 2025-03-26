@@ -252,7 +252,6 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
           console.log(mapData)
           this.availableSpecs = Object.values(mapData)
         }
-
       }
     }
   }
@@ -267,6 +266,5 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
     if (spec.mono_mass) {
       this.form.controls.metadataMM.setValue(spec.mono_mass)
     }
-
   }
 }
