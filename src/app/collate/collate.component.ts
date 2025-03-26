@@ -106,7 +106,7 @@ export class CollateComponent implements OnInit{
   onCollateSelect(event: MatSelectionListChange) {
     this.selectedCollate = event.options[0].value;
     console.log(event.options[0].value)
-    window.open(`/collate/view/${event.options[0].value.id}`, '_blank')
+    window.open(`/#/collate/view/${event.options[0].value.id}`, '_blank')
     //this.router.navigate([`/collate/view/${event.options[0].value.id}`]).then(r => console.log(r));
   }
 
