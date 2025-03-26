@@ -43,8 +43,8 @@ export class CollateSearchMainComponent implements OnInit {
   constructor(private web: WebService, private fb: FormBuilder, private snackBar: MatSnackBar, private router: Router, private collateService: CollateService, private dialog: MatDialog) {
     this.form.controls.selected.valueChanges.subscribe((value: Collate[]|null) => {
       if (value) {
-
-        this.router.navigate([`/collate/view/${value[0].id}`]).then();
+        window.open(`/collate/view/${value[0].id}`, "_blank")
+        //this.router.navigate([`/collate/view/${value[0].id}`]).then();
       }
     })
 
