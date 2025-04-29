@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {SearchResult, SearchResultQuery, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import {Collate} from "../collate";
@@ -10,7 +10,7 @@ import {CollateProjectListComponent} from "../collate-project-list/collate-proje
 import {WebService} from "../../web.service";
 import {AnalysisGroup} from "../../analysis-group/analysis-group";
 import {MatIcon} from "@angular/material/icon";
-import {MatIconButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatToolbar, MatToolbarRow} from "@angular/material/toolbar";
 import {AccountsService} from "../../accounts/accounts.service";
 import {Router} from "@angular/router";
@@ -31,9 +31,10 @@ import {CytoscapePlotComponent} from "../cytoscape-plot/cytoscape-plot.component
 import {
   CollateCytoscapeTermResultFilterDialogComponent
 } from "../collate-cytoscape-term-result-filter-dialog/collate-cytoscape-term-result-filter-dialog.component";
-import {LoginDialogComponent} from "../../accounts/login-dialog/login-dialog.component";
-import {catchError, finalize, of, Subject, takeUntil, tap} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {LoginDialogComponent} from "../../accounts/login-dialog/login-dialog.component";
+import {catchError, finalize, Subject, takeUntil} from "rxjs";
+
 @Component({
     selector: 'app-collate-view',
   imports: [
@@ -55,16 +56,19 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
     MatTooltip,
     CytoscapePlotComponent,
     NgClass,
+    MatButton,
     MatProgressSpinner
   ],
     templateUrl: './collate-view.component.html',
     styleUrl: './collate-view.component.scss'
 })
-export class CollateViewComponent {
+export class CollateViewComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
   selectedCytoscapePlotSearchTerm: string[] = [];
   showCytoscapePlot: boolean = false;
   _sessionId: number | null = null;
+  isLoading: boolean = false;
+  errorMessage: string | null = null;
   @Input() set sessionId(value: number | null) {
     if (value && this.collate) {
       this.getSearchFromID(value);
@@ -101,10 +105,10 @@ export class CollateViewComponent {
   pastSearches: {searchQuery: SearchResultQuery|null, termFounds: string[], collate: number, searchID:number}[] = [];
   waitingForDownload = false
   cytoscapePlotFilteredResults: { [projectId: number]: SearchResult[] } = {};
-  isLoading = false;
-  errorMessage: string | null = null;
-
-
+  toggleCytoscapePlot() {
+    this.showCytoscapePlot = !this.showCytoscapePlot;
+    console.log(this.cytoscapePlotFilteredResults)
+  }
 
   constructor(private cdr: ChangeDetectorRef, private title: Title, private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
     const pastSearches = localStorage.getItem('cinderPastSearches');
@@ -139,25 +143,9 @@ export class CollateViewComponent {
     })
   }
 
-  private loadUserPreferences(): void {
-    try {
-      const storedPlotVisibility = localStorage.getItem('cinder_show_cytoscape_plot');
-      if (storedPlotVisibility !== null) {
-        this.showCytoscapePlot = JSON.parse(storedPlotVisibility);
-      }
-    } catch (e) {
-      console.error('Failed to load user preferences', e);
-    }
-  }
-
-  toggleCytoscapePlot(): void {
-    this.showCytoscapePlot = !this.showCytoscapePlot;
-    localStorage.setItem('cinder_show_cytoscape_plot', JSON.stringify(this.showCytoscapePlot));
-
-    if (this.showCytoscapePlot && Object.keys(this.cytoscapePlotFilteredResults).length === 0) {
-      this.cytoscapePlotFilteredResults = { ...this.filteredResults };
-      this.collateService.collateRedrawSubject.next(true);
-    }
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private loadCollate(collateId: number): void {
@@ -166,9 +154,9 @@ export class CollateViewComponent {
 
     this.collateService.getCollate(collateId)
       .pipe(
-        tap(() => this.errorMessage = null),
         catchError(error => {
           if (error.status === 401 || error.status === 404) {
+            // Open login dialog when unauthorized or resource not found
             const dialogRef = this.dialog.open(LoginDialogComponent);
             dialogRef.afterClosed().subscribe(success => {
               if (success) {
@@ -182,41 +170,74 @@ export class CollateViewComponent {
               }
             });
           } else {
-            this.errorMessage = 'Error loading data: ' + (error.message || 'Unknown error');
+            this.errorMessage = 'Failed to load collate data';
             this.sb.open('Error loading collate', 'Dismiss', {
               duration: 3000
             });
           }
-          return of(null);
+          throw error;
         }),
         finalize(() => this.isLoading = false),
         takeUntil(this.destroy$)
       )
-      .subscribe((collate: any) => {
-        if (collate) {
-          collate = collate as Collate;
-          this.collate = collate;
-          this.title.setTitle(`${collate.title} - C|nder`);
-          this.projects = collate.projects;
+      .subscribe((collate: Collate) => {
+        this.collate = collate;
+        this.title.setTitle(`${collate.title} - C|nder`);
+        this.projects = collate.projects;
+        if (!collate.settings) {
+          collate.settings = {
+            projectOrder: [],
+            analysisGroupOrderMap: {},
+            projectConditionColorMap: {},
+            renameSampleCondition: {},
+            projectAnalysisGroupVisibility: {},
+            plotSettings: {},
+            showTags: false,
+          };
+        }
+        if (!collate.settings.plotSettings) {
+          collate.settings.plotSettings = {}
+        }
 
-          // Initialize settings if needed
-          if (!collate.settings) {
-            collate.settings = {
-              projectOrder: [],
-              analysisGroupOrderMap: {},
-              projectConditionColorMap: {},
-              renameSampleCondition: {},
-              projectAnalysisGroupVisibility: {},
-              plotSettings: {},
-              showTags: false,
-            };
+        if (collate.settings.projectOrder) {
+          this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
+        }
+
+        if (this.collate?.settings.projectAnalysisGroupVisibility) {
+          // Existing logic
+        } else {
+          // @ts-ignore
+          this.collate.settings.projectAnalysisGroupVisibility = {};
+          for (const p of this.projects) {
+            // @ts-ignore
+            this.collate.settings.projectAnalysisGroupVisibility[p.id] = {}
           }
+        }
 
-          // If session ID was provided before collate loaded, get the search data now
+        if (this.collate?.settings.renameSampleCondition) {
+          if (this.sessionId) {
+            this.getSearchFromID(this.sessionId);
+          }
+        } else {
+          // @ts-ignore
+          this.collate.settings.renameSampleCondition = {};
+          for (const p of this.projects) {
+            // @ts-ignore
+            this.collate.settings.renameSampleCondition[p.id] = {}
+            this.web.getProjectUniqueConditions(p.id).subscribe((value) => {
+              for (const a of value) {
+                // @ts-ignore
+                this.collate.settings.renameSampleCondition[p.id][a.Condition] = a.Condition
+              }
+              // @ts-ignore
+              console.log(this.collate.settings.renameSampleCondition)
+            })
+          }
           if (this.sessionId) {
             this.getSearchFromID(this.sessionId);
           }
         }
+        console.log(this.projects)
       });
   }
 
@@ -448,10 +469,5 @@ export class CollateViewComponent {
 
       }
     })
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
