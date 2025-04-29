@@ -276,39 +276,44 @@ export class CollateViewComponent {
 
   getFilteredSearchResults(searchTerms: string[]): { [projectId: number]: SearchResult[] } {
     const filteredResults: { [projectId: number]: SearchResult[] } = {};
-    console.log(searchTerms)
-    Object.keys(this.searchResults).forEach(projectId => {
-      // @ts-ignore
-      filteredResults[projectId] = this.searchResults[projectId].filter(result => searchTerms.includes(result.search_term));
-      if (this.collate?.settings?.analysisGroupOrderMap) {
-        Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
-          const id = parseInt(projectId);
-          const analysisGroupOrder = this.collate?.settings.analysisGroupOrderMap[id];
 
-          if (!filteredResults[id]) {
-            return;
+    Object.keys(this.searchResults).forEach(projectId => {
+      const numericProjectId = parseInt(projectId);
+      // Filter by search terms first
+      filteredResults[numericProjectId] = this.searchResults[numericProjectId].filter(result =>
+        searchTerms.includes(result.search_term)
+      );
+
+      // Handle ordering if order map exists
+      if (this.collate?.settings?.analysisGroupOrderMap?.[numericProjectId]) {
+        const analysisGroupOrder = this.collate.settings.analysisGroupOrderMap[numericProjectId];
+
+        // Find items not in order
+        const notInOrder = filteredResults[numericProjectId].filter(
+          result => !analysisGroupOrder.includes(result.analysis_group.id)
+        );
+
+        // Filter and sort items in order
+        filteredResults[numericProjectId] = filteredResults[numericProjectId]
+          .filter(result => analysisGroupOrder.includes(result.analysis_group.id))
+          .sort((a, b) => analysisGroupOrder.indexOf(a.analysis_group.id) - analysisGroupOrder.indexOf(b.analysis_group.id));
+
+        // Actually append the not-in-order items
+        filteredResults[numericProjectId] = filteredResults[numericProjectId].concat(notInOrder);
+      }
+
+      // Apply visibility filtering regardless of order map
+      if (this.collate?.settings?.projectAnalysisGroupVisibility?.[numericProjectId]) {
+        const projectVisibility = this.collate.settings.projectAnalysisGroupVisibility[numericProjectId];
+
+        filteredResults[numericProjectId] = filteredResults[numericProjectId].filter(result => {
+          const analysisGroupId = result.analysis_group.id;
+          // If no visibility setting, default to showing
+          if (!(analysisGroupId in projectVisibility)) {
+            return true;
           }
-          if (!analysisGroupOrder) {
-            return;
-          }
-          const notInOrder = filteredResults[id].filter(result => !analysisGroupOrder.includes(result.analysis_group.id));
-          filteredResults[id] = filteredResults[id].filter(result => analysisGroupOrder.includes(result.analysis_group.id));
-          filteredResults[id] = filteredResults[id].sort((a, b) => {
-            return analysisGroupOrder.indexOf(a.analysis_group.id) - analysisGroupOrder.indexOf(b.analysis_group.id);
-          })
-          filteredResults[id].concat(notInOrder);
-          if (this.collate?.settings?.projectAnalysisGroupVisibility) {
-            const projectAnalysisGroupVisibility = this.collate?.settings.projectAnalysisGroupVisibility[id];
-            filteredResults[id] = filteredResults[id].filter(result => {
-              if (!projectAnalysisGroupVisibility) {
-                return true;
-              }
-              if (!(result.analysis_group.id in projectAnalysisGroupVisibility)) {
-                return true;
-              }
-              return projectAnalysisGroupVisibility[result.analysis_group.id];
-            })
-          }
+          // Otherwise use the visibility setting
+          return projectVisibility[analysisGroupId];
         });
       }
     });
