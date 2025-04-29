@@ -32,7 +32,8 @@ import {
   CollateCytoscapeTermResultFilterDialogComponent
 } from "../collate-cytoscape-term-result-filter-dialog/collate-cytoscape-term-result-filter-dialog.component";
 import {LoginDialogComponent} from "../../accounts/login-dialog/login-dialog.component";
-
+import {catchError, finalize, of, Subject, takeUntil, tap} from "rxjs";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 @Component({
     selector: 'app-collate-view',
   imports: [
@@ -53,7 +54,8 @@ import {LoginDialogComponent} from "../../accounts/login-dialog/login-dialog.com
     MatTabLabel,
     MatTooltip,
     CytoscapePlotComponent,
-    NgClass
+    NgClass,
+    MatProgressSpinner
   ],
     templateUrl: './collate-view.component.html',
     styleUrl: './collate-view.component.scss'
@@ -190,8 +192,9 @@ export class CollateViewComponent {
         finalize(() => this.isLoading = false),
         takeUntil(this.destroy$)
       )
-      .subscribe(collate => {
+      .subscribe((collate: any) => {
         if (collate) {
+          collate = collate as Collate;
           this.collate = collate;
           this.title.setTitle(`${collate.title} - C|nder`);
           this.projects = collate.projects;
