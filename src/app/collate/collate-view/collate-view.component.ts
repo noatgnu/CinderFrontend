@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
+import {ChangeDetectorRef, Component, Input} from '@angular/core';
 import {SearchResult, SearchResultQuery, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import {Collate} from "../collate";
@@ -19,7 +19,6 @@ import {MatDialog} from "@angular/material/dialog";
 import {CollateQrCodeDialogComponent} from "../collate-qr-code-dialog/collate-qr-code-dialog.component";
 import {NgClass, NgOptimizedImage} from "@angular/common";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
-import {Observable} from "rxjs";
 import {WebsocketService} from "../../websocket.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatTooltip} from "@angular/material/tooltip";
@@ -31,7 +30,6 @@ import {CytoscapePlotComponent} from "../cytoscape-plot/cytoscape-plot.component
 import {
   CollateCytoscapeTermResultFilterDialogComponent
 } from "../collate-cytoscape-term-result-filter-dialog/collate-cytoscape-term-result-filter-dialog.component";
-import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {LoginDialogComponent} from "../../accounts/login-dialog/login-dialog.component";
 import {catchError, finalize, Subject, takeUntil} from "rxjs";
 
@@ -57,18 +55,18 @@ import {catchError, finalize, Subject, takeUntil} from "rxjs";
     CytoscapePlotComponent,
     NgClass,
     MatButton,
-    MatProgressSpinner
   ],
     templateUrl: './collate-view.component.html',
     styleUrl: './collate-view.component.scss'
 })
-export class CollateViewComponent implements OnDestroy {
+export class CollateViewComponent {
   private destroy$ = new Subject<void>();
   selectedCytoscapePlotSearchTerm: string[] = [];
   showCytoscapePlot: boolean = false;
   _sessionId: number | null = null;
   isLoading: boolean = false;
   errorMessage: string | null = null;
+
   @Input() set sessionId(value: number | null) {
     if (value && this.collate) {
       this.getSearchFromID(value);
@@ -143,11 +141,6 @@ export class CollateViewComponent implements OnDestroy {
     })
   }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   private loadCollate(collateId: number): void {
     this.isLoading = true;
     this.errorMessage = null;
@@ -204,7 +197,7 @@ export class CollateViewComponent implements OnDestroy {
         }
 
         if (this.collate?.settings.projectAnalysisGroupVisibility) {
-          // Existing logic
+
         } else {
           // @ts-ignore
           this.collate.settings.projectAnalysisGroupVisibility = {};

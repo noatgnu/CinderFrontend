@@ -1,128 +1,91 @@
-<div class="collate-container">
-  <mat-toolbar color="primary">
-    <mat-toolbar-row>
-      <a href="/#/home" class="logo-link">
-        <img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'" alt="C|nder Logo">
-      </a>
-
-      <span class="spacer"></span>
-
-      @if (collate) {
-        <button mat-icon-button [matMenuTriggerFor]="previousSearch" matTooltip="View previous searches">
-          <mat-icon>history</mat-icon>
-        </button>
-        <mat-menu #previousSearch="matMenu">
-          @if (pastSearches.length === 0) {
-            <button mat-menu-item disabled>No previous searches</button>
-          } @else {
-            @for (p of pastSearches; track p) {
-              @if (p.collate === collate.id) {
-                <button mat-menu-item (click)="restoreSearches(p.searchQuery, p.searchID)">
-                  <strong>#{{p.searchID}}</strong>: {{p.termFounds.join(', ')}}
-                </button>
-              }
+<mat-toolbar>
+  <mat-toolbar-row>
+    <a href="/#/home"><img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'"></a>
+    <span class="spacer"></span>
+    @if (collate) {
+      <button mat-icon-button [matMenuTriggerFor]="previousSearch" matTooltip="View previous searches">
+        <mat-icon>history</mat-icon>
+      </button>
+      <mat-menu #previousSearch="matMenu">
+        @if (pastSearches.length === 0) {
+          <button mat-menu-item disabled>No previous searches</button>
+        } @else {
+          @for (p of pastSearches; track p) {
+            @if (p.collate === collate.id) {
+              <button mat-menu-item (click)="restoreSearches(p.searchQuery, p.searchID)">{{p.searchID}}. {{p.termFounds.join(',')}}</button>
             }
           }
-        </mat-menu>
-      }
-
-      <button mat-icon-button (click)="openQRCodeDialog()" matTooltip="Share via QR code">
-        <mat-icon>qr_code</mat-icon>
-      </button>
-
-      <button mat-icon-button (click)="openVisibilityDialog()" matTooltip="Manage analysis group visibility">
-        <mat-icon>visibility</mat-icon>
-      </button>
-
-      @if (accounts.loggedIn) {
-        <button mat-icon-button (click)="navigateToEdit()" matTooltip="Edit collate">
-          <mat-icon>edit</mat-icon>
-        </button>
-      }
-    </mat-toolbar-row>
-  </mat-toolbar>
-
-  <!-- Loading and error states -->
-  @if (isLoading) {
-    <div class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading collate data...</p>
-    </div>
-  } @else if (errorMessage) {
-    <div class="error-container">
-      <mat-icon color="warn">error</mat-icon>
-      <p>{{errorMessage}}</p>
-      <button mat-raised-button color="primary" (click)="navigateToHome()">
-        Return Home
-      </button>
-    </div>
-  } @else if (collate) {
-    <!-- Collate content -->
-    <app-collate-header [collate]="collate"></app-collate-header>
-
-    @if (collate.settings?.showTags) {
-      <div class="tags-container">
-        <app-collate-tags [collageTags]="collate.tags"></app-collate-tags>
-      </div>
-    }
-
-    <div class="search-container">
-      <app-collate-search [projects]="projects" (searchResultID)="_sessionId=$event;getSearchFromID($event)"></app-collate-search>
-    </div>
-
-    @if (searchTerms.length > 0) {
-      <div class="visualization-controls">
-        <button mat-button (click)="toggleCytoscapePlot()" class="toggle-button">
-          <mat-icon [ngClass]="{'active-icon': showCytoscapePlot, 'inactive-icon': !showCytoscapePlot}">account_tree</mat-icon>
-          {{showCytoscapePlot ? 'Hide' : 'Show'}} Network View
-        </button>
-
-        @if (showCytoscapePlot) {
-          <button mat-button (click)="filterCytoscapePlot()" class="filter-button">
-            <mat-icon>filter_list</mat-icon>
-            Filter Network
-          </button>
         }
-      </div>
 
-      @if (collate && showCytoscapePlot && cytoscapePlotFilteredResults) {
-        <div class="cytoscape-container">
-          <app-cytoscape-plot
-            [renameCondition]="collate.settings.renameSampleCondition"
-            [projects]="projects"
-            [searchResultsMap]="cytoscapePlotFilteredResults">
-          </app-cytoscape-plot>
-        </div>
-      }
-
-      <div class="search-results">
-        <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">
-          @for (term of searchTerms; track term) {
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <span class="tab-label">{{term}}</span>
-                <button mat-icon-button (click)="$event.stopPropagation(); exportData(term)"
-                        [disabled]="waitingForDownload"
-                        matTooltip="Export data">
-                  <mat-icon>{{waitingForDownload ? 'hourglass_empty' : 'download'}}</mat-icon>
-                </button>
-              </ng-template>
-            </mat-tab>
-          }
-        </mat-tab-group>
-      </div>
-
-      <app-collate-project-list
-        [searchTerm]="selectedSearchTerm"
-        [renameCondition]="collate.settings.renameSampleCondition"
-        [projects]="projects"
-        [filteredResults]="filteredResults">
-      </app-collate-project-list>
+      </mat-menu>
     }
-  } @else {
-    <div class="no-collate-container">
-      <p>No collate data available</p>
-      <button mat-raised-button color="primary" (click)="navigateToHome()">Return Home</button>
+
+    <button mat-icon-button (click)="openQRCodeDialog()" matTooltip="Open QR code dialog">
+      <mat-icon>qr_code</mat-icon>
+    </button>
+    <button mat-icon-button (click)="openVisibilityDialog()" matTooltip="Change analysis group visibility">
+      <mat-icon>visibility</mat-icon>
+    </button>
+    @if (accounts.loggedIn) {
+      <button mat-icon-button (click)="navigateToEdit()" matTooltip="Edit collate">
+        <mat-icon>edit</mat-icon>
+      </button>
+    }
+  </mat-toolbar-row>
+</mat-toolbar>
+@if (collate) {
+  <app-collate-header [collate]="collate"></app-collate-header>
+}
+@if (collate && collate.settings) {
+  @if (collate.settings.showTags) {
+    <div style="display: flex; justify-content: center; padding: 20px">
+      <app-collate-tags [collageTags]="collate.tags"></app-collate-tags>
     </div>
   }
+}
+
+
+<div style="display: flex; justify-content: center">
+  <app-collate-search [projects]="projects" (searchResultID)="_sessionId=$event;getSearchFromID($event)"></app-collate-search>
 </div>
+
+@if (searchTerms.length > 0) {
+  <div style="display: flex">
+    <button mat-icon-button (click)="toggleCytoscapePlot()" matTooltip="Toggle Cytoscape Plot">
+      <mat-icon [ngClass]="{'disabled-icon': !showCytoscapePlot}">account_tree</mat-icon>
+    </button>
+    @if (showCytoscapePlot) {
+      <button mat-icon-button (click)="filterCytoscapePlot()" matTooltip="Filter Cytoscape Plot Search Terms">
+        <mat-icon>filter_list</mat-icon>
+      </button>
+    }
+
+  </div>
+
+  @if (collate && showCytoscapePlot && cytoscapePlotFilteredResults) {
+    <app-cytoscape-plot [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [searchResultsMap]="cytoscapePlotFilteredResults"></app-cytoscape-plot>
+  }
+  <div style="padding: 20px">
+    <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">
+      @for (term of searchTerms; track term) {
+        <mat-tab>
+          <ng-template mat-tab-label >
+            {{term}}
+            <button mat-icon-button (click)="exportData(term)" [disabled]="waitingForDownload" matTooltip="Export data">
+              <mat-icon>download</mat-icon>
+            </button>
+
+          </ng-template>
+        </mat-tab>
+
+      }
+    </mat-tab-group>
+  </div>
+
+  @if (collate) {
+    <app-collate-project-list [searchTerm]="selectedSearchTerm" [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
+  }
+}
+
+
+
