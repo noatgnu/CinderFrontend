@@ -1,3 +1,95 @@
 .disabled-icon {
   color: red;
 }
+.collate-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.active-icon {
+  color: #2196f3;
+}
+
+.inactive-icon {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.loading-container, .error-container, .no-collate-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+}
+
+.visualization-controls {
+  display: flex;
+  padding: 8px 16px;
+  align-items: center;
+
+  .toggle-button, .filter-button {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+
+    mat-icon {
+      margin-right: 4px;
+    }
+  }
+}
+
+.cytoscape-container {
+  margin: 0 -16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.tags-container {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+}
+
+.search-results {
+  padding: 16px;
+}
+
+.tab-label {
+  margin-right: 8px;
+}

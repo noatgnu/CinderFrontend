@@ -31,6 +31,7 @@ import {CytoscapePlotComponent} from "../cytoscape-plot/cytoscape-plot.component
 import {
   CollateCytoscapeTermResultFilterDialogComponent
 } from "../collate-cytoscape-term-result-filter-dialog/collate-cytoscape-term-result-filter-dialog.component";
+import {LoginDialogComponent} from "../../accounts/login-dialog/login-dialog.component";
 
 @Component({
     selector: 'app-collate-view',
@@ -58,6 +59,7 @@ import {
     styleUrl: './collate-view.component.scss'
 })
 export class CollateViewComponent {
+  private destroy$ = new Subject<void>();
   selectedCytoscapePlotSearchTerm: string[] = [];
   showCytoscapePlot: boolean = false;
   _sessionId: number | null = null;
@@ -74,65 +76,7 @@ export class CollateViewComponent {
 
   @Input() set collateId(value: number | null) {
     if (value) {
-      this.collateService.getCollate(value).subscribe((collate: Collate) => {
-        this.collate = collate;
-        this.title.setTitle(`${collate.title} - C|nder`);
-        this.projects = collate.projects;
-        if (!collate.settings) {
-          collate.settings = {
-            projectOrder: [],
-            analysisGroupOrderMap: {},
-            projectConditionColorMap: {},
-            renameSampleCondition: {},
-            projectAnalysisGroupVisibility: {},
-            plotSettings: {},
-            showTags: false,
-          };
-        }
-        if (!collate.settings.plotSettings  ) {
-          collate.settings.plotSettings = {}
-        }
-
-        if (collate.settings.projectOrder) {
-          this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
-        }
-
-        if (this.collate?.settings.projectAnalysisGroupVisibility) {
-
-        } else {
-          // @ts-ignore
-          this.collate.settings.projectAnalysisGroupVisibility = {};
-          for (const p of this.projects) {
-            // @ts-ignore
-            this.collate.settings.projectAnalysisGroupVisibility[p.id] = {}
-          }
-        }
-
-        if (this.collate?.settings.renameSampleCondition) {
-          if (this.sessionId) {
-            this.getSearchFromID(this.sessionId);
-          }
-        } else {
-          // @ts-ignore
-          this.collate.settings.renameSampleCondition = {};
-          for (const p of this.projects) {
-            // @ts-ignore
-            this.collate.settings.renameSampleCondition[p.id] = {}
-            this.web.getProjectUniqueConditions(p.id).subscribe((value) => {
-              for (const a of value) {
-                // @ts-ignore
-                this.collate.settings.renameSampleCondition[p.id][a.Condition] = a.Condition
-              }
-              // @ts-ignore
-              console.log(this.collate.settings.renameSampleCondition)
-            })
-          }
-          if (this.sessionId) {
-            this.getSearchFromID(this.sessionId);
-          }
-        }
-        console.log(this.projects)
-      })
+      this.loadCollate(value);
     }
   }
   collate: Collate | null = null;
@@ -155,10 +99,10 @@ export class CollateViewComponent {
   pastSearches: {searchQuery: SearchResultQuery|null, termFounds: string[], collate: number, searchID:number}[] = [];
   waitingForDownload = false
   cytoscapePlotFilteredResults: { [projectId: number]: SearchResult[] } = {};
-  toggleCytoscapePlot() {
-    this.showCytoscapePlot = !this.showCytoscapePlot;
-    console.log(this.cytoscapePlotFilteredResults)
-  }
+  isLoading = false;
+  errorMessage: string | null = null;
+
+
 
   constructor(private cdr: ChangeDetectorRef, private title: Title, private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
     const pastSearches = localStorage.getItem('cinderPastSearches');
@@ -191,6 +135,86 @@ export class CollateViewComponent {
         }
       }
     })
+  }
+
+  private loadUserPreferences(): void {
+    try {
+      const storedPlotVisibility = localStorage.getItem('cinder_show_cytoscape_plot');
+      if (storedPlotVisibility !== null) {
+        this.showCytoscapePlot = JSON.parse(storedPlotVisibility);
+      }
+    } catch (e) {
+      console.error('Failed to load user preferences', e);
+    }
+  }
+
+  toggleCytoscapePlot(): void {
+    this.showCytoscapePlot = !this.showCytoscapePlot;
+    localStorage.setItem('cinder_show_cytoscape_plot', JSON.stringify(this.showCytoscapePlot));
+
+    if (this.showCytoscapePlot && Object.keys(this.cytoscapePlotFilteredResults).length === 0) {
+      this.cytoscapePlotFilteredResults = { ...this.filteredResults };
+      this.collateService.collateRedrawSubject.next(true);
+    }
+  }
+
+  private loadCollate(collateId: number): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    this.collateService.getCollate(collateId)
+      .pipe(
+        tap(() => this.errorMessage = null),
+        catchError(error => {
+          if (error.status === 401 || error.status === 404) {
+            const dialogRef = this.dialog.open(LoginDialogComponent);
+            dialogRef.afterClosed().subscribe(success => {
+              if (success) {
+                // User logged in successfully, retry loading the collate
+                this.loadCollate(collateId);
+              } else {
+                this.errorMessage = 'Authentication required to view this resource';
+                this.sb.open('Authentication required to view this resource', 'Dismiss', {
+                  duration: 5000
+                });
+              }
+            });
+          } else {
+            this.errorMessage = 'Error loading data: ' + (error.message || 'Unknown error');
+            this.sb.open('Error loading collate', 'Dismiss', {
+              duration: 3000
+            });
+          }
+          return of(null);
+        }),
+        finalize(() => this.isLoading = false),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(collate => {
+        if (collate) {
+          this.collate = collate;
+          this.title.setTitle(`${collate.title} - C|nder`);
+          this.projects = collate.projects;
+
+          // Initialize settings if needed
+          if (!collate.settings) {
+            collate.settings = {
+              projectOrder: [],
+              analysisGroupOrderMap: {},
+              projectConditionColorMap: {},
+              renameSampleCondition: {},
+              projectAnalysisGroupVisibility: {},
+              plotSettings: {},
+              showTags: false,
+            };
+          }
+
+          // If session ID was provided before collate loaded, get the search data now
+          if (this.sessionId) {
+            this.getSearchFromID(this.sessionId);
+          }
+        }
+      });
   }
 
   async associateAnalysisGroupsWithProjects() {
@@ -421,5 +445,10 @@ export class CollateViewComponent {
 
       }
     })
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

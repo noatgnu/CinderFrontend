@@ -4,15 +4,31 @@
     <mat-form-field>
       <input matInput type="text" class="form-control" formControlName="username" id="username">
       <mat-label>Username</mat-label>
+      @if (form.get('username')?.invalid && form.get('username')?.touched) {
+        <mat-error>Username is required</mat-error>
+      }
     </mat-form-field>
     <mat-form-field>
       <input matInput type="password" class="form-control" formControlName="password" id="password">
       <mat-label>Password</mat-label>
+      @if (form.get('password')?.invalid && form.get('password')?.touched) {
+        <mat-error>Password is required</mat-error>
+      }
     </mat-form-field>
+    @if (loginError) {
+      <div class="error-message">{{loginError}}</div>
+    }
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="login()">Login</button>
-  <button mat-button (click)="close()">Close</button>
-  <button mat-button (click)="connectKeycloak()">Keycloak</button>
+  <button mat-button (click)="login()" [disabled]="isLoading || form.invalid">
+    @if (isLoading) {
+      <mat-spinner diameter="20"></mat-spinner>
+      <span>Logging in...</span>
+    } @else {
+      Login
+    }
+  </button>
+  <button mat-button (click)="close()" [disabled]="isLoading">Close</button>
+  <button mat-button (click)="connectKeycloak()" [disabled]="isLoading">Keycloak</button>
 </mat-dialog-actions>
