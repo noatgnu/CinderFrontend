@@ -34,6 +34,7 @@ export class AppComponent implements AfterViewInit {
         if (!this.web.searchSessionID) {
           this.web.getSearchSessionID().subscribe((data) => {
             this.ws.connectSearchWS(data)
+            this.ws.connectCurtainWS(data)
             localStorage.setItem("cinderSearchSessionID", data)
             this.web.searchSessionID = data
             this.ws.searchWSConnection?.subscribe((data) => {
@@ -60,6 +61,7 @@ export class AppComponent implements AfterViewInit {
           })
         } else {
           this.ws.connectSearchWS(this.web.searchSessionID)
+          this.ws.connectCurtainWS(this.web.searchSessionID)
           this.ws.searchWSConnection?.subscribe((data) => {
             if (data) {
               console.log(data)
