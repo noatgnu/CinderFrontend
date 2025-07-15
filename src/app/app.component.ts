@@ -22,9 +22,34 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.ws.lostConnectionSubject.subscribe((data) => {
-      if (data) {
-        this.sb.open("Lost push notification connection to server. Refresh to restore.", "Dismiss")
+    this.ws.lostConnectionSubject.subscribe((connectionType) => {
+      if (connectionType) {
+        const status = connectionType === 'search' ? this.ws.getSearchConnectionStatus() : this.ws.getCurtainConnectionStatus()
+        
+        if (status.hasActiveOperations) {
+          // Active operations - show information that auto-reconnect failed
+          this.sb.open(`Lost ${connectionType} connection during active operations. Auto-reconnect failed.`, "Refresh", {
+            duration: 0 // Persistent message
+          }).onAction().subscribe(() => {
+            window.location.reload()
+          })
+        } else {
+          // No active operations - offer manual reconnection
+          this.sb.open(`Lost ${connectionType} connection. Click to reconnect.`, "Reconnect", {
+            duration: 10000
+          }).onAction().subscribe(() => {
+            const success = connectionType === 'search' ? this.ws.manualReconnectSearch() : this.ws.manualReconnectCurtain()
+            if (success) {
+              this.sb.open(`Reconnecting to ${connectionType}...`, "Dismiss", { duration: 3000 })
+            } else {
+              this.sb.open(`Failed to reconnect to ${connectionType}. Please refresh the page.`, "Refresh", {
+                duration: 0
+              }).onAction().subscribe(() => {
+                window.location.reload()
+              })
+            }
+          })
+        }
       }
     })
 
@@ -44,12 +69,19 @@ export class AppComponent implements AfterViewInit {
                   switch (data["status"]) {
                     case "error":
                       this.sb.open("Search failed", "Dismiss", {duration: 2000})
+                      this.ws.removeSearchOperation(data["id"])
                       break
                     case "started":
                       this.sb.open("Search started", "Dismiss", {duration: 2000})
+                      this.ws.addSearchOperation(data["id"])
                       break
                     case "in_progress":
                       this.sb.open(`Search in progress: ${data["current_progress"]}/${data["found_files"]}`, "Dismiss", {duration: 2000})
+                      this.ws.addSearchOperation(data["id"])
+                      break
+                    case "complete":
+                      this.ws.removeSearchOperation(data["id"])
+                      break
                   }
                 }
               }
@@ -67,6 +99,17 @@ export class AppComponent implements AfterViewInit {
               console.log(data)
               if (data.type === "logout") {
                 this.accounts.logout()
+              } else if (data.type === "search_status") {
+                switch (data.status) {
+                  case "error":
+                  case "complete":
+                    this.ws.removeSearchOperation(data.id)
+                    break
+                  case "started":
+                  case "in_progress":
+                    this.ws.addSearchOperation(data.id)
+                    break
+                }
               }
             }
           })

@@ -53,6 +53,7 @@ import {
   AnalysisGroupMetadataImportComponent
 } from "./analysis-group-metadata-import/analysis-group-metadata-import.component";
 import {AnalysisGroup} from "../analysis-group";
+import {MatPaginator, PageEvent} from "@angular/material/paginator";
 
 @Component({
     selector: 'app-analysis-group-general-metadata',
@@ -100,7 +101,8 @@ import {AnalysisGroup} from "../analysis-group";
         CdkDragHandle,
         MatCheckbox,
         MatProgressBar,
-        AnalysisGroupMetadataImportComponent
+        AnalysisGroupMetadataImportComponent,
+        MatPaginator
     ],
     templateUrl: './analysis-group-general-metadata.component.html',
     styleUrl: './analysis-group-general-metadata.component.scss'
@@ -182,6 +184,11 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   @Input() canEdit: boolean = false
   autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[] | MsVocab[]>} = {}
   sourceFileMap: {[key: string]: SourceFile} = {}
+  
+  // Pagination properties
+  pageSize: number = 10
+  pageIndex: number = 0
+  pageSizeOptions: number[] = [5, 10, 25, 50]
   constructor(private sb: MatSnackBar, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private ws: WebsocketService, public data: DataService) {
 
     this.ws.curtainWSConnection?.subscribe((data) => {
@@ -705,5 +712,20 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
         })
       }
     })
+  }
+
+  // Pagination methods
+  get paginatedSourceFiles(): SourceFile[] {
+    const startIndex = this.pageIndex * this.pageSize
+    return this.sourceFiles.slice(startIndex, startIndex + this.pageSize)
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex
+    this.pageSize = event.pageSize
+  }
+
+  get totalSourceFiles(): number {
+    return this.sourceFiles.length
   }
 }

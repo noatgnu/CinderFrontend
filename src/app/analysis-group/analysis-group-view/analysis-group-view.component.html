@@ -46,8 +46,20 @@
           </button>
         </div>
         @if (composingCurtainProgress.started) {
-          <p>{{composingCurtainProgress.message}}</p>
-          <mat-progress-bar [value]="composingCurtainProgress.progress" [mode]="'determinate'" [color]="'primary'"></mat-progress-bar>
+          <div style="margin: 10px 0;">
+            <p>{{composingCurtainProgress.message}}</p>
+            @if (composingCurtainProgress.downloadedBytes && composingCurtainProgress.totalBytes) {
+              <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #666;">
+                <span>{{formatBytes(composingCurtainProgress.downloadedBytes)}} / {{formatBytes(composingCurtainProgress.totalBytes)}}</span>
+                <span>{{composingCurtainProgress.progress.toFixed(1)}}%</span>
+              </div>
+            } @else {
+              <div style="text-align: right; font-size: 0.8em; color: #666;">
+                <span>{{composingCurtainProgress.progress.toFixed(1)}}%</span>
+              </div>
+            }
+            <mat-progress-bar [value]="composingCurtainProgress.progress" [mode]="'determinate'" [color]="'primary'"></mat-progress-bar>
+          </div>
         }
 
         <div style="display: flex; flex-direction: row; gap:10px">

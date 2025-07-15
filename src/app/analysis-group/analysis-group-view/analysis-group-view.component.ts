@@ -68,7 +68,16 @@ export class AnalysisGroupViewComponent {
     message: "",
     completed: false,
     error: false,
-    started: false
+    started: false,
+    downloadedBytes: 0,
+    totalBytes: 0,
+    // Enhanced progress tracking
+    overallProgress: 0,
+    currentPhase: "",
+    phaseProgress: 0,
+    estimatedRemainingSeconds: null,
+    phaseDetails: {},
+    timestamp: null
   }
   @Input() set analysisGroup(value: AnalysisGroup|undefined) {
     this._analysisGroup = value
@@ -140,7 +149,7 @@ export class AnalysisGroupViewComponent {
 
   constructor(private sb: MatSnackBar, private dataService: DataService, private titleService: Title, private fb: FormBuilder, private web: WebService, private matDialog: MatDialog, public accounts: AccountsService, private ws: WebsocketService) {
     this.ws.curtainWSConnection?.subscribe((data) => {
-      if (data.analysis_group_id === this.analysisGroup?.id) {
+      if (data.analysis_group_id === this.analysisGroup?.id || data.id) {
         if (data.type === "curtain_status") {
           switch (data.status) {
             case "started":
@@ -151,18 +160,87 @@ export class AnalysisGroupViewComponent {
               this.getCurtainData()
               break
           }
+        } else if (data.type === "curtain_progress") {
+          // Handle real-time download progress updates (backward compatible)
+          switch (data.status) {
+            case "downloading":
+              this.composingCurtainProgress.progress = data.percentage || 0
+              this.composingCurtainProgress.message = data.message || "Downloading data from Curtain"
+              this.composingCurtainProgress.downloadedBytes = data.downloaded_bytes
+              this.composingCurtainProgress.totalBytes = data.total_bytes
+              // Track download as active operation if not already tracked
+              const downloadOpId = `download_${data.id || this.analysisGroup?.id}`
+              this.ws.addCurtainOperation(downloadOpId)
+              break
+            case "download_complete":
+              this.composingCurtainProgress.progress = 100
+              this.composingCurtainProgress.message = data.message || "Download complete, processing data"
+              // Remove download operation as it's complete
+              const completeOpId = `download_${data.id || this.analysisGroup?.id}`
+              this.ws.removeCurtainOperation(completeOpId)
+              break
+          }
+        } else if (data.type === "curtain_progress_enhanced") {
+          // Handle enhanced progress messages with phase tracking
+          this.composingCurtainProgress.overallProgress = data.overall_progress || 0
+          this.composingCurtainProgress.progress = data.overall_progress || 0 // Backward compatibility
+          this.composingCurtainProgress.currentPhase = data.current_phase || ""
+          this.composingCurtainProgress.phaseProgress = data.phase_progress || 0
+          this.composingCurtainProgress.estimatedRemainingSeconds = data.estimated_remaining_seconds
+          this.composingCurtainProgress.phaseDetails = data.details || {}
+          this.composingCurtainProgress.timestamp = data.timestamp
+          
+          // Update message with enhanced information
+          const phaseDisplay = data.current_phase ? data.current_phase.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Processing'
+          let message = `${phaseDisplay} (${data.phase_progress?.toFixed(1) || 0}%)`
+          
+          // Add step details if available
+          if (data.details?.step) {
+            message += ` - ${data.details.step}`
+          }
+          
+          // Add time estimation if available
+          if (data.estimated_remaining_seconds) {
+            const minutes = Math.floor(data.estimated_remaining_seconds / 60)
+            const seconds = data.estimated_remaining_seconds % 60
+            if (minutes > 0) {
+              message += ` - Est. ${minutes}m ${seconds}s remaining`
+            } else {
+              message += ` - Est. ${seconds}s remaining`
+            }
+          }
+          
+          this.composingCurtainProgress.message = message
+          
+          // Track active operation
+          const enhancedOpId = `enhanced_${data.id || this.analysisGroup?.id}`
+          this.ws.addCurtainOperation(enhancedOpId)
+        } else if (data.type === "curtain_phase_complete") {
+          // Handle phase completion messages
+          const phaseDisplay = data.phase?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Phase'
+          this.sb.open(`${phaseDisplay} completed`, "Dismiss", {duration: 3000})
+        } else if (data.type === "curtain_partial_success") {
+          // Handle partial success messages
+          const successCount = data.successful_operations?.length || 0
+          const failureCount = Object.keys(data.failed_operations || {}).length
+          const message = `Import partially completed: ${successCount} succeeded, ${failureCount} failed`
+          this.sb.open(message, "Dismiss", {duration: 8000})
         } else if (data.type === "curtain_compose_status") {
           switch (data.status) {
             case "started":
               this.sb.open("Composing data from Curtain started", "Dismiss", {duration: 5000})
-              this.composingCurtainProgress.progress = 30
-              this.composingCurtainProgress.message = "Removed analysis group associated data if exist"
+              this.composingCurtainProgress.progress = 0
+              this.composingCurtainProgress.message = "Starting data composition from Curtain"
+              // Track this as an active operation
+              this.ws.addCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
             case "complete":
               this.sb.open("Composing data from Curtain completed. Please manually set Condition A and Condition B in Comparison Matrix.", "Dismiss")
               this.composingCurtainProgress.progress = 100
               this.composingCurtainProgress.message = "Composing data from Curtain completed. Please manually set Condition A and Condition B in Comparison Matrix."
               this.composingCurtainProgress.completed = true
+              // Remove from active operations
+              this.ws.removeCurtainOperation(`compose_${this.analysisGroup?.id}`)
               this.web.getAnalysisGroup(this.analysisGroup!.id).subscribe((data) => {
                 this.analysisGroup = data
               })
@@ -170,6 +248,8 @@ export class AnalysisGroupViewComponent {
             case "error":
               this.sb.open("Error composing data from Curtain", "Dismiss", {duration: 5000})
               this.composingCurtainProgress.error = true
+              // Remove from active operations on error
+              this.ws.removeCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
           }
         }
@@ -370,13 +450,23 @@ export class AnalysisGroupViewComponent {
       progress: 0,
       message: "",
       completed: false,
-      error: false
+      error: false,
+      started: false,
+      downloadedBytes: 0,
+      totalBytes: 0,
+      // Enhanced progress tracking
+      overallProgress: 0,
+      currentPhase: "",
+      phaseProgress: 0,
+      estimatedRemainingSeconds: null,
+      phaseDetails: {},
+      timestamp: null
     }
     if (this.analysisGroup && this.web.searchSessionID) {
       this.composingCurtainProgress.started = true
       this.web.composeAnalysisGroupFilesFromCurtainData(this.analysisGroup.id, this.web.searchSessionID).subscribe((data) => {
-        this.composingCurtainProgress.progress = 10
-        this.composingCurtainProgress.message = "Data composition started"
+        this.composingCurtainProgress.progress = 5
+        this.composingCurtainProgress.message = "Data composition initiated"
         this.sb.open("Data composition started", "Dismiss", {duration: 5000})
       })
     }
@@ -449,5 +539,13 @@ export class AnalysisGroupViewComponent {
       this.analysisGroup.metadata_columns = ag.metadata_columns
       this.analysisGroup.source_files = ag.source_files
     }
+  }
+
+  formatBytes(bytes: number): string {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 }
