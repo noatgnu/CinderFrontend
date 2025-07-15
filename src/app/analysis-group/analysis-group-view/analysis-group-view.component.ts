@@ -64,13 +64,25 @@ export class AnalysisGroupViewComponent {
   canEdit: boolean = false
 
   composingCurtainProgress: any = {
+    // Overall progress
     progress: 0,
     message: "",
     completed: false,
     error: false,
     started: false,
+    
+    // Download progress (separate)
+    downloadProgress: 0,
+    downloadMessage: "",
+    downloadActive: false,
     downloadedBytes: 0,
     totalBytes: 0,
+    
+    // Processing progress (separate)
+    processingProgress: 0,
+    processingMessage: "",
+    processingActive: false,
+    
     // Enhanced progress tracking
     overallProgress: 0,
     currentPhase: "",
@@ -164,8 +176,9 @@ export class AnalysisGroupViewComponent {
           // Handle real-time download progress updates (backward compatible)
           switch (data.status) {
             case "downloading":
-              this.composingCurtainProgress.progress = data.percentage || 0
-              this.composingCurtainProgress.message = data.message || "Downloading data from Curtain"
+              this.composingCurtainProgress.downloadProgress = data.percentage || 0
+              this.composingCurtainProgress.downloadMessage = data.message || "Downloading data from Curtain"
+              this.composingCurtainProgress.downloadActive = true
               this.composingCurtainProgress.downloadedBytes = data.downloaded_bytes
               this.composingCurtainProgress.totalBytes = data.total_bytes
               // Track download as active operation if not already tracked
@@ -173,8 +186,9 @@ export class AnalysisGroupViewComponent {
               this.ws.addCurtainOperation(downloadOpId)
               break
             case "download_complete":
-              this.composingCurtainProgress.progress = 100
-              this.composingCurtainProgress.message = data.message || "Download complete, processing data"
+              this.composingCurtainProgress.downloadProgress = 100
+              this.composingCurtainProgress.downloadMessage = data.message || "Download complete"
+              this.composingCurtainProgress.downloadActive = false
               // Remove download operation as it's complete
               const completeOpId = `download_${data.id || this.analysisGroup?.id}`
               this.ws.removeCurtainOperation(completeOpId)
@@ -210,6 +224,17 @@ export class AnalysisGroupViewComponent {
             }
           }
           
+          // Separate download and processing progress
+          if (data.current_phase === 'data_download') {
+            this.composingCurtainProgress.downloadProgress = data.phase_progress || 0
+            this.composingCurtainProgress.downloadMessage = message
+            this.composingCurtainProgress.downloadActive = true
+          } else if (data.current_phase === 'initialization' || data.current_phase === 'data_processing' || data.current_phase === 'file_creation' || data.current_phase === 'database_storage') {
+            this.composingCurtainProgress.processingProgress = data.phase_progress || 0
+            this.composingCurtainProgress.processingMessage = message
+            this.composingCurtainProgress.processingActive = true
+          }
+          
           this.composingCurtainProgress.message = message
           
           // Track active operation
@@ -231,11 +256,19 @@ export class AnalysisGroupViewComponent {
               this.sb.open("Composing data from Curtain started", "Dismiss", {duration: 5000})
               this.composingCurtainProgress.progress = 0
               this.composingCurtainProgress.message = "Starting data composition from Curtain"
+              this.composingCurtainProgress.started = true
+              this.composingCurtainProgress.completed = false
+              this.composingCurtainProgress.error = false
+              // Reset separate progress bars
+              this.composingCurtainProgress.downloadProgress = 0
+              this.composingCurtainProgress.downloadActive = false
+              this.composingCurtainProgress.processingProgress = 0
+              this.composingCurtainProgress.processingActive = false
               // Track this as an active operation
               this.ws.addCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
             case "in_progress":
-              // Update progress during processing
+              // Update overall progress during processing
               this.composingCurtainProgress.progress = data.percentage || 0
               this.composingCurtainProgress.message = data.message || "Processing data from Curtain"
               // Ensure operation is tracked
@@ -246,6 +279,11 @@ export class AnalysisGroupViewComponent {
               this.composingCurtainProgress.progress = 100
               this.composingCurtainProgress.message = "Composing data from Curtain completed. Please manually set Condition A and Condition B in Comparison Matrix."
               this.composingCurtainProgress.completed = true
+              // Complete all progress bars
+              this.composingCurtainProgress.downloadProgress = 100
+              this.composingCurtainProgress.downloadActive = false
+              this.composingCurtainProgress.processingProgress = 100
+              this.composingCurtainProgress.processingActive = false
               // Remove from active operations
               this.ws.removeCurtainOperation(`compose_${this.analysisGroup?.id}`)
               this.web.getAnalysisGroup(this.analysisGroup!.id).subscribe((data) => {
@@ -255,6 +293,8 @@ export class AnalysisGroupViewComponent {
             case "error":
               this.sb.open("Error composing data from Curtain", "Dismiss", {duration: 5000})
               this.composingCurtainProgress.error = true
+              this.composingCurtainProgress.downloadActive = false
+              this.composingCurtainProgress.processingActive = false
               // Remove from active operations on error
               this.ws.removeCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
@@ -454,13 +494,25 @@ export class AnalysisGroupViewComponent {
 
   composeDataFromCurtain() {
     this.composingCurtainProgress = {
+      // Overall progress
       progress: 0,
       message: "",
       completed: false,
       error: false,
       started: false,
+      
+      // Download progress (separate)
+      downloadProgress: 0,
+      downloadMessage: "",
+      downloadActive: false,
       downloadedBytes: 0,
       totalBytes: 0,
+      
+      // Processing progress (separate)
+      processingProgress: 0,
+      processingMessage: "",
+      processingActive: false,
+      
       // Enhanced progress tracking
       overallProgress: 0,
       currentPhase: "",

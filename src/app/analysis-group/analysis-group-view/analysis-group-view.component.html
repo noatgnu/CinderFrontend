@@ -47,18 +47,41 @@
         </div>
         @if (composingCurtainProgress.started) {
           <div style="margin: 10px 0;">
-            <p>{{composingCurtainProgress.message}}</p>
-            @if (composingCurtainProgress.downloadedBytes && composingCurtainProgress.totalBytes) {
-              <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #666;">
-                <span>{{formatBytes(composingCurtainProgress.downloadedBytes)}} / {{formatBytes(composingCurtainProgress.totalBytes)}}</span>
-                <span>{{composingCurtainProgress.progress.toFixed(1)}}%</span>
-              </div>
-            } @else {
+            <!-- Overall Progress -->
+            <div style="margin-bottom: 15px;">
+              <p><strong>Overall Progress:</strong> {{composingCurtainProgress.message}}</p>
               <div style="text-align: right; font-size: 0.8em; color: #666;">
                 <span>{{composingCurtainProgress.progress.toFixed(1)}}%</span>
               </div>
+              <mat-progress-bar [value]="composingCurtainProgress.progress" [mode]="'determinate'" [color]="'primary'"></mat-progress-bar>
+            </div>
+
+            <!-- Download Progress -->
+            @if (composingCurtainProgress.downloadActive) {
+              <div style="margin-bottom: 15px;">
+                <p><strong>Download:</strong> {{composingCurtainProgress.downloadMessage}}</p>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #666;">
+                  @if (composingCurtainProgress.downloadedBytes && composingCurtainProgress.totalBytes) {
+                    <span>{{formatBytes(composingCurtainProgress.downloadedBytes)}} / {{formatBytes(composingCurtainProgress.totalBytes)}}</span>
+                  } @else {
+                    <span></span>
+                  }
+                  <span>{{composingCurtainProgress.downloadProgress.toFixed(1)}}%</span>
+                </div>
+                <mat-progress-bar [value]="composingCurtainProgress.downloadProgress" [mode]="'determinate'" [color]="'accent'"></mat-progress-bar>
+              </div>
             }
-            <mat-progress-bar [value]="composingCurtainProgress.progress" [mode]="'determinate'" [color]="'primary'"></mat-progress-bar>
+
+            <!-- Processing Progress -->
+            @if (composingCurtainProgress.processingActive) {
+              <div style="margin-bottom: 15px;">
+                <p><strong>Processing:</strong> {{composingCurtainProgress.processingMessage}}</p>
+                <div style="text-align: right; font-size: 0.8em; color: #666;">
+                  <span>{{composingCurtainProgress.processingProgress.toFixed(1)}}%</span>
+                </div>
+                <mat-progress-bar [value]="composingCurtainProgress.processingProgress" [mode]="'determinate'" [color]="'warn'"></mat-progress-bar>
+              </div>
+            }
           </div>
         }
 
