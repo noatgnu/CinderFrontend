@@ -234,6 +234,13 @@ export class AnalysisGroupViewComponent {
               // Track this as an active operation
               this.ws.addCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
+            case "in_progress":
+              // Update progress during processing
+              this.composingCurtainProgress.progress = data.percentage || 0
+              this.composingCurtainProgress.message = data.message || "Processing data from Curtain"
+              // Ensure operation is tracked
+              this.ws.addCurtainOperation(`compose_${this.analysisGroup?.id}`)
+              break
             case "complete":
               this.sb.open("Composing data from Curtain completed. Please manually set Condition A and Condition B in Comparison Matrix.", "Dismiss")
               this.composingCurtainProgress.progress = 100
