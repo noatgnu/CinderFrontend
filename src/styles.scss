@@ -2,6 +2,7 @@
 @use "../m3-theme" as m3;
 @use "@angular/material" as mat;
 
+@include mat.core();
 @include mat.elevation-classes();
 @include mat.app-background();
 
