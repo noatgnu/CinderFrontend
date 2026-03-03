@@ -38,7 +38,7 @@ import { MatIconModule } from '@angular/material/icon';
     `,
   styles: [`
     .breadcrumb-nav {
-      padding: 16px 0;
+      padding: 16px 50px;
       background-color: transparent;
     }
     

@@ -1,9 +1,10 @@
 .side-by-side-container {
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 16px;
   width: 100%;
   height: calc(100vh - 100px);
+  padding-left: 16px;
 }
 
 .cytoscape-plot-container {

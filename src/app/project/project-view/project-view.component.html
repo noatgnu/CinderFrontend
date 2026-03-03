@@ -1,6 +1,6 @@
+<app-breadcrumb></app-breadcrumb>
 <div style="display: flex; flex-direction: row; justify-content: center; padding: 50px">
   <div style="width: 100%">
-    <app-breadcrumb></app-breadcrumb>
     @if (project) {
       <form (ngSubmit)="updateProject()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
         <mat-form-field style="width: 100%">
