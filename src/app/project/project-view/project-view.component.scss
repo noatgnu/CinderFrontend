@@ -1,33 +1,85 @@
 .paginator-footer {
   background-color: var(--mdc-theme-surface-variant, rgba(0,0,0,0.05));
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+  overflow: hidden;
 
   ::ng-deep .mat-mdc-paginator {
     background-color: transparent !important;
   }
 }
 
-mat-list-item {
-  transition: background-color 0.2s ease;
-  border-radius: 8px;
-  margin: 4px 0;
-  padding: 0 16px !important;
+.ag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.ag-tile {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: var(--mdc-theme-surface, #fff);
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  min-height: 140px;
 
   &:hover {
-    background-color: rgba(var(--mdc-theme-primary-rgb, 103, 80, 164), 0.08) !important;
-    
-    a {
-      color: var(--mdc-theme-tertiary) !important;
+    border-color: var(--mdc-theme-primary);
+    background-color: rgba(var(--mdc-theme-primary-rgb, 103, 80, 164), 0.02);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+    .ag-name {
+      color: var(--mdc-theme-primary);
     }
 
-    mat-icon {
-      opacity: 1 !important;
-      color: var(--mdc-theme-primary);
-      transform: translateX(4px);
+    .ag-tile-footer mat-icon {
+      opacity: 1;
+      transform: scale(1.1);
     }
   }
+}
+
+.ag-tile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.ag-name {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+}
+
+.ag-description {
+  font-size: 13px;
+  opacity: 0.7;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.ag-tile-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
 
   mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    opacity: 0.2;
     transition: all 0.2s ease;
   }
 }
