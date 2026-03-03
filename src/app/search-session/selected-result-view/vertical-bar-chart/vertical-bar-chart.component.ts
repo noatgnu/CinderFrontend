@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import * as PlotlyJS from 'plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 import {GraphService} from "../../../graph.service";
 import {MatButton} from "@angular/material/button";

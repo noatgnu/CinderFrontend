@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import * as PlotlyJS from 'plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
 import {PlotlyModule} from "angular-plotly.js";
 import {SearchResult} from "../../../search-session";
 import {GraphService} from "../../../graph.service";

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CurtainData} from "../analysis-group";
 
-import * as PlotlyJS from 'plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 import {AccountsService} from "../../accounts/accounts.service";
 import {GraphService} from "../../graph.service";

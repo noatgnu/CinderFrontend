@@ -6,7 +6,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import {provideHttpClient, withInterceptors} from "@angular/common/http";
 import {authInterceptor} from "./auth.interceptor";
 
-import * as PlotlyJS from 'plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 
 export const appConfig: ApplicationConfig = {
