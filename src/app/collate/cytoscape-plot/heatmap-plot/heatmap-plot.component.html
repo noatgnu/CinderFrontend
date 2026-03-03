@@ -1,6 +1,44 @@
-<div style="display:block; overflow: auto; position: relative;">
-  <button mat-icon-button matTooltip="Export to CSV" (click)="exportToCsv()" style="position: absolute; top: 5px; right: 5px; z-index: 100;">
-    <mat-icon>download</mat-icon>
-  </button>
-  <plotly-plot (hover)="handleHoverIn($event)" (unhover)="handleHoverOut($event)" [data]="graphData" [layout]="layout" [config]="plotConfig" [updateOnlyWithRevision]="true" [revision]="revision"></plotly-plot>
+<div class="heatmap-card">
+  <mat-toolbar>
+    <span class="toolbar-title">Heatmap</span>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button matTooltip="Export to CSV" (click)="exportToCsv()">
+      <mat-icon>download</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Toggle Legend" (click)="showLegend = !showLegend">
+      <mat-icon>{{ showLegend ? 'visibility_off' : 'help_outline' }}</mat-icon>
+    </button>
+  </mat-toolbar>
+  @if (showLegend) {
+    <div class="heatmap-legend">
+      <div class="legend-title">Legend</div>
+      <div class="legend-item">
+        <span class="legend-color" style="border: 3px solid red;"></span>
+        <span>Project boundary</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="border-bottom: 3px solid rgb(179,0,137);"></span>
+        <span>Comparison group</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="border-left: 3px solid rgba(186,104,166);"></span>
+        <span>Comparison separator</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="border: 3px solid #00ff00;"></span>
+        <span>Selected protein</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="border: 2px solid black;"></span>
+        <span>Hover highlight</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-gradient"></span>
+        <span>Log2FC (Viridis)</span>
+      </div>
+    </div>
+  }
+  <div class="heatmap-content">
+    <plotly-plot (hover)="handleHoverIn($event)" (unhover)="handleHoverOut($event)" [data]="graphData" [layout]="layout" [config]="plotConfig" [updateOnlyWithRevision]="true" [revision]="revision"></plotly-plot>
+  </div>
 </div>

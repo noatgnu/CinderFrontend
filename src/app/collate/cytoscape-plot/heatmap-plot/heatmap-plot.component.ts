@@ -4,10 +4,11 @@ import {HeatmapDataPoint} from "../cytoscape-plot.types";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
+import {MatToolbar} from "@angular/material/toolbar";
 
 @Component({
   selector: 'app-heatmap-plot',
-  imports: [PlotlyModule, MatIconButton, MatIcon, MatTooltip],
+  imports: [PlotlyModule, MatIconButton, MatIcon, MatTooltip, MatToolbar],
   templateUrl: './heatmap-plot.component.html',
   styleUrl: './heatmap-plot.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -39,6 +40,7 @@ export class HeatmapPlotComponent {
   layout: any = {};
   graphData: any[] = [];
   revision = 0;
+  showLegend = false;
   reversePointIndexToProject: Record<number, any> = {};
   reversePointIndexToColumn: Record<number, any> = {};
   reversePointIndexToData: Record<number, HeatmapDataPoint> = {};
