@@ -80,30 +80,29 @@ export class AppComponent implements AfterViewInit {
             localStorage.setItem("cinderSearchSessionID", data)
             this.web.searchSessionID = data
             this.ws.searchWSConnection?.subscribe((data) => {
-              if (data) {
-                if (data["type"] === "search_status") {
+              if (data && data["type"] === "search_status") {
+                const id = data["id"]?.toString();
+                if (!id) return;
 
-                  switch (data["status"]) {
-                    case "error":
-                      this.sb.open("Search failed", "Dismiss", {duration: 2000})
-                      this.ws.removeSearchOperation(data["id"])
-                      this.ws.removeOperation(data["id"])
-                      break
-                    case "started":
-                      this.sb.open("Search started", "Dismiss", {duration: 2000})
-                      this.ws.addSearchOperation(data["id"])
-                      this.ws.updateOperationProgress(data["id"], 'search', 'started', 0, 'Search started', 'Search Operation');
-                      break
-                    case "in_progress":
-                      const progress = (data["current_progress"] / data["found_files"]) * 100;
-                      this.ws.addSearchOperation(data["id"])
-                      this.ws.updateOperationProgress(data["id"], 'search', 'in_progress', progress, `Processed ${data["current_progress"]}/${data["found_files"]}`, 'Search Operation');
-                      break
-                    case "complete":
-                      this.ws.removeSearchOperation(data["id"])
-                      this.ws.removeOperation(data["id"])
-                      break
-                  }
+                switch (data["status"]) {
+                  case "error":
+                    this.sb.open("Search failed", "Dismiss", {duration: 2000})
+                    this.ws.removeSearchOperation(id)
+                    break
+                  case "started":
+                    this.sb.open("Search started", "Dismiss", {duration: 2000})
+                    this.ws.addSearchOperation(id)
+                    break
+                  case "in_progress":
+                    const total = data["found_files"] || 0;
+                    const current = data["current_progress"] || 0;
+                    const progress = total > 0 ? (current / total) * 100 : 0;
+                    this.ws.addSearchOperation(id)
+                    this.ws.updateOperationProgress(id, 'search', 'in_progress', progress, `Processed ${current}/${total}`, 'Search Operation');
+                    break
+                  case "complete":
+                    this.ws.removeSearchOperation(id)
+                    break
                 }
               }
             })

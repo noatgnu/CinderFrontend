@@ -1,5 +1,11 @@
 <div style="display: flex; flex-direction: column; gap: 20px">
-  <h3>Metadata</h3>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h3>Metadata</h3>
+    <mat-button-toggle-group [value]="viewMode()" (change)="viewMode.set($event.value)">
+      <mat-button-toggle value="accordion"><mat-icon>view_day</mat-icon> Accordion</mat-button-toggle>
+      <mat-button-toggle value="table"><mat-icon>table_chart</mat-icon> Table</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
   <div style="display: flex; flex-direction: column; gap: 20px">
     @for (m of metadata; track m.id) {
       @if (metadataFormMap[m.id]) {
@@ -25,17 +31,24 @@
               </mat-option>
             }
           </mat-autocomplete>
-          @if (m.mandatory) {
-            @if (!markedForDeletion.includes(m)) {
-              <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Mark for deletion'" (click)="metadataDeleted.emit(m);markedForDeletion.push(m)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            } @else {
-              <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Undo deletion mark'" (click)="undoDeletion(m)">
-                <mat-icon>undo</mat-icon>
-              </button>
+          
+          <div style="display: flex; gap: 4px;">
+            <button mat-icon-button type="button" [matTooltip]="'Sync this value to all samples'" (click)="syncAll(m)" [disabled]="!canEdit">
+              <mat-icon color="accent">sync</mat-icon>
+            </button>
+
+            @if (m.mandatory) {
+              @if (!markedForDeletion.includes(m)) {
+                <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Mark for deletion'" (click)="metadataDeleted.emit(m);markedForDeletion.push(m)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              } @else {
+                <button [disabled]="!canEdit" mat-icon-button type="button" [matTooltip]="'Undo deletion mark'" (click)="undoDeletion(m)">
+                  <mat-icon>undo</mat-icon>
+                </button>
+              }
             }
-          }
+          </div>
         </form>
       }
     }
@@ -86,129 +99,174 @@
         [hidePageSize]="false">
       </mat-paginator>
     </div>
-    <mat-accordion multi #metaColAccordion>
-      @for (s of paginatedSourceFiles; track s.id; let index = $index) {
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{s.name}}
-            </mat-panel-title>
-            <mat-panel-description>
-              {{s.description}}
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <div style="display: flex; flex-direction: column; gap: 20px">
+    @if (viewMode() === 'accordion') {
+      <mat-accordion multi #metaColAccordion>
+        @for (s of paginatedSourceFiles; track s.id; let index = $index) {
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{s.name}}
+              </mat-panel-title>
+              <mat-panel-description>
+                {{s.description}}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div style="display: flex; flex-direction: column; gap: 20px">
 
-            <mat-menu #metadataMenuFileSpecific="matMenu">
-              <button mat-menu-item (click)="createMetadataFileSpecific('disease', s.id)">Disease</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('tissue', s.id)">Tissue</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('subcellular location', s.id)">Subcellular location</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('organism', s.id)">Organism</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('modification', s.id)">Modification</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('cell type', s.id)">Cell type</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('enrichment process', s.id)">Enrichment process</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('technology type', s.id)">Technology type</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('label', s.id)">Label</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific('assay name', s.id)">Assay name</button>
-              <button mat-menu-item (click)="createMetadataFileSpecific(null, s.id)">Create custom metadata field</button>
-            </mat-menu>
-            <div style="display: flex; gap: 20px">
-              @if (sourcefileFormMap[s.id]) {
-                <form [formGroup]="sourcefileFormMap[s.id]" style="width:300px">
-                  <mat-form-field style="width: 100%">
-                    <input matInput formControlName="name">
-                    <mat-label>Source File Sample Name</mat-label>
-                    <mat-hint>@if (sourcefileFormMap[s.id].controls["name"].dirty) {Value changed}</mat-hint>
-                  </mat-form-field>
-                  <mat-form-field style="width: 100%">
-                    <textarea matInput formControlName="description"></textarea>
-                    <mat-label>Source File Sample Description</mat-label>
-                    <mat-hint>@if (sourcefileFormMap[s.id].controls["description"].dirty) {Value changed}</mat-hint>
-                  </mat-form-field>
-                </form>
-              }
-              <div style="flex-grow: 1">
-                <div style="display: flex; gap: 20px">
-                  <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Add new metadata annotation'" [matMenuTriggerFor]="metadataMenuFileSpecific"><mat-icon>add</mat-icon></button>
-                  @if (canEdit) {
-                    <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Remove this source file'" (click)="removeSampleFile(s.id)"><mat-icon>delete</mat-icon></button>
-                  }
-                </div>
-                <h5>Metadata Annotation</h5>
-                <div style="display: flex; flex-direction: column; gap: 20px" cdkDropList (cdkDropListDropped)="drop($event, s)">
-                  @for (c of s.metadata_columns; track c.id) {
-                    @if (metadataFormMap[c.id]) {
-                      <form id="metadata-column-{{s.id}}-{{c.id}}" [formGroup]="metadataFormMap[c.id]" cdkDrag [cdkDragData]="c">
-                        <div style="display: flex; gap: 20px">
-                          <mat-form-field style="flex-grow: 1">
-                            <textarea matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue"></textarea>
-                            <mat-label>{{c.name}}</mat-label>
-                            <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)} - Position {{c.column_position}}.
-                              @if (data.metadataHintMap[c.name]) {
-                                {{data.metadataHintMap[c.name]}}
-                              }</mat-hint>
-                            @if (canEdit) {
-                              @if (!c.mandatory) {
-                                <button type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
-                                  @if (!metadataFormMap[c.id].controls['value'].disabled) {
-                                    <mat-icon>delete</mat-icon>
-                                  } @else {
-                                    <mat-icon>undo</mat-icon>
-                                  }
-                                </button>
+              <mat-menu #metadataMenuFileSpecific="matMenu">
+                <button mat-menu-item (click)="createMetadataFileSpecific('disease', s.id)">Disease</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific('tissue', s.id)">Tissue</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific('subcellular location', s.id)">Subcellular location</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific('organism', s.id)">Organism</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific('modification', s.id)">Modification</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific('cell type', s.id)">Cell type</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific('enrichment process', s.id)">Enrichment process</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific('technology type', s.id)">Technology type</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific('label', s.id)">Label</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific('assay name', s.id)">Assay name</button>
+                <button mat-menu-item (click)="createMetadataFileSpecific(null, s.id)">Create custom metadata field</button>
+              </mat-menu>
+              <div style="display: flex; gap: 20px">
+                @if (sourcefileFormMap[s.id]) {
+                  <form [formGroup]="sourcefileFormMap[s.id]" style="width:300px">
+                    <mat-form-field style="width: 100%">
+                      <input matInput formControlName="name">
+                      <mat-label>Source File Sample Name</mat-label>
+                      <mat-hint>@if (sourcefileFormMap[s.id].controls["name"].dirty) {Value changed}</mat-hint>
+                    </mat-form-field>
+                    <mat-form-field style="width: 100%">
+                      <textarea matInput formControlName="description"></textarea>
+                      <mat-label>Source File Sample Description</mat-label>
+                      <mat-hint>@if (sourcefileFormMap[s.id].controls["description"].dirty) {Value changed}</mat-hint>
+                    </mat-form-field>
+                  </form>
+                }
+                <div style="flex-grow: 1">
+                  <div style="display: flex; gap: 20px">
+                    <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Add new metadata annotation'" [matMenuTriggerFor]="metadataMenuFileSpecific"><mat-icon>add</mat-icon></button>
+                    @if (canEdit) {
+                      <button [disabled]="!canEdit" type="button" mat-icon-button [matTooltip]="'Remove this source file'" (click)="removeSampleFile(s.id)"><mat-icon>delete</mat-icon></button>
+                    }
+                  </div>
+                  <h5>Metadata Annotation</h5>
+                  <div style="display: flex; flex-direction: column; gap: 20px" cdkDropList (cdkDropListDropped)="drop($event, s)">
+                    @for (c of s.metadata_columns; track c.id) {
+                      @if (metadataFormMap[c.id]) {
+                        <form id="metadata-column-{{s.id}}-{{c.id}}" [formGroup]="metadataFormMap[c.id]" cdkDrag [cdkDragData]="c">
+                          <div style="display: flex; gap: 20px">
+                            <mat-form-field style="flex-grow: 1">
+                              <textarea matInput formControlName="value" [matAutocomplete]="autoMetadataSourceFileValue"></textarea>
+                              <mat-label>{{c.name}}</mat-label>
+                              <mat-hint>{{c.type}} @if(metadataFormMap[c.id].dirty) {(value modified)} - Position {{c.column_position}}.
+                                @if (data.metadataHintMap[c.name]) {
+                                  {{data.metadataHintMap[c.name]}}
+                                }</mat-hint>
+                              @if (canEdit) {
+                                @if (!c.mandatory) {
+                                  <button type="button" mat-icon-button matSuffix (click)="markForDeleteOrUndo(c)">
+                                    @if (!metadataFormMap[c.id].controls['value'].disabled) {
+                                      <mat-icon>delete</mat-icon>
+                                    } @else {
+                                      <mat-icon>undo</mat-icon>
+                                    }
+                                  </button>
+                                }
                               }
-                            }
 
-                            <mat-autocomplete #autoMetadataSourceFileValue="matAutocomplete">
-                              @for (m of autoCompleteMap[c.id]| async ; track m) {
-                                <mat-option [value]="displayData(m)">
-                                  {{displayData(m)}}
-                                </mat-option>
-                              }
-                            </mat-autocomplete>
-                          </mat-form-field>
-                          <div>
-                            <mat-checkbox formControlName="not_applicable" (click)="updateNotApplicable(c)">Field not applicable</mat-checkbox>
+                              <mat-autocomplete #autoMetadataSourceFileValue="matAutocomplete">
+                                @for (m of autoCompleteMap[c.id]| async ; track m) {
+                                  <mat-option [value]="displayData(m)">
+                                    {{displayData(m)}}
+                                  </mat-option>
+                                }
+                              </mat-autocomplete>
+                            </mat-form-field>
                             <div>
-                              <button mat-icon-button type="button" cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
-                              <button mat-icon-button type="button" [matMenuTriggerFor]="copyMenu"><mat-icon>copy_all</mat-icon></button>
-                              <mat-menu #copyMenu>
-                                <button type="button" mat-menu-item (click)="copyMetadata(c, true)">Copy value and fill in blank metadata at the same position {{c.column_position}}</button>
-                                <button type="button" mat-menu-item (click)="copyMetadata(c, false)">Copy value and replace metadata at the same position {{c.column_position}}</button>
-                              </mat-menu>
-                              <button mat-icon-button type="button" [matMenuTriggerFor]="navigateMenu" [matTooltip]="'Navigate to next or previous source file'" >
-                                <mat-icon>arrow_forward</mat-icon>
-                              </button>
-                              <mat-menu #navigateMenu>
-                                <button type="button" mat-menu-item (click)="navigateToSourceFile(c.column_position, index, 'next')" [matTooltip]="'Navigate to position '+c.column_position+' in the next file'">Next file</button>
-                                <button type="button" mat-menu-item (click)="navigateToSourceFile(c.column_position, index, 'previous')" [matTooltip]="'Navigate to position '+c.column_position+' in the previous file'">Previous file</button>
-                              </mat-menu>
-                              <button mat-icon-button type="button" (click)="openMetadataEditorDialog(c)"><mat-icon>edit</mat-icon></button>
+                              <mat-checkbox formControlName="not_applicable" (click)="updateNotApplicable(c)">Field not applicable</mat-checkbox>
+                              <div>
+                                <button mat-icon-button type="button" cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
+                                <button mat-icon-button type="button" [matMenuTriggerFor]="copyMenu"><mat-icon>copy_all</mat-icon></button>
+                                <mat-menu #copyMenu>
+                                  <button type="button" mat-menu-item (click)="copyMetadata(c, true)">Copy value and fill in blank metadata at the same position {{c.column_position}}</button>
+                                  <button type="button" mat-menu-item (click)="copyMetadata(c, false)">Copy value and replace metadata at the same position {{c.column_position}}</button>
+                                </mat-menu>
+                                <button mat-icon-button type="button" [matMenuTriggerFor]="navigateMenu" [matTooltip]="'Navigate to next or previous source file'" >
+                                  <mat-icon>arrow_forward</mat-icon>
+                                </button>
+                                <mat-menu #navigateMenu>
+                                  <button type="button" mat-menu-item (click)="navigateToSourceFile(c.column_position, index, 'next')" [matTooltip]="'Navigate to position '+c.column_position+' in the next file'">Next file</button>
+                                  <button type="button" mat-menu-item (click)="navigateToSourceFile(c.column_position, index, 'previous')" [matTooltip]="'Navigate to position '+c.column_position+' in the previous file'">Previous file</button>
+                                </mat-menu>
+                                <button mat-icon-button type="button" (click)="openMetadataEditorDialog(c)"><mat-icon>edit</mat-icon></button>
+                              </div>
                             </div>
+
                           </div>
 
-                        </div>
 
-
-                      </form>
+                        </form>
+                      }
                     }
-                  }
-                </div>
+                  </div>
 
+                </div>
               </div>
             </div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 20px">
-            @for (c of s.metadata_columns; track c.id) {
+            <div style="display: flex; flex-direction: column; gap: 20px">
+              @for (c of s.metadata_columns; track c.id) {
 
-            }
-          </div>
+              }
+            </div>
 
-        </mat-expansion-panel>
-      }
-    </mat-accordion>
+          </mat-expansion-panel>
+        }
+      </mat-accordion>
+    } @else {
+      <div class="table-container mat-elevation-z2" style="overflow: auto; max-height: 600px;">
+        <table mat-table [dataSource]="pivotRows()" class="pivot-table">
+          <ng-container matColumnDef="sourceName" sticky>
+            <th mat-header-cell *matHeaderCellDef> Sample / Source File </th>
+            <td mat-cell *matCellDef="let row">
+              <div style="display: flex; flex-direction: column; padding: 8px 0;">
+                <b class="scientific-id">{{row.sourceFile.name}}</b>
+                <small class="text-muted">{{row.sourceFile.description}}</small>
+              </div>
+            </td>
+          </ng-container>
+
+          @for (colKey of uniqueMetadataColumns(); track colKey) {
+            <ng-container [matColumnDef]="colKey">
+              <th mat-header-cell *matHeaderCellDef> {{colKey}} </th>
+              <td mat-cell *matCellDef="let row">
+                @if (row[colKey] && metadataFormMap[row[colKey].id]) {
+                  <form [formGroup]="metadataFormMap[row[colKey].id]" style="min-width: 200px; padding: 8px 0;">
+                    <mat-form-field appearance="outline" style="width: 100%;" subsheet>
+                      <input matInput formControlName="value" [matAutocomplete]="autoTableValue" [placeholder]="row[colKey].name">
+                      <mat-autocomplete #autoTableValue="matAutocomplete">
+                        @for (m of autoCompleteMap[row[colKey].id]| async ; track m) {
+                          <mat-option [value]="displayData(m)">
+                            {{displayData(m)}}
+                          </mat-option>
+                        }
+                      </mat-autocomplete>
+                      @if (metadataFormMap[row[colKey].id].dirty) {
+                        <mat-icon matSuffix color="accent" matTooltip="Unsaved changes">pending</mat-icon>
+                      }
+                    </mat-form-field>
+                  </form>
+                } @else {
+                  <span class="text-muted">N/A</span>
+                }
+              </td>
+            </ng-container>
+          }
+
+          <tr mat-header-row *matHeaderRowDef="tableDisplayedColumns(); sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: tableDisplayedColumns();"></tr>
+        </table>
+      </div>
+    }
     
-    <!-- Bottom paginator -->
     <div style="display: flex; justify-content: center; margin-top: 10px;">
       <mat-paginator
         [length]="totalSourceFiles"
@@ -223,4 +281,3 @@
 
   }
 </div>
-

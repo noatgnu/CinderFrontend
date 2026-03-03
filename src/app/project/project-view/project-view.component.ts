@@ -12,13 +12,18 @@ import {
 } from "../../analysis-group/create-analysis-group-dialog/create-analysis-group-dialog.component";
 import {AnalysisGroupQuery} from "../../analysis-group/analysis-group";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
-import {MatList, MatListItem, MatListItemTitle, MatListOption, MatSelectionList} from "@angular/material/list";
+import {MatList, MatListItem, MatListItemTitle} from "@angular/material/list";
 import {AccountsService} from "../../accounts/accounts.service";
 import {Species, SpeciesQuery} from "../../species";
-import {MatSelect} from "@angular/material/select";
 import {Title} from "@angular/platform-browser";
 import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
 import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component";
+import {StatusBadgeComponent} from "../../shared/status-badge/status-badge.component";
+import {EmptyStateComponent} from "../../shared/empty-state/empty-state.component";
+import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
+import {MatTooltip} from "@angular/material/tooltip";
+import {MatDivider} from "@angular/material/divider";
+import {DataService} from "../../data.service";
 
 @Component({
     selector: 'app-project-view',
@@ -33,12 +38,16 @@ import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component"
         MatListItem,
         MatPaginator,
         MatListItemTitle,
-        MatSelect,
-        MatSelectionList,
-        MatListOption,
         MatIconButton,
         MatSuffix,
-        BreadcrumbComponent
+        BreadcrumbComponent,
+        StatusBadgeComponent,
+        EmptyStateComponent,
+        MatAutocomplete,
+        MatOption,
+        MatAutocompleteTrigger,
+        MatTooltip,
+        MatDivider
     ],
     templateUrl: './project-view.component.html',
     styleUrl: './project-view.component.scss'
@@ -47,7 +56,7 @@ export class ProjectViewComponent {
   private _project?: Project|undefined
 
   canEdit = false
-
+  
   @Input() set project(value: Project|undefined) {
     this._project = value
     if (!value) {
@@ -63,7 +72,6 @@ export class ProjectViewComponent {
       this.analysisGroupQuery = data
     })
     if (value.species){
-      console.log(value.species)
       this.web.getSpeciesByID(value.species).subscribe((data) => {
         this.form.controls.species_name.enable()
         this.form.controls.species.enable()
@@ -97,7 +105,7 @@ export class ProjectViewComponent {
   speciesQuery?: SpeciesQuery|undefined
 
 
-  constructor(private titleService: Title, private fb: FormBuilder, private web: WebService, private dialog: MatDialog, public accounts: AccountsService) {
+  constructor(private titleService: Title, private fb: FormBuilder, private web: WebService, private dialog: MatDialog, public accounts: AccountsService, public dataService: DataService) {
     this.form.controls.species_name.valueChanges.subscribe((data) => {
       if (data) {
         this.web.getSpecies(undefined, 20, 0, data).subscribe((data) => {

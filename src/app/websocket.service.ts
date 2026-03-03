@@ -19,17 +19,26 @@ export interface OperationProgress {
 export class WebsocketService {
   baseURL = environment.baseURL.replace("http", "ws")
   
-  // Track all operations in a signal for the UI to consume
   public activeOperations: WritableSignal<OperationProgress[]> = signal([]);
 
   updateOperationProgress(id: string, type: 'search' | 'curtain', status: string, progress: number, message?: string, label?: string) {
+    if (!id) return;
+    
+    const validatedProgress = (isNaN(progress) || progress === null || progress === undefined) ? 0 : progress;
+
     this.activeOperations.update(ops => {
       const index = ops.findIndex(o => o.id === id);
       if (index !== -1) {
-        ops[index] = { ...ops[index], status, progress, message, label: label || ops[index].label };
+        ops[index] = { 
+          ...ops[index], 
+          status: status || ops[index].status, 
+          progress: validatedProgress, 
+          message: message || ops[index].message, 
+          label: label || ops[index].label 
+        };
         return [...ops];
       } else {
-        return [...ops, { id, type, status, progress, message, label }];
+        return [...ops, { id, type, status, progress: validatedProgress, message, label }];
       }
     });
   }
@@ -37,52 +46,14 @@ export class WebsocketService {
   removeOperation(id: string) {
     this.activeOperations.update(ops => ops.filter(o => o.id !== id));
   }
-  searchWSConnection?: WebSocketSubject<{
-    "type": string,
-    "status": "in_progress"|"complete"|"error"|"started",
-    "id": string,
-    "found_files": number,
-    "current_progress": number,
-    "error": string,
-    "file": string,
-    "instance_id": string
-  }>
 
-  curtainWSConnection?: WebSocketSubject<{
-    "type": string,
-    "status": "in_progress"|"complete"|"error"|"started"|"downloading"|"download_complete"|"partial_success",
-    "analysis_group_id"?: number,
-    "id"?: number,
-    "downloaded_bytes"?: number,
-    "total_bytes"?: number,
-    "percentage"?: number,
-    "message"?: string,
-    "error"?: string,
-    // Enhanced progress message fields (backward compatible)
-    "overall_progress"?: number,
-    "current_phase"?: string,
-    "phase_progress"?: number,
-    "details"?: {
-      "step"?: string,
-      "current_type"?: string,
-      "completed_task"?: string,
-      "total_tasks"?: number,
-      "downloaded_bytes"?: number,
-      "total_bytes"?: number
-    },
-    "timestamp"?: string,
-    "estimated_remaining_seconds"?: number,
-    // Partial failure fields
-    "successful_operations"?: string[],
-    "failed_operations"?: {[key: string]: string},
-    // Phase completion fields
-    "phase"?: string
-  }>
+  searchWSConnection?: WebSocketSubject<any>
+  curtainWSConnection?: WebSocketSubject<any>
+  
   connectedWS: boolean = false
   connectedCurtainWS: boolean = false
   lostConnectionSubject: Subject<string> = new Subject<string>()
   
-  // Activity tracking for automatic reconnection
   private searchActiveOperations: Set<string> = new Set()
   private curtainActiveOperations: Set<string> = new Set()
   private searchReconnectAttempts: number = 0
@@ -91,7 +62,6 @@ export class WebsocketService {
   private searchSessionID?: string
   private curtainSessionID?: string
   
-  // Connection state tracking
   searchConnectionLostTime?: Date
   curtainConnectionLostTime?: Date
 
@@ -106,18 +76,13 @@ export class WebsocketService {
           this.connectedWS = true
           this.searchReconnectAttempts = 0
           this.searchConnectionLostTime = undefined
-          console.log("Connected to search websocket")
         }
       },
       closeObserver: {
         next: () => {
-          console.log("Closed connection to search websocket")
           this.connectedWS = false
           this.searchConnectionLostTime = new Date()
-          
-          // Check if we should automatically reconnect
           if (this.searchActiveOperations.size > 0 && this.searchReconnectAttempts < this.maxReconnectAttempts) {
-            console.log(`Search operations active (${this.searchActiveOperations.size}), attempting auto-reconnect ${this.searchReconnectAttempts + 1}/${this.maxReconnectAttempts}`)
             this.attemptSearchReconnect()
           } else {
             this.lostConnectionSubject.next("search")
@@ -136,18 +101,13 @@ export class WebsocketService {
           this.connectedCurtainWS = true
           this.curtainReconnectAttempts = 0
           this.curtainConnectionLostTime = undefined
-          console.log("Connected to curtain websocket")
         }
       },
       closeObserver: {
         next: () => {
-          console.log("Closed connection to curtain websocket")
           this.connectedCurtainWS = false
           this.curtainConnectionLostTime = new Date()
-          
-          // Check if we should automatically reconnect
           if (this.curtainActiveOperations.size > 0 && this.curtainReconnectAttempts < this.maxReconnectAttempts) {
-            console.log(`Curtain operations active (${this.curtainActiveOperations.size}), attempting auto-reconnect ${this.curtainReconnectAttempts + 1}/${this.maxReconnectAttempts}`)
             this.attemptCurtainReconnect()
           } else {
             this.lostConnectionSubject.next("curtain")
@@ -156,7 +116,6 @@ export class WebsocketService {
       }
     })
   }
-
 
   closeSearchWS() {
     if (this.searchWSConnection) {
@@ -170,35 +129,31 @@ export class WebsocketService {
     }
   }
 
-  // Activity tracking methods
-  addSearchOperation(operationId: string) {
+  addSearchOperation(operationId: string, label?: string) {
     this.searchActiveOperations.add(operationId)
-    console.log(`Added search operation: ${operationId}`)
+    this.updateOperationProgress(operationId, 'search', 'started', 0, 'Starting search...', label || 'Search Operation');
   }
 
   removeSearchOperation(operationId: string) {
     this.searchActiveOperations.delete(operationId)
-    console.log(`Removed search operation: ${operationId}`)
+    this.removeOperation(operationId)
   }
 
-  addCurtainOperation(operationId: string) {
+  addCurtainOperation(operationId: string, label?: string) {
     this.curtainActiveOperations.add(operationId)
-    console.log(`Added curtain operation: ${operationId}`)
+    this.updateOperationProgress(operationId, 'curtain', 'started', 0, 'Initialising...', label || 'Curtain Import');
   }
 
   removeCurtainOperation(operationId: string) {
     this.curtainActiveOperations.delete(operationId)
-    console.log(`Removed curtain operation: ${operationId}`)
+    this.removeOperation(operationId)
   }
 
-  // Reconnection methods
   private attemptSearchReconnect() {
     this.searchReconnectAttempts++
-    const delay = Math.min(1000 * Math.pow(2, this.searchReconnectAttempts - 1), 30000) // Exponential backoff, max 30s
-    
+    const delay = Math.min(1000 * Math.pow(2, this.searchReconnectAttempts - 1), 30000)
     timer(delay).subscribe(() => {
       if (this.searchSessionID) {
-        console.log(`Attempting to reconnect search WebSocket (attempt ${this.searchReconnectAttempts}/${this.maxReconnectAttempts})`)
         this.connectSearchWS(this.searchSessionID)
       }
     })
@@ -206,17 +161,14 @@ export class WebsocketService {
 
   private attemptCurtainReconnect() {
     this.curtainReconnectAttempts++
-    const delay = Math.min(1000 * Math.pow(2, this.curtainReconnectAttempts - 1), 30000) // Exponential backoff, max 30s
-    
+    const delay = Math.min(1000 * Math.pow(2, this.curtainReconnectAttempts - 1), 30000)
     timer(delay).subscribe(() => {
       if (this.curtainSessionID) {
-        console.log(`Attempting to reconnect curtain WebSocket (attempt ${this.curtainReconnectAttempts}/${this.maxReconnectAttempts})`)
         this.connectCurtainWS(this.curtainSessionID)
       }
     })
   }
 
-  // Manual reconnection methods for user-initiated reconnects
   manualReconnectSearch(): boolean {
     if (this.searchSessionID) {
       this.searchReconnectAttempts = 0
@@ -235,7 +187,6 @@ export class WebsocketService {
     return false
   }
 
-  // Check if connections are lost and for how long
   getSearchConnectionStatus(): { connected: boolean, lostTime?: Date, hasActiveOperations: boolean } {
     return {
       connected: this.connectedWS,

@@ -66,26 +66,19 @@ export class AnalysisGroupViewComponent {
   canEdit: boolean = false
 
   composingCurtainProgress: any = {
-    // Overall progress
     progress: 0,
     message: "",
     completed: false,
     error: false,
     started: false,
-    
-    // Download progress (separate)
     downloadProgress: 0,
     downloadMessage: "",
     downloadActive: false,
     downloadedBytes: 0,
     totalBytes: 0,
-    
-    // Processing progress (separate)
     processingProgress: 0,
     processingMessage: "",
     processingActive: false,
-    
-    // Enhanced progress tracking
     overallProgress: 0,
     currentPhase: "",
     phaseProgress: 0,
@@ -175,79 +168,49 @@ export class AnalysisGroupViewComponent {
               break
           }
         } else if (data.type === "curtain_progress") {
-          // Handle real-time download progress updates (backward compatible)
           switch (data.status) {
             case "downloading":
               this.composingCurtainProgress.downloadProgress = data.percentage || 0
               this.composingCurtainProgress.downloadMessage = data.message || "Downloading data from Curtain"
               this.composingCurtainProgress.downloadActive = true
-              this.composingCurtainProgress.downloadedBytes = data.downloaded_bytes
-              this.composingCurtainProgress.totalBytes = data.total_bytes
-              // Track download as active operation if not already tracked
+              this.composingCurtainProgress.downloadedBytes = data.downloaded_bytes || 0
+              this.composingCurtainProgress.totalBytes = data.total_bytes || 0
               const downloadOpId = `download_${data.id || this.analysisGroup?.id}`
-              this.ws.addCurtainOperation(downloadOpId)
+              this.ws.addCurtainOperation(downloadOpId, `Downloading: ${this.analysisGroup?.name || 'Data'}`)
+              this.ws.updateOperationProgress(downloadOpId, 'curtain', 'downloading', data.percentage || 0, data.message || "Downloading...");
               break
             case "download_complete":
               this.composingCurtainProgress.downloadProgress = 100
               this.composingCurtainProgress.downloadMessage = data.message || "Download complete"
               this.composingCurtainProgress.downloadActive = false
-              // Remove download operation as it's complete
               const completeOpId = `download_${data.id || this.analysisGroup?.id}`
               this.ws.removeCurtainOperation(completeOpId)
               break
           }
         } else if (data.type === "curtain_progress_enhanced") {
-          // Handle enhanced progress messages with phase tracking
           this.composingCurtainProgress.overallProgress = data.overall_progress || 0
-          this.composingCurtainProgress.progress = data.overall_progress || 0 // Backward compatibility
+          this.composingCurtainProgress.progress = data.overall_progress || 0 
           this.composingCurtainProgress.currentPhase = data.current_phase || ""
           this.composingCurtainProgress.phaseProgress = data.phase_progress || 0
-          this.composingCurtainProgress.estimatedRemainingSeconds = data.estimated_remaining_seconds
-          this.composingCurtainProgress.phaseDetails = data.details || {}
-          this.composingCurtainProgress.timestamp = data.timestamp
-          
-          // Update message with enhanced information
-          const phaseDisplay = data.current_phase ? data.current_phase.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Processing'
-          let message = `${phaseDisplay} (${data.phase_progress?.toFixed(1) || 0}%)`
-          
-          // Add step details if available
-          if (data.details?.step) {
-            message += ` - ${data.details.step}`
-          }
-          
-          // Add time estimation if available
-          if (data.estimated_remaining_seconds) {
-            const minutes = Math.floor(data.estimated_remaining_seconds / 60)
-            const seconds = data.estimated_remaining_seconds % 60
-            if (minutes > 0) {
-              message += ` - Est. ${minutes}m ${seconds}s remaining`
-            } else {
-              message += ` - Est. ${seconds}s remaining`
-            }
-          }
-          
-          // Separate download and processing progress
+          const phaseDisplay = data.current_phase ? data.current_phase.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) : 'Processing'
+          const message = `${phaseDisplay} (${(data.phase_progress || 0).toFixed(1)}%)`
+          const enhancedOpId = `enhanced_${data.id || this.analysisGroup?.id}`
+          this.ws.updateOperationProgress(enhancedOpId, 'curtain', data.current_phase || 'processing', data.overall_progress || 0, message, `Importing: ${this.analysisGroup?.name || 'Data'}`);
           if (data.current_phase === 'data_download') {
             this.composingCurtainProgress.downloadProgress = data.phase_progress || 0
             this.composingCurtainProgress.downloadMessage = message
             this.composingCurtainProgress.downloadActive = true
-          } else if (data.current_phase === 'initialization' || data.current_phase === 'data_processing' || data.current_phase === 'file_creation' || data.current_phase === 'database_storage') {
+          } else if (['initialization', 'data_processing', 'file_creation', 'database_storage'].includes(data.current_phase || '')) {
             this.composingCurtainProgress.processingProgress = data.phase_progress || 0
             this.composingCurtainProgress.processingMessage = message
             this.composingCurtainProgress.processingActive = true
           }
-          
           this.composingCurtainProgress.message = message
-          
-          // Track active operation
-          const enhancedOpId = `enhanced_${data.id || this.analysisGroup?.id}`
           this.ws.addCurtainOperation(enhancedOpId)
         } else if (data.type === "curtain_phase_complete") {
-          // Handle phase completion messages
-          const phaseDisplay = data.phase?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Phase'
+          const phaseDisplay = data.phase?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || 'Phase'
           this.sb.open(`${phaseDisplay} completed`, "Dismiss", {duration: 3000})
         } else if (data.type === "curtain_partial_success") {
-          // Handle partial success messages
           const successCount = data.successful_operations?.length || 0
           const failureCount = Object.keys(data.failed_operations || {}).length
           const message = `Import partially completed: ${successCount} succeeded, ${failureCount} failed`
@@ -261,19 +224,15 @@ export class AnalysisGroupViewComponent {
               this.composingCurtainProgress.started = true
               this.composingCurtainProgress.completed = false
               this.composingCurtainProgress.error = false
-              // Reset separate progress bars
               this.composingCurtainProgress.downloadProgress = 0
               this.composingCurtainProgress.downloadActive = false
               this.composingCurtainProgress.processingProgress = 0
               this.composingCurtainProgress.processingActive = false
-              // Track this as an active operation
               this.ws.addCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
             case "in_progress":
-              // Update overall progress during processing
               this.composingCurtainProgress.progress = data.percentage || 0
               this.composingCurtainProgress.message = data.message || "Processing data from Curtain"
-              // Ensure operation is tracked
               this.ws.addCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
             case "complete":
@@ -281,12 +240,10 @@ export class AnalysisGroupViewComponent {
               this.composingCurtainProgress.progress = 100
               this.composingCurtainProgress.message = "Composing data from Curtain completed. Please manually set Condition A and Condition B in Comparison Matrix."
               this.composingCurtainProgress.completed = true
-              // Complete all progress bars
               this.composingCurtainProgress.downloadProgress = 100
               this.composingCurtainProgress.downloadActive = false
               this.composingCurtainProgress.processingProgress = 100
               this.composingCurtainProgress.processingActive = false
-              // Remove from active operations
               this.ws.removeCurtainOperation(`compose_${this.analysisGroup?.id}`)
               this.web.getAnalysisGroup(this.analysisGroup!.id).subscribe((data) => {
                 this.analysisGroup = data
@@ -297,7 +254,6 @@ export class AnalysisGroupViewComponent {
               this.composingCurtainProgress.error = true
               this.composingCurtainProgress.downloadActive = false
               this.composingCurtainProgress.processingActive = false
-              // Remove from active operations on error
               this.ws.removeCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
           }
@@ -388,7 +344,6 @@ export class AnalysisGroupViewComponent {
     }
     ref.afterClosed().subscribe((data) => {
       if (data) {
-        console.log(this.sampleAnnotations)
         if (!this.sampleAnnotations) {
           // @ts-ignore
           this.web.createSampleAnnotation(this.analysisGroup!.id, this.analysisGroup?.name + " sample annotation", data, this.analysisGroupSearched.id).subscribe((data) => {
@@ -496,26 +451,19 @@ export class AnalysisGroupViewComponent {
 
   composeDataFromCurtain() {
     this.composingCurtainProgress = {
-      // Overall progress
       progress: 0,
       message: "",
       completed: false,
       error: false,
       started: false,
-      
-      // Download progress (separate)
       downloadProgress: 0,
       downloadMessage: "",
       downloadActive: false,
       downloadedBytes: 0,
       totalBytes: 0,
-      
-      // Processing progress (separate)
       processingProgress: 0,
       processingMessage: "",
       processingActive: false,
-      
-      // Enhanced progress tracking
       overallProgress: 0,
       currentPhase: "",
       phaseProgress: 0,
@@ -584,7 +532,6 @@ export class AnalysisGroupViewComponent {
         }
       }
     }
-    console.log(this.metadataDeletionList)
   }
 
   reorderMetadataColumn(columnsChanged: MetadataColumn[]) {

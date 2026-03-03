@@ -1,77 +1,75 @@
 <app-breadcrumb></app-breadcrumb>
+
 <div style="display: flex; flex-direction: row; justify-content: center; padding: 50px">
   <div style="width: 100%">
     @if (project) {
-      <form (ngSubmit)="updateProject()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
+      <form (ngSubmit)="updateProject()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px;">
         <mat-form-field style="width: 100%">
-          <input matInput formControlName="name" type="text" placeholder="Project Name">
+          <input matInput formControlName="name" placeholder="Project Name" [readonly]="!canEdit">
           <mat-label>Project Name</mat-label>
         </mat-form-field>
         <mat-form-field style="width: 100%">
-          <textarea matInput formControlName="description" placeholder="Project Description"></textarea>
+          <textarea matInput formControlName="description" placeholder="Project Description" [readonly]="!canEdit"></textarea>
           <mat-label>Project Description</mat-label>
         </mat-form-field>
-        <mat-form-field style="width: 100%">
-          <input matInput formControlName="species_name" placeholder="Species Name" type="search">
-          <mat-label>Species Name Search</mat-label>
-          <button mat-icon-button matSuffix (click)="changeSpeciesEditableState()">
-            @if (speciesEditable) {
-              <mat-icon>lock_open</mat-icon>
-            } @else {
-              <mat-icon>lock</mat-icon>
-            }
-          </button>
-        </mat-form-field>
 
-        @if (speciesQuery && speciesEditable) {
-          @if (speciesQuery.results.length > 0) {
-            <mat-selection-list formControlName="species" [multiple]="false" style="max-height: 200px; overflow: auto">
-              @for (species of speciesQuery.results; track species.id) {
-                <mat-list-option [value]="species">
-                  {{species.official_name}}
-                </mat-list-option>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <mat-form-field style="width: 100%">
+            <input matInput formControlName="species_name" placeholder="Search Species..." type="search" [matAutocomplete]="auto">
+            <mat-label>Organism</mat-label>
+            <mat-autocomplete #auto="matAutocomplete">
+              @for (species of speciesQuery?.results; track species.id) {
+                <mat-option [value]="species.official_name" (onSelectionChange)="form.controls.species.setValue([species])">
+                  {{species.official_name}} (TaxID: {{species.taxon}})
+                </mat-option>
               }
-            </mat-selection-list>
-          }
-        }
+            </mat-autocomplete>
+            @if (canEdit) {
+              <button type="button" mat-icon-button matSuffix (click)="changeSpeciesEditableState()" [matTooltip]="speciesEditable ? 'Lock selection' : 'Edit selection'">
+                <mat-icon>{{speciesEditable ? 'lock_open' : 'lock'}}</mat-icon>
+              </button>
+            }
+          </mat-form-field>
+        </div>
 
         <div style="display: flex; flex-direction: row; gap: 20px">
-          <button mat-flat-button color="primary" type="submit" [disabled]="!canEdit">Update</button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="!canEdit">Update Project</button>
           @if (canEdit) {
-            <button mat-flat-button color="accent" (click)="openAnalysisGroupCreateModal()"><mat-icon>add</mat-icon> Analysis Group</button>
-            <button mat-flat-button color="warn" (click)="deleteProject()">Delete</button>
+            <button mat-flat-button color="accent" (click)="openAnalysisGroupCreateModal()"><mat-icon>add</mat-icon> Create Analysis Group</button>
+            <button mat-flat-button color="warn" (click)="deleteProject()">Delete Project</button>
           }
         </div>
       </form>
+      
       @if (analysisGroupQuery) {
-        <div style="padding: 20px">
-          <p>Associated Analysis Group</p>
-          @if (analysisGroupQuery.results.length >0) {
+        <div style="padding: 24px; border-radius: 12px; background-color: var(--mdc-theme-surface-variant, rgba(0,0,0,0.05));">
+          <h3 style="margin-top: 0;">Associated Analysis Groups</h3>
+          @if (analysisGroupQuery.results.length > 0) {
             <mat-list>
               @for (ag of analysisGroupQuery.results; track ag.id) {
-                <mat-list-item>
-                  <a matListItemTitle href="/#/analysis-group/{{ag.id}}" target="_blank">{{ag.name}}</a>
-                  <hr>
+                <mat-list-item style="height: auto; padding: 8px 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <a matListItemTitle href="/#/analysis-group/{{ag.id}}" target="_blank" style="font-weight: 600; text-decoration: none; color: var(--mdc-theme-primary);">{{ag.name}}</a>
+                    <app-status-badge [label]="dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type) || ''" type="secondary"></app-status-badge>
+                  </div>
+                  <div matListItemLine style="margin-top: 4px; opacity: 0.7;">{{ag.description}}</div>
                 </mat-list-item>
+                <mat-divider></mat-divider>
               }
             </mat-list>
+            
+            <mat-paginator [length]="analysisGroupQuery.count"
+                           [pageSize]="pageSize"
+                           (page)="handlePageChange($event)"
+                           [hidePageSize]="true"
+                           [pageIndex]="currentPage"
+                           aria-label="Select page">
+            </mat-paginator>
           } @else {
-            <p>No analysis groups found.</p>
+            <app-empty-state title="No Analysis Groups" message="This project doesn't have any experiments yet." icon="analytics"></app-empty-state>
           }
-          <mat-paginator #paginator
-                         (page)="handlePageChange($event)"
-                         [length]="analysisGroupQuery.count"
-                         [pageSize]="pageSize"
-                         [showFirstLastButtons]="true"
-                         [hidePageSize]="true"
-                         [pageIndex]="currentPage"
-                         aria-label="Select page">
-          </mat-paginator>
-
         </div>
       }
-
     }
-
   </div>
 </div>

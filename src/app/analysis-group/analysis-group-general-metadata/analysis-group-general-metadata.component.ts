@@ -54,6 +54,8 @@ import {
 } from "./analysis-group-metadata-import/analysis-group-metadata-import.component";
 import {AnalysisGroup} from "../analysis-group";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
+import {signal, computed} from '@angular/core';
+import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 
 @Component({
     selector: 'app-analysis-group-general-metadata',
@@ -102,7 +104,9 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
         MatCheckbox,
         MatProgressBar,
         AnalysisGroupMetadataImportComponent,
-        MatPaginator
+        MatPaginator,
+        MatButtonToggleGroup,
+        MatButtonToggle
     ],
     templateUrl: './analysis-group-general-metadata.component.html',
     styleUrl: './analysis-group-general-metadata.component.scss'
@@ -111,6 +115,32 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   @ViewChildren(MatExpansionPanel) expansionPanels!: QueryList<MatExpansionPanel>;
   @ViewChild("metaColAccordion") metaColAccordion!: MatAccordion
   sdrfValidating: boolean = false
+
+  public viewMode = signal<'accordion' | 'table'>('accordion');
+
+  uniqueMetadataColumns = computed(() => {
+    const columns = new Set<string>();
+    this.sourceFiles.forEach(sf => {
+      sf.metadata_columns.forEach(mc => {
+        columns.add(`${mc.type} [${mc.name}]`);
+      });
+    });
+    return Array.from(columns).sort();
+  });
+
+  pivotRows = computed(() => {
+    return this.paginatedSourceFiles.map(sf => {
+      const row: any = { sourceFile: sf };
+      sf.metadata_columns.forEach(mc => {
+        row[`${mc.type} [${mc.name}]`] = mc;
+      });
+      return row;
+    });
+  });
+
+  tableDisplayedColumns = computed(() => {
+    return ['sourceName', ...this.uniqueMetadataColumns()];
+  });
 
   sdrfImportingProgress: number = 0
   sdrfImportingText: string = ""
@@ -185,7 +215,6 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   autoCompleteMap: {[key: string]: Observable<SubcellularLocation[] | HumanDisease[] | Tissue[] | Species[] | MsVocab[]>} = {}
   sourceFileMap: {[key: string]: SourceFile} = {}
   
-  // Pagination properties
   pageSize: number = 10
   pageIndex: number = 0
   pageSizeOptions: number[] = [5, 10, 25, 50]
@@ -197,7 +226,6 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           if (data.status === "complete") {
             if ("job_id" in data && "file" in data) {
               if (data.job_id === this.export_job_id) {
-                console.log(data)
                 window.open(`${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`)
               }
             }
@@ -550,7 +578,6 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       moveItemInArray(sourceFile.metadata_columns, previousIndex, currentIndex);
       sourceFile.metadata_columns[currentIndex].column_position = new_index_position
       listOfColumnsChanged.push(sourceFile.metadata_columns[currentIndex])
-      // if currentIndex is greater than previousIndex, we need to decrement the column_position of all columns between previousIndex and currentIndex
       if (currentIndex > previousIndex) {
         for (let i = previousIndex; i <= currentIndex; i++) {
           sourceFile.metadata_columns[i].column_position -= 1
@@ -584,7 +611,6 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     if (this.web.searchSessionID) {
       this.web.exportSDRFFile(this.analysis_group_id, this.web.searchSessionID).subscribe((data) => {
         this.export_job_id = data.job_id
-        console.log(data)
       })
     }
 
@@ -714,7 +740,21 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
     })
   }
 
-  // Pagination methods
+  syncAll(metadata: MetadataColumn) {
+    if (this.metadataFormMap[metadata.id].dirty) {
+      this.sb.open("Please save changes before syncing", "Dismiss", {duration: 3000});
+      return;
+    }
+    this.web.copyMetadataValueToAllInSamePosition(metadata.id, false).subscribe((data) => {
+      this.sb.open(`Propagated "${metadata.name}" to all samples`, "Dismiss", {duration: 3000});
+      data.forEach(m => {
+        if (m.source_file && this.metadataFormMap[m.id]) {
+          this.metadataFormMap[m.id].controls['value'].patchValue(m.value, {emitEvent: false});
+        }
+      });
+    });
+  }
+
   get paginatedSourceFiles(): SourceFile[] {
     const startIndex = this.pageIndex * this.pageSize
     return this.sourceFiles.slice(startIndex, startIndex + this.pageSize)

@@ -1,5 +1,5 @@
 import { Component, computed } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { WebsocketService } from '../../websocket.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -9,46 +9,43 @@ import { MatCardModule } from '@angular/material/card';
 @Component({
   selector: 'app-operation-center',
   standalone: true,
-  imports: [MatIconModule, MatProgressBarModule, MatButtonModule, MatCardModule],
+  imports: [CommonModule, MatIconModule, MatProgressBarModule, MatButtonModule, MatCardModule],
   template: `
-    @if (hasOperations()) {
-      <div class="operation-dock" [class.collapsed]="isCollapsed">
-        <mat-card class="operation-card">
-          <mat-card-header class="operation-header">
-            <mat-card-title>
-              <mat-icon class="title-icon">hourglass_empty</mat-icon>
-              Active Operations ({{ activeCount() }})
-            </mat-card-title>
-            <button mat-icon-button (click)="isCollapsed = !isCollapsed">
-              <mat-icon>{{ isCollapsed ? 'expand_less' : 'expand_more' }}</mat-icon>
-            </button>
-          </mat-card-header>
-          @if (!isCollapsed) {
-            <mat-card-content class="operation-content">
-              <div class="operation-list">
-                @for (op of ws.activeOperations(); track op.id) {
-                  <div class="operation-item">
-                    <div class="op-info">
-                      <span class="op-label">{{ op.label || 'Operation' }}</span>
-                      <span class="op-status">{{ op.status }}</span>
-                    </div>
-                    @if (op.message) {
-                      <div class="op-message">{{ op.message }}</div>
-                    }
-                    <mat-progress-bar
-                      [mode]="op.progress > 0 ? 'determinate' : 'indeterminate'"
-                      [value]="op.progress"
-                      [color]="op.type === 'search' ? 'primary' : 'accent'">
-                    </mat-progress-bar>
-                  </div>
+    <div class="operation-dock" [class.collapsed]="isCollapsed" *ngIf="hasOperations()">
+      <mat-card class="operation-card">
+        <mat-card-header class="operation-header">
+          <mat-card-title>
+            <mat-icon class="title-icon">hourglass_empty</mat-icon>
+            Active Operations ({{ activeCount() }})
+          </mat-card-title>
+          <button mat-icon-button (click)="isCollapsed = !isCollapsed">
+            <mat-icon>{{ isCollapsed ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </button>
+        </mat-card-header>
+        
+        <mat-card-content class="operation-content" *ngIf="!isCollapsed">
+          <div class="operation-list">
+            @for (op of ws.activeOperations(); track op.id) {
+              <div class="operation-item">
+                <div class="op-info">
+                  <span class="op-label">{{ op.label || 'Operation' }}</span>
+                  <span class="op-status">{{ op.status }}</span>
+                </div>
+                @if (op.message) {
+                  <div class="op-message">{{ op.message }}</div>
                 }
+                <mat-progress-bar 
+                  [mode]="(op.progress !== undefined && op.progress !== null && op.progress > 0) ? 'determinate' : 'indeterminate'" 
+                  [value]="op.progress"
+                  [color]="op.type === 'search' ? 'primary' : 'accent'">
+                </mat-progress-bar>
               </div>
-            </mat-card-content>
-          }
-        </mat-card>
-      </div>
-    }
-    `,
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  `,
   styles: [`
     .operation-dock {
       position: fixed;
