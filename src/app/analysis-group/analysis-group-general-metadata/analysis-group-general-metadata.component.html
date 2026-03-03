@@ -89,15 +89,17 @@
   @if (sourceFiles.length > 0) {
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
       <h4>Source Files ({{totalSourceFiles}} total)</h4>
-      <mat-paginator
-        [length]="totalSourceFiles"
-        [pageSize]="pageSize"
-        [pageIndex]="pageIndex"
-        [pageSizeOptions]="pageSizeOptions"
-        [showFirstLastButtons]="true"
-        (page)="onPageChange($event)"
-        [hidePageSize]="false">
-      </mat-paginator>
+      <div class="paginator-header">
+        <mat-paginator
+          [length]="totalSourceFiles"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="pageSizeOptions"
+          [showFirstLastButtons]="true"
+          (page)="onPageChange($event)"
+          [hidePageSize]="false">
+        </mat-paginator>
+      </div>
     </div>
     @if (viewMode() === 'accordion') {
       <mat-accordion multi #metaColAccordion>
@@ -267,7 +269,7 @@
       </div>
     }
     
-    <div style="display: flex; justify-content: center; margin-top: 10px;">
+    <div class="paginator-footer">
       <mat-paginator
         [length]="totalSourceFiles"
         [pageSize]="pageSize"

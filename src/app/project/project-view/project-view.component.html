@@ -42,31 +42,40 @@
       </form>
       
       @if (analysisGroupQuery) {
-        <div style="padding: 24px; border-radius: 12px; background-color: var(--mdc-theme-surface-variant, rgba(0,0,0,0.05));">
-          <h3 style="margin-top: 0;">Associated Analysis Groups</h3>
-          @if (analysisGroupQuery.results.length > 0) {
-            <mat-list>
-              @for (ag of analysisGroupQuery.results; track ag.id) {
-                <mat-list-item style="height: auto; padding: 8px 0;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <a matListItemTitle href="/#/analysis-group/{{ag.id}}" target="_blank" style="font-weight: 600; text-decoration: none; color: var(--mdc-theme-primary);">{{ag.name}}</a>
-                    <app-status-badge [label]="dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type) || ''" type="secondary"></app-status-badge>
-                  </div>
-                  <div matListItemLine style="margin-top: 4px; opacity: 0.7;">{{ag.description}}</div>
-                </mat-list-item>
-                <mat-divider></mat-divider>
-              }
-            </mat-list>
+        <div style="border-radius: 12px; background-color: var(--mdc-theme-surface-variant, rgba(0,0,0,0.05)); overflow: hidden;">
+          <div style="padding: 24px;">
+            <h3 style="margin-top: 0;">Associated Analysis Groups</h3>
+            @if (analysisGroupQuery.results.length > 0) {
+              <mat-list>
+                @for (ag of analysisGroupQuery.results; track ag.id) {
+                  <mat-list-item style="height: auto; padding: 12px 0; cursor: pointer;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 4px;">
+                      <a matListItemTitle href="/#/analysis-group/{{ag.id}}" target="_blank" style="font-weight: 600; text-decoration: none; color: var(--mdc-theme-primary); line-height: 1.4; padding-bottom: 2px;">{{ag.name}}</a>
+                      <div style="display: flex; align-items: center; gap: 12px;">
+                        <app-status-badge [label]="dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type) || ''" type="secondary"></app-status-badge>
+                        <mat-icon style="opacity: 0.3;">chevron_right</mat-icon>
+                      </div>
+                    </div>
+                    <div matListItemLine style="margin-top: 4px; opacity: 0.7; line-height: 1.4;">{{ag.description}}</div>
+                  </mat-list-item>
+                  <mat-divider></mat-divider>
+                }
+              </mat-list>
+            </div>
             
-            <mat-paginator [length]="analysisGroupQuery.count"
-                           [pageSize]="pageSize"
-                           (page)="handlePageChange($event)"
-                           [hidePageSize]="true"
-                           [pageIndex]="currentPage"
-                           aria-label="Select page">
-            </mat-paginator>
+            <div class="paginator-footer">
+              <mat-paginator [length]="analysisGroupQuery.count"
+                             [pageSize]="pageSize"
+                             (page)="handlePageChange($event)"
+                             [hidePageSize]="true"
+                             [pageIndex]="currentPage"
+                             aria-label="Select page">
+              </mat-paginator>
+            </div>
           } @else {
-            <app-empty-state title="No Analysis Groups" message="This project doesn't have any experiments yet." icon="analytics"></app-empty-state>
+            <div style="padding: 24px;">
+              <app-empty-state title="No Analysis Groups" message="This project doesn't have any experiments yet." icon="analytics"></app-empty-state>
+            </div>
           }
         </div>
       }

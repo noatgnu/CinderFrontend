@@ -3,6 +3,7 @@ import {Project, ProjectQuery} from "../project";
 import {
   MatList,
   MatListItem,
+  MatListItemLine,
   MatListItemTitle,
   MatListOption,
   MatSelectionList,
@@ -20,6 +21,7 @@ import {StatusBadgeComponent} from "../../shared/status-badge/status-badge.compo
         MatSelectionList,
         MatListOption,
         MatListItemTitle,
+        MatListItemLine,
         StatusBadgeComponent
     ],
     templateUrl: './project-list.component.html',

@@ -57,3 +57,20 @@
     min-height: auto;
   }
 }
+
+.paginator-header {
+  ::ng-deep .mat-mdc-paginator {
+    background-color: transparent !important;
+  }
+}
+
+.paginator-footer {
+  margin-top: 10px;
+  background-color: var(--mdc-theme-surface-variant, rgba(0,0,0,0.05));
+  border-radius: 8px;
+  overflow: hidden;
+
+  ::ng-deep .mat-mdc-paginator {
+    background-color: transparent !important;
+  }
+}

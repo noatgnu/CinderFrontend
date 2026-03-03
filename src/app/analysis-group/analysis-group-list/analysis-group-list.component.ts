@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AnalysisGroup, AnalysisGroupQuery} from "../analysis-group";
 import {MatDivider} from "@angular/material/divider";
-import {MatListItemLine, MatListOption, MatSelectionList} from "@angular/material/list";
+import {MatListItemLine, MatListItemTitle, MatListOption, MatSelectionList} from "@angular/material/list";
 import {DataService} from "../../data.service";
 import {StatusBadgeComponent} from "../../shared/status-badge/status-badge.component";
 
@@ -12,6 +12,7 @@ import {StatusBadgeComponent} from "../../shared/status-badge/status-badge.compo
         MatListOption,
         MatSelectionList,
         MatListItemLine,
+        MatListItemTitle,
         StatusBadgeComponent
     ],
     templateUrl: './analysis-group-list.component.html',

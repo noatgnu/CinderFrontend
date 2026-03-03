@@ -1,0 +1,32 @@
+.paginator-footer {
+  background-color: var(--mdc-theme-surface-variant, rgba(0,0,0,0.05));
+  border-top: 1px solid rgba(0,0,0,0.05);
+
+  ::ng-deep .mat-mdc-paginator {
+    background-color: transparent !important;
+  }
+}
+
+mat-list-item {
+  transition: background-color 0.2s ease;
+  border-radius: 8px;
+  margin: 4px 0;
+
+  &:hover {
+    background-color: rgba(var(--mdc-theme-primary-rgb, 103, 80, 164), 0.08) !important;
+    
+    a {
+      color: var(--mdc-theme-tertiary) !important;
+    }
+
+    mat-icon {
+      opacity: 1 !important;
+      color: var(--mdc-theme-primary);
+      transform: translateX(4px);
+    }
+  }
+
+  mat-icon {
+    transition: all 0.2s ease;
+  }
+}

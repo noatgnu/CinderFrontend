@@ -1,18 +1,21 @@
 @if (projectQuery) {
-
     <mat-selection-list [multiple]="false" #projectSelection (selectionChange)="selectProject($event)">
       @for (project of projectQuery.results; track project.id) {
-        <mat-list-option [value]="project">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span>{{project.name}}</span>
+        <mat-list-option [value]="project" style="height: auto; padding: 8px 0;">
+          <div matListItemTitle style="font-weight: 600; line-height: 1.4; padding-bottom: 2px;">{{project.name}}</div>
+          <div matListItemLine style="opacity: 0.7; font-size: 12px; line-height: 1.2; margin-bottom: 4px;">
+            {{project.description}}
+          </div>
+          <div matListItemLine style="display: flex; gap: 4px; align-items: center;">
             @if (project.temporary) {
               <app-status-badge label="Temporary" type="tertiary"></app-status-badge>
+            }
+            @if (project.encrypted) {
+              <app-status-badge label="Encrypted" type="outline"></app-status-badge>
             }
           </div>
         </mat-list-option>
         <mat-divider></mat-divider>
       }
     </mat-selection-list>
-
 }
-
