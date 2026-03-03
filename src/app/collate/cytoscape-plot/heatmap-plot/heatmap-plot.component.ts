@@ -45,9 +45,9 @@ export class HeatmapPlotComponent {
 
   plotConfig = {
     responsive: true,
-    scrollZoom: true,
+    scrollZoom: false,
     displayModeBar: true,
-    modeBarButtonsToAdd: ['pan2d', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
+    modeBarButtonsToRemove: ['zoom2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d', 'pan2d', 'select2d', 'lasso2d'],
     displaylogo: false
   };
   drawHeatmap() {
@@ -252,8 +252,14 @@ export class HeatmapPlotComponent {
         scaleratio: 1,
         tickvals: tickvals,
         ticktext: ticktext,
-        ticklen: 0
-      },yaxis: { title: 'Protein', showgrid: false },
+        ticklen: 0,
+        fixedrange: true
+      },
+      yaxis: {
+        title: 'Protein',
+        showgrid: false,
+        fixedrange: true
+      },
       shapes: shapes
     };
     this.graphData = [trace];
