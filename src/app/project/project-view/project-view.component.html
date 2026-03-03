@@ -48,16 +48,16 @@
               <h3 style="margin-top: 0;">Associated Analysis Groups</h3>
               <mat-list>
                 @for (ag of analysisGroupQuery.results; track ag.id) {
-                  <mat-list-item style="height: auto; padding: 12px 0; cursor: pointer;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 4px;">
-                      <a matListItemTitle href="/#/analysis-group/{{ag.id}}" target="_blank" style="font-weight: 600; text-decoration: none; color: var(--mdc-theme-primary); line-height: 1.4; padding-bottom: 2px;">{{ag.name}}</a>
-                      <div style="display: flex; align-items: center; gap: 12px;">
-                        <app-status-badge [label]="dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type) || ''" type="secondary"></app-status-badge>
-                        <mat-icon style="opacity: 0.3;">chevron_right</mat-icon>
-                      </div>
+                <mat-list-item style="height: auto; padding: 12px 0; cursor: pointer;">
+                  <div matListItemTitle style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 4px;">
+                    <a href="/#/analysis-group/{{ag.id}}" target="_blank" style="text-decoration: none; color: var(--mdc-theme-primary); line-height: 1.4; padding-bottom: 2px;">{{ag.name}}</a>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <app-status-badge [label]="dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type) || ''" type="secondary"></app-status-badge>
+                      <mat-icon style="opacity: 0.3;">chevron_right</mat-icon>
                     </div>
-                    <div matListItemLine style="margin-top: 4px; opacity: 0.7; line-height: 1.4;">{{ag.description}}</div>
-                  </mat-list-item>
+                  </div>
+                  <div matListItemLine style="margin-top: 4px; opacity: 0.7; line-height: 1.4; font-weight: 400;">{{ag.description}}</div>
+                </mat-list-item>
                   <mat-divider></mat-divider>
                 }
               </mat-list>
