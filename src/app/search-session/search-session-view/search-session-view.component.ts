@@ -15,6 +15,7 @@ import {MatIcon} from "@angular/material/icon";
 import {WebsocketService} from "../../websocket.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {environment} from "../../../environments/environment";
+import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component";
 
 @Component({
     selector: 'app-search-session-view',
@@ -29,7 +30,8 @@ import {environment} from "../../../environments/environment";
         SelectedResultViewComponent,
         MatInput,
         MatIconButton,
-        MatIcon
+        MatIcon,
+        BreadcrumbComponent
     ],
     templateUrl: './search-session-view.component.html',
     styleUrl: './search-session-view.component.scss'

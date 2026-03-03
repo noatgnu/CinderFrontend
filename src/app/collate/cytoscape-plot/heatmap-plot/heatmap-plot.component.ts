@@ -1,82 +1,55 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
-import * as PlotlyJS from 'plotly.js-dist-min';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {PlotlyModule} from "angular-plotly.js";
+import {HeatmapDataPoint} from "../cytoscape-plot.types";
+import {MatIconButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-heatmap-plot',
-  imports: [PlotlyModule],
+  imports: [PlotlyModule, MatIconButton, MatIcon, MatTooltip],
   templateUrl: './heatmap-plot.component.html',
-  styleUrl: './heatmap-plot.component.scss'
+  styleUrl: './heatmap-plot.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeatmapPlotComponent {
-  private _data: {
-    project: string
-    analysis_group: string,
-    conditionA: string,
-    conditionB: string,
-    log2fc: number,
-    p_value: number,
-    comparison: string,
-    protein: string,
-    searchTerm: string
-  }[] = []
-  @Input() set data (value: {
-    project: string
-    analysis_group: string,
-    conditionA: string,
-    conditionB: string,
-    log2fc: number,
-    p_value: number,
-    comparison: string,
-    protein: string,
-    searchTerm: string
-  }[]) {
+  private _data: HeatmapDataPoint[] = [];
+  private _highlightedProtein: string | null = null;
+
+  @Input() set data(value: HeatmapDataPoint[]) {
     this._data = value;
     this.drawHeatmap();
   }
 
-  @Output() currentHoverTarget: EventEmitter<{
-    project: string
-    analysis_group: string,
-    conditionA: string,
-    conditionB: string,
-    log2fc: number,
-    p_value: number,
-    comparison: string,
-    protein: string,
-    searchTerm: string
-  }> = new EventEmitter<{
-    project: string
-    analysis_group: string,
-    conditionA: string,
-    conditionB: string,
-    log2fc: number,
-    p_value: number,
-    comparison: string,
-    protein: string,
-    searchTerm: string
-  }>();
+  @Input() set highlightedProtein(value: string | null) {
+    this._highlightedProtein = value;
+    this.highlightProteinColumns(value);
+  }
 
-  get data() {
+  @Output() currentHoverTarget = new EventEmitter<HeatmapDataPoint | undefined>();
+
+  get data(): HeatmapDataPoint[] {
     return this._data;
   }
 
-  layout: any = {}
-  graphData: any = {}
-  revision = 0
-  reversePointIndexToProject: any = {}
-  reversePointIndexToColumn: any = {}
-  reversePointIndexToData: any = {}
+  get highlightedProtein(): string | null {
+    return this._highlightedProtein;
+  }
+
+  layout: any = {};
+  graphData: any[] = [];
+  revision = 0;
+  reversePointIndexToProject: Record<number, any> = {};
+  reversePointIndexToColumn: Record<number, any> = {};
+  reversePointIndexToData: Record<number, HeatmapDataPoint> = {};
+
+  plotConfig = {
+    responsive: true,
+    scrollZoom: true,
+    displayModeBar: true,
+    modeBarButtonsToAdd: ['pan2d', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
+    displaylogo: false
+  };
   drawHeatmap() {
     // Group data by project
     const projectGroups: any = {};
@@ -283,7 +256,6 @@ export class HeatmapPlotComponent {
       },yaxis: { title: 'Protein', showgrid: false },
       shapes: shapes
     };
-    console.log(layout)
     this.graphData = [trace];
     this.layout = layout;
     this.revision++;
@@ -311,6 +283,56 @@ export class HeatmapPlotComponent {
       this.currentHoverTarget.emit(undefined);
       this.revision++;
     }
+  }
 
+  private highlightProteinColumns(proteinId: string | null): void {
+    Object.keys(this.reversePointIndexToData).forEach(key => {
+      const index = parseInt(key, 10);
+      const data = this.reversePointIndexToData[index];
+      const shape = this.reversePointIndexToColumn[index];
+      if (shape) {
+        if (proteinId && data.protein === proteinId) {
+          shape.line.color = '#00ff00';
+          shape.line.width = 3;
+        } else {
+          shape.line.color = 'rgba(0,0,0,0)';
+          shape.line.width = 2;
+        }
+      }
+    });
+    this.revision++;
+  }
+
+  exportToCsv(): void {
+    if (!this.data || this.data.length === 0) return;
+
+    const headers = ['Protein', 'Project', 'Analysis Group', 'Condition A', 'Condition B', 'Comparison', 'Log2FC', 'P-value', 'Search Term'];
+    const rows = this.data.map(d => [
+      d.protein,
+      d.project,
+      d.analysis_group,
+      d.conditionA,
+      d.conditionB,
+      d.comparison,
+      d.log2fc.toString(),
+      d.p_value.toString(),
+      d.searchTerm
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `heatmap_${this.data[0]?.searchTerm || 'data'}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 }

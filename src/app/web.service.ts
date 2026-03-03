@@ -6,7 +6,7 @@ import {Project, ProjectQuery} from "./project/project";
 import {AnalysisGroup, AnalysisGroupCondition, AnalysisGroupQuery, CurtainData} from "./analysis-group/analysis-group";
 import {ProjectFile} from "./project-file";
 import {SampleAnnotation} from "./sample-annotation";
-import {map, Subject} from "rxjs";
+import {map, Observable, shareReplay, Subject} from "rxjs";
 import {ComparisonMatrix} from "./comparison-matrix";
 import {SearchResult, SearchResultQuery, SearchSession, SearchSessionQuery} from "./search-session";
 import {Species, SpeciesQuery} from "./species";
@@ -28,6 +28,7 @@ import {UnimodQuery} from "./unimod";
 export class WebService {
   cinderInstanceID: string = crypto.randomUUID()
   baseURL: string = environment.baseURL
+  private stringDBCache = new Map<string, Observable<any[]>>();
   keycloakCallbackUrl: string = environment.keycloakCallbackUrl
   searchSessionID: string|null = null
   updateFromLabGroupSelection: Subject<boolean> = new Subject<boolean>()
@@ -1153,7 +1154,13 @@ export class WebService {
     return this.http.get<UserProfile>(`${this.baseURL}/api/users/get_profile/`, {responseType: 'json', observe: 'body'})
   }
 
-  getStringDBInteractions(genes: string[], organism: string, score: number = 400, networkType: string = "functional", add_nodes: number = 0, show_query_node_labels: boolean = true) {
+  getStringDBInteractions(genes: string[], organism: string, score: number = 400, networkType: string = "functional", add_nodes: number = 0, show_query_node_labels: boolean = true): Observable<any[]> {
+    const cacheKey = `${genes.sort().join(',')}_${organism}_${score}_${networkType}_${add_nodes}`;
+    const cached = this.stringDBCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     let params = new HttpParams();
     params = params.append("identifiers", genes.join("%0d"));
     params = params.append("required_score", score.toString());
@@ -1165,9 +1172,16 @@ export class WebService {
     if (show_query_node_labels) {
       params = params.append("show_query_node_labels", "1");
     }
-    return this.http.get<any[]>(
+    const request$ = this.http.get<any[]>(
       "https://string-db.org/api/json/network?",
       {responseType: "json", params: params, observe: "body"}
-    )
+    ).pipe(shareReplay(1));
+
+    this.stringDBCache.set(cacheKey, request$);
+    return request$;
+  }
+
+  clearStringDBCache(): void {
+    this.stringDBCache.clear();
   }
 }

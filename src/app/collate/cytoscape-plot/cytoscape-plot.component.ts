@@ -1,24 +1,19 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, ViewChild, ViewEncapsulation} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild, ViewEncapsulation} from '@angular/core';
 import cytoscape from "cytoscape";
-import {SearchResult, SearchSession} from "../../search-session";
+import {SearchResult} from "../../search-session";
 import {Project} from "../../project/project";
-import euler from 'cytoscape-euler';
 import popper, {PopperInstance} from 'cytoscape-popper';
-import {computePosition, flip, shift, limitShift} from "@floating-ui/dom";
+import {computePosition, flip, limitShift, shift} from "@floating-ui/dom";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass} from "@angular/common";
 import {CollateService} from "../collate.service";
 import Layers, {ICanvasLayer, IPoint} from 'cytoscape-layers';
-import cy from "cytoscape";
 import fcose from 'cytoscape-fcose';
-import edgehandles from 'cytoscape-edgehandles';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatDialog} from "@angular/material/dialog";
-import {
-  CytoscapePlotFilterDialogComponent
-} from "./cytoscape-plot-filter-dialog/cytoscape-plot-filter-dialog.component";
+import {CytoscapePlotFilterDialogComponent} from "./cytoscape-plot-filter-dialog/cytoscape-plot-filter-dialog.component";
 import {StringDbDialogComponent} from "./string-db-dialog/string-db-dialog.component";
 import {WebService} from "../../web.service";
 // @ts-ignore
@@ -28,6 +23,9 @@ import pdf from 'cytoscape-pdf-export';
 import {HeatmapPlotComponent} from "./heatmap-plot/heatmap-plot.component";
 import {MatToolbar} from "@angular/material/toolbar";
 import {GraphService} from "../../graph.service";
+import {CytoscapeElement, CytoscapeFilter, HeatmapDataPoint, StringDBInteraction} from "./cytoscape-plot.types";
+import {Subscription} from "rxjs";
+import {CytoscapeGraphService} from "./cytoscape-graph.service";
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -79,90 +77,97 @@ function popperFactory(ref: any, content: any, opts: any) {
   ],
   templateUrl: './cytoscape-plot.component.html',
   styleUrl: './cytoscape-plot.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CytoscapePlotComponent implements AfterViewInit{
-  showBarChart: boolean = true;
-  showCytoscapePlot: boolean = false;
-  heatmapData: {
-    project: string
-    analysis_group: string,
-    conditionA: string,
-    conditionB: string,
-    log2fc: number,
-    p_value: number,
-    comparison: string,
-    protein: string,
-    searchTerm: string,
-  }[] = [];
-  heatMapGroupData: {
-    project: string,
-    analysis_group: string,
-    conditionA: string,
-    conditionB: string,
-    log2fc: number,
-    p_value: number,
-    comparison: string,
-    protein: string,
-    searchTerm: string
-  }[][] = [];
+export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
+  showBarChart = true;
+  showCytoscapePlot = false;
+  heatmapData: HeatmapDataPoint[] = [];
+  heatMapGroupData: HeatmapDataPoint[][] = [];
+
   @ViewChild('cy') cyElement!: ElementRef;
   @ViewChild('heatmapContainer') heatmapContainer!: ElementRef;
   @ViewChild('cytoscapePlotContainer') cytoscapePlotContainer!: ElementRef;
   @Input() projects: Project[] = [];
-  @Input() searchResultsMap: { [projectID: string]: SearchResult[] } = {};
-  @Input() renameCondition: { [projectID: number]: {
-      [key: string]: string
-    } } = {};
+  @Input() searchResultsMap: Record<string, SearchResult[]> = {};
+  @Input() renameCondition: Record<number, Record<string, string>> = {};
+  @Output() proteinSelected = new EventEmitter<string | null>();
 
-  cy!: cytoscape.Core
+  selectedProtein: string | null = null;
+  cy!: cytoscape.Core;
   currentPopperRef: PopperInstance | null = null;
   currentTooltip: HTMLElement | null = null;
-  barChartLayers: Map<string, ICanvasLayer> = new Map();
-  projectColorMap: { [projectId: string]: string } = {};
-  cytoscapeElements: any[] = [];
-  currentFilter: { log2fc: number, pvalue: number, projectNames: string[], analysisGroupNames: string[] } = { log2fc: 0, pvalue: 0, projectNames: [], analysisGroupNames: [] };
-  layers: any;
+  barChartLayers = new Map<string, ICanvasLayer>();
+  projectColorMap: Record<string, string> = {};
+  cytoscapeElements: CytoscapeElement[] = [];
+  currentFilter: CytoscapeFilter = { log2fc: 0, pvalue: 0, projectNames: [], analysisGroupNames: [] };
+  layers: any = null;
   defaultSticky = true;
   isExpanded = false;
-  constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog, private webService: WebService, private graphService: GraphService) {
 
-  }
+  private subscriptions: Subscription[] = [];
+  private scrollHandler = this.onScroll.bind(this);
 
-  ngAfterViewInit() {
-    window.addEventListener('scroll', this.onScroll.bind(this));
+  constructor(
+    private collateService: CollateService,
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog,
+    private webService: WebService,
+    private graphService: GraphService,
+    private cytoscapeGraphService: CytoscapeGraphService
+  ) {}
+
+  ngAfterViewInit(): void {
+    window.addEventListener('scroll', this.scrollHandler);
     cytoscape.use(fcose);
     cytoscape.use(popper(popperFactory));
     cytoscape.use(Layers);
     cytoscape.use(pdf);
-    //cytoscape.use(edgehandles);
-    this.initCytoscape()
-    this.collateService.collateRedrawSubject.subscribe(() => {
-      this.updateCytoscape()
-    })
+    this.initCytoscape();
 
-    this.graphService.proteinSelectionSubject.subscribe((proteinIDs) => {
-      if (this.cy && proteinIDs.length > 0) {
-        this.cy.batch(() => {
-          this.cy.nodes().removeClass('highlighted');
-          proteinIDs.forEach(id => {
-            // Find nodes where id contains the protein ID (since some nodes have concatenated IDs)
-            const targets = this.cy.nodes().filter(node => node.id().includes(id));
-            targets.addClass('highlighted');
-            targets.select();
+    this.subscriptions.push(
+      this.collateService.collateRedrawSubject.subscribe(() => {
+        this.updateCytoscape();
+      })
+    );
+
+    this.subscriptions.push(
+      this.graphService.proteinSelectionSubject.subscribe((proteinIDs) => {
+        if (this.cy && proteinIDs.length > 0) {
+          this.cy.batch(() => {
+            this.cy.nodes().removeClass('highlighted');
+            proteinIDs.forEach(id => {
+              const targets = this.cy.nodes().filter(node => node.id().includes(id));
+              targets.addClass('highlighted');
+              targets.select();
+            });
           });
-        });
-        const highlighted = this.cy.nodes('.highlighted');
-        if (highlighted.length > 0) {
-          this.cy.animate({
-            fit: {
-              eles: highlighted,
-              padding: 50
-            }
-          }, { duration: 500 });
+          const highlighted = this.cy.nodes('.highlighted');
+          if (highlighted.length > 0) {
+            this.cy.animate({
+              fit: { eles: highlighted, padding: 50 }
+            }, { duration: 500 });
+          }
         }
-      }
-    });
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('scroll', this.scrollHandler);
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    if (this.cy) {
+      this.cy.destroy();
+    }
+    this.cleanupTooltip();
+  }
+
+  private cleanupTooltip(): void {
+    if (this.currentTooltip && this.currentTooltip.parentNode) {
+      this.currentTooltip.parentNode.removeChild(this.currentTooltip);
+      this.currentTooltip = null;
+    }
   }
 
   updateCytoscape() {
@@ -190,6 +195,13 @@ export class CytoscapePlotComponent implements AfterViewInit{
               'font-size': 16,
               'font-weight': 'bold',
               'label': 'data(label)'
+            }
+          },
+          { selector: 'node.selected', style: {
+              'border-width': 4,
+              'border-color': '#00ff00',
+              'font-size': 14,
+              'font-weight': 'bold'
             }
           },
           { selector: 'edge[color]', style: {
@@ -269,6 +281,24 @@ export class CytoscapePlotComponent implements AfterViewInit{
           targetNode.style('label', currentLabel ? '' : targetNode.data('label'));
         });
       });
+
+      this.cy.nodes('.protein').forEach(node => {
+        node.on('click', (event) => {
+          const targetNode = event.target;
+          const proteinId = targetNode.data('id');
+          if (this.selectedProtein === proteinId) {
+            this.selectedProtein = null;
+            this.cy.nodes('.protein').removeClass('selected');
+          } else {
+            this.selectedProtein = proteinId;
+            this.cy.nodes('.protein').removeClass('selected');
+            targetNode.addClass('selected');
+          }
+          this.proteinSelected.emit(this.selectedProtein);
+          this.cdr.markForCheck();
+        });
+      });
+
       //@ts-ignore
       const layers: any = this.cy.layers()
       this.layers = layers;
@@ -342,7 +372,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   private drawBarChartOnEdges(layers: any) {
     layers.renderPerEdge(
       layers.nodeLayer.insertAfter('canvas'),
-      (ctx: CanvasRenderingContext2D, edge: cy.EdgeSingular, path: Path2D, start: IPoint, end: IPoint) => {
+      (ctx: CanvasRenderingContext2D, edge: cytoscape.EdgeSingular, path: Path2D, start: IPoint, end: IPoint) => {
 
         // draw bar chart in middle of edge
         if (!this.showBarChart || !edge.data('showBarChart')) {
@@ -396,94 +426,16 @@ export class CytoscapePlotComponent implements AfterViewInit{
   }
 
 
-  buildGraphElements() {
-    const elements: any[] = [];
-    const addedNodes = new Set();
-    const projectColorMap: { [projectId: string]: string } = {};
-    const heatmapData: any[] = [];
-    this.projects.forEach(project => {
-      const searchResults = this.searchResultsMap[project.id] || [];
-      if (!projectColorMap[project.id]) {
-        projectColorMap[project.id] = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-      }
-      const projectColor = projectColorMap[project.id];
-
-      searchResults.forEach(result => {
-        const proteinId = result.gene_name || result.uniprot_id || result.primary_id;
-
-        if (!addedNodes.has(proteinId)) {
-          elements.push({ data: { id: proteinId, label: proteinId, size: 25 }, classes: 'protein' });
-          addedNodes.add(proteinId);
-        }
-
-        let conditionA = result.condition_A;
-        let conditionB = result.condition_B;
-        if (this.renameCondition[project.id]) {
-          if (this.renameCondition[project.id][result.condition_A]) {
-            conditionA = this.renameCondition[project.id][result.condition_A];
-          }
-          if (this.renameCondition[project.id][result.condition_B]) {
-            conditionB = this.renameCondition[project.id][result.condition_B];
-          }
-        }
-        const comparisonId = `${conditionA} vs ${conditionB}`;
-        if (!addedNodes.has(comparisonId)) {
-          elements.push({ data: { id: comparisonId, label: `${conditionA} vs ${conditionB}`, size: 25}, classes: 'comparison' });
-          addedNodes.add(comparisonId);
-        }
-        const conditionAValues = result.searched_data.filter(data => data.Condition === result.condition_A && data.Value);
-        const conditionBValues = result.searched_data.filter(data => data.Condition === result.condition_B && data.Value);
-        let intensityA = 0;
-        let intensityB = 0;
-        // calculate average intensity for each condition if multiple values are present and ignore NaN or undefined or null or empty values
-        if (conditionAValues.length > 0) {
-          intensityA = conditionAValues.reduce((acc, curr) => acc + curr.Value, 0) / conditionAValues.length;
-        }
-        if (conditionBValues.length > 0) {
-          intensityB = conditionBValues.reduce((acc, curr) => acc + curr.Value, 0) / conditionBValues.length;
-        }
-
-        // Determine the direction of the edge based on the fold change
-        const source = result.log2_fc > 0 ? proteinId : comparisonId;
-        const target = result.log2_fc > 0 ? comparisonId : proteinId;
-
-        elements.push({
-          data: {
-            id: `${proteinId}-${comparisonId}-${project.id}-${result.analysis_group.id}`,
-            source: source,
-            target: target,
-            color: projectColor,
-            conditionA: conditionA,
-            conditionB: conditionB,
-            intensityA: intensityA,
-            intensityB: intensityB,
-            analysis_group: result.analysis_group.name,
-            project: project.name,
-            fc: result.log2_fc,
-            p_value: result.log10_p,
-            protein: proteinId,
-            searchTerm: result.search_term
-          }
-        });
-        heatmapData.push({
-          project: project.name,
-          analysis_group: result.analysis_group.name,
-          conditionA: conditionA,
-          conditionB: conditionB,
-          log2fc: result.log2_fc,
-          p_value: result.log10_p,
-          comparison: comparisonId,
-          protein: proteinId,
-          searchTerm: result.search_term
-        })
-      });
-    });
-    this.heatmapData = heatmapData;
-    console.log(this.heatmapData)
-    console.log(elements)
-    this.projectColorMap = projectColorMap;
-    this.heatMapGroupData = this.convertHeatmapDataToHeatmapGroupData()
-    return elements;
+  buildGraphElements(): CytoscapeElement[] {
+    const result = this.cytoscapeGraphService.buildGraphElements(
+      this.projects,
+      this.searchResultsMap,
+      this.renameCondition
+    );
+    this.heatmapData = result.heatmapData;
+    this.projectColorMap = result.projectColorMap;
+    this.heatMapGroupData = this.cytoscapeGraphService.groupHeatmapDataBySearchTerm(this.heatmapData);
+    return result.elements;
   }
 
   toggleCytoscapePlot() {
@@ -493,10 +445,6 @@ export class CytoscapePlotComponent implements AfterViewInit{
   toggleBarChart() {
     this.showBarChart = !this.showBarChart;
     this.updateCytoscape();
-  }
-
-  getRandomColor(): string {
-    return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
   }
 
   getProjectColor(projectId: string): string {
@@ -634,7 +582,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
     });
   }
 
-  addStringDBInteractions(data: any[]) {
+  addStringDBInteractions(data: StringDBInteraction[]): void {
     const addedNodes = new Set<string>();
     const addedEdges = new Set<string>();
 
@@ -878,10 +826,10 @@ export class CytoscapePlotComponent implements AfterViewInit{
     if (!this.cy) {
       return;
     }
-    if (!this.cy.container()) {
+    if (!this.cy.container() || !this.layers) {
       return;
     }
-    const blob = this.layers.png({
+    this.layers.png({
       output: 'blob-promise',
       ignoreUnsupportedLayerOrder: true,
       full: true,
@@ -896,26 +844,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
     })
   }
 
-  convertHeatmapDataToHeatmapGroupData() {
-    // group by searchTerm
-    const groupedData: { [searchTerm: string]: {
-        project: string,
-        analysis_group: string,
-        conditionA: string,
-        conditionB: string,
-        log2fc: number,
-        p_value: number,
-        comparison: string,
-        protein: string,
-        searchTerm: string
-      }[] } = {};
-    this.heatmapData.forEach(data => {
-      if (!groupedData[data.searchTerm]) {
-        groupedData[data.searchTerm] = [];
-      }
-      groupedData[data.searchTerm].push(data);
-    })
-    return Object.values(groupedData);
+  convertHeatmapDataToHeatmapGroupData(): HeatmapDataPoint[][] {
+    return this.cytoscapeGraphService.groupHeatmapDataBySearchTerm(this.heatmapData);
   }
 
   onScroll() {
@@ -962,26 +892,12 @@ export class CytoscapePlotComponent implements AfterViewInit{
     this.cy.fit();
   }
 
-  handleHoverTarget(data: {
-    project: string,
-    analysis_group: string,
-    conditionA: string,
-    conditionB: string,
-    log2fc: number,
-    p_value: number,
-    comparison: string,
-    protein: string,
-    searchTerm: string
-  }|undefined) {
-
+  handleHoverTarget(data: HeatmapDataPoint | undefined): void {
     this.cy.edges().stop(true).style('opacity', 1);
 
     if (data) {
-      // Apply blinking effect to the targeted edge
       this.cy.edges().forEach(edge => {
         const edgeData = edge.data();
-        console.log(edgeData.project === data.project, edgeData.analysis_group === data.analysis_group, edgeData.conditionA === data.conditionA, edgeData.conditionB === data.conditionB, edgeData.protein === data.protein, edgeData.searchTerm === data.searchTerm)
-
         if (
           edgeData.project === data.project &&
           edgeData.analysis_group === data.analysis_group &&
@@ -990,7 +906,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
           edgeData.protein === data.protein &&
           edgeData.searchTerm === data.searchTerm
         ) {
-          const blink = () => {
+          const blink = (): void => {
             edge.animate({ style: { opacity: 0 } }, {
               duration: 500,
               complete: () => {
@@ -999,9 +915,8 @@ export class CytoscapePlotComponent implements AfterViewInit{
                   complete: blink
                 });
               }
-            })
-          }
-          console.log(edge)
+            });
+          };
           blink();
         }
       });

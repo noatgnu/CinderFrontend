@@ -32,6 +32,7 @@ import {
 } from "../collate-cytoscape-term-result-filter-dialog/collate-cytoscape-term-result-filter-dialog.component";
 import {LoginDialogComponent} from "../../accounts/login-dialog/login-dialog.component";
 import {catchError, finalize, Subject, takeUntil} from "rxjs";
+import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component";
 
 @Component({
     selector: 'app-collate-view',
@@ -55,6 +56,7 @@ import {catchError, finalize, Subject, takeUntil} from "rxjs";
     CytoscapePlotComponent,
     NgClass,
     MatButton,
+    BreadcrumbComponent
   ],
     templateUrl: './collate-view.component.html',
     styleUrl: './collate-view.component.scss'

@@ -2,12 +2,14 @@ import {Component, OnInit} from '@angular/core';
 import {BannerComponent} from "../banner/banner.component";
 import {FooterComponent} from "../footer/footer.component";
 import {WebService} from "../web.service";
+import {BreadcrumbComponent} from "../shared/breadcrumb/breadcrumb.component";
 
 @Component({
     selector: 'app-home',
     imports: [
         BannerComponent,
-        FooterComponent
+        FooterComponent,
+        BreadcrumbComponent
     ],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'

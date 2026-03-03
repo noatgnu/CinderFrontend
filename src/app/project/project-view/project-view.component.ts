@@ -18,6 +18,7 @@ import {Species, SpeciesQuery} from "../../species";
 import {MatSelect} from "@angular/material/select";
 import {Title} from "@angular/platform-browser";
 import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
+import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component";
 
 @Component({
     selector: 'app-project-view',
@@ -36,7 +37,8 @@ import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-
         MatSelectionList,
         MatListOption,
         MatIconButton,
-        MatSuffix
+        MatSuffix,
+        BreadcrumbComponent
     ],
     templateUrl: './project-view.component.html',
     styleUrl: './project-view.component.scss'

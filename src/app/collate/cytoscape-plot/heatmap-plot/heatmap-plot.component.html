@@ -1,3 +1,6 @@
-<div style="display:block; overflow: auto">
-  <plotly-plot (hover)="handleHoverIn($event)" (unhover)="handleHoverOut($event)" [data]="graphData" [layout]="layout" [updateOnlyWithRevision]="true" [revision]="revision"></plotly-plot>
+<div style="display:block; overflow: auto; position: relative;">
+  <button mat-icon-button matTooltip="Export to CSV" (click)="exportToCsv()" style="position: absolute; top: 5px; right: 5px; z-index: 100;">
+    <mat-icon>download</mat-icon>
+  </button>
+  <plotly-plot (hover)="handleHoverIn($event)" (unhover)="handleHoverOut($event)" [data]="graphData" [layout]="layout" [config]="plotConfig" [updateOnlyWithRevision]="true" [revision]="revision"></plotly-plot>
 </div>

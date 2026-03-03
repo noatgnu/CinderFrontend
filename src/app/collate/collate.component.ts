@@ -25,6 +25,8 @@ import {AsyncPipe} from "@angular/common";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
+import {BreadcrumbComponent} from "../shared/breadcrumb/breadcrumb.component";
+
 @Component({
     selector: 'app-collate',
     imports: [
@@ -50,7 +52,8 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
         MatAutocomplete,
         AsyncPipe,
         ReactiveFormsModule,
-        MatAutocompleteTrigger
+        MatAutocompleteTrigger,
+        BreadcrumbComponent
     ],
     templateUrl: './collate.component.html',
     styleUrl: './collate.component.scss'

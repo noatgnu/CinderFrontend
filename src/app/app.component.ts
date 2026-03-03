@@ -7,12 +7,11 @@ import {WebService} from "./web.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {UiSettingsService} from "./ui-settings.service";
 import {OperationCenterComponent} from "./shared/operation-center/operation-center.component";
-import {BreadcrumbComponent} from "./shared/breadcrumb/breadcrumb.component";
 import {CommandPaletteComponent} from "./shared/command-palette/command-palette.component";
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, NavbarComponent, OperationCenterComponent, BreadcrumbComponent, CommandPaletteComponent],
+    imports: [RouterOutlet, NavbarComponent, OperationCenterComponent, CommandPaletteComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss'
 })
