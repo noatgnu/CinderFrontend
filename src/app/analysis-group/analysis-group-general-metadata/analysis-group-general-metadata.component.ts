@@ -11,7 +11,6 @@ import {
   MatHeaderRowDef,
   MatRow, MatRowDef, MatTable
 } from "@angular/material/table";
-import {MatChip, MatChipSet} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
 import {MatDialog} from "@angular/material/dialog";
 import {
@@ -22,7 +21,8 @@ import {MatFormField, MatInput, MatSuffix} from "@angular/material/input";
 import {MatHint, MatLabel} from "@angular/material/form-field";
 import {AsyncPipe} from "@angular/common";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
-import {filter, map, Observable, of, startWith, switchMap} from "rxjs";
+import {Observable, of} from "rxjs";
+import {map} from "rxjs/operators";
 import {SubcellularLocation} from "../../subcellular-location";
 import {HumanDisease} from "../../human-disease";
 import {Tissue} from "../../tissue";
@@ -37,7 +37,6 @@ import {
   MatExpansionPanelTitle
 } from "@angular/material/expansion";
 import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-dialog.component";
-import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
 import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
 import {Species} from "../../species";
 import {WebsocketService} from "../../websocket.service";
@@ -56,6 +55,7 @@ import {AnalysisGroup} from "../analysis-group";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {signal, computed} from '@angular/core';
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
     selector: 'app-analysis-group-general-metadata',
@@ -63,8 +63,6 @@ import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-to
         MatButton,
         MatCell,
         MatCellDef,
-        MatChip,
-        MatChipSet,
         MatColumnDef,
         MatHeaderCell,
         MatHeaderRow,
@@ -92,9 +90,6 @@ import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-to
         MatExpansionPanelTitle,
         MatExpansionPanelDescription,
         MatExpansionPanelHeader,
-        MatCard,
-        MatCardHeader,
-        MatCardContent,
         MatHint,
         ReactiveFormsModule,
         MatSuffix,
@@ -106,7 +101,8 @@ import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-to
         AnalysisGroupMetadataImportComponent,
         MatPaginator,
         MatButtonToggleGroup,
-        MatButtonToggle
+        MatButtonToggle,
+        MatDivider
     ],
     templateUrl: './analysis-group-general-metadata.component.html',
     styleUrl: './analysis-group-general-metadata.component.scss'

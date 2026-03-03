@@ -43,9 +43,9 @@
       
       @if (analysisGroupQuery) {
         <div style="border-radius: 12px; background-color: var(--mdc-theme-surface-variant, rgba(0,0,0,0.05)); overflow: hidden;">
-          <div style="padding: 24px;">
-            <h3 style="margin-top: 0;">Associated Analysis Groups</h3>
-            @if (analysisGroupQuery.results.length > 0) {
+          @if (analysisGroupQuery.results.length > 0) {
+            <div style="padding: 24px;">
+              <h3 style="margin-top: 0;">Associated Analysis Groups</h3>
               <mat-list>
                 @for (ag of analysisGroupQuery.results; track ag.id) {
                   <mat-list-item style="height: auto; padding: 12px 0; cursor: pointer;">
@@ -62,7 +62,6 @@
                 }
               </mat-list>
             </div>
-            
             <div class="paginator-footer">
               <mat-paginator [length]="analysisGroupQuery.count"
                              [pageSize]="pageSize"
