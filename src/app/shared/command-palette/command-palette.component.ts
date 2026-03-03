@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
@@ -14,13 +14,12 @@ import { debounceTime, distinctUntilChanged, switchMap, of, forkJoin } from 'rxj
   selector: 'app-command-palette-dialog',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    MatAutocompleteModule, 
-    MatInputModule, 
-    MatFormFieldModule, 
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    MatInputModule,
+    MatFormFieldModule,
     MatIconModule
-  ],
+],
   template: `
     <div class="command-palette-wrapper">
       <mat-form-field appearance="fill" class="search-field">
@@ -119,17 +118,18 @@ export class CommandPaletteDialogComponent implements OnInit {
 @Component({
   selector: 'app-command-palette',
   standalone: true,
-  imports: [CommonModule, MatDialogModule],
+  imports: [MatDialogModule],
   template: ''
 })
 export class CommandPaletteComponent {
   constructor(private dialog: MatDialog) {}
 
-  @HostListener('window:keydown.control.k', ['$event'])
-  @HostListener('window:keydown.meta.k', ['$event'])
+  @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
-    event.preventDefault();
-    this.openPalette();
+    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+      event.preventDefault();
+      this.openPalette();
+    }
   }
 
   openPalette() {

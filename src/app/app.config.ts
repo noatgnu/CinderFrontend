@@ -1,10 +1,13 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
 import {provideRouter, withComponentInputBinding, withHashLocation} from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {provideHttpClient, withInterceptors} from "@angular/common/http";
 import {authInterceptor} from "./auth.interceptor";
+
+import * as PlotlyJS from 'plotly.js';
+import { PlotlyModule } from 'angular-plotly.js';
 
 export const appConfig: ApplicationConfig = {
   providers:
@@ -18,6 +21,7 @@ export const appConfig: ApplicationConfig = {
       provideHttpClient(
         withInterceptors([authInterceptor])
       ),
-      provideAnimationsAsync()
+      provideAnimationsAsync(),
+      importProvidersFrom(PlotlyModule.forRoot(PlotlyJS))
     ]
 };

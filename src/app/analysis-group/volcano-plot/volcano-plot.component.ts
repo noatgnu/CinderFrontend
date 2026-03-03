@@ -1,15 +1,13 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CurtainData} from "../analysis-group";
 
-import * as PlotlyJS from 'plotly.js-dist-min';
+import * as PlotlyJS from 'plotly.js';
 import { PlotlyModule } from 'angular-plotly.js';
 import {AccountsService} from "../../accounts/accounts.service";
 import {GraphService} from "../../graph.service";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
-
-PlotlyModule.plotlyjs = PlotlyJS;
 
 @Component({
     selector: 'app-volcano-plot',

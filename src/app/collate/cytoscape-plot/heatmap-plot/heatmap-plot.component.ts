@@ -9,10 +9,8 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
+import * as PlotlyJS from 'plotly.js';
 import {PlotlyModule} from "angular-plotly.js";
-import * as PlotlyJS from "plotly.js-dist-min";
-
-PlotlyModule.plotlyjs = PlotlyJS;
 
 @Component({
   selector: 'app-heatmap-plot',

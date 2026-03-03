@@ -18,6 +18,7 @@ import {LabGroupUserListDialogComponent} from "./lab-group-user-list-dialog/lab-
 import {User} from "../user/user";
 import {UiSettingsService} from "../ui-settings.service";
 import {MatTooltip} from "@angular/material/tooltip";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
     selector: 'app-navbar',
@@ -31,7 +32,8 @@ import {MatTooltip} from "@angular/material/tooltip";
         NgOptimizedImage,
         MatSlideToggle,
         MatButton,
-        MatTooltip
+        MatTooltip,
+        MatDivider
     ],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss'

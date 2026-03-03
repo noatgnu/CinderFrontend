@@ -9,30 +9,37 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, RouterModule, MatIconModule],
   template: `
-    <nav class="breadcrumb-nav" aria-label="Breadcrumb" *ngIf="(breadcrumbService.breadcrumbs$ | async)?.length">
-      <ol class="breadcrumb-list">
-        <li class="breadcrumb-item">
-          <a routerLink="/home" class="breadcrumb-link">
-            <mat-icon class="home-icon">home</mat-icon>
-          </a>
-        </li>
-        <li *ngFor="let breadcrumb of breadcrumbService.breadcrumbs$ | async; let last = last" class="breadcrumb-item">
-          <mat-icon class="separator">chevron_right</mat-icon>
-          <a *ngIf="!last" [routerLink]="breadcrumb.url" class="breadcrumb-link">
-            {{ breadcrumb.label }}
-          </a>
-          <span *ngIf="last" class="breadcrumb-current" aria-current="page">
-            {{ breadcrumb.label }}
-          </span>
-        </li>
-      </ol>
-    </nav>
-  `,
+    @if ((breadcrumbService.breadcrumbs$ | async)?.length) {
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item">
+            <a routerLink="/home" class="breadcrumb-link">
+              <mat-icon class="home-icon">home</mat-icon>
+            </a>
+          </li>
+          @for (breadcrumb of breadcrumbService.breadcrumbs$ | async; track breadcrumb; let last = $last) {
+            <li class="breadcrumb-item">
+              <mat-icon class="separator">chevron_right</mat-icon>
+              @if (!last) {
+                <a [routerLink]="breadcrumb.url" class="breadcrumb-link">
+                  {{ breadcrumb.label }}
+                </a>
+              }
+              @if (last) {
+                <span class="breadcrumb-current" aria-current="page">
+                  {{ breadcrumb.label }}
+                </span>
+              }
+            </li>
+          }
+        </ol>
+      </nav>
+    }
+    `,
   styles: [`
     .breadcrumb-nav {
-      padding: 12px 24px;
-      background-color: var(--mdc-theme-surface, #f5f5f5);
-      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding: 16px 0;
+      background-color: transparent;
     }
     
     .breadcrumb-list {
@@ -47,37 +54,38 @@ import { MatIconModule } from '@angular/material/icon';
     .breadcrumb-item {
       display: flex;
       align-items: center;
-      font-size: 13px;
-      color: var(--mdc-theme-text-secondary-on-background, rgba(0, 0, 0, 0.6));
+      font-size: 14px;
+      color: var(--mdc-theme-text-secondary-on-background);
     }
     
     .breadcrumb-link {
-      color: var(--mdc-theme-primary, #6750a4);
+      color: var(--mdc-theme-primary);
       text-decoration: none;
       font-weight: 500;
+      transition: color 0.2s;
     }
     
     .breadcrumb-link:hover {
-      text-decoration: underline;
+      color: var(--mdc-theme-tertiary);
     }
     
     .breadcrumb-current {
-      font-weight: 600;
-      color: var(--mdc-theme-text-primary-on-background, rgba(0, 0, 0, 0.87));
+      font-weight: 500;
+      color: var(--mdc-theme-text-primary-on-background);
     }
     
     .separator {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
       margin: 0 4px;
-      opacity: 0.5;
+      opacity: 0.3;
     }
     
     .home-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
     }
   `]
 })

@@ -1,11 +1,9 @@
 import {Component, Input} from '@angular/core';
+import * as PlotlyJS from 'plotly.js';
 import {PlotlyModule} from "angular-plotly.js";
-import * as PlotlyJS from "plotly.js-dist-min";
 import {SearchResult} from "../../../search-session";
 import {GraphService} from "../../../graph.service";
 import {AccountsService} from "../../../accounts/accounts.service";
-
-PlotlyModule.plotlyjs = PlotlyJS;
 
 @Component({
     selector: 'app-bar-chart',

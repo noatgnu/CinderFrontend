@@ -25,12 +25,6 @@ import {EmptyStateComponent} from "../../shared/empty-state/empty-state.componen
 @Component({
     selector: 'app-search-result-list',
     imports: [
-        DatePipe,
-        MatDivider,
-        MatListOption,
-        MatSelectionList,
-        MatListItemTitle,
-        MatListItemLine,
         MatTable,
         MatColumnDef,
         MatHeaderCell,
