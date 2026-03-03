@@ -848,48 +848,31 @@ export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
     return this.cytoscapeGraphService.groupHeatmapDataBySearchTerm(this.heatmapData);
   }
 
-  onScroll() {
-    if (this.defaultSticky) {
-      if (this.cyElement && this.cytoscapePlotContainer && this.heatmapContainer) {
-        const cyContainer = this.cytoscapePlotContainer.nativeElement;
-        const heatmapContainer = this.heatmapContainer.nativeElement;
-        const heatmapRect = heatmapContainer.getBoundingClientRect();
-        if (heatmapRect.bottom < 0) {
-          cyContainer.style.position = 'relative';
-        } else {
-          cyContainer.style.position = 'sticky';
-          cyContainer.style.top = '0';
-        }
-      }
-    }
-
+  onScroll(): void {
   }
 
-  toggleSticky() {
+  toggleSticky(): void {
     this.defaultSticky = !this.defaultSticky;
-    if (!this.defaultSticky) {
-      if (this.cytoscapePlotContainer) {
-        this.cytoscapePlotContainer.nativeElement.style.position = 'relative';
-      }
-    } else {
-      this.cytoscapePlotContainer.nativeElement.style.position = 'sticky';
-      this.cytoscapePlotContainer.nativeElement.style.top = '0';
+    if (this.cytoscapePlotContainer) {
+      this.cytoscapePlotContainer.nativeElement.style.position = this.defaultSticky ? 'sticky' : 'relative';
     }
   }
 
-  toggleExpand() {
+  toggleExpand(): void {
     this.isExpanded = !this.isExpanded;
-    if (this.isExpanded) {
-      if (this.cyElement) {
-        this.cyElement.nativeElement.style.height = '800px';
-      }
-    } else {
-      if (this.cyElement) {
-        this.cyElement.nativeElement.style.height = '300px';
+    if (this.cytoscapePlotContainer) {
+      if (this.isExpanded) {
+        this.cytoscapePlotContainer.nativeElement.style.flex = '0 0 70%';
+        this.cytoscapePlotContainer.nativeElement.style.maxWidth = '70%';
+      } else {
+        this.cytoscapePlotContainer.nativeElement.style.flex = '0 0 50%';
+        this.cytoscapePlotContainer.nativeElement.style.maxWidth = '50%';
       }
     }
-    this.cy.resize();
-    this.cy.fit();
+    setTimeout(() => {
+      this.cy.resize();
+      this.cy.fit();
+    }, 300);
   }
 
   handleHoverTarget(data: HeatmapDataPoint | undefined): void {
