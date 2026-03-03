@@ -16,6 +16,8 @@ import {WebService} from "../web.service";
 import {LabGroupCreateDialogComponent} from "./lab-group-create-dialog/lab-group-create-dialog.component";
 import {LabGroupUserListDialogComponent} from "./lab-group-user-list-dialog/lab-group-user-list-dialog.component";
 import {User} from "../user/user";
+import {UiSettingsService} from "../ui-settings.service";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-navbar',
@@ -28,7 +30,8 @@ import {User} from "../user/user";
         MatMenuTrigger,
         NgOptimizedImage,
         MatSlideToggle,
-        MatButton
+        MatButton,
+        MatTooltip
     ],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss'
@@ -39,7 +42,14 @@ export class NavbarComponent implements OnInit {
   currentLabGroup: LabGroup | undefined;
   currentUser: User | undefined;
 
-  constructor(private webService: WebService, private router: Router, public accounts: AccountsService, private dialog: MatDialog, private graphService: GraphService) {
+  constructor(
+    private webService: WebService,
+    private router: Router,
+    public accounts: AccountsService,
+    private dialog: MatDialog,
+    private graphService: GraphService,
+    public uiSettings: UiSettingsService
+  ) {
     if (this.accounts.userAccount.currentUser) {
       this.webService.getUser(this.accounts.userAccount.currentUser).subscribe({
         next: (response) => {

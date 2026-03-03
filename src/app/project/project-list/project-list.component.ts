@@ -9,6 +9,7 @@ import {
   MatSelectionListChange
 } from "@angular/material/list";
 import {MatDivider} from "@angular/material/divider";
+import {StatusBadgeComponent} from "../../shared/status-badge/status-badge.component";
 
 @Component({
     selector: 'app-project-list',
@@ -18,7 +19,8 @@ import {MatDivider} from "@angular/material/divider";
         MatDivider,
         MatSelectionList,
         MatListOption,
-        MatListItemTitle
+        MatListItemTitle,
+        StatusBadgeComponent
     ],
     templateUrl: './project-list.component.html',
     styleUrl: './project-list.component.scss'

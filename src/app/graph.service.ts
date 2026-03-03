@@ -18,6 +18,7 @@ export class GraphService {
   ]
 
   redrawTrigger: Subject<boolean> = new Subject<boolean>()
+  proteinSelectionSubject: Subject<string[]> = new Subject<string[]>()
 
   plotSettings: any = {
     marginLeft: 150,

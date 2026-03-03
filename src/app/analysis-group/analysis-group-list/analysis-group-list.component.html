@@ -3,8 +3,8 @@
     @for (ag of analysisGroupQuery.results; track ag.id) {
       <mat-list-option [value]="ag" (click)="selectAnalysisGroup(ag)">
         <b>{{ag.name}}</b>
-        <span matListItemLine>
-          {{dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type)}}
+        <span matListItemLine style="display: flex; align-items: center; gap: 8px;">
+          <app-status-badge [label]="dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type) || ''" type="secondary"></app-status-badge>
         </span>
       </mat-list-option>
       <mat-divider></mat-divider>

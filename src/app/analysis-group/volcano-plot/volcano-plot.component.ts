@@ -5,12 +5,15 @@ import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
 import {AccountsService} from "../../accounts/accounts.service";
 import {GraphService} from "../../graph.service";
+import {MatIconButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
+import {MatTooltip} from "@angular/material/tooltip";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 
 @Component({
     selector: 'app-volcano-plot',
-    imports: [PlotlyModule],
+    imports: [PlotlyModule, MatIconButton, MatIcon, MatTooltip],
     templateUrl: './volcano-plot.component.html',
     styleUrl: './volcano-plot.component.scss'
 })
@@ -318,38 +321,34 @@ export class VolcanoPlotComponent {
         margin: this.graphLayout.margin
       }
     }
-    let element = document.getElementsByTagName("body")[0]
-    let style = window.getComputedStyle(element)
-    let backgroundColor = style.backgroundColor
-    if (this.accounts.userAccount.darkMode) {
-      this.graphLayout.plot_bgcolor = backgroundColor;
-      this.graphLayout.paper_bgcolor = backgroundColor;
-      this.graphLayout.font = {
-        color: "white",
-        size: 14
-      };
-      this.graphLayout.xaxis.tickfont.color = "white"
-      this.graphLayout.yaxis.tickfont.color = "white"
-      for (const s of this.graphLayout.shapes) {
-        s.line.color = "white"
+    
+    // Theme-aware coloring
+    const isDark = this.accounts.userAccount.darkMode;
+    const textColor = isDark ? '#FFFFFF' : '#000000';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const bgColor = getComputedStyle(document.body).backgroundColor || (isDark ? '#121212' : '#FFFFFF');
+
+    this.graphLayout.plot_bgcolor = bgColor;
+    this.graphLayout.paper_bgcolor = bgColor;
+    this.graphLayout.font = { color: textColor, size: 14 };
+    this.graphLayout.xaxis.tickfont.color = textColor;
+    this.graphLayout.yaxis.tickfont.color = textColor;
+    this.graphLayout.xaxis.title.font = { color: textColor };
+    this.graphLayout.yaxis.title.font = { color: textColor };
+    this.graphLayout.title.font.color = textColor;
+
+    for (const s of this.graphLayout.shapes) {
+      if (s.line.color === 'rgb(21,4,4)' || s.line.color === 'white' || s.line.color === 'black') {
+        s.line.color = textColor;
       }
-      if (this.graphLayout.yaxis.showgrid) {
-        this.graphLayout.yaxis.gridcolor = "white"
-      }
-      if (this.graphLayout.xaxis.showgrid) {
-        this.graphLayout.xaxis.gridcolor = "white"
-      }
-      for (const a of this.graphLayout.annotations) {
-        a.font.color = "white"
-        a.arrowcolor = "white"
-      }
-    } else {
-      this.graphLayout.plot_bgcolor = "#FFFFFF";
-      this.graphLayout.paper_bgcolor = "#FFFFFF";
-      this.graphLayout.font = {
-        color: "black",
-        size: 14
-      };
+    }
+
+    if (this.graphLayout.yaxis.showgrid) this.graphLayout.yaxis.gridcolor = gridColor;
+    if (this.graphLayout.xaxis.showgrid) this.graphLayout.xaxis.gridcolor = gridColor;
+
+    for (const a of this.graphLayout.annotations) {
+      a.font.color = textColor;
+      a.arrowcolor = textColor;
     }
 
     if (this.curtainData.settings.volcanoAdditionalShapes) {
@@ -359,8 +358,6 @@ export class VolcanoPlotComponent {
     }
 
     this.revision += 1
-    console.log("cutoff", cutOff)
-    console.log(this.graphData)
   }
 
   significantGroup(x: number, y: number) {
@@ -389,10 +386,16 @@ export class VolcanoPlotComponent {
   selectData(e: any) {
     if ("points" in e) {
       const selected: any[] = []
+      const selectedIDs: string[] = []
       for (const p of e["points"]) {
         selected.push(p.data.data[p.pointIndex])
+        const d = p.data.data[p.pointIndex]
+        if (d["Primary ID"]) selectedIDs.push(d["Primary ID"])
       }
       this.selected.emit(selected)
+      if (selectedIDs.length > 0) {
+        this.graph.proteinSelectionSubject.next(selectedIDs)
+      }
     }
   }
 }

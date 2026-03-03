@@ -1,21 +1,23 @@
 @if (searchResultQuery) {
   @if (searchResultQuery.results.length === 0) {
-    <div class="no-results">
-      <h2>No results found</h2>
-    </div>
+    <app-empty-state 
+      title="No search results" 
+      message="We couldn't find any proteins matching your search criteria across your projects."
+      icon="search_off">
+    </app-empty-state>
   } @else {
     <table mat-table [dataSource]="searchResultQuery.results" #table matSort (matSortChange)="handleSortChange($event)">
       <ng-container matColumnDef="primary_id">
         <th mat-header-cell *matHeaderCellDef> Primary ID </th>
-        <td mat-cell *matCellDef="let element"> {{element.primary_id}} </td>
+        <td mat-cell *matCellDef="let element" class="scientific-id" [innerHTML]="element.primary_id | highlight: element.search_term"></td>
       </ng-container>
       <ng-container matColumnDef="uniprot_id">
         <th mat-header-cell *matHeaderCellDef> UniProt Accession ID </th>
-        <td mat-cell *matCellDef="let element"> {{element.uniprot_id}} </td>
+        <td mat-cell *matCellDef="let element" class="accession" [innerHTML]="element.uniprot_id | highlight: element.search_term"></td>
       </ng-container>
       <ng-container matColumnDef="gene_name">
         <th mat-header-cell *matHeaderCellDef> Gene name </th>
-        <td mat-cell *matCellDef="let element"> {{element.gene_name}} </td>
+        <td mat-cell *matCellDef="let element" class="gene-name" [innerHTML]="element.gene_name | highlight: element.search_term"></td>
       </ng-container>
       <ng-container matColumnDef="log2_fc">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Log2 FC </th>

@@ -49,15 +49,15 @@
         <table mat-table [dataSource]="searchResults" class="mat-elevation-z8">
           <ng-container matColumnDef="primary_id">
             <th mat-header-cell *matHeaderCellDef> Primary ID </th>
-            <td mat-cell *matCellDef="let result"> {{result.primary_id}} </td>
+            <td mat-cell *matCellDef="let result" class="scientific-id"> {{result.primary_id}} </td>
           </ng-container>
           <ng-container matColumnDef="uniprot_id">
             <th mat-header-cell *matHeaderCellDef> UniProt ID </th>
-            <td mat-cell *matCellDef="let result"> {{result.uniprot_id}} </td>
+            <td mat-cell *matCellDef="let result" class="accession"> {{result.uniprot_id}} </td>
           </ng-container>
           <ng-container matColumnDef="gene_name">
             <th mat-header-cell *matHeaderCellDef> Gene Names </th>
-            <td mat-cell *matCellDef="let result"> {{result.gene_name}} </td>
+            <td mat-cell *matCellDef="let result" class="gene-name"> {{result.gene_name}} </td>
           </ng-container>
           <ng-container matColumnDef="log2_fc">
             <th mat-header-cell *matHeaderCellDef> log2FC </th>

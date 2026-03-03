@@ -1,14 +1,42 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, WritableSignal } from '@angular/core';
 import {environment} from "../environments/environment";
 import {AccountsService} from "./accounts/accounts.service";
 import {WebSocketSubject} from "rxjs/internal/observable/dom/WebSocketSubject";
 import {Subject, timer} from "rxjs";
+
+export interface OperationProgress {
+  id: string;
+  type: 'search' | 'curtain';
+  status: string;
+  progress: number;
+  message?: string;
+  label?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebsocketService {
   baseURL = environment.baseURL.replace("http", "ws")
+  
+  // Track all operations in a signal for the UI to consume
+  public activeOperations: WritableSignal<OperationProgress[]> = signal([]);
+
+  updateOperationProgress(id: string, type: 'search' | 'curtain', status: string, progress: number, message?: string, label?: string) {
+    this.activeOperations.update(ops => {
+      const index = ops.findIndex(o => o.id === id);
+      if (index !== -1) {
+        ops[index] = { ...ops[index], status, progress, message, label: label || ops[index].label };
+        return [...ops];
+      } else {
+        return [...ops, { id, type, status, progress, message, label }];
+      }
+    });
+  }
+
+  removeOperation(id: string) {
+    this.activeOperations.update(ops => ops.filter(o => o.id !== id));
+  }
   searchWSConnection?: WebSocketSubject<{
     "type": string,
     "status": "in_progress"|"complete"|"error"|"started",

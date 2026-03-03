@@ -3,6 +3,7 @@ import {AnalysisGroup, AnalysisGroupQuery} from "../analysis-group";
 import {MatDivider} from "@angular/material/divider";
 import {MatListItemLine, MatListOption, MatSelectionList} from "@angular/material/list";
 import {DataService} from "../../data.service";
+import {StatusBadgeComponent} from "../../shared/status-badge/status-badge.component";
 
 @Component({
     selector: 'app-analysis-group-list',
@@ -10,7 +11,8 @@ import {DataService} from "../../data.service";
         MatDivider,
         MatListOption,
         MatSelectionList,
-        MatListItemLine
+        MatListItemLine,
+        StatusBadgeComponent
     ],
     templateUrl: './analysis-group-list.component.html',
     styleUrl: './analysis-group-list.component.scss'

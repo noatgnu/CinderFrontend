@@ -1,14 +1,18 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, effect, Renderer2} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {NavbarComponent} from "./navbar/navbar.component";
 import {AccountsService} from "./accounts/accounts.service";
 import {WebsocketService} from "./websocket.service";
 import {WebService} from "./web.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {UiSettingsService} from "./ui-settings.service";
+import {OperationCenterComponent} from "./shared/operation-center/operation-center.component";
+import {BreadcrumbComponent} from "./shared/breadcrumb/breadcrumb.component";
+import {CommandPaletteComponent} from "./shared/command-palette/command-palette.component";
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, NavbarComponent],
+    imports: [RouterOutlet, NavbarComponent, OperationCenterComponent, BreadcrumbComponent, CommandPaletteComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss'
 })
@@ -17,8 +21,22 @@ export class AppComponent implements AfterViewInit {
 
   ready: boolean = false;
 
-  constructor(private web: WebService, private accounts: AccountsService, private ws: WebsocketService, private sb: MatSnackBar) {
-
+  constructor(
+    private web: WebService,
+    private accounts: AccountsService,
+    private ws: WebsocketService,
+    private sb: MatSnackBar,
+    public uiSettings: UiSettingsService,
+    private renderer: Renderer2
+  ) {
+    // Effect to toggle compact-mode class on the body element
+    effect(() => {
+      if (this.uiSettings.compactMode()) {
+        this.renderer.addClass(document.body, 'compact-mode');
+      } else {
+        this.renderer.removeClass(document.body, 'compact-mode');
+      }
+    });
   }
 
   ngAfterViewInit() {
@@ -70,17 +88,21 @@ export class AppComponent implements AfterViewInit {
                     case "error":
                       this.sb.open("Search failed", "Dismiss", {duration: 2000})
                       this.ws.removeSearchOperation(data["id"])
+                      this.ws.removeOperation(data["id"])
                       break
                     case "started":
                       this.sb.open("Search started", "Dismiss", {duration: 2000})
                       this.ws.addSearchOperation(data["id"])
+                      this.ws.updateOperationProgress(data["id"], 'search', 'started', 0, 'Search started', 'Search Operation');
                       break
                     case "in_progress":
-                      this.sb.open(`Search in progress: ${data["current_progress"]}/${data["found_files"]}`, "Dismiss", {duration: 2000})
+                      const progress = (data["current_progress"] / data["found_files"]) * 100;
                       this.ws.addSearchOperation(data["id"])
+                      this.ws.updateOperationProgress(data["id"], 'search', 'in_progress', progress, `Processed ${data["current_progress"]}/${data["found_files"]}`, 'Search Operation');
                       break
                     case "complete":
                       this.ws.removeSearchOperation(data["id"])
+                      this.ws.removeOperation(data["id"])
                       break
                   }
                 }
@@ -88,7 +110,15 @@ export class AppComponent implements AfterViewInit {
             })
             this.ws.connectSearchWS(data)
             this.ws.curtainWSConnection?.subscribe((data) => {
-              if (data) {}
+              if (data) {
+                if (data.status === 'complete' || data.status === 'error') {
+                  if (data.id) this.ws.removeOperation(data.id.toString());
+                } else if (data.status) {
+                  const progress = data.overall_progress || data.percentage || 0;
+                  const label = `Curtain: ${data.analysis_group_id}`;
+                  if (data.id) this.ws.updateOperationProgress(data.id.toString(), 'curtain', data.status, progress, data.message || data.current_phase, label);
+                }
+              }
             })
           })
         } else {
@@ -104,10 +134,13 @@ export class AppComponent implements AfterViewInit {
                   case "error":
                   case "complete":
                     this.ws.removeSearchOperation(data.id)
+                    this.ws.removeOperation(data.id)
                     break
                   case "started":
                   case "in_progress":
+                    const progress = data.found_files > 0 ? (data.current_progress / data.found_files) * 100 : 0;
                     this.ws.addSearchOperation(data.id)
+                    this.ws.updateOperationProgress(data.id, 'search', data.status, progress, `Processed ${data.current_progress}/${data.found_files}`, 'Search Operation');
                     break
                 }
               }
@@ -115,7 +148,15 @@ export class AppComponent implements AfterViewInit {
           })
           //this.ws.connectCurtainWS(this.web.searchSessionID)
           this.ws.curtainWSConnection?.subscribe((data) => {
-            if (data) {}
+            if (data) {
+              if (data.status === 'complete' || data.status === 'error') {
+                if (data.id) this.ws.removeOperation(data.id.toString());
+              } else if (data.status) {
+                const progress = data.overall_progress || data.percentage || 0;
+                const label = `Curtain: ${data.analysis_group_id}`;
+                if (data.id) this.ws.updateOperationProgress(data.id.toString(), 'curtain', data.status, progress, data.message || data.current_phase, label);
+              }
+            }
           })
         }
         this.ready = true

@@ -19,6 +19,8 @@ import {
   MatTable
 } from "@angular/material/table";
 import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
+import {HighlightPipe} from "../../shared/highlight.pipe";
+import {EmptyStateComponent} from "../../shared/empty-state/empty-state.component";
 
 @Component({
     selector: 'app-search-result-list',
@@ -41,7 +43,9 @@ import {MatSort, MatSortHeader, Sort} from "@angular/material/sort";
         MatHeaderRowDef,
         MatSort,
         MatSortHeader,
-        NgClass
+        NgClass,
+        HighlightPipe,
+        EmptyStateComponent
     ],
     templateUrl: './search-result-list.component.html',
     styleUrl: './search-result-list.component.scss'

@@ -27,6 +27,7 @@ import C2S from 'canvas-to-svg';
 import pdf from 'cytoscape-pdf-export';
 import {HeatmapPlotComponent} from "./heatmap-plot/heatmap-plot.component";
 import {MatToolbar} from "@angular/material/toolbar";
+import {GraphService} from "../../graph.service";
 
 function popperFactory(ref: any, content: any, opts: any) {
   // see https://floating-ui.com/docs/computePosition#options
@@ -124,7 +125,7 @@ export class CytoscapePlotComponent implements AfterViewInit{
   layers: any;
   defaultSticky = true;
   isExpanded = false;
-  constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog, private webService: WebService) {
+  constructor(private collateService: CollateService, private cdr: ChangeDetectorRef, private dialog: MatDialog, private webService: WebService, private graphService: GraphService) {
 
   }
 
@@ -139,6 +140,29 @@ export class CytoscapePlotComponent implements AfterViewInit{
     this.collateService.collateRedrawSubject.subscribe(() => {
       this.updateCytoscape()
     })
+
+    this.graphService.proteinSelectionSubject.subscribe((proteinIDs) => {
+      if (this.cy && proteinIDs.length > 0) {
+        this.cy.batch(() => {
+          this.cy.nodes().removeClass('highlighted');
+          proteinIDs.forEach(id => {
+            // Find nodes where id contains the protein ID (since some nodes have concatenated IDs)
+            const targets = this.cy.nodes().filter(node => node.id().includes(id));
+            targets.addClass('highlighted');
+            targets.select();
+          });
+        });
+        const highlighted = this.cy.nodes('.highlighted');
+        if (highlighted.length > 0) {
+          this.cy.animate({
+            fit: {
+              eles: highlighted,
+              padding: 50
+            }
+          }, { duration: 500 });
+        }
+      }
+    });
   }
 
   updateCytoscape() {
@@ -160,6 +184,14 @@ export class CytoscapePlotComponent implements AfterViewInit{
           { selector: '.protein', style: { 'background-color': '#FF5733' } },
           { selector: '.analysis', style: { 'background-color': '#ba0000', 'label': '' } },
           { selector: '.comparison', style: { 'background-color': '#33A1FF', 'label': '' } },
+          { selector: 'node.highlighted', style: {
+              'border-width': 4,
+              'border-color': '#ffd000',
+              'font-size': 16,
+              'font-weight': 'bold',
+              'label': 'data(label)'
+            }
+          },
           { selector: 'edge[color]', style: {
               'width': 2,
               'line-color': 'data(color)',

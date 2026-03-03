@@ -44,7 +44,60 @@ mat-sidenav {
   }
 }
 
+/* Compact Mode Optimization */
+.compact-mode {
+  /* Reduce MatList density */
+  .mat-mdc-list-base {
+    --mdc-list-list-item-container-height: 32px;
+    --mdc-list-list-item-one-line-container-height: 32px;
+  }
 
+  .mat-mdc-list-item {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+  }
+
+  /* Reduce MatCard padding */
+  .mat-mdc-card-content {
+    padding: 8px 16px !important;
+  }
+
+  .mat-mdc-card-header {
+    padding: 8px 16px !important;
+  }
+
+  /* Tighter tables */
+  .mat-mdc-table .mat-mdc-cell,
+  .mat-mdc-table .mat-mdc-header-cell {
+    padding: 4px 8px !important;
+  }
+}
+
+/* Scientific Typography */
+.scientific-id, .accession, .gene-name {
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.text-highlight {
+  background-color: #ffd000;
+  color: black;
+  font-weight: bold;
+  padding: 0 2px;
+  border-radius: 2px;
+}
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

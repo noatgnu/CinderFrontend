@@ -12,10 +12,21 @@
         <button mat-button [matMenuTriggerFor]="userMenu">Logged in as: {{accounts.currentUser.username}} @if(accounts.currentUser.is_staff) {<mat-icon>shield_person</mat-icon>} @else {<mat-icon>person</mat-icon>}</button>
       }
       <mat-slide-toggle
+        [color]="'primary'"
+        [checked]="uiSettings.compactMode()"
+        (change)="uiSettings.toggleCompactMode()"
+        matTooltip="Toggle Compact Mode"
+        style="margin-right: 16px;"
+      >
+        <mat-icon>density_medium</mat-icon>
+      </mat-slide-toggle>
+
+      <mat-slide-toggle
         class="example-margin"
         [color]="'primary'"
         [checked]="accounts.userAccount.darkMode"
         (change)="switchDarkMode()"
+        matTooltip="Toggle Dark Mode"
       >
         <mat-icon>lightbulb</mat-icon>
       </mat-slide-toggle>

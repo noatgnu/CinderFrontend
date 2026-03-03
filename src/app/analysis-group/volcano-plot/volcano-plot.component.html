@@ -1,1 +1,8 @@
-<plotly-plot (selected)="selectData($event)" (plotlyClick)="selectData($event)" [data]="graphData" [config]="config" [layout]="graphLayout" [revision]="revision" [updateOnlyWithRevision]="true"></plotly-plot>
+<div class="plot-container" style="position: relative; display: inline-block;">
+    <div class="plot-toolbar" style="position: absolute; top: 10px; right: 50px; z-index: 10; display: flex; gap: 4px; background: rgba(255,255,255,0.5); padding: 2px; border-radius: 8px;">
+        <button mat-icon-button (click)="drawVolcanoPlot()" matTooltip="Sync Theme & Reset">
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </div>
+    <plotly-plot (selected)="selectData($event)" (plotlyClick)="selectData($event)" [data]="graphData" [config]="config" [layout]="graphLayout" [revision]="revision" [updateOnlyWithRevision]="true"></plotly-plot>
+</div>
