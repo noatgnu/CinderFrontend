@@ -48,16 +48,18 @@
               <h3 style="margin-top: 0;">Associated Analysis Groups</h3>
               <mat-list>
                 @for (ag of analysisGroupQuery.results; track ag.id) {
-                <mat-list-item style="height: auto; padding: 12px 0; cursor: pointer;">
-                  <div matListItemTitle style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 4px;">
-                    <a href="/#/analysis-group/{{ag.id}}" target="_blank" style="text-decoration: none; color: var(--mdc-theme-primary); line-height: 1.4; padding-bottom: 2px;">{{ag.name}}</a>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                      <app-status-badge [label]="dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type) || ''" type="secondary"></app-status-badge>
-                      <mat-icon style="opacity: 0.3;">chevron_right</mat-icon>
-                    </div>
-                  </div>
-                  <div matListItemLine style="margin-top: 4px; opacity: 0.7; line-height: 1.4; font-weight: 400;">{{ag.description}}</div>
-                </mat-list-item>
+                  <mat-list-item style="height: auto; padding: 0 !important; cursor: pointer;" (click)="openAnalysisGroup(ag.id)">
+                    <a [href]="'/#/analysis-group/' + ag.id" target="_blank" (click)="$event.stopPropagation()" style="text-decoration: none; color: inherit; display: block; width: 100%; padding: 12px 16px;">
+                      <div matListItemTitle style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 4px;">
+                        <span style="font-weight: 600; color: var(--mdc-theme-primary); line-height: 1.4;">{{ag.name}}</span>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                          <app-status-badge [label]="dataService.getAnalysisGroupTypeLabel(ag.analysis_group_type) || ''" type="secondary"></app-status-badge>
+                          <mat-icon style="opacity: 0.3;">chevron_right</mat-icon>
+                        </div>
+                      </div>
+                      <div matListItemLine style="margin-top: 4px; opacity: 0.7; line-height: 1.4; font-weight: 400;">{{ag.description}}</div>
+                    </a>
+                  </mat-list-item>
                   <mat-divider></mat-divider>
                 }
               </mat-list>

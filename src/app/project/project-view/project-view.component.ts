@@ -176,4 +176,8 @@ export class ProjectViewComponent {
       this.form.controls.species_name.disable()
     }
   }
+
+  openAnalysisGroup(id: number) {
+    window.open(`/#/analysis-group/${id}`, '_blank');
+  }
 }
