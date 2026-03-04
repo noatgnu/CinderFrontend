@@ -24,11 +24,11 @@
 }
 
 .accent-text {
-  color: #ba0000;
+  color: var(--app-brand-color);
 }
 
 .accent-link {
-  color: #ba0000;
+  color: var(--app-brand-color);
   text-decoration: none;
 
   &:hover {
@@ -44,7 +44,7 @@
 
 .search-hint {
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--app-text-secondary);
   margin: 8px 0;
 }
 

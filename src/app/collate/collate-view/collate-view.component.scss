@@ -12,7 +12,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--app-hover-overlay);
   }
 }
 
@@ -21,11 +21,11 @@
 }
 
 .active-icon {
-  color: #2196f3;
+  color: var(--app-primary-color);
 }
 
 .inactive-icon {
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--app-text-secondary);
 }
 
 .loading-container {
@@ -43,7 +43,7 @@
 
   p {
     font-size: 16px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--app-text-secondary);
   }
 }
 
@@ -60,13 +60,13 @@
     height: 48px;
     width: 48px;
     margin-bottom: 16px;
-    color: #f44336;
+    color: var(--app-error-color);
   }
 
   p {
     font-size: 16px;
     margin-bottom: 24px;
-    color: rgba(0, 0, 0, 0.87);
+    color: var(--app-text-color);
   }
 }
 
@@ -83,18 +83,18 @@
     height: 64px;
     width: 64px;
     margin-bottom: 16px;
-    color: rgba(0, 0, 0, 0.3);
+    color: var(--app-text-hint);
   }
 
   p {
     font-size: 18px;
     margin-bottom: 8px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--app-text-secondary);
   }
 
   .hint {
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--app-text-hint);
   }
 }
 
@@ -103,7 +103,7 @@
   padding: 8px 16px;
   align-items: center;
   gap: 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--app-divider-color);
 
   button {
     display: flex;
@@ -116,12 +116,12 @@
   }
 
   .active-toggle {
-    background-color: rgba(33, 150, 243, 0.1);
+    background-color: var(--app-hover-overlay);
   }
 }
 
 .cytoscape-container {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--app-divider-color);
 }
 
 .search-container {

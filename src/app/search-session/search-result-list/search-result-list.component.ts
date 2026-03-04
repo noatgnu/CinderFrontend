@@ -1,14 +1,6 @@
-import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {SearchResult, SearchResultQuery} from "../../search-session";
-import {DatePipe, NgClass} from "@angular/common";
-import {MatDivider} from "@angular/material/divider";
-import {
-  MatListItemLine,
-  MatListItemTitle,
-  MatListOption,
-  MatSelectionList,
-  MatSelectionListChange
-} from "@angular/material/list";
+import {NgClass} from "@angular/common";
 import {
   MatCell,
   MatCellDef,
@@ -24,6 +16,7 @@ import {EmptyStateComponent} from "../../shared/empty-state/empty-state.componen
 
 @Component({
     selector: 'app-search-result-list',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatTable,
         MatColumnDef,
@@ -63,13 +56,9 @@ export class SearchResultListComponent {
   @Output() selected = new EventEmitter<SearchResult>()
   @Output() sortChange = new EventEmitter<Sort>()
 
-  constructor() {
-  }
-
   handleSelection(event: SearchResult) {
     this.selected.emit(event)
     this.selectedRow = event
-    //this.selected.emit(event.source.selectedOptions.selected[0].value)
   }
 
   handleSortChange(event: Sort) {

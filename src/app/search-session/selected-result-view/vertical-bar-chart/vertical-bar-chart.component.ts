@@ -1,17 +1,19 @@
-import {Component, Input} from '@angular/core';
-import * as PlotlyJS from 'plotly.js-dist-min';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import { PlotlyModule } from 'angular-plotly.js';
 import {GraphService} from "../../../graph.service";
 import {MatButton} from "@angular/material/button";
 import {AccountsService} from "../../../accounts/accounts.service";
+import {Subject, takeUntil} from "rxjs";
 
 @Component({
     selector: 'app-vertical-bar-chart',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [PlotlyModule, MatButton],
     templateUrl: './vertical-bar-chart.component.html',
     styleUrl: './vertical-bar-chart.component.scss'
 })
-export class VerticalBarChartComponent {
+export class VerticalBarChartComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   showOtherConditions = false
   @Input() title: string = ''
 
@@ -19,7 +21,6 @@ export class VerticalBarChartComponent {
 
   private _annotationData: {Sample: string, Condition: string, Value: number}[] = []
   @Input() set annotationData(value: {Sample: string, Condition: string, Value: number}[]) {
-    console.log(value)
     this._annotationData = value
     this.currentColor = 0
     this.drawVerticalBarChart()
@@ -54,9 +55,10 @@ export class VerticalBarChartComponent {
   revision = 0
   currentColor = 0
   colorMap: any = {}
-  constructor(private graph: GraphService, private accounts: AccountsService) {
-    this.graph.redrawTrigger.subscribe(() => {
+  constructor(private graph: GraphService, private accounts: AccountsService, private cdr: ChangeDetectorRef) {
+    this.graph.redrawTrigger.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.drawVerticalBarChart()
+      this.cdr.markForCheck()
     })
   }
 
@@ -135,5 +137,10 @@ export class VerticalBarChartComponent {
   toggleOtherConditions() {
     this.showOtherConditions = !this.showOtherConditions
     this.drawVerticalBarChart()
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next()
+    this.destroy$.complete()
   }
 }

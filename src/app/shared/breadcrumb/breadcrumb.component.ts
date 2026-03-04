@@ -42,7 +42,7 @@ import { MatIconModule } from '@angular/material/icon';
       padding: 16px 50px;
       background-color: transparent;
     }
-    
+
     .breadcrumb-list {
       display: flex;
       list-style: none;
@@ -51,42 +51,44 @@ import { MatIconModule } from '@angular/material/icon';
       align-items: center;
       flex-wrap: wrap;
     }
-    
+
     .breadcrumb-item {
       display: flex;
       align-items: center;
       font-size: 14px;
-      color: var(--mdc-theme-text-secondary-on-background);
+      color: var(--app-text-secondary);
     }
-    
+
     .breadcrumb-link {
-      color: var(--mdc-theme-primary);
+      color: var(--app-primary-color);
       text-decoration: none;
       font-weight: 500;
       transition: color 0.2s;
     }
-    
+
     .breadcrumb-link:hover {
-      color: var(--mdc-theme-tertiary);
+      color: var(--app-tertiary-color);
     }
-    
+
     .breadcrumb-current {
       font-weight: 500;
-      color: var(--mdc-theme-text-primary-on-background);
+      color: var(--app-text-color);
     }
-    
+
     .separator {
       font-size: 20px;
       width: 20px;
       height: 20px;
       margin: 0 4px;
-      opacity: 0.3;
+      color: var(--app-text-secondary);
+      opacity: 0.5;
     }
-    
+
     .home-icon {
       font-size: 20px;
       width: 20px;
       height: 20px;
+      color: var(--app-primary-color);
     }
   `]
 })

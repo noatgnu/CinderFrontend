@@ -1,8 +1,8 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {WebService} from "../../web.service";
 import {SearchResult, SearchResultQuery, SearchSession} from "../../search-session";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
-import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, ReactiveFormsModule} from "@angular/forms";
 import {SearchResultListComponent} from "../search-result-list/search-result-list.component";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
@@ -16,9 +16,12 @@ import {WebsocketService} from "../../websocket.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {environment} from "../../../environments/environment";
 import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component";
+import {Subject, switchMap, takeUntil} from "rxjs";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
     selector: 'app-search-session-view',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         SearchResultListComponent,
         MatPaginator,
@@ -31,21 +34,28 @@ import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component"
         MatInput,
         MatIconButton,
         MatIcon,
-        BreadcrumbComponent
+        BreadcrumbComponent,
+        MatProgressSpinner
     ],
     templateUrl: './search-session-view.component.html',
     styleUrl: './search-session-view.component.scss'
 })
-export class SearchSessionViewComponent {
+export class SearchSessionViewComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   baseUrl = environment.baseURL
+  isLoading = false
   private _searchSession: SearchSession|undefined = undefined
   @Input() set searchSession(value: SearchSession) {
     this._searchSession = value
     this.titleService.setTitle(`Search - ${value.search_term}`)
     this.searchResultQuery = undefined
     if (value && !value.failed) {
-      this.web.getSearchResults(value.id, this.pageSize, 0, 'df', this.currentSort?.active, this.currentSort?.direction).subscribe((data) => {
+      this.isLoading = true
+      this.cdr.markForCheck()
+      this.web.getSearchResults(value.id, this.pageSize, 0, 'df', this.currentSort?.active, this.currentSort?.direction).pipe(takeUntil(this.destroy$)).subscribe((data) => {
         this.searchResultQuery = data
+        this.isLoading = false
+        this.cdr.markForCheck()
       })
     }
   }
@@ -66,16 +76,22 @@ export class SearchSessionViewComponent {
     log10_p: new FormControl<number>(0),
   })
   currentSort: Sort|undefined = undefined
-  constructor(private titleService: Title, private web: WebService, private fb: FormBuilder, private ws: WebsocketService, private sb: MatSnackBar) {
-    this.form.valueChanges.subscribe((data) => {
+  constructor(private titleService: Title, private web: WebService, private fb: FormBuilder, private ws: WebsocketService, private sb: MatSnackBar, private cdr: ChangeDetectorRef) {
+    this.form.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      switchMap((data) => {
+        const searchTerm = data.searchTerm || ''
+        const log2Fc = data.log2_fc || 0
+        const log10P = data.log10_p || 0
+        return this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, "df", this.currentSort?.active, this.currentSort?.direction, searchTerm, log2Fc, log10P)
+      })
+    ).subscribe((data) => {
       if (!this.searchSession.failed) {
-        // @ts-ignore
-        this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, "df", this.currentSort?.active, this.currentSort?.direction, data.searchTerm, data.log2_fc, data.log10_p).subscribe((data) => {
-          this.searchResultQuery = data
-        })
+        this.searchResultQuery = data
+        this.cdr.markForCheck()
       }
     })
-    this.ws.searchWSConnection?.subscribe((data) => {
+    this.ws.searchWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       if (data) {
         if (data.type === "export_status") {
           if (this.web.cinderInstanceID === data.instance_id) {
@@ -102,9 +118,12 @@ export class SearchSessionViewComponent {
   handlePageEvent(event: PageEvent) {
     const offset = event.pageIndex * event.pageSize
     this.pageSize = event.pageSize
-    // @ts-ignore
-    this.web.getSearchResults(this.searchSession.id, this.pageSize, offset, "df", this.currentSort?.active, this.currentSort?.direction, this.form.controls.searchTerm.value, this.form.controls.log2_fc.value, this.form.controls.log10_p.value).subscribe((data) => {
+    const searchTerm = this.form.controls.searchTerm.value || ''
+    const log2Fc = this.form.controls.log2_fc.value || 0
+    const log10P = this.form.controls.log10_p.value || 0
+    this.web.getSearchResults(this.searchSession.id, this.pageSize, offset, "df", this.currentSort?.active, this.currentSort?.direction, searchTerm, log2Fc, log10P).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.searchResultQuery = data
+      this.cdr.markForCheck()
     })
   }
 
@@ -117,18 +136,26 @@ export class SearchSessionViewComponent {
   handleSort(event: Sort) {
     this.currentSort = event
     if (this.searchResultQuery) {
-      // @ts-ignore
-      this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, "df", event.active, event.direction, this.form.controls.searchTerm.value, this.form.controls.log2_fc.value, this.form.controls.log10_p.value).subscribe((data) => {
+      const searchTerm = this.form.controls.searchTerm.value || ''
+      const log2Fc = this.form.controls.log2_fc.value || 0
+      const log10P = this.form.controls.log10_p.value || 0
+      this.web.getSearchResults(this.searchSession.id, this.pageSize, 0, "df", event.active, event.direction, searchTerm, log2Fc, log10P).pipe(takeUntil(this.destroy$)).subscribe((data) => {
         this.searchResultQuery = data
+        this.cdr.markForCheck()
       })
     }
   }
 
   exportData() {
-    // @ts-ignore
-    this.web.exportSearchData(this.searchSession.id, this.form.controls.searchTerm.value, this.form.controls.log2_fc.value, this.form.controls.log10_p.value, this.web.searchSessionID).subscribe((data) => {
-
-    })
+    const searchTerm = this.form.controls.searchTerm.value || ''
+    const log2Fc = this.form.controls.log2_fc.value || 0
+    const log10P = this.form.controls.log10_p.value || 0
+    const sessionId = this.web.searchSessionID || ''
+    this.web.exportSearchData(this.searchSession.id, searchTerm, log2Fc, log10P, sessionId).pipe(takeUntil(this.destroy$)).subscribe()
   }
 
+  ngOnDestroy() {
+    this.destroy$.next()
+    this.destroy$.complete()
+  }
 }

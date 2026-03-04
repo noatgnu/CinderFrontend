@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {SearchSession, SearchSessionQuery} from "../../search-session";
 import {MatDivider} from "@angular/material/divider";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
@@ -6,6 +6,7 @@ import {DatePipe} from "@angular/common";
 
 @Component({
     selector: 'app-search-session-list',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDivider,
         MatListOption,
@@ -27,7 +28,4 @@ export class SearchSessionListComponent {
   }
 
   @Output() searchSessionSelected = new EventEmitter<SearchSession>()
-
-  constructor() {
-  }
 }

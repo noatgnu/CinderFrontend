@@ -1,6 +1,6 @@
 .search-session-side-nav {
   width: 300px;
-  border-right: 1px solid #000000;
+  border-right: 1px solid var(--app-outline-variant);
   display: flex;
   flex-direction: column;
   height: calc(100vh - 64px);

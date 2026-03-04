@@ -9,5 +9,6 @@
 }
 
 .highlighted-row {
-  background-color: #009dff;
+  background-color: var(--app-primary-color);
+  color: var(--app-on-primary);
 }

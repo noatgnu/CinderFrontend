@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
@@ -15,9 +15,12 @@ import {SearchSessionListComponent} from "./search-session-list/search-session-l
 import {AccountsService} from "../accounts/accounts.service";
 import {SearchSessionViewComponent} from "./search-session-view/search-session-view.component";
 import {Router} from "@angular/router";
+import {Subject, takeUntil} from "rxjs";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
     selector: 'app-search-session',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatButton,
         MatFormField,
@@ -33,20 +36,28 @@ import {Router} from "@angular/router";
         MatToolbar,
         MatToolbarRow,
         SearchSessionListComponent,
-        SearchSessionViewComponent
+        SearchSessionViewComponent,
+        MatProgressSpinner
     ],
     templateUrl: './search-session.component.html',
     styleUrl: './search-session.component.scss'
 })
-export class SearchSessionComponent {
+export class SearchSessionComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   sidebarOpen = true
+  isLoading = true
+  isLoadingSession = false
   private _searchSession: SearchSession|undefined = undefined
   private _searchID: number = 0
   @Input() set searchID(value: number) {
     if (value) {
       this._searchID = value
-      this.web.getSearchSession(value).subscribe((data) => {
+      this.isLoadingSession = true
+      this.cdr.markForCheck()
+      this.web.getSearchSession(value).pipe(takeUntil(this.destroy$)).subscribe((data) => {
         this._searchSession = data
+        this.isLoadingSession = false
+        this.cdr.markForCheck()
       })
     }
   }
@@ -71,9 +82,11 @@ export class SearchSessionComponent {
     search: new FormControl(""),
   })
 
-  constructor(private router: Router, private web: WebService, private fb: FormBuilder, private accounts: AccountsService) {
-    this.web.getSearchSessions(undefined, this.pageSize, 0, undefined, this.accounts.loggedIn, this.web.searchSessionID).subscribe((data) => {
+  constructor(private router: Router, private web: WebService, private fb: FormBuilder, private accounts: AccountsService, private cdr: ChangeDetectorRef) {
+    this.web.getSearchSessions(undefined, this.pageSize, 0, undefined, this.accounts.loggedIn, this.web.searchSessionID).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.searchSessionQuery = data
+      this.isLoading = false
+      this.cdr.markForCheck()
     })
   }
 
@@ -81,21 +94,18 @@ export class SearchSessionComponent {
   handlePageEvent(e: PageEvent) {
     this.pageSize = e.pageSize
     const offset = e.pageIndex * e.pageSize
-    if (this.form.controls.search.value) {
-      this.web.getSearchSessions(undefined, this.pageSize, offset, this.form.controls.search.value,  this.accounts.loggedIn, this.web.searchSessionID).subscribe((data) => {
-        this.searchSessionQuery = data
-      })
-    } else {
-      this.web.getSearchSessions(undefined, this.pageSize, offset, undefined,  this.accounts.loggedIn, this.web.searchSessionID).subscribe((data) => {
-        this.searchSessionQuery = data
-      })
-    }
-
+    const searchValue = this.form.controls.search.value || undefined
+    this.web.getSearchSessions(undefined, this.pageSize, offset, searchValue, this.accounts.loggedIn, this.web.searchSessionID).pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      this.searchSessionQuery = data
+      this.cdr.markForCheck()
+    })
   }
+
   deleteSearchSession(id: number) {
-    this.web.deleteSearchSession(id).subscribe((data) => {
+    this.web.deleteSearchSession(id).pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.searchSession = undefined
       this.searchSessionQuery?.results?.splice(this.searchSessionQuery.results.findIndex((value) => value.id === id), 1)
+      this.cdr.markForCheck()
     })
   }
 
@@ -105,5 +115,10 @@ export class SearchSessionComponent {
 
   onSearchSessionSelected(event: SearchSession) {
     this.router.navigate([`/search-session`, event.id])
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next()
+    this.destroy$.complete()
   }
 }

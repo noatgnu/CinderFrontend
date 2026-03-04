@@ -14,6 +14,27 @@ mat-sidenav {
   @include mat.system-level-colors(m3.$light-theme);
   @include mat.system-level-typography(m3.$light-theme);
   background: mat.get-theme-color(m3.$light-theme, background);
+
+  --app-text-color: #{mat.get-theme-color(m3.$light-theme, on-surface)};
+  --app-text-secondary: #{mat.get-theme-color(m3.$light-theme, on-surface-variant)};
+  --app-text-hint: rgba(0, 0, 0, 0.38);
+  --app-primary-color: #{mat.get-theme-color(m3.$light-theme, primary)};
+  --app-on-primary: #{mat.get-theme-color(m3.$light-theme, on-primary)};
+  --app-secondary-color: #{mat.get-theme-color(m3.$light-theme, secondary)};
+  --app-tertiary-color: #{mat.get-theme-color(m3.$light-theme, tertiary)};
+  --app-error-color: #{mat.get-theme-color(m3.$light-theme, error)};
+  --app-surface-color: #{mat.get-theme-color(m3.$light-theme, surface)};
+  --app-surface-variant: #{mat.get-theme-color(m3.$light-theme, surface-variant)};
+  --app-background-color: #{mat.get-theme-color(m3.$light-theme, background)};
+  --app-outline-color: #{mat.get-theme-color(m3.$light-theme, outline)};
+  --app-outline-variant: #{mat.get-theme-color(m3.$light-theme, outline-variant)};
+  --app-divider-color: rgba(0, 0, 0, 0.12);
+  --app-hover-overlay: rgba(0, 0, 0, 0.04);
+  --app-card-background: #{mat.get-theme-color(m3.$light-theme, surface)};
+  --app-brand-color: #ba0000;
+
+  color: var(--app-text-color);
+
   .header-container {
     background: mat.get-theme-color(m3.$light-theme, background);
     color: mat.get-theme-color(m3.$light-theme, primary);
@@ -25,20 +46,46 @@ mat-sidenav {
   @include mat.system-level-colors(m3.$dark-theme);
   @include mat.system-level-typography(m3.$dark-theme);
   background: mat.get-theme-color(m3.$dark-theme, background);
+
+  --app-text-color: #{mat.get-theme-color(m3.$dark-theme, on-surface)};
+  --app-text-secondary: #{mat.get-theme-color(m3.$dark-theme, on-surface-variant)};
+  --app-text-hint: rgba(255, 255, 255, 0.38);
+  --app-primary-color: #{mat.get-theme-color(m3.$dark-theme, primary)};
+  --app-on-primary: #{mat.get-theme-color(m3.$dark-theme, on-primary)};
+  --app-secondary-color: #{mat.get-theme-color(m3.$dark-theme, secondary)};
+  --app-tertiary-color: #{mat.get-theme-color(m3.$dark-theme, tertiary)};
+  --app-error-color: #{mat.get-theme-color(m3.$dark-theme, error)};
+  --app-surface-color: #{mat.get-theme-color(m3.$dark-theme, surface)};
+  --app-surface-variant: #{mat.get-theme-color(m3.$dark-theme, surface-variant)};
+  --app-background-color: #{mat.get-theme-color(m3.$dark-theme, background)};
+  --app-outline-color: #{mat.get-theme-color(m3.$dark-theme, outline)};
+  --app-outline-variant: #{mat.get-theme-color(m3.$dark-theme, outline-variant)};
+  --app-divider-color: rgba(255, 255, 255, 0.12);
+  --app-hover-overlay: rgba(255, 255, 255, 0.04);
+  --app-card-background: #{mat.get-theme-color(m3.$dark-theme, surface)};
+  --app-brand-color: #ff8a78;
+
+  color: var(--app-text-color);
+
   .header-container {
     background: mat.get-theme-color(m3.$dark-theme, background);
     color: mat.get-theme-color(m3.$dark-theme, primary);
   }
-  p {
-    @if m3.$dark-theme {
-      color: mat.get-theme-color(m3.$dark-theme, tertiary);
-    }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--app-text-color);
   }
+
+  p, span, div, li, td, th, label {
+    color: inherit;
+  }
+
   a {
-    color: mat.get-theme-color(m3.$dark-theme, primary);
+    color: var(--app-primary-color);
   }
+
   a:visited {
-    color: mat.get-theme-color(m3.$dark-theme, tertiary);
+    color: var(--app-tertiary-color);
   }
 }
 
@@ -104,8 +151,8 @@ mat-sidenav {
 .full-width { width: 100%; }
 .page-container { padding: 50px; }
 .form-container-lg { width: 600px; margin: 0 auto; }
-.text-brand { color: #ba0000; }
-.text-muted { opacity: 0.7; }
+.text-brand { color: var(--app-brand-color); }
+.text-muted { color: var(--app-text-secondary); }
 
 .sidebar-scroll-height {
   height: calc(100vh - 64px * 4 - 20px);

@@ -55,78 +55,81 @@ import { MatCardModule } from '@angular/material/card';
       z-index: 1000;
       transition: transform 0.3s ease-in-out;
     }
-    
+
     .operation-card {
-      background-color: var(--mdc-elevated-card-container-color, #fff);
+      background-color: var(--app-card-background);
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       border-radius: 12px;
       overflow: hidden;
     }
-    
+
     .operation-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 8px 16px;
-      background-color: var(--mdc-theme-surface, #f5f5f5);
-      border-bottom: 1px solid rgba(0,0,0,0.05);
+      background-color: var(--app-surface-variant);
+      border-bottom: 1px solid var(--app-divider-color);
     }
-    
+
     .operation-header mat-card-title {
       display: flex;
       align-items: center;
       font-size: 14px;
       margin: 0;
+      color: var(--app-text-color);
     }
-    
+
     .title-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
       margin-right: 8px;
+      color: var(--app-primary-color);
     }
-    
+
     .operation-content {
       max-height: 400px;
       overflow-y: auto;
       padding: 0 !important;
     }
-    
+
     .operation-list {
       display: flex;
       flex-direction: column;
     }
-    
+
     .operation-item {
       padding: 12px 16px;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
+      border-bottom: 1px solid var(--app-divider-color);
     }
-    
+
     .operation-item:last-child {
       border-bottom: none;
     }
-    
+
     .op-info {
       display: flex;
       justify-content: space-between;
       margin-bottom: 4px;
     }
-    
+
     .op-label {
       font-weight: 600;
       font-size: 12px;
+      color: var(--app-text-color);
     }
-    
+
     .op-status {
       font-size: 10px;
       text-transform: uppercase;
-      color: var(--mdc-theme-text-secondary-on-background);
+      color: var(--app-text-secondary);
     }
-    
+
     .op-message {
       font-size: 11px;
       margin-bottom: 8px;
-      color: var(--mdc-theme-text-secondary-on-background);
+      color: var(--app-text-secondary);
     }
   `]
 })

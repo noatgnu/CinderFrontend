@@ -60,15 +60,16 @@ import { debounceTime, distinctUntilChanged, switchMap, of, forkJoin } from 'rxj
       margin-left: 8px;
       padding: 2px 6px;
       border-radius: 4px;
-      background: rgba(0,0,0,0.05);
+      background: var(--app-hover-overlay);
       font-size: 10px;
       text-transform: uppercase;
+      color: var(--app-text-secondary);
     }
     .palette-footer {
       padding: 8px;
       font-size: 11px;
-      opacity: 0.6;
-      border-top: 1px solid rgba(0,0,0,0.05);
+      color: var(--app-text-secondary);
+      border-top: 1px solid var(--app-divider-color);
       text-align: right;
     }
   `]

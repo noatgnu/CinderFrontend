@@ -10,7 +10,7 @@
 }
 
 .logo-text {
-  color: #ba0000;
+  color: var(--app-brand-color);
   font-weight: bold;
   text-decoration: none;
 
@@ -20,11 +20,11 @@
 }
 
 .nav-icon-button {
-  color: rgb(172, 110, 110);
+  color: var(--app-primary-color);
 }
 
 .logout-button {
-  color: rgb(186, 104, 166);
+  color: var(--app-secondary-color);
 }
 
 .user-icon {
@@ -35,7 +35,7 @@
   vertical-align: middle;
 
   &.staff {
-    color: #1976d2;
+    color: var(--app-tertiary-color);
   }
 }
 

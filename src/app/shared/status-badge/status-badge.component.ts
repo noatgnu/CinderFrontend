@@ -22,12 +22,12 @@ import { CommonModule } from '@angular/common';
       text-transform: uppercase;
       white-space: nowrap;
     }
-    
-    .primary { background-color: var(--mdc-theme-primary, #6750a4); color: white; }
-    .secondary { background-color: var(--mdc-theme-secondary, #625b71); color: white; }
-    .tertiary { background-color: var(--mdc-theme-tertiary, #7d5260); color: white; }
-    .error { background-color: var(--mdc-theme-error, #b3261e); color: white; }
-    .outline { border: 1px solid currentColor; background: transparent; }
+
+    .primary { background-color: var(--app-primary-color); color: var(--app-on-primary); }
+    .secondary { background-color: var(--app-secondary-color); color: white; }
+    .tertiary { background-color: var(--app-tertiary-color); color: white; }
+    .error { background-color: var(--app-error-color); color: white; }
+    .outline { border: 1px solid var(--app-outline-color); background: transparent; color: var(--app-text-color); }
   `]
 })
 export class StatusBadgeComponent {

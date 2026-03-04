@@ -27,28 +27,30 @@ import { MatButtonModule } from '@angular/material/button';
       justify-content: center;
       padding: 48px 24px;
       text-align: center;
-      color: var(--mdc-theme-text-secondary-on-background, rgba(0, 0, 0, 0.6));
+      color: var(--app-text-secondary);
     }
-    
+
     .empty-state-icon {
       font-size: 64px;
       width: 64px;
       height: 64px;
       margin-bottom: 16px;
       opacity: 0.5;
+      color: var(--app-text-secondary);
     }
-    
+
     .empty-state-title {
       margin: 0 0 8px 0;
       font-size: 20px;
       font-weight: 500;
-      color: var(--mdc-theme-text-primary-on-background, rgba(0, 0, 0, 0.87));
+      color: var(--app-text-color);
     }
-    
+
     .empty-state-message {
       margin: 0 0 24px 0;
       max-width: 400px;
       line-height: 1.5;
+      color: var(--app-text-secondary);
     }
   `]
 })
