@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbService } from './breadcrumb.service';
@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-breadcrumb',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, MatIconModule],
   template: `
     @if ((breadcrumbService.breadcrumbs$ | async)?.length) {

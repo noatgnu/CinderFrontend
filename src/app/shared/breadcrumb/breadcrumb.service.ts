@@ -18,11 +18,17 @@ export class BreadcrumbService {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
-      const root = this.router.routerState.snapshot.root;
-      const breadcrumbs: Breadcrumb[] = [];
-      this.addBreadcrumb(root, [], breadcrumbs);
-      this._breadcrumbs$.next(breadcrumbs);
+      this.buildBreadcrumbs();
     });
+
+    this.buildBreadcrumbs();
+  }
+
+  private buildBreadcrumbs() {
+    const root = this.router.routerState.snapshot.root;
+    const breadcrumbs: Breadcrumb[] = [];
+    this.addBreadcrumb(root, [], breadcrumbs);
+    this._breadcrumbs$.next(breadcrumbs);
   }
 
   private addBreadcrumb(route: ActivatedRouteSnapshot, parentUrl: string[], breadcrumbs: Breadcrumb[]) {

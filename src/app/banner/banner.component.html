@@ -27,7 +27,7 @@
         <mat-card-subtitle>Cinder Project Data</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p># of Projects: {{projectCount}}</p>
+        <p># of Projects: @if (isLoadingProjectCount) {<mat-spinner diameter="16" class="inline-spinner"></mat-spinner>} @else {{{projectCount}}}</p>
         <app-project-search [multipleSelection]="false" (selectedProjects)="handleProjectSelection($event)"></app-project-search>
       </mat-card-content>
       @if (accounts.loggedIn) {
@@ -46,7 +46,7 @@
         <mat-card-subtitle>Project Assigned Analysis Groups</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p># of Analysis Groups: {{analysisGroupCount}}</p>
+        <p># of Analysis Groups: @if (isLoadingAnalysisGroupCount) {<mat-spinner diameter="16" class="inline-spinner"></mat-spinner>} @else {{{analysisGroupCount}}}</p>
         <app-analysis-search (selectedAnalysisGroups)="handleAGSelection($event)"></app-analysis-search>
       </mat-card-content>
       @if (accounts.loggedIn) {

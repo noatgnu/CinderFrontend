@@ -41,6 +41,7 @@ import {Router} from "@angular/router";
 import {CollateSearchMainComponent} from "../collate/collate-search-main/collate-search-main.component";
 import {CreateCollateDialogComponent} from "../collate/create-collate-dialog/create-collate-dialog.component";
 import {CollateService} from "../collate/collate.service";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
     selector: 'app-banner',
@@ -70,7 +71,8 @@ import {CollateService} from "../collate/collate.service";
         AsyncPipe,
         MatSelectionList,
         MatListOption,
-        CollateSearchMainComponent
+        CollateSearchMainComponent,
+        MatProgressSpinner
     ],
     templateUrl: './banner.component.html',
     styleUrl: './banner.component.scss'
@@ -79,6 +81,8 @@ export class BannerComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
   projectCount = 0;
   analysisGroupCount = 0;
+  isLoadingProjectCount = true;
+  isLoadingAnalysisGroupCount = true;
 
   form = this.fb.group({
     search: new FormControl<string>("", Validators.required),
@@ -105,10 +109,12 @@ export class BannerComponent implements OnDestroy {
   ) {
     this.web.getProjectCount().pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.projectCount = data.count;
+      this.isLoadingProjectCount = false;
       this.cdr.markForCheck();
     });
     this.web.getAnalysisGroupCount().pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.analysisGroupCount = data.count;
+      this.isLoadingAnalysisGroupCount = false;
       this.cdr.markForCheck();
     });
     this.form.controls.species_name.valueChanges.pipe(
@@ -135,6 +141,11 @@ export class BannerComponent implements OnDestroy {
     this.web.updateFromLabGroupSelection.pipe(
       takeUntil(this.destroy$),
       filter((value) => !!value),
+      tap(() => {
+        this.isLoadingProjectCount = true;
+        this.isLoadingAnalysisGroupCount = true;
+        this.cdr.markForCheck();
+      }),
       switchMap(() => forkJoin({
         projectCount: this.web.getProjectCount(),
         analysisGroupCount: this.web.getAnalysisGroupCount()
@@ -142,6 +153,8 @@ export class BannerComponent implements OnDestroy {
     ).subscribe((data) => {
       this.projectCount = data.projectCount.count;
       this.analysisGroupCount = data.analysisGroupCount.count;
+      this.isLoadingProjectCount = false;
+      this.isLoadingAnalysisGroupCount = false;
       this.cdr.markForCheck();
     });
   }
