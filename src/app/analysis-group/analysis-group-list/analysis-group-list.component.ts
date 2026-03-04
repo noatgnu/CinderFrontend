@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {AnalysisGroup, AnalysisGroupQuery} from "../analysis-group";
 import {MatDivider} from "@angular/material/divider";
 import {MatListItemLine, MatListItemTitle, MatListOption, MatSelectionList} from "@angular/material/list";
@@ -7,6 +7,7 @@ import {StatusBadgeComponent} from "../../shared/status-badge/status-badge.compo
 
 @Component({
     selector: 'app-analysis-group-list',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDivider,
         MatListOption,

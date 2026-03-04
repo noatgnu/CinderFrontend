@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
@@ -16,11 +16,12 @@ import {
 import {AnalysisGroupListComponent} from "./analysis-group-list/analysis-group-list.component";
 import {AnalysisGroupViewComponent} from "./analysis-group-view/analysis-group-view.component";
 import {DataService} from "../data.service";
-import {SearchSession} from "../search-session";
 import {Router} from "@angular/router";
+import {filter, Subject, switchMap, takeUntil} from "rxjs";
 
 @Component({
     selector: 'app-analysis-group',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatFormField,
         MatIcon,
@@ -38,7 +39,8 @@ import {Router} from "@angular/router";
     templateUrl: './analysis-group.component.html',
     styleUrl: './analysis-group.component.scss'
 })
-export class AnalysisGroupComponent {
+export class AnalysisGroupComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   sidebarOpen = true
   analysisGroupQuery?: AnalysisGroupQuery
   pageIndex = 0
@@ -55,8 +57,9 @@ export class AnalysisGroupComponent {
   @Input() set analysisGroupID(value: number|undefined) {
     this._analysisGroupID = value
     if (value) {
-      this.web.getAnalysisGroup(value).subscribe((data) => {
+      this.web.getAnalysisGroup(value).pipe(takeUntil(this.destroy$)).subscribe((data) => {
         this.selectedAnalysisGroup = data
+        this.cdr.markForCheck()
       })
     }
   }
@@ -65,55 +68,56 @@ export class AnalysisGroupComponent {
     return this._analysisGroupID
   }
 
-  constructor(private router: Router, public dataService: DataService, private fb: FormBuilder, private dialog: MatDialog, private web: WebService) {
-    this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
+  constructor(private router: Router, public dataService: DataService, private fb: FormBuilder, private dialog: MatDialog, private web: WebService, private cdr: ChangeDetectorRef) {
+    this.web.getAnalysisGroups(undefined, this.limit, this.offset).pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
       this.analysisGroupQuery = data
+      this.cdr.markForCheck()
     })
-    this.form.controls.name.valueChanges.subscribe((value: string) => {
-      if (value) {
-        this.web.getAnalysisGroups(undefined, this.limit, this.offset, value).subscribe((data: any) => {
-          this.analysisGroupQuery = data
-        })
-      }
+    this.form.controls.name.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      filter((value): value is string => !!value),
+      switchMap((value) => this.web.getAnalysisGroups(undefined, this.limit, this.offset, value))
+    ).subscribe((data: any) => {
+      this.analysisGroupQuery = data
+      this.cdr.markForCheck()
     })
-    this.web.updateFromLabGroupSelection.subscribe((value) => {
-      if (value) {
-        this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
-          this.analysisGroupQuery = data
-        })
-      }
+    this.web.updateFromLabGroupSelection.pipe(
+      takeUntil(this.destroy$),
+      filter((value) => !!value),
+      switchMap(() => this.web.getAnalysisGroups(undefined, this.limit, this.offset))
+    ).subscribe((data: any) => {
+      this.analysisGroupQuery = data
+      this.cdr.markForCheck()
     })
   }
 
   openCreateAnalysisGroupDialog() {
     const ref = this.dialog.open(CreateAnalysisGroupDialogComponent)
     ref.componentInstance.enableProjectSelection = true
-    ref.afterClosed().subscribe((data) => {
-      if (data){
-        this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
-          this.analysisGroupQuery = data
-        })
-      }
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((data) => !!data),
+      switchMap(() => this.web.getAnalysisGroups(undefined, this.limit, this.offset))
+    ).subscribe((data: any) => {
+      this.analysisGroupQuery = data
+      this.cdr.markForCheck()
     })
   }
 
   handlePageEvent(event: PageEvent) {
     this.offset = event.pageIndex * event.pageSize
     this.limit = event.pageSize
-    if (this.form.controls.name.value) {
-      this.web.getAnalysisGroups(undefined, this.limit, this.offset, this.form.controls.name.value).subscribe((data: any) => {
-        this.analysisGroupQuery = data
-      })
-    } else {
-      this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
-        this.analysisGroupQuery = data
-      })
-    }
+    const searchValue = this.form.controls.name.value || undefined
+    this.web.getAnalysisGroups(undefined, this.limit, this.offset, searchValue).pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
+      this.analysisGroupQuery = data
+      this.cdr.markForCheck()
+    })
   }
 
   refreshData() {
-    this.web.getAnalysisGroups(undefined, this.limit, this.offset).subscribe((data: any) => {
+    this.web.getAnalysisGroups(undefined, this.limit, this.offset).pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
       this.analysisGroupQuery = data
+      this.cdr.markForCheck()
     })
   }
 
@@ -132,5 +136,10 @@ export class AnalysisGroupComponent {
   }
   onAnalysisGroupSelected(event: AnalysisGroup) {
     this.router.navigate([`/analysis-group`, event.id])
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next()
+    this.destroy$.complete()
   }
 }

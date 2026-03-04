@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {WebService} from "../../web.service";
@@ -10,9 +10,11 @@ import {MatList, MatListItem, MatListItemTitle, MatListOption, MatSelectionList}
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {DataService} from "../../data.service";
+import {filter, Subject, switchMap, takeUntil} from "rxjs";
 
 @Component({
     selector: 'app-create-analysis-group-dialog',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDialogTitle,
         MatDialogContent,
@@ -34,7 +36,8 @@ import {DataService} from "../../data.service";
     templateUrl: './create-analysis-group-dialog.component.html',
     styleUrl: './create-analysis-group-dialog.component.scss'
 })
-export class CreateAnalysisGroupDialogComponent {
+export class CreateAnalysisGroupDialogComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   @Input() enableProjectSelection: boolean = false
 
   private _project?: Project
@@ -67,17 +70,19 @@ export class CreateAnalysisGroupDialogComponent {
   analysisGroupTypeChoices = [
     ""
   ]
-  constructor(public dataService: DataService, private web: WebService, private fb: FormBuilder, private matDialogRef: MatDialogRef<CreateAnalysisGroupDialogComponent>) {
-    this.formProjectSearch.controls.selectedProject.valueChanges.subscribe((value: Project[]|undefined|null) => {
-      if (value) {
-        this.project = value[0]
-      }
+  constructor(public dataService: DataService, private web: WebService, private fb: FormBuilder, private matDialogRef: MatDialogRef<CreateAnalysisGroupDialogComponent>, private cdr: ChangeDetectorRef) {
+    this.formProjectSearch.controls.selectedProject.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      filter((value): value is Project[] => !!value && value.length > 0)
+    ).subscribe((value) => {
+      this.project = value[0]
     })
-    this.formProjectSearch.controls.searchTerm.valueChanges.subscribe((value: string|null) => {
-      // @ts-ignore
-      this.web.getProjects(undefined, this.projectPageLimit, 0, value).subscribe((data) => {
-        this.projectQuery = data
-      })
+    this.formProjectSearch.controls.searchTerm.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      switchMap((value) => this.web.getProjects(undefined, this.projectPageLimit, 0, value || undefined))
+    ).subscribe((data) => {
+      this.projectQuery = data
+      this.cdr.markForCheck()
     })
   }
 
@@ -87,21 +92,24 @@ export class CreateAnalysisGroupDialogComponent {
 
   submit() {
     if (this.form.valid && this.project && this.form.value.name && this.form.value.description && this.form.value.project_id && this.form.value.analysis_group_type) {
-      this.web.createAnalysisGroup(this.form.value.name, this.form.value.description, this.form.value.project_id, this.form.value.analysis_group_type).subscribe(
-        (data) => {
+      this.web.createAnalysisGroup(this.form.value.name, this.form.value.description, this.form.value.project_id, this.form.value.analysis_group_type).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (data) => {
           this.matDialogRef.close(data)
         },
-        (error) => {
+        error: (error) => {
           this.matDialogRef.close(error)
         }
-      )
+      })
     }
   }
 
   getProjects(offset?: number, limit?: number) {
-    // @ts-ignore
-    this.web.getProjects(undefined, limit, offset, this.formProjectSearch.value.searchTerm).subscribe((data) => {
+    const searchTerm = this.formProjectSearch.value.searchTerm || undefined
+    this.web.getProjects(undefined, limit, offset, searchTerm).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.projectQuery = data
+      this.cdr.markForCheck()
     })
   }
 
@@ -111,5 +119,8 @@ export class CreateAnalysisGroupDialogComponent {
     this.getProjects(offset, this.projectPageLimit)
   }
 
-
+  ngOnDestroy() {
+    this.destroy$.next()
+    this.destroy$.complete()
+  }
 }
