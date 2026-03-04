@@ -51,7 +51,7 @@
             <!-- Overall Progress -->
             <div style="margin-bottom: 15px;">
               <p><strong>Overall Progress:</strong> {{composingCurtainProgress.message}}</p>
-              <div style="text-align: right; font-size: 0.8em; color: #666;">
+              <div style="text-align: right; font-size: 0.8em; color: var(--app-text-secondary);">
                 <span>{{composingCurtainProgress.progress.toFixed(1)}}%</span>
               </div>
               <mat-progress-bar [value]="composingCurtainProgress.progress" [mode]="'determinate'" [color]="'primary'"></mat-progress-bar>
@@ -61,7 +61,7 @@
             @if (composingCurtainProgress.downloadActive) {
               <div style="margin-bottom: 15px;">
                 <p><strong>Download:</strong> {{composingCurtainProgress.downloadMessage}}</p>
-                <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #666;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: var(--app-text-secondary);">
                   @if (composingCurtainProgress.downloadedBytes && composingCurtainProgress.totalBytes) {
                     <span>{{formatBytes(composingCurtainProgress.downloadedBytes)}} / {{formatBytes(composingCurtainProgress.totalBytes)}}</span>
                   } @else {
@@ -77,7 +77,7 @@
             @if (composingCurtainProgress.processingActive) {
               <div style="margin-bottom: 15px;">
                 <p><strong>Processing:</strong> {{composingCurtainProgress.processingMessage}}</p>
-                <div style="text-align: right; font-size: 0.8em; color: #666;">
+                <div style="text-align: right; font-size: 0.8em; color: var(--app-text-secondary);">
                   <span>{{composingCurtainProgress.processingProgress.toFixed(1)}}%</span>
                 </div>
                 <mat-progress-bar [value]="composingCurtainProgress.processingProgress" [mode]="'determinate'" [color]="'warn'"></mat-progress-bar>

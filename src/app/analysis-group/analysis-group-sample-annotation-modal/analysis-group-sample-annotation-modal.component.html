@@ -1,49 +1,164 @@
 <h2 mat-dialog-title>Sample Annotation</h2>
-<div mat-dialog-content>
-  <form [formGroup]="form">
-    <mat-form-field style="width: 300px">
-      <mat-select (selectionChange)="onSelectionChange($event)" formControlName="columns" [multiple]="true">
-        @for (c of columns; track c) {
-          <mat-option [value]="c">{{c}}</mat-option>
-        }
-      </mat-select>
-      <mat-label>Columns</mat-label>
-    </mat-form-field>
-  </form>
-  @if (annotationData.length > 0) {
-    <table mat-table [dataSource]="annotationData" #table>
-      <ng-container matColumnDef="Sample">
-        <th mat-header-cell *matHeaderCellDef> Sample </th>
-        <td mat-cell *matCellDef="let element"> {{element.value.Sample}} </td>
-      </ng-container>
-      <ng-container matColumnDef="Condition">
-        <th mat-header-cell *matHeaderCellDef> Condition </th>
-        <td mat-cell *matCellDef="let element">
-          <form [formGroup]="element">
-            <mat-form-field>
-              <input style="border-radius: 0" matInput #optionCondition  (change)="handleAutoCompleteChange($event, optionCondition.value)" placeholder="{{element.value.Sample}}" formControlName="Condition">
-              <mat-label>{{element.value.Sample}}</mat-label>
-            </mat-form-field>
-          </form>
+<div mat-dialog-content class="dialog-content">
+  <div class="master-detail-container">
+    <div class="column-list-panel">
+      <div class="panel-header">
+        <span class="panel-title">Available Columns</span>
+        <span class="column-count">{{ selectedColumns.length }}/{{ columns.length }}</span>
+      </div>
+      <mat-divider></mat-divider>
 
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  }
-<!--  @for (s of annotationData; track s) {
-    <div style="display: flex; flex-direction: row; gap: 20px">
-      <form [formGroup]="s">
-        <mat-form-field>
-          <input matInput #optionCondition placeholder="{{s.value.Sample}}" value="{{s.value.Sample}}" formControlName="Condition">
-          <mat-label>{{s.value.Sample}}</mat-label>
+      <div class="search-box">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput
+                 placeholder="Search columns..."
+                 [value]="columnSearchQuery"
+                 (input)="filterColumns($any($event.target).value)">
         </mat-form-field>
-      </form>
+      </div>
+
+      @if (isLoadingColumns) {
+        <div class="loading-state">
+          <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+          <span>Loading columns...</span>
+        </div>
+      } @else if (filteredColumns.length === 0) {
+        <div class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <span>No columns found</span>
+        </div>
+      } @else {
+        <div class="select-all-row">
+          <mat-checkbox
+            [checked]="allColumnsSelected"
+            [indeterminate]="someColumnsSelected"
+            (change)="toggleAllColumns()">
+            Select All ({{ filteredColumns.length }})
+          </mat-checkbox>
+        </div>
+        <div class="column-items">
+          @for (column of filteredColumns; track column; let i = $index) {
+            <div
+              class="column-item"
+              [class.selected]="isColumnSelected(column)"
+              (click)="toggleColumnSelection(column, i)">
+              <mat-checkbox
+                [checked]="isColumnSelected(column)"
+                (click)="$event.stopPropagation()"
+                (change)="toggleColumnSelection(column, i)">
+              </mat-checkbox>
+              <span class="column-name" [matTooltip]="column">{{ column }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="panel-footer">
+        <small class="hint-text">Shift+click for range selection</small>
+      </div>
     </div>
-  }-->
+
+    <mat-divider vertical></mat-divider>
+
+    <div class="annotation-panel">
+      <div class="panel-header">
+        <span class="panel-title">Sample → Condition Mapping</span>
+      </div>
+      <mat-divider></mat-divider>
+
+      @if (annotationRows.length > 0) {
+        <div class="bulk-actions">
+          <mat-checkbox
+            [checked]="allRowsSelected"
+            [indeterminate]="someRowsSelected"
+            (change)="toggleAllRows()">
+          </mat-checkbox>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="bulk-input">
+            <input matInput
+                   placeholder="Condition for selected..."
+                   [(ngModel)]="bulkConditionValue"
+                   (keyup.enter)="applyBulkCondition()">
+          </mat-form-field>
+          <button mat-stroked-button
+                  [disabled]="selectedRowCount === 0 || !bulkConditionValue.trim()"
+                  (click)="applyBulkCondition()"
+                  matTooltip="Apply condition to {{ selectedRowCount }} selected rows">
+            Apply ({{ selectedRowCount }})
+          </button>
+          @if (selectedRowCount > 0) {
+            <button mat-icon-button (click)="clearSelection()" matTooltip="Clear selection">
+              <mat-icon>clear</mat-icon>
+            </button>
+          }
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="table-container">
+          <table mat-table [dataSource]="annotationRows">
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox
+                  [checked]="row.selected"
+                  (change)="toggleRowSelection(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Sample">
+              <th mat-header-cell *matHeaderCellDef>Sample</th>
+              <td mat-cell *matCellDef="let row">
+                <span class="sample-name" [matTooltip]="row.form.value.Sample">
+                  {{ row.form.value.Sample }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Condition">
+              <th mat-header-cell *matHeaderCellDef>Condition</th>
+              <td mat-cell *matCellDef="let row">
+                <form [formGroup]="row.form" class="condition-form">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <input matInput formControlName="Condition" placeholder="Enter condition">
+                    @if (row.form.controls.Condition.hasError('required') && row.form.controls.Condition.touched) {
+                      <mat-error>Required</mat-error>
+                    }
+                  </mat-form-field>
+                </form>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row">
+                @if (isRowValid(row)) {
+                  <mat-icon class="valid-icon" matTooltip="Valid">check_circle</mat-icon>
+                } @else {
+                  <mat-icon class="invalid-icon" matTooltip="Missing condition">error</mat-icon>
+                }
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                [class.selected-row]="row.selected"
+                [class.invalid-row]="!isRowValid(row)"></tr>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-annotation">
+          <mat-icon>arrow_back</mat-icon>
+          <span>Select columns from the left panel</span>
+          <small>Conditions will be auto-parsed from sample names</small>
+        </div>
+      }
+    </div>
+  </div>
 </div>
-<mat-dialog-actions>
-  <button mat-button (click)="save()">Submit</button>
-  <button mat-button (click)="cancel()">Close</button>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()" [disabled]="annotationRows.length === 0">
+    Save
+  </button>
 </mat-dialog-actions>

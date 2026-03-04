@@ -72,11 +72,11 @@ mat-sidenav {
     color: mat.get-theme-color(m3.$dark-theme, primary);
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    color: var(--app-text-color);
+  h1, h2, h3, h4, h5, h6, b, strong {
+    color: var(--app-text-color) !important;
   }
 
-  p, span, div, li, td, th, label {
+  p, span, div, li, td, th, label, small {
     color: inherit;
   }
 

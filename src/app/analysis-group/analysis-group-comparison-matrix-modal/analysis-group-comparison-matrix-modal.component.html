@@ -1,106 +1,186 @@
-<h2 mat-dialog-title>Analysis Group Comparison Matrix</h2>
-<div mat-dialog-content>
-  @if (form.length > 0) {
-    <mat-tab-group mat-stretch-tabs="false">
-      @for (f of form; track f; let i = $index) {
-        @if (f.value.comparison_label) {
-          <mat-tab [label]="f.value.comparison_label">
-            <ng-container>
-              <div>
-                <form [formGroup]="f" style="display: flex; flex-direction: column; gap:10px; overflow-y:hidden">
-                  <div>
-                    <mat-form-field>
-                      <mat-select formControlName="condition_A">
-                        @for(c of conditions; track c) {
-                          <mat-option [value]="c">{{c}}</mat-option>
-                        }
-                      </mat-select>
-                      <mat-label>Condition A</mat-label>
-                    </mat-form-field>
-                  </div>
-                  <div>
-                    <mat-form-field>
-                      <mat-select formControlName="condition_B">
-                        @for(c of conditions; track c) {
-                          <mat-option [value]="c">{{c}}</mat-option>
-                        }
-                      </mat-select>
-                      <mat-label>Condition B</mat-label>
-                    </mat-form-field>
-                  </div>
-                  <div>
-                    <mat-form-field>
-                      <mat-select formControlName="fold_change_col">
-                        @for(c of columns; track c) {
-                          <mat-option [value]="c">{{c}}</mat-option>
-                        }
-                      </mat-select>
-                      <mat-label>Fold Change Column</mat-label>
-                    </mat-form-field>
-                  </div>
-                  <div>
-                    <mat-form-field>
-                      <mat-select formControlName="p_value_col">
-                        @for(c of columns; track c) {
-                          <mat-option [value]="c">{{c}}</mat-option>
-                        }
-                      </mat-select>
-                      <mat-label>P-Value Column</mat-label>
-                    </mat-form-field>
-                  </div>
-                  <div>
-                    <mat-form-field>
-                      <mat-select formControlName="comparison_col">
-                        @for(c of columns; track c) {
-                          <mat-option [value]="c">{{c}}</mat-option>
-                        }
-                      </mat-select>
-                      <mat-label>Comparison Column</mat-label>
-                    </mat-form-field>
-                  </div>
-                  If the comparison column has been selected, please select the comparison label column below. If not, please write the comparison label in the text box below.
-                  <div>
-                    @if (f.value.comparison_col) {
-                      <mat-form-field>
-                        <mat-select formControlName="comparison_label">
-                          @for (c of comparison_labels_map[f.value.comparison_col]; track c) {
-                            <mat-option [value]="c">{{c}}</mat-option>
-                          }
-                        </mat-select>
-                        <mat-label>Comparison Label</mat-label>
-                      </mat-form-field>
-                    } @else {
-                      <mat-form-field>
-                        <input matInput type="text" formControlName="comparison_label">
-                        <mat-label>Comparison Label</mat-label>
-                      </mat-form-field>
-                    }
-                  </div>
-                </form>
+<h2 mat-dialog-title>Comparison Matrix</h2>
+<div mat-dialog-content class="dialog-content">
+  <div class="master-detail-container">
+    <div class="comparison-list">
+      <div class="list-header">
+        <span class="list-title">Comparisons</span>
+        <button mat-icon-button (click)="addComparison()" matTooltip="Add new comparison">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+      <mat-divider></mat-divider>
+      @if (forms.length === 0) {
+        <div class="empty-list">
+          <mat-icon>compare_arrows</mat-icon>
+          <span>No comparisons yet</span>
+          <button mat-stroked-button color="primary" (click)="addComparison()">
+            Add First Comparison
+          </button>
+        </div>
+      } @else {
+        <div class="list-items">
+          @for (f of forms; track f; let i = $index) {
+            <div
+              class="comparison-item"
+              [class.selected]="selectedIndex === i"
+              [class.invalid]="!isFormValid(f)"
+              (click)="selectComparison(i)">
+              <div class="item-content">
+                <span class="item-label">{{ f.value.comparison_label || 'Untitled' }}</span>
+                @if (f.value.condition_A && f.value.condition_B) {
+                  <span class="item-conditions">{{ f.value.condition_A }} vs {{ f.value.condition_B }}</span>
+                }
               </div>
-              <div style="display: flex; flex-direction: row; gap: 10px">
-                <button mat-icon-button color="warn" (click)="copyComparison(f)">
-                  <mat-icon>content_copy</mat-icon>
-                </button>
-                <button mat-icon-button color="warn" (click)="removeComparison(i)">
-                  <mat-icon>remove</mat-icon>
-                </button>
+              <div class="item-status">
+                @if (isFormValid(f)) {
+                  <mat-icon class="valid-icon">check_circle</mat-icon>
+                } @else {
+                  <mat-icon class="invalid-icon">error</mat-icon>
+                }
               </div>
-            </ng-container>
-          </mat-tab>
-        }
+            </div>
+          }
+        </div>
       }
-    </mat-tab-group>
-  }
+    </div>
+
+    <mat-divider vertical></mat-divider>
+
+    <div class="detail-panel">
+      @if (isLoadingColumns) {
+        <div class="loading-state">
+          <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+          <span>Loading columns...</span>
+        </div>
+      } @else if (selectedForm) {
+        <div class="detail-header">
+          <span class="detail-title">Edit: {{ selectedForm.value.comparison_label || 'Untitled' }}</span>
+          <div class="detail-actions">
+            <button mat-icon-button (click)="copyComparison(selectedForm)" matTooltip="Duplicate comparison">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="removeComparison(selectedIndex)" matTooltip="Remove comparison">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <form [formGroup]="selectedForm" class="comparison-form">
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Comparison Label</mat-label>
+              <input matInput type="text" formControlName="comparison_label">
+              @if (selectedForm.controls.comparison_label.hasError('required')) {
+                <mat-error>Label is required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-section">
+            <span class="section-title">Conditions</span>
+            <div class="form-row two-columns">
+              <mat-form-field appearance="outline">
+                <mat-label>Condition A</mat-label>
+                <mat-select formControlName="condition_A">
+                  @for (c of conditions; track c) {
+                    <mat-option [value]="c">{{ c }}</mat-option>
+                  }
+                </mat-select>
+                @if (selectedForm.controls.condition_A.hasError('required')) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Condition B</mat-label>
+                <mat-select formControlName="condition_B">
+                  @for (c of conditions; track c) {
+                    <mat-option [value]="c">{{ c }}</mat-option>
+                  }
+                </mat-select>
+                @if (selectedForm.controls.condition_B.hasError('required')) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <span class="section-title">Data Columns</span>
+            <div class="form-row two-columns">
+              <mat-form-field appearance="outline">
+                <mat-label>Fold Change Column</mat-label>
+                <mat-select formControlName="fold_change_col">
+                  @for (c of columns; track c) {
+                    <mat-option [value]="c">{{ c }}</mat-option>
+                  }
+                </mat-select>
+                @if (selectedForm.controls.fold_change_col.hasError('required')) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>P-Value Column</mat-label>
+                <mat-select formControlName="p_value_col">
+                  @for (c of columns; track c) {
+                    <mat-option [value]="c">{{ c }}</mat-option>
+                  }
+                </mat-select>
+                @if (selectedForm.controls.p_value_col.hasError('required')) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <span class="section-title">Comparison Column (Optional)</span>
+            <mat-hint class="section-hint">
+              If your data has a comparison column, select it to auto-populate comparison labels
+            </mat-hint>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Comparison Column</mat-label>
+                <mat-select formControlName="comparison_col">
+                  <mat-option [value]="null">None</mat-option>
+                  @for (c of columns; track c) {
+                    <mat-option [value]="c">{{ c }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            @if (selectedForm.value.comparison_col && comparison_labels_map[selectedForm.value.comparison_col]) {
+              <div class="form-row">
+                @if (isLoadingLabels) {
+                  <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+                } @else {
+                  <mat-form-field appearance="outline">
+                    <mat-label>Select Comparison Label</mat-label>
+                    <mat-select formControlName="comparison_label">
+                      @for (c of comparison_labels_map[selectedForm.value.comparison_col]; track c) {
+                        <mat-option [value]="c">{{ c }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+              </div>
+            }
+          </div>
+        </form>
+      } @else {
+        <div class="empty-detail">
+          <mat-icon>touch_app</mat-icon>
+          <span>Select a comparison to edit or add a new one</span>
+        </div>
+      }
+    </div>
+  </div>
 </div>
-<mat-dialog-actions>
-  <button mat-button (click)="addComparison()">
-    Add Comparison
-  </button>
-  <button mat-button (click)="save()">
-    Submit
-  </button>
-  <button mat-button (click)="cancel()">
-    Close
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()" [disabled]="forms.length === 0">
+    Save
   </button>
 </mat-dialog-actions>
