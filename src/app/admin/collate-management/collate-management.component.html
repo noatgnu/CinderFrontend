@@ -1,10 +1,10 @@
 <h1>Collate Management</h1>
-<form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
-  <mat-form-field style="width: 100%">
+<form [formGroup]="form" class="form-section">
+  <mat-form-field class="full-width">
     <input matInput formControlName="searchTerm">
     <mat-label>Search Term</mat-label>
   </mat-form-field>
-  <mat-form-field style="width: 100%">
+  <mat-form-field class="full-width">
     <mat-label>Search Tags</mat-label>
     <mat-chip-grid #chipGrid>
       @for (tag of searchTags; track tag.id) {
@@ -71,7 +71,7 @@
 }
 <mat-divider></mat-divider>
 <h1>Collate Tags Management</h1>
-<form [formGroup]="formTagManagement" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
+<form [formGroup]="formTagManagement" class="form-section">
   <mat-form-field>
     <input matInput formControlName="searchTerm">
     <mat-label>Tag Search Term</mat-label>

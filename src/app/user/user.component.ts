@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {User, UserProfile} from "./user";
 import {MatDivider} from "@angular/material/divider";
@@ -12,9 +12,11 @@ import {MatChip, MatChipGrid, MatChipRemove, MatChipRow, MatChipSet} from "@angu
 import {MatIcon} from "@angular/material/icon";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {Subject, takeUntil} from "rxjs";
 
 @Component({
     selector: 'app-user',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDivider,
         ReactiveFormsModule,
@@ -37,14 +39,15 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     templateUrl: './user.component.html',
     styleUrl: './user.component.scss'
 })
-export class UserComponent {
-  private _user: User|null = null
+export class UserComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
+  private _user: User | null = null
   hidePassword = true
   hideConfirmPassword = true
 
   @Input() set user(value: User) {
     if (!value) {
-      this.web.getCurrentUser().subscribe((user) => {
+      this.web.getCurrentUser().pipe(takeUntil(this.destroy$)).subscribe((user) => {
         this._user = user
         this.form.patchValue({
           username: this._user.username,
@@ -52,8 +55,8 @@ export class UserComponent {
           last_name: this._user.last_name,
           email: this._user.email
         })
-        }
-      )
+        this.cdr.markForCheck();
+      })
     } else {
       this._user = value
       this.form.patchValue({
@@ -63,12 +66,14 @@ export class UserComponent {
         email: this._user.email
       })
     }
-    this.web.getUserProfile().subscribe((userProfile) => {
+    this.web.getUserProfile().pipe(takeUntil(this.destroy$)).subscribe((userProfile) => {
       this.userProfile = userProfile;
+      this.cdr.markForCheck();
     })
 
-    this.web.getCurrentUserLabGroups().subscribe((labGroups) => {
+    this.web.getCurrentUserLabGroups().pipe(takeUntil(this.destroy$)).subscribe((labGroups) => {
       this.labGroupForm.controls.lab_group.setValue(labGroups)
+      this.cdr.markForCheck();
     })
     this.fetchLabGroups()
   }
@@ -101,48 +106,56 @@ export class UserComponent {
   userProfile?: UserProfile
 
 
-  constructor(private fb: FormBuilder, private web: WebService, private snackBar: MatSnackBar) {
+  constructor(
+    private fb: FormBuilder,
+    private web: WebService,
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-
-
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   updateUser() {
-    this.web.updateUser(this.user.id, this.form.value.email, null, this.form.value.last_name, this.form.value.first_name).subscribe((user) => {
-      this.user = user;
-      this.snackBar.open("User updated", "Close", {
-        duration: 2000
-      })
-    }, error => {
-      this.snackBar.open("Error updating user", "Close", {
-        duration: 2000
-      })
+    this.web.updateUser(this.user.id, this.form.value.email, null, this.form.value.last_name, this.form.value.first_name).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (user) => {
+        this.user = user;
+        this.snackBar.open("User updated", "Close", { duration: 2000 })
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.snackBar.open("Error updating user", "Close", { duration: 2000 })
+      }
     })
   }
 
   updatePassword() {
-    this.web.updateUser(this.user.id, null, this.passwordForm.value.new_password, null, null).subscribe((user) => {
-      this.user = user;
-      this.snackBar.open("Password updated", "Close", {
-        duration: 2000
-      })
-    }, error => {
-      this.snackBar.open("Error updating password", "Close", {
-        duration: 2000
-      })
+    this.web.updateUser(this.user.id, null, this.passwordForm.value.new_password, null, null).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (user) => {
+        this.user = user;
+        this.snackBar.open("Password updated", "Close", { duration: 2000 })
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.snackBar.open("Error updating password", "Close", { duration: 2000 })
+      }
     })
   }
 
   fetchLabGroups() {
-    if (this.labGroupForm.controls.search_term.value) {
-      this.web.getLabGroups(this.labGroupForm.controls.search_term.value, this.size, this.currentIndex).subscribe((labGroups) => {
-        this.labGroupQuery = labGroups
-      })
-    } else {
-      this.web.getLabGroups(undefined, this.size, this.currentIndex).subscribe((labGroups) => {
-        this.labGroupQuery = labGroups
-      })
-    }
+    const searchTerm = this.labGroupForm.controls.search_term.value || undefined
+    this.web.getLabGroups(searchTerm, this.size, this.currentIndex).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((labGroups) => {
+      this.labGroupQuery = labGroups
+      this.cdr.markForCheck();
+    })
   }
 
   removeLabGroup(labGroup: LabGroup) {
@@ -185,19 +198,19 @@ export class UserComponent {
   }
 
   updateLabGroups() {
-    this.web.getCurrentUserLabGroups().subscribe((currentLabGroups) => {
+    this.web.getCurrentUserLabGroups().pipe(takeUntil(this.destroy$)).subscribe((currentLabGroups) => {
       const existingLabGroups = this.labGroupForm.controls.lab_group.value || [];
       const existingLabGroupIds = new Set(existingLabGroups.map(lg => lg.id));
       const currentLabGroupIds = new Set(currentLabGroups.map(lg => lg.id));
       existingLabGroupIds.forEach(labGroupId => {
         if (!currentLabGroupIds.has(labGroupId)) {
-          this.web.addLabGroupMember(labGroupId, this.user.id).subscribe();
+          this.web.addLabGroupMember(labGroupId, this.user.id).pipe(takeUntil(this.destroy$)).subscribe();
         }
       });
 
       currentLabGroupIds.forEach(labGroup => {
         if (!existingLabGroupIds.has(labGroup)) {
-          this.web.removeLabGroupMember(labGroup, this.user.id).subscribe();
+          this.web.removeLabGroupMember(labGroup, this.user.id).pipe(takeUntil(this.destroy$)).subscribe();
         }
       });
     });

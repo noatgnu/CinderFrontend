@@ -1,6 +1,3 @@
-.disabled-icon {
-  color: red;
-}
 .collate-container {
   display: flex;
   flex-direction: column;
@@ -31,7 +28,26 @@
   color: rgba(0, 0, 0, 0.54);
 }
 
-.loading-container, .error-container, .no-collate-container {
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  text-align: center;
+  min-height: 200px;
+
+  mat-spinner {
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.error-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,11 +60,41 @@
     height: 48px;
     width: 48px;
     margin-bottom: 16px;
+    color: #f44336;
   }
 
   p {
     font-size: 16px;
     margin-bottom: 24px;
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 64px;
+    height: 64px;
+    width: 64px;
+    margin-bottom: 16px;
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  p {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .hint {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -56,21 +102,25 @@
   display: flex;
   padding: 8px 16px;
   align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 
-  .toggle-button, .filter-button {
+  button {
     display: flex;
     align-items: center;
-    margin-right: 8px;
+    gap: 4px;
 
     mat-icon {
       margin-right: 4px;
     }
   }
+
+  .active-toggle {
+    background-color: rgba(33, 150, 243, 0.1);
+  }
 }
 
 .cytoscape-container {
-  margin: 0 -16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 

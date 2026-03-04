@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {Project, ProjectQuery} from "../project";
 import {
   MatList,
@@ -14,6 +14,7 @@ import {StatusBadgeComponent} from "../../shared/status-badge/status-badge.compo
 
 @Component({
     selector: 'app-project-list',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatList,
         MatListItem,
@@ -27,28 +28,14 @@ import {StatusBadgeComponent} from "../../shared/status-badge/status-badge.compo
     templateUrl: './project-list.component.html',
     styleUrl: './project-list.component.scss'
 })
-export class ProjectListComponent implements AfterViewInit {
+export class ProjectListComponent {
   @Input() projectQuery?: ProjectQuery
 
   @Output() projectSelected: EventEmitter<Project> = new EventEmitter<Project>()
 
-  constructor() {
-
-  }
-
-  ngAfterViewInit() {
-
-  }
-
   selectProject(selectionEvent: MatSelectionListChange) {
-    // get selection from selected event
     const selected = selectionEvent.source.selectedOptions.selected
-    // get the first selected item
     const selectedProject = selected[0].value
-    // emit the selected project
     this.projectSelected.emit(selectedProject)
   }
-
-
-
 }

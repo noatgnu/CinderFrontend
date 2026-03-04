@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {CollateService} from "../../collate/collate.service";
 import {WebService} from "../../web.service";
@@ -17,7 +17,7 @@ import {MatChip, MatChipGrid, MatChipInput, MatChipRemove, MatChipRow, MatChipSe
 import {Collate, CollateQuery, CollateTag} from "../../collate/collate";
 import {COMMA, ENTER} from "@angular/cdk/keycodes";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {filter, map, Observable, startWith, switchMap} from "rxjs";
+import {filter, map, Observable, startWith, Subject, switchMap, takeUntil} from "rxjs";
 import {
   MatCell,
   MatCellDef,
@@ -36,6 +36,7 @@ import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-
 
 @Component({
     selector: 'app-collate-management',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ReactiveFormsModule,
         MatLabel,
@@ -73,7 +74,9 @@ import {AreYouSureDialogComponent} from "../../are-you-sure-dialog/are-you-sure-
     templateUrl: './collate-management.component.html',
     styleUrl: './collate-management.component.scss'
 })
-export class CollateManagementComponent implements OnInit {
+export class CollateManagementComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   form = this.fb.group({
     searchTerm: [''],
     tag: ['']
@@ -96,8 +99,19 @@ export class CollateManagementComponent implements OnInit {
   })
   searchTags: CollateTag[] = [];
 
-  constructor(private dialog: MatDialog, private router: Router, private fb: FormBuilder, private collateService: CollateService, private web: WebService, private snackBar: MatSnackBar) {
+  constructor(
+    private dialog: MatDialog,
+    private router: Router,
+    private fb: FormBuilder,
+    private collateService: CollateService,
+    private web: WebService,
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
+  ) {}
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngOnInit() {
@@ -118,10 +132,13 @@ export class CollateManagementComponent implements OnInit {
   }
 
   searchCollates() {
-    this.collateService.getCollates(this.limit, this.offset, this.form.value.searchTerm, this.searchTags.map((s) => s.id)).subscribe({
+    this.collateService.getCollates(this.limit, this.offset, this.form.value.searchTerm, this.searchTags.map((s) => s.id)).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (data: CollateQuery) => {
         this.collates = data.results;
         this.totalCount = data.count;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.snackBar.open('Error loading collates', 'Dismiss')
@@ -130,9 +147,12 @@ export class CollateManagementComponent implements OnInit {
   }
 
   fetchTags() {
-    this.collateService.getCollateTags(this.formTagManagement.value.searchTerm, this.tagLimit, this.tagOffset).subscribe((data)=> {
+    this.collateService.getCollateTags(this.formTagManagement.value.searchTerm, this.tagLimit, this.tagOffset).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((data) => {
       this.searchTagResults = data.results;
       this.searchTagTotalCount = data.count;
+      this.cdr.markForCheck();
     })
   }
 
@@ -154,24 +174,23 @@ export class CollateManagementComponent implements OnInit {
   }
 
   editCollate(collate: Collate) {
-    this.router.navigate([`/collate/edit/${collate.id}`]).then(r => console.log(r));
+    this.router.navigate([`/collate/edit/${collate.id}`]);
   }
 
   deleteCollate(collate: Collate) {
-    this.dialog.open(AreYouSureDialogComponent).afterClosed().subscribe((result) => {
-      if (!result) {
-        return;
+    this.dialog.open(AreYouSureDialogComponent).afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((result) => !!result),
+      switchMap(() => this.collateService.deleteCollate(collate.id))
+    ).subscribe({
+      next: () => {
+        this.snackBar.open('Collate deleted', 'Dismiss');
+        this.searchCollates();
+      },
+      error: () => {
+        this.snackBar.open('Error deleting collate', 'Dismiss');
       }
-      this.collateService.deleteCollate(collate.id).subscribe({
-        next: () => {
-          this.snackBar.open('Collate deleted', 'Dismiss');
-          this.searchCollates();
-        },
-        error: () => {
-          this.snackBar.open('Error deleting collate', 'Dismiss');
-        }
-      });
-    })
+    });
   }
 
   handlePageEvent(event: PageEvent) {
@@ -181,20 +200,19 @@ export class CollateManagementComponent implements OnInit {
   }
 
   deleteTag(tag: CollateTag) {
-    this.dialog.open(AreYouSureDialogComponent).afterClosed().subscribe((result) => {
-      if (!result) {
-        return;
+    this.dialog.open(AreYouSureDialogComponent).afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((result) => !!result),
+      switchMap(() => this.collateService.deleteCollateTag(tag.id))
+    ).subscribe({
+      next: () => {
+        this.snackBar.open('Tag deleted', 'Dismiss');
+        this.fetchTags();
+      },
+      error: () => {
+        this.snackBar.open('Error deleting tag', 'Dismiss');
       }
-      this.collateService.deleteCollateTag(tag.id).subscribe({
-        next: () => {
-          this.snackBar.open('Tag deleted', 'Dismiss');
-          this.fetchTags();
-        },
-        error: () => {
-          this.snackBar.open('Error deleting tag', 'Dismiss');
-        }
-      });
-    })
+    });
   }
 
   handleTagPageEvent(event: PageEvent) {

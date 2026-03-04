@@ -1,10 +1,10 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {MatToolbar, MatToolbarRow} from "@angular/material/toolbar";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatDialog} from "@angular/material/dialog";
 import {ProjectAddDialogComponent} from "../project-add-dialog/project-add-dialog.component";
-import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
+import {CdkDrag, CdkDragHandle, CdkDropList} from "@angular/cdk/drag-drop";
 import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
 import {Project} from "../../project/project";
 import {Collate, CollateTag} from "../collate";
@@ -31,8 +31,9 @@ import {
 import {GraphService} from "../../graph.service";
 import {CollateTagCreateDialogComponent} from "../collate-tag-create-dialog/collate-tag-create-dialog.component";
 import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
-import {forkJoin, Observable} from "rxjs";
+import {filter, forkJoin, Observable, Subject, switchMap, takeUntil} from "rxjs";
 import {MatCheckbox} from "@angular/material/checkbox";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {AccountsService} from "../../accounts/accounts.service";
 import {
   CollateRenameSampleConditionDialogComponent
@@ -41,9 +42,12 @@ import {
   CollateProjectAnalysisGroupVisibilityDialogComponent
 } from "../collate-project-analysis-group-visibility-dialog/collate-project-analysis-group-visibility-dialog.component";
 import {CollatePlotSettingsComponent} from "../collate-plot-settings/collate-plot-settings.component";
+import {CollateSettingsService} from "../collate-settings.service";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-collate-editor',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatToolbar,
         MatIconButton,
@@ -71,20 +75,29 @@ import {CollatePlotSettingsComponent} from "../collate-plot-settings/collate-plo
         MatButton,
         CollateTagsComponent,
         MatLabel,
-        MatCheckbox
+        MatCheckbox,
+        MatProgressSpinner,
+        MatTooltip
     ],
     templateUrl: './collate-editor.component.html',
     styleUrl: './collate-editor.component.scss'
 })
-export class CollateEditorComponent {
+export class CollateEditorComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   private _collate: Collate | null = null;
   canEdit: boolean = false;
+  isLoading: boolean = false;
+  isSaving: boolean = false;
   @Input() set collateId(value: number | null) {
     if (value) {
-      this.collateService.getCollate(value).subscribe((collate: Collate) => {
+      this.isLoading = true;
+      this.cdr.markForCheck();
+      this.collateService.getCollate(value).pipe(takeUntil(this.destroy$)).subscribe((collate: Collate) => {
+        this.isLoading = false;
         this._collate = collate;
-        this.accounts.getCollatePermissions(collate.id).subscribe((permissions) => {
+        this.accounts.getCollatePermissions(collate.id).pipe(takeUntil(this.destroy$)).subscribe((permissions) => {
           this.canEdit = permissions.edit;
+          this.cdr.markForCheck();
         });
         this.projects = collate.projects;
         if (!this._collate.settings) {
@@ -106,40 +119,38 @@ export class CollateEditorComponent {
           this.projects = this.projects.filter(project => collate.settings.projectOrder.includes(project.id));
           this.projects = this.projects.concat(notFound);
         }
-        if (this.collate) {
-          if ("showTags" in this.collate.settings) {
-            this.collate.settings.showTags = false;
+        const currentCollate = this._collate;
+        if (currentCollate) {
+          if ("showTags" in currentCollate.settings) {
+            currentCollate.settings.showTags = false;
           }
-        }
 
-        if (this.collate?.settings.projectConditionColorMap) {
-          this.graph.projectConditionColorMap = this.collate.settings.projectConditionColorMap;
-        } else {
-          // @ts-ignore
-          this.collate.settings.projectConditionColorMap = {};
-          for (const p of this.projects) {
-            // @ts-ignore
-            this.collate.settings.projectConditionColorMap[p.id] = {};
+          if (!currentCollate.settings.projectConditionColorMap) {
+            currentCollate.settings.projectConditionColorMap = {};
           }
-        }
-        if (this.collate?.settings.renameSampleCondition) {
+          this.graph.projectConditionColorMap = currentCollate.settings.projectConditionColorMap;
+          for (const p of this.projects) {
+            if (!currentCollate.settings.projectConditionColorMap[p.id]) {
+              currentCollate.settings.projectConditionColorMap[p.id] = {};
+            }
+          }
 
-        } else {
-          // @ts-ignore
-          this.collate.settings.renameSampleCondition = {};
+          if (!currentCollate.settings.renameSampleCondition) {
+            currentCollate.settings.renameSampleCondition = {};
+          }
           for (const p of this.projects) {
-            // @ts-ignore
-            this.collate.settings.renameSampleCondition[p.id] = {}
-            this.web.getProjectUniqueConditions(p.id).subscribe((value) => {
-              for (const a of value) {
-                // @ts-ignore
-                this.collate.settings.renameSampleCondition[p.id][a.Condition] = a.Condition
-              }
-              // @ts-ignore
-              console.log(this.collate.settings.renameSampleCondition)
-            })
+            if (!currentCollate.settings.renameSampleCondition[p.id]) {
+              currentCollate.settings.renameSampleCondition[p.id] = {};
+              this.web.getProjectUniqueConditions(p.id).pipe(takeUntil(this.destroy$)).subscribe((value) => {
+                for (const a of value) {
+                  currentCollate.settings.renameSampleCondition[p.id][a.Condition] = a.Condition;
+                }
+                this.cdr.markForCheck();
+              });
+            }
           }
         }
+        this.cdr.markForCheck();
       })
     }
   }
@@ -170,42 +181,57 @@ export class CollateEditorComponent {
   filteredResults: { [projectId: number]: SearchResult[] } = {};
   removedTags: CollateTag[] = [];
 
-  constructor(private accounts: AccountsService, private graph: GraphService, private router: Router, private snackBar: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private accounts: AccountsService,
+    private graph: GraphService,
+    private router: Router,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private collateService: CollateService,
+    private web: WebService,
+    private settingsService: CollateSettingsService
+  ) {}
 
   openProjectAddDialog() {
     const dialogRef = this.dialog.open(ProjectAddDialogComponent);
 
-    dialogRef.afterClosed().subscribe((result: Project[]) => {
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result: Project[]) => {
       if (result) {
         this.projects = this.projects.concat(result);
         if (this.collate) {
           this.collate.projects = this.projects;
           this.updateProjectOrder();
         }
+        this.cdr.markForCheck();
       }
     });
   }
 
 
   updateProjectOrder() {
-
     if (this._collate) {
       this._collate.settings.projectOrder = this.projects.map(project => project.id);
     }
-    console.log(this.collate)
   }
 
   updateCollate() {
     if (this._collate) {
-      this.collateService.updateCollate(this._collate.id, this._collate).subscribe(() => {
+      this.isSaving = true;
+      this.cdr.markForCheck();
+      this.collateService.updateCollate(this._collate.id, this._collate).pipe(takeUntil(this.destroy$)).subscribe(() => {
         if (this.removedTags.length > 0) {
-          const obserables: Observable<any>[] = this.removedTags.map(tag => this.collateService.removeTagFromCollate(this._collate?.id as number, tag.id));
-          forkJoin(obserables).subscribe(() => {
+          const observables: Observable<unknown>[] = this.removedTags.map(tag => this.collateService.removeTagFromCollate(this._collate?.id as number, tag.id));
+          forkJoin(observables).pipe(takeUntil(this.destroy$)).subscribe(() => {
+            this.isSaving = false;
             this.showSnackBar('Collate saved successfully');
             this.removedTags = [];
-          })
+            this.cdr.markForCheck();
+          });
         } else {
+          this.isSaving = false;
           this.showSnackBar('Collate saved successfully');
+          this.cdr.markForCheck();
         }
       });
     }
@@ -230,54 +256,48 @@ export class CollateEditorComponent {
   }
 
   getSearchFromID(id: number) {
-    this.web.getSearchSession(id).subscribe((data) => {
-      console.log(data)
-    })
-    this.web.getSearchResults(id,99999).subscribe((data) => {
-      console.log(data.results)
-      this.distributeSearchResults(data.results).then();
-    })
-  }
-
-  async associateAnalysisGroupsWithProjects() {
-    const analysisGroups = await this.web.getAnalysisGroupsFromProjects(this.projects).toPromise();
-    this.projectAnalysisGroups = {};
-    this.analysisGroupProjects = {};
-    if (analysisGroups) {
-      analysisGroups.forEach(analysisGroup => {
-        const projectId = analysisGroup.project;
-        if (!this.projectAnalysisGroups[projectId]) {
-          this.projectAnalysisGroups[projectId] = [];
-        }
-        this.projectAnalysisGroups[projectId].push(analysisGroup);
-
-        this.analysisGroupProjects[analysisGroup.id] = this.projects.find(project => project.id === projectId) as Project;
-      });
-    }
-  }
-
-  async distributeSearchResults(results: SearchResult[]) {
-    await this.associateAnalysisGroupsWithProjects();
-    this.searchResults = {};
-    this.searchTerms = Array.from(new Set(results.map(result => result.search_term)));
-    results.forEach(result => {
-      const analysisGroup = result.analysis_group.id;
-      const project = this.analysisGroupProjects[analysisGroup];
-      if (project) {
-        if (!this.searchResults[project.id]) {
-          this.searchResults[project.id] = [];
-        }
-        this.searchResults[project.id].push(result);
-      }
+    this.web.getSearchSession(id).pipe(takeUntil(this.destroy$)).subscribe();
+    this.web.getSearchResults(id, 99999).pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      this.distributeSearchResults(data.results);
     });
-    this.selectedSearchTerm = this.searchTerms[0];
-    this.filterDataBySearchTerm();
+  }
+
+  distributeSearchResults(results: SearchResult[]) {
+    this.web.getAnalysisGroupsFromProjects(this.projects).pipe(takeUntil(this.destroy$)).subscribe((analysisGroups) => {
+      this.projectAnalysisGroups = {};
+      this.analysisGroupProjects = {};
+      if (analysisGroups) {
+        analysisGroups.forEach(analysisGroup => {
+          const projectId = analysisGroup.project;
+          if (!this.projectAnalysisGroups[projectId]) {
+            this.projectAnalysisGroups[projectId] = [];
+          }
+          this.projectAnalysisGroups[projectId].push(analysisGroup);
+          this.analysisGroupProjects[analysisGroup.id] = this.projects.find(project => project.id === projectId) as Project;
+        });
+      }
+      this.searchResults = {};
+      this.searchTerms = Array.from(new Set(results.map(result => result.search_term)));
+      results.forEach(result => {
+        const analysisGroupId = result.analysis_group.id;
+        const project = this.analysisGroupProjects[analysisGroupId];
+        if (project) {
+          if (!this.searchResults[project.id]) {
+            this.searchResults[project.id] = [];
+          }
+          this.searchResults[project.id].push(result);
+        }
+      });
+      this.selectedSearchTerm = this.searchTerms[0];
+      this.filterDataBySearchTerm();
+      this.cdr.markForCheck();
+    });
   }
 
   getFilteredSearchResults(): { [projectId: number]: SearchResult[] } {
     const filteredResults: { [projectId: number]: SearchResult[] } = {};
-    Object.keys(this.searchResults).forEach(projectId => {
-      // @ts-ignore
+    Object.keys(this.searchResults).forEach(projectIdStr => {
+      const projectId = parseInt(projectIdStr, 10);
       filteredResults[projectId] = this.searchResults[projectId].filter(result => result.search_term === this.selectedSearchTerm);
     });
     if (this.collate?.settings?.analysisGroupOrderMap) {
@@ -318,6 +338,7 @@ export class CollateEditorComponent {
   filterDataBySearchTerm() {
     this.selectedSearchTerm = this.searchTerms[this.selectedIndex];
     this.filteredResults = this.getFilteredSearchResults();
+    this.cdr.markForCheck();
   }
 
   onProjectOrderChanged(projects: Project[]) {
@@ -350,167 +371,114 @@ export class CollateEditorComponent {
         this.collate.settings.analysisGroupOrderMap = {};
       }
       this.collate.settings.analysisGroupOrderMap[projectId] = event.map(result => result.analysis_group.id);
-      // update order map to only include unique analysis groups
-      Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
-        // @ts-ignore
-        this.collate.settings.analysisGroupOrderMap[projectId] = Array.from(new Set(this.collate.settings.analysisGroupOrderMap[projectId]));
+      Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectIdStr => {
+        const id = parseInt(projectIdStr, 10);
+        if (this.collate) {
+          this.collate.settings.analysisGroupOrderMap[id] = Array.from(new Set(this.collate.settings.analysisGroupOrderMap[id]));
+        }
       });
     }
   }
 
   openVisibilityDialog() {
-    const ref = this.dialog.open(CollateProjectAnalysisGroupVisibilityDialogComponent)
-    this.web.getAnalysisGroupsFromProjects(this.projects).subscribe((analysisGroups: AnalysisGroup[]) => {
-      const projectAnalysisGroups: {[projectId: number]: AnalysisGroup[]} = {};
-      analysisGroups.forEach(analysisGroup => {
-        if (!projectAnalysisGroups[analysisGroup.project]) {
-          projectAnalysisGroups[analysisGroup.project] = [];
-        }
-        projectAnalysisGroups[analysisGroup.project].push(analysisGroup);
-      });
-      // reorder analysisGroup in each project by id found in settings if analysisGroup can't be found in settings, it will be placed at the end
+    const ref = this.dialog.open(CollateProjectAnalysisGroupVisibilityDialogComponent);
+    this.web.getAnalysisGroupsFromProjects(this.projects).pipe(takeUntil(this.destroy$)).subscribe((analysisGroups: AnalysisGroup[]) => {
+      let projectAnalysisGroups = this.settingsService.groupAnalysisGroupsByProject(analysisGroups);
       if (this.collate?.settings?.analysisGroupOrderMap) {
-        Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
-          const id = parseInt(projectId);
-          const analysisGroupOrder = this.collate?.settings.analysisGroupOrderMap[id];
-          if (!analysisGroupOrder) {
-            return;
-          }
-          if (!projectAnalysisGroups[id]) {
-            return;
-          }
-          // take out analysis groups that are not in the order map to be placed at the end
-          const notInOrder = projectAnalysisGroups[id].filter(analysisGroup => !analysisGroupOrder.includes(analysisGroup.id));
-          projectAnalysisGroups[id] = projectAnalysisGroups[id].filter(analysisGroup => analysisGroupOrder.includes(analysisGroup.id));
-
-          projectAnalysisGroups[id] = projectAnalysisGroups[id].sort((a, b) => {
-            return analysisGroupOrder.indexOf(a.id) - analysisGroupOrder.indexOf(b.id);
-          });
-          projectAnalysisGroups[id] = projectAnalysisGroups[id].concat(notInOrder);
-        });
+        projectAnalysisGroups = this.settingsService.orderAnalysisGroups(projectAnalysisGroups, this.collate.settings.analysisGroupOrderMap);
       }
-
       ref.componentInstance.projectAnalysisGroupMap = projectAnalysisGroups;
-
       ref.componentInstance.projects = this.projects;
-
-      let projectAnalysisGroupVisibility: {[projectId: number]: {[analysisGroupID: number]: boolean}} = {};
-      if (this.collate?.settings?.projectAnalysisGroupVisibility) {
-        projectAnalysisGroupVisibility = this.collate.settings.projectAnalysisGroupVisibility;
-      }
-      for (const projectId in projectAnalysisGroups) {
-        if (!projectAnalysisGroupVisibility[projectId]) {
-          projectAnalysisGroupVisibility[projectId] = {};
-        }
-        for (const analysisGroup of projectAnalysisGroups[projectId]) {
-          if (!(analysisGroup.id in projectAnalysisGroupVisibility[projectId])) {
-            projectAnalysisGroupVisibility[projectId][analysisGroup.id] = true;
-          }
-        }
-      }
-      ref.componentInstance.projectAnalysisGroupVisibilityMap = Object.assign({}, projectAnalysisGroupVisibility);
-    })
-    ref.afterClosed().subscribe((result: { [projectID: number]: { [analysisGroupID: number]: boolean } }) => {
+      const visibility = this.settingsService.initializeVisibilityMap(
+        projectAnalysisGroups,
+        this.collate?.settings?.projectAnalysisGroupVisibility
+      );
+      ref.componentInstance.projectAnalysisGroupVisibilityMap = { ...visibility };
+    });
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result: { [projectID: number]: { [analysisGroupID: number]: boolean } }) => {
       if (this.collate && result) {
         this.collate.settings.projectAnalysisGroupVisibility = result;
         this.filteredResults = this.getFilteredSearchResults();
+        this.cdr.markForCheck();
       }
-    })
+    });
   }
 
   openReorderDialog() {
     const ref = this.dialog.open(CollateProjectAnalysisGroupReorderDialogComponent);
-    this.web.getAnalysisGroupsFromProjects(this.projects).subscribe((analysisGroups: AnalysisGroup[]) => {
-      const projectAnalysisGroups: {[projectId: number]: AnalysisGroup[]} = {};
-      analysisGroups.forEach(analysisGroup => {
-        if (!projectAnalysisGroups[analysisGroup.project]) {
-          projectAnalysisGroups[analysisGroup.project] = [];
-        }
-        projectAnalysisGroups[analysisGroup.project].push(analysisGroup);
-      });
-      // reorder analysisGroup in each project by id found in settings if analysisGroup can't be found in settings, it will be placed at the end
+    this.web.getAnalysisGroupsFromProjects(this.projects).pipe(takeUntil(this.destroy$)).subscribe((analysisGroups: AnalysisGroup[]) => {
+      let projectAnalysisGroups = this.settingsService.groupAnalysisGroupsByProject(analysisGroups);
       if (this.collate?.settings?.analysisGroupOrderMap) {
-        Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
-          const id = parseInt(projectId);
-          const analysisGroupOrder = this.collate?.settings.analysisGroupOrderMap[id];
-          if (!analysisGroupOrder) {
-            return;
-          }
-          if (!projectAnalysisGroups[id]) {
-            return;
-          }
-          // take out analysis groups that are not in the order map to be placed at the end
-          const notInOrder = projectAnalysisGroups[id].filter(analysisGroup => !analysisGroupOrder.includes(analysisGroup.id));
-          projectAnalysisGroups[id] = projectAnalysisGroups[id].filter(analysisGroup => analysisGroupOrder.includes(analysisGroup.id));
-
-          projectAnalysisGroups[id] = projectAnalysisGroups[id].sort((a, b) => {
-            return analysisGroupOrder.indexOf(a.id) - analysisGroupOrder.indexOf(b.id);
-          });
-          projectAnalysisGroups[id] = projectAnalysisGroups[id].concat(notInOrder);
-        });
+        projectAnalysisGroups = this.settingsService.orderAnalysisGroups(projectAnalysisGroups, this.collate.settings.analysisGroupOrderMap);
       }
-
       ref.componentInstance.projectAnalysisGroupMap = projectAnalysisGroups;
-
       ref.componentInstance.projects = this.projects;
-    })
-    ref.afterClosed().subscribe((result: {projects: Project[], projectAnalysisGroupMap: {[projectId: number]: AnalysisGroup[]}}) => {
+    });
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((result): result is { projects: Project[], projectAnalysisGroupMap: { [projectId: number]: AnalysisGroup[] } } => !!result)
+    ).subscribe((result) => {
       this.projects = result.projects;
-      this.updateProjectOrder()
+      this.updateProjectOrder();
       this.projectAnalysisGroups = result.projectAnalysisGroupMap;
-      // update order of analysis groups
-      const analysisGroupOrderMap: {[projectId: number]: number[]} = {};
-      Object.keys(this.projectAnalysisGroups).forEach(projectId => {
-        // @ts-ignore
-        analysisGroupOrderMap[projectId] = this.projectAnalysisGroups[projectId].map(analysisGroup => analysisGroup.id);
+      const analysisGroupOrderMap: { [projectId: number]: number[] } = {};
+      Object.keys(this.projectAnalysisGroups).forEach(projectIdStr => {
+        const projectId = parseInt(projectIdStr, 10);
+        analysisGroupOrderMap[projectId] = this.projectAnalysisGroups[projectId].map(ag => ag.id);
       });
       if (this.collate) {
         this.collate.settings.analysisGroupOrderMap = analysisGroupOrderMap;
         this.filteredResults = this.getFilteredSearchResults();
       }
-
-    })
+      this.cdr.markForCheck();
+    });
   }
 
   openConditionColorEditorDialog() {
     const ref = this.dialog.open(CollateConditionColorEditorDialogComponent);
     ref.componentInstance.projectConditionColorMap = this.collate?.settings?.projectConditionColorMap;
     ref.componentInstance.projects = this.projects;
-    ref.afterClosed().subscribe((result: { [projectID: number]: { [condition: string]: string } }) => {
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((result): result is { [projectID: number]: { [condition: string]: string } } => !!result)
+    ).subscribe((result) => {
       if (this.collate) {
         this.collate.settings.projectConditionColorMap = result;
       }
-      this.graph.projectConditionColorMap = Object.assign({}, result);
+      this.graph.projectConditionColorMap = { ...result };
       this.filteredResults = this.getFilteredSearchResults();
       this.graph.redrawTrigger.next(true);
-    })
-
+      this.cdr.markForCheck();
+    });
   }
 
   openCollateTagCreateDialog() {
     const ref = this.dialog.open(CollateTagCreateDialogComponent);
-    ref.afterClosed().subscribe((result: {name: string, existing: boolean, id: number}) => {
-      if (result) {
-        if (result.name) {
-          if (result.existing && result.id && result.id !== -1) {
-            this.collateService.addTagToCollate(this.collate?.id as number, result.id).subscribe((tag) => {
-              if (this.collate) {
-                this.collate.tags.push(tag);
-              }
-            })
-          } else {
-            this.collateService.createCollateTag(result.name).subscribe((tag) => {
-              this.collateService.addTagToCollate(this.collate?.id as number, tag.id).subscribe((tag) => {
-                if (this.collate) {
-                  this.collate.tags.push(tag);
-                }
-              })
-            })
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((result): result is { name: string, existing: boolean, id: number } => !!result && !!result.name)
+    ).subscribe((result) => {
+      if (result.existing && result.id && result.id !== -1) {
+        this.collateService.addTagToCollate(this.collate?.id as number, result.id).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe((tag) => {
+          if (this.collate) {
+            this.collate.tags.push(tag);
+            this.cdr.markForCheck();
           }
-
-        }
+        });
+      } else {
+        this.collateService.createCollateTag(result.name).pipe(
+          takeUntil(this.destroy$),
+          switchMap(tag => this.collateService.addTagToCollate(this.collate?.id as number, tag.id))
+        ).subscribe((tag) => {
+          if (this.collate) {
+            this.collate.tags.push(tag);
+            this.cdr.markForCheck();
+          }
+        });
       }
-    })
+    });
   }
 
   handleCollageTagsChange(tags: CollateTag[]) {
@@ -523,15 +491,18 @@ export class CollateEditorComponent {
 
   openRenameConditionDialog() {
     if (this.collate) {
-      const ref = this.dialog.open(CollateRenameSampleConditionDialogComponent)
-      ref.componentInstance.projects = this.collate.projects
-      ref.componentInstance.renameSampleCondition = this.collate.settings.renameSampleCondition
-      ref.afterClosed().subscribe((result: any)=> {
+      const ref = this.dialog.open(CollateRenameSampleConditionDialogComponent);
+      ref.componentInstance.projects = this.collate.projects;
+      ref.componentInstance.renameSampleCondition = this.collate.settings.renameSampleCondition;
+      ref.afterClosed().pipe(
+        takeUntil(this.destroy$),
+        filter((result): result is { [projectId: number]: { [key: string]: string } } => !!result)
+      ).subscribe((result) => {
         if (this.collate) {
-          this.collate.settings.renameSampleCondition = Object.assign({}, result)
-          console.log(this.collate.settings.renameSampleCondition)
+          this.collate.settings.renameSampleCondition = { ...result };
+          this.cdr.markForCheck();
         }
-      })
+      });
     }
   }
 
@@ -539,7 +510,7 @@ export class CollateEditorComponent {
     if (this.collate) {
       const ref = this.dialog.open(CollatePlotSettingsComponent);
       ref.componentInstance.settings = this.collate.settings.plotSettings;
-      ref.afterClosed().subscribe((result: any) => {
+      ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result: any) => {
         if (this.collate && result) {
           this.collate.settings.plotSettings = result;
           this.graph.plotSettings = result;
@@ -547,5 +518,10 @@ export class CollateEditorComponent {
         }
       });
     }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

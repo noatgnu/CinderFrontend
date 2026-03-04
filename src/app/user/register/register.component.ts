@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {WebService} from "../../web.service";
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -10,9 +10,11 @@ import {LabGroup, LabGroupQuery} from "../../lab-group";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatDivider} from "@angular/material/divider";
+import {Subject, takeUntil, filter, switchMap} from "rxjs";
 
 @Component({
     selector: 'app-register',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ReactiveFormsModule,
         MatFormField,
@@ -31,7 +33,8 @@ import {MatDivider} from "@angular/material/divider";
     templateUrl: './register.component.html',
     styleUrl: './register.component.scss'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   private _token: string = ''
   hidePassword = true
   hideConfirmPassword = true
@@ -71,17 +74,32 @@ export class RegisterComponent {
   limit = 5
   offset = 0
 
-  constructor(private webService: WebService, private fb: FormBuilder, private snackBar: MatSnackBar) {
-    this.webService.getLabGroups("", this.limit, this.offset).subscribe((response) => {
+  constructor(
+    private webService: WebService,
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.webService.getLabGroups("", this.limit, this.offset).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((response) => {
       this.labGroupQuery = response
+      this.cdr.markForCheck();
     })
-    this.form.controls.search_lab_group.valueChanges.subscribe((value) => {
-      if (value) {
-        this.webService.getLabGroups(value, this.limit, this.offset).subscribe((response) => {
-          this.labGroupQuery = response
-        })
-      }
+
+    this.form.controls.search_lab_group.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      filter((value): value is string => !!value),
+      switchMap((value) => this.webService.getLabGroups(value, this.limit, this.offset))
+    ).subscribe((response) => {
+      this.labGroupQuery = response
+      this.cdr.markForCheck();
     })
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   createAccount() {
@@ -93,28 +111,35 @@ export class RegisterComponent {
       return
     }
     if (this.form.value.username && this.form.value.token && this.form.value.email && this.form.value.last_name && this.form.value.password && this.form.value.first_name) {
-      this.webService.createUserWithToken(this.form.value.username, this.form.value.token, this.form.value.email, this.form.value.last_name, this.form.value.password, this.form.value.first_name, this.form.value.lab_group).subscribe(
-        (response) => {
-        this.snackBar.open('Account created', 'Close', { duration: 2000 })
-      }, error => {
-        this.snackBar.open('Failed to create account', 'Close', { duration: 2000 })
-        })
+      this.webService.createUserWithToken(
+        this.form.value.username,
+        this.form.value.token,
+        this.form.value.email,
+        this.form.value.last_name,
+        this.form.value.password,
+        this.form.value.first_name,
+        this.form.value.lab_group
+      ).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.snackBar.open('Account created', 'Close', { duration: 2000 })
+        },
+        error: () => {
+          this.snackBar.open('Failed to create account', 'Close', { duration: 2000 })
+        }
+      })
     }
   }
 
   onPageChange(event: PageEvent) {
     this.limit = event.pageSize;
     this.offset = event.pageIndex * this.limit;
-    if (this.form.controls.search_lab_group.value) {
-      this.webService.getLabGroups(this.form.controls.search_lab_group.value, this.limit, this.offset).subscribe((response) => {
-        this.labGroupQuery = response
-      })
-    } else {
-      this.webService.getLabGroups("", this.limit, this.offset).subscribe((response) => {
-        this.labGroupQuery = response
-      })
-    }
-
+    const searchValue = this.form.controls.search_lab_group.value || ""
+    this.webService.getLabGroups(searchValue, this.limit, this.offset).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((response) => {
+      this.labGroupQuery = response
+      this.cdr.markForCheck();
+    })
   }
 
 }

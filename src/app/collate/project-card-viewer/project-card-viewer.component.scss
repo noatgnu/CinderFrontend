@@ -1,0 +1,22 @@
+.accent-text {
+  color: #ba0000;
+}
+
+.toggle-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.results-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.drag-item-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

@@ -1,0 +1,16 @@
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.footer-content {
+  text-align: center;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.footer-text {
+  font-size: 20px;
+}

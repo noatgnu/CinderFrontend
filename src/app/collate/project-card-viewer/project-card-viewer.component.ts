@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {Project} from "../../project/project";
 import {
   MatCard,
@@ -29,6 +29,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-project-card-viewer',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatCardSubtitle,
         MatCardTitle,
@@ -72,7 +73,6 @@ export class ProjectCardViewerComponent {
   private _searchResults: SearchResult[] = [];
   @Input() set searchResults(value: SearchResult[]) {
     this._searchResults = value;
-    console.log(value);
   }
 
   @Input() colorMap: { [condition: string]: string } | undefined = {};

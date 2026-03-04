@@ -1,0 +1,46 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.logo-text {
+  color: #ba0000;
+  font-weight: bold;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.nav-icon-button {
+  color: rgb(172, 110, 110);
+}
+
+.logout-button {
+  color: rgb(186, 104, 166);
+}
+
+.user-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+  margin-left: 4px;
+  vertical-align: middle;
+
+  &.staff {
+    color: #1976d2;
+  }
+}
+
+mat-menu-item {
+  mat-icon {
+    margin-right: 8px;
+  }
+}

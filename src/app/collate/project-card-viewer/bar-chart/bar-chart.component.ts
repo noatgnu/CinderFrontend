@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import * as PlotlyJS from 'plotly.js-dist-min';
 import {PlotlyModule} from "angular-plotly.js";
 import {SearchResult} from "../../../search-session";
@@ -7,6 +7,7 @@ import {AccountsService} from "../../../accounts/accounts.service";
 
 @Component({
     selector: 'app-bar-chart',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         PlotlyModule
     ],
@@ -265,10 +266,8 @@ export class BarChartComponent {
       dataCount = uniqueConditions.length
       this.graphData = [...traces, ...boxes]
     }
-    console.log(this.colorMap)
     this.graphLayout.width = this.graphLayout.margin.l + this.graphLayout.margin.r + this.barSize * dataCount
     this.revision++
-    console.log(this.graphData)
   }
 
   calculateMean(data: number[]): number {

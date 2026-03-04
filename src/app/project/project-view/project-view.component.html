@@ -1,20 +1,20 @@
 <app-breadcrumb></app-breadcrumb>
 
-<div style="display: flex; flex-direction: row; justify-content: center; padding: 50px">
-  <div style="width: 100%">
+<div class="view-container">
+  <div class="content-wrapper">
     @if (project) {
-      <form (ngSubmit)="updateProject()" [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px;">
-        <mat-form-field style="width: 100%">
+      <form (ngSubmit)="updateProject()" [formGroup]="form" class="project-form">
+        <mat-form-field class="full-width">
           <input matInput formControlName="name" placeholder="Project Name" [readonly]="!canEdit">
           <mat-label>Project Name</mat-label>
         </mat-form-field>
-        <mat-form-field style="width: 100%">
+        <mat-form-field class="full-width">
           <textarea matInput formControlName="description" placeholder="Project Description" [readonly]="!canEdit"></textarea>
           <mat-label>Project Description</mat-label>
         </mat-form-field>
 
-        <div style="display: flex; flex-direction: column; gap: 10px">
-          <mat-form-field style="width: 100%">
+        <div class="species-section">
+          <mat-form-field class="full-width">
             <input matInput formControlName="species_name" placeholder="Search Species..." type="search" [matAutocomplete]="auto">
             <mat-label>Organism</mat-label>
             <mat-autocomplete #auto="matAutocomplete">
@@ -32,7 +32,7 @@
           </mat-form-field>
         </div>
 
-        <div style="display: flex; flex-direction: row; gap: 20px">
+        <div class="action-buttons">
           <button mat-flat-button color="primary" type="submit" [disabled]="!canEdit">Update Project</button>
           @if (canEdit) {
             <button mat-flat-button color="accent" (click)="openAnalysisGroupCreateModal()"><mat-icon>add</mat-icon> Create Analysis Group</button>
@@ -42,8 +42,8 @@
       </form>
       
       @if (analysisGroupQuery) {
-        <div style="margin-top: 40px;">
-          <h3 style="margin-bottom: 16px; padding-left: 4px;">Associated Analysis Groups</h3>
+        <div class="analysis-groups-section">
+          <h3 class="section-header">Associated Analysis Groups</h3>
           @if (analysisGroupQuery.results.length > 0) {
             <div class="ag-grid">
               @for (ag of analysisGroupQuery.results; track ag.id) {
@@ -60,7 +60,7 @@
               }
             </div>
             
-            <div class="paginator-footer" style="margin-top: 24px; border-radius: 8px;">
+            <div class="paginator-footer">
               <mat-paginator [length]="analysisGroupQuery.count"
                              [pageSize]="pageSize"
                              (page)="handlePageChange($event)"

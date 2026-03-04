@@ -1,9 +1,15 @@
 <app-breadcrumb></app-breadcrumb>
-<div class="header-container" style="display: flex; flex-direction: row; justify-content: center; align-items: center; height: 200px">
-  <div class="header" style="text-align: center; font-family: Roboto, Helvetica Neue, sans-serif">
-    <h1>C|nder</h1><br>
-    <div style="font-size: 25px; font-family: 'Roboto', 'Arial Narrow', sans-serif">Proteomics Data Indexer</div>
+@if (isLoading) {
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
   </div>
-</div>
-<app-banner></app-banner>
-<app-footer [text]="frontEndData?.footer"></app-footer>
+} @else {
+  <div class="header-container">
+    <div class="header">
+      <h1>C|nder</h1>
+      <div class="subtitle">Proteomics Data Indexer</div>
+    </div>
+  </div>
+  <app-banner></app-banner>
+  <app-footer [text]="frontEndData?.footer"></app-footer>
+}

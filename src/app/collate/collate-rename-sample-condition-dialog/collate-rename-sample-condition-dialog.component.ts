@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {Project} from "../../project/project";
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {
@@ -22,8 +22,11 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 
+import {Subject, takeUntil} from "rxjs";
+
 @Component({
     selector: 'app-collate-rename-sample-condition-dialog',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDialogTitle,
         MatDialogContent,
@@ -50,7 +53,8 @@ import {MatInput} from "@angular/material/input";
     templateUrl: './collate-rename-sample-condition-dialog.component.html',
     styleUrl: './collate-rename-sample-condition-dialog.component.scss'
 })
-export class CollateRenameSampleConditionDialogComponent {
+export class CollateRenameSampleConditionDialogComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   displayedColumns: string[] = ["original", "display"]
   projectConditionMap: { [projectID: number]: string[] } = {}
   private _projects: Project[] = []
@@ -77,7 +81,7 @@ export class CollateRenameSampleConditionDialogComponent {
     }
   }) {
     for (const project of this.projects) {
-      this.web.getProjectUniqueConditions(project.id).subscribe((res) => {
+      this.web.getProjectUniqueConditions(project.id).pipe(takeUntil(this.destroy$)).subscribe((res) => {
         for (const conditionAnalysisGroup of res) {
           if (!this.formMap[conditionAnalysisGroup.AnalysisGroup.project]) {
             this.formMap[conditionAnalysisGroup.AnalysisGroup.project] = {}
@@ -107,8 +111,9 @@ export class CollateRenameSampleConditionDialogComponent {
               this.formMap[conditionAnalysisGroup.AnalysisGroup.project][conditionAnalysisGroup.Condition].controls[conditionAnalysisGroup.Condition].setValue(value[conditionAnalysisGroup.AnalysisGroup.project][conditionAnalysisGroup.Condition])
             }
           }
-        }}
-      )
+        }
+        this.cdr.markForCheck();
+      })
     }
   }
 
@@ -126,9 +131,13 @@ export class CollateRenameSampleConditionDialogComponent {
     private dialog: MatDialogRef<CollateConditionColorEditorDialogComponent>,
     private web: WebService,
     private fb: FormBuilder,
-    private sb: MatSnackBar
-  ) {
+    private sb: MatSnackBar,
+    private cdr: ChangeDetectorRef
+  ) {}
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   close() {

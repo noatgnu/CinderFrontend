@@ -1,6 +1,3 @@
-mat-card {
-  margin: 20px;
-}
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -10,7 +7,29 @@ mat-card {
   }
 }
 
-.header h1, .header p {
-  opacity: 0;
-  animation: fadeIn 2s ease-in-out forwards;
+.header-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.header {
+  text-align: center;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+
+  h1 {
+    opacity: 0;
+    animation: fadeIn 2s ease-in-out forwards;
+    margin-bottom: 8px;
+  }
+
+  .greeting {
+    font-size: 25px;
+    font-family: Roboto, 'Arial Narrow', sans-serif;
+    opacity: 0;
+    animation: fadeIn 2s ease-in-out forwards;
+    animation-delay: 0.3s;
+  }
 }

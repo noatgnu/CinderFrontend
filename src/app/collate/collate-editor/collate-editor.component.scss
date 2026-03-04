@@ -1,6 +1,7 @@
 mat-card {
   margin: 20px;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -13,4 +14,68 @@ mat-card {
 .header h1, .header p {
   opacity: 0;
   animation: fadeIn 2s ease-in-out forwards;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.header {
+  text-align: center;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.title-input {
+  font-size: 2em;
+  text-align: center;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  padding: 5px;
+}
+
+.greeting-text {
+  font-size: 25px;
+  font-family: Roboto, 'Arial Narrow', sans-serif;
+  cursor: pointer;
+}
+
+.greeting-input {
+  font-size: 25px;
+  text-align: center;
+  font-family: Roboto, 'Arial Narrow', sans-serif;
+  padding: 5px;
+}
+
+.center-content {
+  display: flex;
+  justify-content: center;
+}
+
+.tags-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.tabs-container {
+  padding: 20px;
+}
+
+.no-permission {
+  display: flex;
+  justify-content: center;
 }

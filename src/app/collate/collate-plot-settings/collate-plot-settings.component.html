@@ -1,41 +1,40 @@
 <h5 mat-dialog-title>Plot General Settings</h5>
 <div mat-dialog-content>
-  <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px">
-    <section style="display: flex; flex-direction: column; gap: 5px">
+  <form [formGroup]="form" class="settings-form">
+    <section class="settings-section">
       <b>Overall Size</b>
       <mat-form-field>
-        <input matInput formControlName="height" type="number">
         <mat-label>Height</mat-label>
+        <input matInput formControlName="height" type="number">
       </mat-form-field>
       <mat-form-field>
-        <input matInput formControlName="barSize" type="number">
         <mat-label>Bar size</mat-label>
+        <input matInput formControlName="barSize" type="number">
       </mat-form-field>
       <mat-form-field>
-        <input matInput formControlName="marginLeft" type="number">
         <mat-label>Margin Left</mat-label>
+        <input matInput formControlName="marginLeft" type="number">
       </mat-form-field>
       <mat-form-field>
-        <input matInput formControlName="marginRight" type="number">
         <mat-label>Margin Right</mat-label>
+        <input matInput formControlName="marginRight" type="number">
       </mat-form-field>
       <mat-form-field>
-        <input matInput formControlName="marginTop" type="number">
         <mat-label>Margin Top</mat-label>
+        <input matInput formControlName="marginTop" type="number">
       </mat-form-field>
       <mat-form-field>
-        <input matInput formControlName="marginBottom" type="number">
         <mat-label>Margin Bottom</mat-label>
+        <input matInput formControlName="marginBottom" type="number">
       </mat-form-field>
-
     </section>
     <mat-divider></mat-divider>
-    <section style="display: flex; flex-direction: column; gap: 5px">
+    <section class="settings-section">
       <b>Title</b>
       <mat-checkbox formControlName="showTitle">Show Title</mat-checkbox>
       <mat-form-field>
-        <input matInput formControlName="titleTextSize" type="number">
         <mat-label>Title Text Size</mat-label>
+        <input matInput formControlName="titleTextSize" type="number">
       </mat-form-field>
     </section>
   </form>

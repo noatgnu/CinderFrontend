@@ -1,14 +1,12 @@
-<div style="display: flex; flex-direction: row; justify-content: center; gap:20px; padding:20px; flex-wrap: wrap">
-  <div style="display: flex; flex-direction: column; gap:20px">
-    <mat-card style="width: 350px" appearance="outlined">
+<div class="banner">
+  <div class="banner-column">
+    <mat-card class="banner-card" appearance="outlined">
       <mat-card-header>
         <mat-card-title>
-          <span style="color:#ba0000"><mat-icon>lock</mat-icon></span>
-          <a href="/#/collate"><span style="color:#ba0000">Collate</span></a>
+          <span class="accent-text"><mat-icon>lock</mat-icon></span>
+          <a href="/#/collate" class="accent-link">Collate</a>
         </mat-card-title>
-        <mat-card-subtitle>
-          Cinder Data Collate
-        </mat-card-subtitle>
+        <mat-card-subtitle>Cinder Data Collate</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <app-collate-search-main></app-collate-search-main>
@@ -19,20 +17,17 @@
         </mat-card-actions>
       }
     </mat-card>
-    <mat-card style="width: 350px" appearance="outlined">
+
+    <mat-card class="banner-card" appearance="outlined">
       <mat-card-header>
         <mat-card-title>
-          <span style="color:#ba0000"><mat-icon>lock</mat-icon></span>
-          <a href="/#/project"><span style="color:#ba0000">Project</span></a>
+          <span class="accent-text"><mat-icon>lock</mat-icon></span>
+          <a href="/#/project" class="accent-link">Project</a>
         </mat-card-title>
-        <mat-card-subtitle>
-          Cinder Project Data
-        </mat-card-subtitle>
+        <mat-card-subtitle>Cinder Project Data</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p>
-          # of Projects: {{projectCount}}
-        </p>
+        <p># of Projects: {{projectCount}}</p>
         <app-project-search [multipleSelection]="false" (selectedProjects)="handleProjectSelection($event)"></app-project-search>
       </mat-card-content>
       @if (accounts.loggedIn) {
@@ -41,20 +36,17 @@
         </mat-card-actions>
       }
     </mat-card>
-    <mat-card style="width: 350px" appearance="outlined">
+
+    <mat-card class="banner-card" appearance="outlined">
       <mat-card-header>
         <mat-card-title>
-          <span style="color:#ba0000"><mat-icon>lock</mat-icon></span>
-          <a href="/#/analysis-group"><span style="color:#ba0000">Analysis Groups</span></a>
+          <span class="accent-text"><mat-icon>lock</mat-icon></span>
+          <a href="/#/analysis-group" class="accent-link">Analysis Groups</a>
         </mat-card-title>
-        <mat-card-subtitle>
-          Project Assigned Analysis Groups
-        </mat-card-subtitle>
+        <mat-card-subtitle>Project Assigned Analysis Groups</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p>
-          # of Analysis Groups: {{analysisGroupCount}}
-        </p>
+        <p># of Analysis Groups: {{analysisGroupCount}}</p>
         <app-analysis-search (selectedAnalysisGroups)="handleAGSelection($event)"></app-analysis-search>
       </mat-card-content>
       @if (accounts.loggedIn) {
@@ -64,95 +56,73 @@
       }
     </mat-card>
   </div>
-  <div style="display: flex; flex-direction: row; justify-content: center">
-    <div>
-      <mat-card style="min-width: 350px; width: 100%" appearance="outlined">
-        <mat-card-header>
-          <mat-card-title>
-            <span style="color:#ba0000"><mat-icon>lock_open</mat-icon></span>
-            <a href="/#/search-session"><span style="color:#ba0000">Search</span></a>
-          </mat-card-title>
-          <mat-card-subtitle>
-            Search through the Cinder Database
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 5px">
-            <mat-form-field>
-              <input matInput formControlName="search" placeholder="Search" type="search">
-              <mat-label>Database Search Term</mat-label>
-            </mat-form-field>
-            <p>
-              <b>Search Multiple Terms</b><br>
-              In order to search with multiple terms, enclose each term in single quotes and separate them with <b>OR</b>.
-            </p>
-            <mat-form-field>
-              <mat-select formControlName="searchMode">
-                <mat-option [value]="'full'">
-                  Full Text
-                </mat-option>
-                <mat-option [value]="'uniprot'">
-                  UniProt Accession ID
-                </mat-option>
-                <mat-option [value]="'gene'">
-                  Gene Names
-                </mat-option>
-                <mat-option [value]="'pi'">
-                  Primary IDs
-                </mat-option>
-              </mat-select>
-              <mat-label>Search Mode</mat-label>
-            </mat-form-field>
-            <mat-form-field>
-              <input matInput formControlName="foldChange" type="number" placeholder="Log2 Fold Change">
-              <mat-label>Log2 Fold Change Cutoff</mat-label>
-            </mat-form-field>
-            <mat-form-field>
-              <input matInput formControlName="pValue" type="number" placeholder="P-Value">
-              <mat-label>-Log10(P-Value) Cutoff</mat-label>
-            </mat-form-field>
-            <mat-form-field>
-              <input matInput type="search" formControlName="species_name" placeholder="Species Name">
-              <mat-label>Species Name Search</mat-label>
-            </mat-form-field>
-            @if (speciesQueryBehaviorSubject.asObservable()|async; as species) {
-              @if (species.length > 0) {
-                <p>
-                  Select an option from below:
-                </p>
 
-                <mat-selection-list [multiple]="false">
-                  @for (s of species; track s.id) {
-                    <mat-list-option [value]="s" (click)="selectSpecies(s)">
-                      {{s.official_name}} ({{s.code}})
-                    </mat-list-option>
-                  }
-                </mat-selection-list>
-              }
+  <div class="banner-column">
+    <mat-card class="search-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>
+          <span class="accent-text"><mat-icon>lock_open</mat-icon></span>
+          <a href="/#/search-session" class="accent-link">Search</a>
+        </mat-card-title>
+        <mat-card-subtitle>Search through the Cinder Database</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" class="search-form">
+          <mat-form-field>
+            <mat-label>Database Search Term</mat-label>
+            <input matInput formControlName="search" placeholder="Search" type="search">
+          </mat-form-field>
+          <p class="search-hint">
+            <b>Search Multiple Terms</b><br>
+            In order to search with multiple terms, enclose each term in single quotes and separate them with <b>OR</b>.
+          </p>
+          <mat-form-field>
+            <mat-label>Search Mode</mat-label>
+            <mat-select formControlName="searchMode">
+              <mat-option [value]="'full'">Full Text</mat-option>
+              <mat-option [value]="'uniprot'">UniProt Accession ID</mat-option>
+              <mat-option [value]="'gene'">Gene Names</mat-option>
+              <mat-option [value]="'pi'">Primary IDs</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Log2 Fold Change Cutoff</mat-label>
+            <input matInput formControlName="foldChange" type="number" placeholder="Log2 Fold Change">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>-Log10(P-Value) Cutoff</mat-label>
+            <input matInput formControlName="pValue" type="number" placeholder="P-Value">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Species Name Search</mat-label>
+            <input matInput type="search" formControlName="species_name" placeholder="Species Name">
+          </mat-form-field>
+          @if (speciesQueryBehaviorSubject.asObservable() | async; as species) {
+            @if (species.length > 0) {
+              <p>Select an option from below:</p>
+              <mat-selection-list [multiple]="false">
+                @for (s of species; track s.id) {
+                  <mat-list-option [value]="s" (click)="selectSpecies(s)">
+                    {{s.official_name}} ({{s.code}})
+                  </mat-list-option>
+                }
+              </mat-selection-list>
             }
-
-          </form>
-          <mat-accordion>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  Filter by Project
-                </mat-panel-title>
-                <mat-panel-description>
-                  Optional
-                </mat-panel-description>
-              </mat-expansion-panel-header>
-              <app-project-search [species]="selectedSpecies" [multipleSelection]="true" (selectedProjects)="handleMultipleProjectSelection($event)"></app-project-search>
-            </mat-expansion-panel>
-          </mat-accordion>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button type="button" (click)="searchDatabase()">Search</button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-
+          }
+        </form>
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>Filter by Project</mat-panel-title>
+              <mat-panel-description>Optional</mat-panel-description>
+            </mat-expansion-panel-header>
+            <app-project-search [species]="selectedSpecies" [multipleSelection]="true" (selectedProjects)="handleMultipleProjectSelection($event)"></app-project-search>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button type="button" (click)="searchDatabase()">Search</button>
+      </mat-card-actions>
+    </mat-card>
   </div>
 </div>
-
-

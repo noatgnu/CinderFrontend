@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
 import {Project} from "../project";
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
@@ -24,9 +24,11 @@ import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/mater
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatDivider} from "@angular/material/divider";
 import {DataService} from "../../data.service";
+import {Subject, takeUntil, filter, switchMap} from "rxjs";
 
 @Component({
     selector: 'app-project-view',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ReactiveFormsModule,
         MatFormField,
@@ -52,27 +54,30 @@ import {DataService} from "../../data.service";
     templateUrl: './project-view.component.html',
     styleUrl: './project-view.component.scss'
 })
-export class ProjectViewComponent {
-  private _project?: Project|undefined
+export class ProjectViewComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
+  private _project?: Project | undefined
 
   canEdit = false
   
-  @Input() set project(value: Project|undefined) {
+  @Input() set project(value: Project | undefined) {
     this._project = value
     if (!value) {
       return
     }
-    this.accounts.getProjectPermissions(value.id).subscribe((data) => {
+    this.accounts.getProjectPermissions(value.id).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.canEdit = data.edit
+      this.cdr.markForCheck();
     })
     this.titleService.setTitle(`Project - ${value.name}`)
     this.form.controls.name.setValue(value.name)
     this.form.controls.description.setValue(value.description)
-    this.web.getAnalysisGroups(undefined, this.pageSize, 0, undefined, value.id).subscribe((data) => {
+    this.web.getAnalysisGroups(undefined, this.pageSize, 0, undefined, value.id).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.analysisGroupQuery = data
+      this.cdr.markForCheck();
     })
-    if (value.species){
-      this.web.getSpeciesByID(value.species).subscribe((data) => {
+    if (value.species) {
+      this.web.getSpeciesByID(value.species).pipe(takeUntil(this.destroy$)).subscribe((data) => {
         this.form.controls.species_name.enable()
         this.form.controls.species.enable()
         this.form.controls.species_name.setValue(data.official_name)
@@ -80,6 +85,7 @@ export class ProjectViewComponent {
         this.form.controls.species.disable()
         this.form.controls.species_name.disable()
         this.speciesEditable = false
+        this.cdr.markForCheck();
       })
     }
   }
@@ -105,64 +111,82 @@ export class ProjectViewComponent {
   speciesQuery?: SpeciesQuery|undefined
 
 
-  constructor(private titleService: Title, private fb: FormBuilder, private web: WebService, private dialog: MatDialog, public accounts: AccountsService, public dataService: DataService) {
-    this.form.controls.species_name.valueChanges.subscribe((data) => {
-      if (data) {
-        this.web.getSpecies(undefined, 20, 0, data).subscribe((data) => {
-          this.speciesQuery = data
-        })
-      }
+  constructor(
+    private titleService: Title,
+    private fb: FormBuilder,
+    private web: WebService,
+    private dialog: MatDialog,
+    public accounts: AccountsService,
+    public dataService: DataService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.form.controls.species_name.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      filter((data): data is string => !!data),
+      switchMap((data) => this.web.getSpecies(undefined, 10, 0, data))
+    ).subscribe((data) => {
+      this.speciesQuery = data
+      this.cdr.markForCheck();
     })
-    this.form.controls.species.valueChanges.subscribe((data) => {
-      if (data) {
-        this.form.controls.species_name.setValue(data[0].official_name)
-      }
+
+    this.form.controls.species.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      filter((data): data is Species[] => !!data && data.length > 0)
+    ).subscribe((data) => {
+      this.form.controls.species_name.setValue(data[0].official_name)
     })
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   updateProject() {
-    if (this.form.value.species) {
-      // @ts-ignore
-      this.web.updateProject(this.project.id, this.form.value.name, this.form.value.description, this.form.value.species[0].id).subscribe((data) => {
-        this.project = data
-        this.updated.emit(data)
-      })
-    } else {
-      // @ts-ignore
-      this.web.updateProject(this.project.id, this.form.value.name, this.form.value.description).subscribe((data) => {
-        this.project = data
-        this.updated.emit(data)
-      })
-    }
+    const name = this.form.value.name as string
+    const description = this.form.value.description as string
+    const speciesId = this.form.value.species?.[0]?.id
 
+    this.web.updateProject(this.project.id, name, description, speciesId).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((data) => {
+      this.project = data
+      this.updated.emit(data)
+      this.cdr.markForCheck();
+    })
   }
 
   deleteProject() {
-    this.dialog.open(AreYouSureDialogComponent).afterClosed().subscribe((data) => {
-      if (data) {
-        this.web.deleteProject(this.project.id).subscribe(() => {
-          this.project = undefined
-          this.deleted.emit(true)
-        })
-      }
+    this.dialog.open(AreYouSureDialogComponent).afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((data) => !!data),
+      switchMap(() => this.web.deleteProject(this.project.id))
+    ).subscribe(() => {
+      this.project = undefined
+      this.deleted.emit(true)
+      this.cdr.markForCheck();
     })
   }
 
   openAnalysisGroupCreateModal() {
     const ref = this.dialog.open(CreateAnalysisGroupDialogComponent)
     ref.componentInstance.project = this.project
-    ref.afterClosed().subscribe((data) => {
-      if (data) {
-        window.open(`/#/analysis-group/${data.id}`, '_blank')
-      }
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((data) => !!data)
+    ).subscribe((data) => {
+      window.open(`/#/analysis-group/${data.id}`, '_blank')
     })
   }
 
   handlePageChange(e: PageEvent) {
     const offset = e.pageIndex * e.pageSize
     this.currentPage = e.pageIndex
-    this.web.getAnalysisGroups(undefined, e.pageSize, offset, undefined, this.project.id).subscribe((data) => {
+    this.web.getAnalysisGroups(undefined, e.pageSize, offset, undefined, this.project.id).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((data) => {
       this.analysisGroupQuery = data
+      this.cdr.markForCheck();
     })
   }
 

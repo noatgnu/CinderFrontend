@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {AdminService} from "../admin.service";
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
@@ -22,9 +22,11 @@ import {
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatDialog} from "@angular/material/dialog";
 import {EditUserDialogComponent} from "./edit-user-dialog/edit-user-dialog.component";
+import {Subject, takeUntil, filter, switchMap} from "rxjs";
 
 @Component({
     selector: 'app-user-management',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ReactiveFormsModule,
         MatLabel,
@@ -53,7 +55,8 @@ import {EditUserDialogComponent} from "./edit-user-dialog/edit-user-dialog.compo
     templateUrl: './user-management.component.html',
     styleUrl: './user-management.component.scss'
 })
-export class UserManagementComponent implements OnInit{
+export class UserManagementComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
   userTokenForm = this.fb.group({
     username: ['', Validators.required],
@@ -71,8 +74,18 @@ export class UserManagementComponent implements OnInit{
   displayedColumns: string[] = ['id', 'username', 'first_name', 'last_name'];
 
 
-  constructor(private dialog: MatDialog, private adminService: AdminService, private fb: FormBuilder, private snackBar: MatSnackBar, private webService: WebService) {
+  constructor(
+    private dialog: MatDialog,
+    private adminService: AdminService,
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar,
+    private webService: WebService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngOnInit() {
@@ -84,8 +97,11 @@ export class UserManagementComponent implements OnInit{
       return
     }
     if (this.userTokenForm.value.username) {
-      this.adminService.generateUserToken(this.userTokenForm.value.username).subscribe((res) => {
+      this.adminService.generateUserToken(this.userTokenForm.value.username).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe((res) => {
         this.userTokenLink = location.protocol + '//' + location.host + '#/user/register/' + res['token']
+        this.cdr.markForCheck();
       })
     }
   }
@@ -99,8 +115,11 @@ export class UserManagementComponent implements OnInit{
   }
 
   fetchUsers() {
-    this.webService.getUsers(this.userSearchForm.value.query,this.limit,this.offset).subscribe((res) => {
+    this.webService.getUsers(this.userSearchForm.value.query, this.limit, this.offset).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((res) => {
       this.userQuery = res
+      this.cdr.markForCheck();
     })
   }
 
@@ -112,10 +131,11 @@ export class UserManagementComponent implements OnInit{
 
   openEditUserDialog(user: User) {
     const ref = this.dialog.open(EditUserDialogComponent, {data: user})
-    ref.afterClosed().subscribe((res) => {
-      if (res) {
-        this.fetchUsers()
-      }
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((res) => !!res)
+    ).subscribe(() => {
+      this.fetchUsers()
     })
   }
 }

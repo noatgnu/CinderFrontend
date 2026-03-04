@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {AccountsService} from "../accounts/accounts.service";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {UserManagementComponent} from "./user-management/user-management.component";
@@ -6,6 +6,7 @@ import {CollateManagementComponent} from "./collate-management/collate-managemen
 
 @Component({
     selector: 'app-admin',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatTabGroup,
         MatTab,
@@ -20,7 +21,6 @@ export class AdminComponent {
   isStaff: boolean = false
 
   constructor(private accounts: AccountsService) {
-    console.log(this.accounts.currentUser)
     this.isStaff = this.accounts.currentUser?.is_staff || false
   }
 

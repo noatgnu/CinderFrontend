@@ -1,3 +1,8 @@
+.main-container {
+  display: flex;
+  flex-direction: row;
+}
+
 .project-side-nav {
   width: 300px;
   border-right: 1px solid #000000;
@@ -5,7 +10,34 @@
   flex-direction: column;
   height: calc(100vh - 64px);
 }
-.project-main-content{
+
+.project-main-content {
   flex: 1;
 }
 
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.list-container {
+  height: calc(100vh - 64px * 4 - 20px);
+  overflow: auto;
+}
+
+.toolbar-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-content-area {
+  height: calc(100vh - 64px * 2 - 20px);
+  overflow: auto;
+}

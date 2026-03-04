@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {SearchResult, SearchResultQuery, SearchSession} from "../../search-session";
 import {Project} from "../../project/project";
 import {Collate} from "../collate";
@@ -31,12 +31,15 @@ import {
   CollateCytoscapeTermResultFilterDialogComponent
 } from "../collate-cytoscape-term-result-filter-dialog/collate-cytoscape-term-result-filter-dialog.component";
 import {LoginDialogComponent} from "../../accounts/login-dialog/login-dialog.component";
-import {catchError, finalize, Subject, takeUntil} from "rxjs";
+import {catchError, filter, finalize, Subject, takeUntil} from "rxjs";
 import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component";
+import {CollateSettingsService} from "../collate-settings.service";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
     selector: 'app-collate-view',
-  imports: [
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
     CollateHeaderComponent,
     CollateSearchComponent,
     MatTab,
@@ -56,12 +59,13 @@ import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component"
     CytoscapePlotComponent,
     NgClass,
     MatButton,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    MatProgressSpinner
   ],
     templateUrl: './collate-view.component.html',
     styleUrl: './collate-view.component.scss'
 })
-export class CollateViewComponent {
+export class CollateViewComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
   selectedCytoscapePlotSearchTerm: string[] = [];
   showCytoscapePlot: boolean = false;
@@ -107,40 +111,53 @@ export class CollateViewComponent {
   cytoscapePlotFilteredResults: { [projectId: number]: SearchResult[] } = {};
   toggleCytoscapePlot() {
     this.showCytoscapePlot = !this.showCytoscapePlot;
-    console.log(this.cytoscapePlotFilteredResults)
+    this.cdr.markForCheck();
   }
 
-  constructor(private cdr: ChangeDetectorRef, private title: Title, private ws: WebsocketService, private sb: MatSnackBar, private dialog: MatDialog, private collateService: CollateService, private web: WebService, public accounts: AccountsService, private router: Router) {
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private title: Title,
+    private ws: WebsocketService,
+    private sb: MatSnackBar,
+    private dialog: MatDialog,
+    private collateService: CollateService,
+    private web: WebService,
+    public accounts: AccountsService,
+    private router: Router,
+    private settingsService: CollateSettingsService
+  ) {
     const pastSearches = localStorage.getItem('cinderPastSearches');
     if (pastSearches) {
       this.pastSearches = JSON.parse(pastSearches);
     }
-    this.ws.searchWSConnection?.subscribe((data) => {
+    this.ws.searchWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       if (data) {
         if (data.type === "export_status") {
           if (this.web.cinderInstanceID === data.instance_id) {
             if (this.waitingForDownload) {
               switch (data.status) {
                 case "error":
-                  this.waitingForDownload = false
-                  break
+                  this.waitingForDownload = false;
+                  this.cdr.markForCheck();
+                  break;
                 case "started":
-                  this.sb.open("Export started", "Dismiss", {duration: 2000})
-                  break
+                  this.sb.open("Export started", "Dismiss", {duration: 2000});
+                  break;
                 case "in_progress":
-                  break
+                  break;
                 case "complete":
-                  this.waitingForDownload = false
-                  this.sb.open("Export complete", "Dismiss", {duration: 2000})
-                  const link = `${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`
-                  window.open(link, "_blank")
-                  break
+                  this.waitingForDownload = false;
+                  this.sb.open("Export complete", "Dismiss", {duration: 2000});
+                  const link = `${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`;
+                  window.open(link, "_blank");
+                  this.cdr.markForCheck();
+                  break;
               }
             }
           }
         }
       }
-    })
+    });
   }
 
   private loadCollate(collateId: number): void {
@@ -198,82 +215,69 @@ export class CollateViewComponent {
           this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
         }
 
-        if (this.collate?.settings.projectAnalysisGroupVisibility) {
-
-        } else {
-          // @ts-ignore
+        if (!this.collate.settings.projectAnalysisGroupVisibility) {
           this.collate.settings.projectAnalysisGroupVisibility = {};
-          for (const p of this.projects) {
-            // @ts-ignore
-            this.collate.settings.projectAnalysisGroupVisibility[p.id] = {}
+        }
+        for (const p of this.projects) {
+          if (!this.collate.settings.projectAnalysisGroupVisibility[p.id]) {
+            this.collate.settings.projectAnalysisGroupVisibility[p.id] = {};
           }
         }
 
-        if (this.collate?.settings.renameSampleCondition) {
-          if (this.sessionId) {
-            this.getSearchFromID(this.sessionId);
-          }
-        } else {
-          // @ts-ignore
+        if (!this.collate.settings.renameSampleCondition) {
           this.collate.settings.renameSampleCondition = {};
-          for (const p of this.projects) {
-            // @ts-ignore
-            this.collate.settings.renameSampleCondition[p.id] = {}
-            this.web.getProjectUniqueConditions(p.id).subscribe((value) => {
-              for (const a of value) {
-                // @ts-ignore
-                this.collate.settings.renameSampleCondition[p.id][a.Condition] = a.Condition
+        }
+        for (const p of this.projects) {
+          if (!this.collate.settings.renameSampleCondition[p.id]) {
+            this.collate.settings.renameSampleCondition[p.id] = {};
+            this.web.getProjectUniqueConditions(p.id).pipe(takeUntil(this.destroy$)).subscribe((value) => {
+              if (this.collate) {
+                for (const a of value) {
+                  this.collate.settings.renameSampleCondition[p.id][a.Condition] = a.Condition;
+                }
+                this.cdr.markForCheck();
               }
-              // @ts-ignore
-              console.log(this.collate.settings.renameSampleCondition)
-            })
-          }
-          if (this.sessionId) {
-            this.getSearchFromID(this.sessionId);
+            });
           }
         }
-        console.log(this.projects)
+        if (this.sessionId) {
+          this.getSearchFromID(this.sessionId);
+        }
+        this.cdr.markForCheck();
       });
   }
 
-  async associateAnalysisGroupsWithProjects() {
-    const analysisGroups = await this.web.getAnalysisGroupsFromProjects(this.projects).toPromise();
-    this.projectAnalysisGroups = {};
-    this.analysisGroupProjects = {};
-    if (analysisGroups) {
-      analysisGroups.forEach(analysisGroup => {
-        const projectId = analysisGroup.project;
-        if (!this.projectAnalysisGroups[projectId]) {
-          this.projectAnalysisGroups[projectId] = [];
-        }
-        this.projectAnalysisGroups[projectId].push(analysisGroup);
-
-        this.analysisGroupProjects[analysisGroup.id] = this.projects.find(project => project.id === projectId) as Project;
-      });
-    }
-  }
-
-  async distributeSearchResults(results: SearchResult[]) {
-    await this.associateAnalysisGroupsWithProjects();
-    this.searchResults = {};
-    this.searchTerms = Array.from(new Set(results.map(result => result.search_term)));
-    results.forEach(result => {
-      const analysisGroup = result.analysis_group.id;
-      const project = this.analysisGroupProjects[analysisGroup];
-      if (project) {
-        if (!this.searchResults[project.id]) {
-          this.searchResults[project.id] = [];
-        }
-        this.searchResults[project.id].push(result);
+  distributeSearchResults(results: SearchResult[]) {
+    this.web.getAnalysisGroupsFromProjects(this.projects).pipe(takeUntil(this.destroy$)).subscribe((analysisGroups) => {
+      this.projectAnalysisGroups = {};
+      this.analysisGroupProjects = {};
+      if (analysisGroups) {
+        analysisGroups.forEach(analysisGroup => {
+          const projectId = analysisGroup.project;
+          if (!this.projectAnalysisGroups[projectId]) {
+            this.projectAnalysisGroups[projectId] = [];
+          }
+          this.projectAnalysisGroups[projectId].push(analysisGroup);
+          this.analysisGroupProjects[analysisGroup.id] = this.projects.find(project => project.id === projectId) as Project;
+        });
       }
+      this.searchResults = {};
+      this.searchTerms = Array.from(new Set(results.map(result => result.search_term)));
+      results.forEach(result => {
+        const analysisGroupId = result.analysis_group.id;
+        const project = this.analysisGroupProjects[analysisGroupId];
+        if (project) {
+          if (!this.searchResults[project.id]) {
+            this.searchResults[project.id] = [];
+          }
+          this.searchResults[project.id].push(result);
+        }
+      });
+      this.searchTerms.sort((a, b) => a.localeCompare(b));
+      this.selectedSearchTerm = this.searchTerms[0];
+      this.filterDataBySearchTerm();
+      this.cdr.markForCheck();
     });
-    console.log(this.searchResults);
-    this.searchTerms.sort((a, b) => {
-      return a.localeCompare(b);
-    })
-    this.selectedSearchTerm = this.searchTerms[0];
-    this.filterDataBySearchTerm();
-
   }
 
   getFilteredSearchResults(searchTerms: string[]): { [projectId: number]: SearchResult[] } {
@@ -319,7 +323,6 @@ export class CollateViewComponent {
         });
       }
     });
-    console.log(filteredResults);
     return filteredResults;
   }
 
@@ -327,44 +330,43 @@ export class CollateViewComponent {
     this.selectedSearchTerm = this.searchTerms[this.selectedIndex];
     this.filteredResults = this.getFilteredSearchResults([this.selectedSearchTerm]);
     if (Object.keys(this.cytoscapePlotFilteredResults).length === 0 && this.filteredResults) {
-      console.log(this.filteredResults);
-      this.cytoscapePlotFilteredResults = Object.assign({}, this.filteredResults) ;
+      this.cytoscapePlotFilteredResults = { ...this.filteredResults };
     }
+    this.cdr.markForCheck();
   }
 
   getSearchFromID(id: number) {
-    this.web.getSearchSession(id).subscribe((data) => {
+    this.web.getSearchSession(id).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.searchSession = data;
-    })
-    this.web.getSearchResults(id,99999).subscribe((data) => {
+      this.cdr.markForCheck();
+    });
+    this.web.getSearchResults(id, 99999).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       if (!this.collate) {
-        return
+        return;
       }
-      console.log(data.results)
       const uniqueSearchTerms = Array.from(new Set(data.results.map(result => result.search_term)));
-      //check if search id is in past searches
-      const search = this.pastSearches.find(search => search.searchID === id);
+      const search = this.pastSearches.find(s => s.searchID === id);
       if (!search) {
         this.pastSearches.push({searchQuery: null, termFounds: uniqueSearchTerms, collate: this.collate.id, searchID: id});
         this.pastSearches = this.pastSearches.slice(-20);
         localStorage.setItem('cinderPastSearches', JSON.stringify(this.pastSearches));
       }
-      this.distributeSearchResults(data.results).then();
-    })
+      this.distributeSearchResults(data.results);
+    });
   }
 
-  restoreSearches(searchQuery: SearchResultQuery|null, searchID: number) {
-    this.web.getSearchSession(searchID).subscribe((data) => {
+  restoreSearches(searchQuery: SearchResultQuery | null, searchID: number) {
+    this.web.getSearchSession(searchID).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.searchSession = data;
-    })
+      this.cdr.markForCheck();
+    });
     if (searchQuery) {
-      this.distributeSearchResults(searchQuery.results).then();
+      this.distributeSearchResults(searchQuery.results);
     } else {
-      this.web.getSearchResults(searchID,99999).subscribe((data) => {
-        this.distributeSearchResults(data.results).then();
-      })
+      this.web.getSearchResults(searchID, 99999).pipe(takeUntil(this.destroy$)).subscribe((data) => {
+        this.distributeSearchResults(data.results);
+      });
     }
-
   }
 
   navigateToEdit() {
@@ -384,90 +386,64 @@ export class CollateViewComponent {
   }
 
   exportData(searchTerm: string) {
-    // @ts-ignore
-    this.web.exportSearchData(this.searchSession.id, searchTerm, 0.00000001, 0.00000001, this.web.searchSessionID).subscribe((data) => {
-      this.waitingForDownload = true
-    })
+    if (this.searchSession && this.web.searchSessionID) {
+      this.web.exportSearchData(this.searchSession.id, searchTerm, 0.00000001, 0.00000001, this.web.searchSessionID)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.waitingForDownload = true;
+          this.cdr.markForCheck();
+        });
+    }
   }
 
   openVisibilityDialog() {
-    const ref = this.dialog.open(CollateProjectAnalysisGroupVisibilityDialogComponent)
-    this.web.getAnalysisGroupsFromProjects(this.projects).subscribe((analysisGroups: AnalysisGroup[]) => {
-      const projectAnalysisGroups: {[projectId: number]: AnalysisGroup[]} = {};
-      analysisGroups.forEach(analysisGroup => {
-        if (!projectAnalysisGroups[analysisGroup.project]) {
-          projectAnalysisGroups[analysisGroup.project] = [];
-        }
-        projectAnalysisGroups[analysisGroup.project].push(analysisGroup);
-      });
-      // reorder analysisGroup in each project by id found in settings if analysisGroup can't be found in settings, it will be placed at the end
+    const ref = this.dialog.open(CollateProjectAnalysisGroupVisibilityDialogComponent);
+    this.web.getAnalysisGroupsFromProjects(this.projects).pipe(takeUntil(this.destroy$)).subscribe((analysisGroups: AnalysisGroup[]) => {
+      let projectAnalysisGroups = this.settingsService.groupAnalysisGroupsByProject(analysisGroups);
       if (this.collate?.settings?.analysisGroupOrderMap) {
-        Object.keys(this.collate.settings.analysisGroupOrderMap).forEach(projectId => {
-          const id = parseInt(projectId);
-          const analysisGroupOrder = this.collate?.settings.analysisGroupOrderMap[id];
-          if (!analysisGroupOrder) {
-            return;
-          }
-          if (!projectAnalysisGroups[id]) {
-            return;
-          }
-          // take out analysis groups that are not in the order map to be placed at the end
-          const notInOrder = projectAnalysisGroups[id].filter(analysisGroup => !analysisGroupOrder.includes(analysisGroup.id));
-          projectAnalysisGroups[id] = projectAnalysisGroups[id].filter(analysisGroup => analysisGroupOrder.includes(analysisGroup.id));
-
-          projectAnalysisGroups[id] = projectAnalysisGroups[id].sort((a, b) => {
-            return analysisGroupOrder.indexOf(a.id) - analysisGroupOrder.indexOf(b.id);
-          });
-          projectAnalysisGroups[id] = projectAnalysisGroups[id].concat(notInOrder);
-        });
+        projectAnalysisGroups = this.settingsService.orderAnalysisGroups(projectAnalysisGroups, this.collate.settings.analysisGroupOrderMap);
       }
-
       ref.componentInstance.projectAnalysisGroupMap = projectAnalysisGroups;
-
       ref.componentInstance.projects = this.projects;
-
-      let projectAnalysisGroupVisibility: {[projectId: number]: {[analysisGroupID: number]: boolean}} = {};
-      if (this.collate?.settings?.projectAnalysisGroupVisibility) {
-        projectAnalysisGroupVisibility = this.collate.settings.projectAnalysisGroupVisibility;
-      }
-      for (const projectId in projectAnalysisGroups) {
-        if (!projectAnalysisGroupVisibility[projectId]) {
-          projectAnalysisGroupVisibility[projectId] = {};
-        }
-        for (const analysisGroup of projectAnalysisGroups[projectId]) {
-          if (!(analysisGroup.id in projectAnalysisGroupVisibility[projectId])) {
-            projectAnalysisGroupVisibility[projectId][analysisGroup.id] = true;
-          }
-        }
-      }
-      ref.componentInstance.projectAnalysisGroupVisibilityMap = Object.assign({}, projectAnalysisGroupVisibility);
-    })
-    ref.afterClosed().subscribe((result: { [projectID: number]: { [analysisGroupID: number]: boolean } }) => {
-      if (this.collate && result) {
+      const visibility = this.settingsService.initializeVisibilityMap(
+        projectAnalysisGroups,
+        this.collate?.settings?.projectAnalysisGroupVisibility
+      );
+      ref.componentInstance.projectAnalysisGroupVisibilityMap = { ...visibility };
+    });
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((result): result is { [projectID: number]: { [analysisGroupID: number]: boolean } } => !!result)
+    ).subscribe((result) => {
+      if (this.collate) {
         this.collate.settings.projectAnalysisGroupVisibility = result;
         this.filteredResults = this.getFilteredSearchResults([this.selectedSearchTerm]);
+        this.cdr.markForCheck();
       }
-    })
+    });
   }
 
   filterCytoscapePlot() {
-    const ref = this.dialog.open(CollateCytoscapeTermResultFilterDialogComponent)
+    const ref = this.dialog.open(CollateCytoscapeTermResultFilterDialogComponent);
     ref.componentInstance.searchTerms = this.searchTerms;
     ref.componentInstance.selectedSearchTerms = this.selectedCytoscapePlotSearchTerm;
-    ref.afterClosed().subscribe((result: {searchTerms: string[]}|undefined|null) => {
-      if (result) {
-        console.log(result);
-        if ( result.searchTerms.length > 0) {
-          const filterResults = this.getFilteredSearchResults(result.searchTerms);
-          this.cytoscapePlotFilteredResults = { ...filterResults };
-        } else {
-          this.cytoscapePlotFilteredResults = {};
-        }
-        console.log(this.cytoscapePlotFilteredResults);
-        this.cdr.detectChanges()
-        this.collateService.collateRedrawSubject.next(true);
-
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((result): result is { searchTerms: string[] } => !!result)
+    ).subscribe((result) => {
+      if (result.searchTerms.length > 0) {
+        const filterResults = this.getFilteredSearchResults(result.searchTerms);
+        this.cytoscapePlotFilteredResults = { ...filterResults };
+      } else {
+        this.cytoscapePlotFilteredResults = {};
       }
-    })
+      this.cdr.markForCheck();
+      this.collateService.collateRedrawSubject.next(true);
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

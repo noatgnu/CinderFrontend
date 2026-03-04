@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {Project} from "../../project/project";
 import {AnalysisGroup} from "../../analysis-group/analysis-group";
@@ -10,6 +10,7 @@ import {MatButton} from "@angular/material/button";
 
 @Component({
     selector: 'app-collate-project-analysis-group-visibility-dialog',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDialogTitle,
         MatDialogContent,

@@ -1,5 +1,5 @@
 <h1>Generate Registration Link</h1>
-<form [formGroup]="userTokenForm" (ngSubmit)="createUserToken()" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
+<form [formGroup]="userTokenForm" (ngSubmit)="createUserToken()" class="form-section">
   <mat-form-field>
     <input matInput formControlName="username" placeholder="Username" type="text">
     <mat-label>Username</mat-label>
@@ -11,7 +11,7 @@
     <mat-card appearance="outlined">
       <mat-card-content>
         Registration Link and Information
-        <mat-form-field style="width:100%">
+        <mat-form-field class="full-width">
           <input matInput [value]="userTokenLink" type="text" readonly>
           <mat-label>Registration Link</mat-label>
           <button mat-icon-button  matSuffix (click)="copyTokenLink()">
@@ -24,7 +24,7 @@
 </form>
 <mat-divider></mat-divider>
 <h1>Manage Users</h1>
-<form [formGroup]="userSearchForm" (ngSubmit)="fetchUsers()" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
+<form [formGroup]="userSearchForm" (ngSubmit)="fetchUsers()" class="form-section">
   <mat-form-field>
     <input matInput formControlName="query" placeholder="Search" type="text">
     <mat-label>Search Term</mat-label>

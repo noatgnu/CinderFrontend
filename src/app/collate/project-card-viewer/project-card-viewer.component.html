@@ -1,13 +1,13 @@
 @if (project) {
   <mat-card appearance="outlined">
     <mat-card-header>
-      <mat-card-title cdkDragHandle><span style="color:#ba0000">{{ project.name }}</span></mat-card-title>
+      <mat-card-title cdkDragHandle><span class="accent-text">{{ project.name }}</span></mat-card-title>
       <mat-card-subtitle>{{ project.description }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
 
       @if (searchResults.length > 0) {
-        <div style="display: flex; flex-direction: column; gap: 20px">
+        <div class="toggle-container">
           <mat-slide-toggle
             [color]="'primary'"
             (change)="expanded = !expanded"
@@ -19,7 +19,7 @@
           </mat-slide-toggle>
         </div>
       }
-      <div cdkDropList (cdkDropListDropped)="drop($event)" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center">
+      <div cdkDropList (cdkDropListDropped)="drop($event)" class="results-container">
         @if (searchResults.length > 0) {
           @for (s of searchResults; track s.id) {
             <div cdkDrag>
@@ -32,11 +32,9 @@
                   <p>No data found for this search</p>
                 </div>
               }
-              <div>
+              <div class="drag-item-info">
                 <button [matTooltip]="s.analysis_group.name" mat-icon-button cdkDragHandle><mat-icon>drag_handle</mat-icon></button>
-                <p>
-                  {{s.analysis_group.name}}
-                </p>
+                <span>{{s.analysis_group.name}}</span>
               </div>
 
             </div>

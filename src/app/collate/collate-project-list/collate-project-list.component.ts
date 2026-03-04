@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {SearchResult} from "../../search-session";
 import {Project} from "../../project/project";
 import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
@@ -6,6 +6,7 @@ import {ProjectCardViewerComponent} from "../project-card-viewer/project-card-vi
 
 @Component({
     selector: 'app-collate-project-list',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDropList,
         ProjectCardViewerComponent,
@@ -30,7 +31,6 @@ export class CollateProjectListComponent {
   @Input() projects: Project[] = [];
   private _filteredResults: { [projectId: number]: SearchResult[] } = {};
   @Input() set filteredResults(value: { [projectId: number]: SearchResult[] }|undefined|null) {
-    console.log(value)
     if (value) {
       this._filteredResults = value;
     } else {

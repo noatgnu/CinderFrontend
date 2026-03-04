@@ -1,6 +1,7 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
 import {Project} from "../../project/project";
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
+import {Subject, takeUntil} from "rxjs";
 import {WebService} from "../../web.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatFormField, MatInput} from "@angular/material/input";
@@ -15,6 +16,7 @@ import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
     selector: 'app-collate-search',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatInput,
         MatButton,
@@ -32,12 +34,13 @@ import {MatProgressBar} from "@angular/material/progress-bar";
     templateUrl: './collate-search.component.html',
     styleUrl: './collate-search.component.scss'
 })
-export class CollateSearchComponent {
+export class CollateSearchComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   @Input() projects: Project[] = [];
   loading: boolean = false;
   searchStartTime: Date | null = null;
   elapsedTime: string = '0.00';
-  private timerInterval: any;
+  private timerInterval: ReturnType<typeof setInterval> | undefined;
   progress: string = "";
   form = this.fb.group({
     searchQuery: new FormControl<string>('', Validators.required),
@@ -45,11 +48,10 @@ export class CollateSearchComponent {
   });
   @Output() searchResultID: EventEmitter<number> = new EventEmitter<number>();
 
-  constructor(private snackBar: MatSnackBar, private ws: WebsocketService, private fb: FormBuilder, private web: WebService, private sb: MatSnackBar) {
-    this.ws.searchWSConnection?.subscribe((data) => {
+  constructor(private cdr: ChangeDetectorRef, private snackBar: MatSnackBar, private ws: WebsocketService, private fb: FormBuilder, private web: WebService, private sb: MatSnackBar) {
+    this.ws.searchWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       if (data) {
         if (data["type"] === "search_status") {
-
           switch (data["status"]) {
             case "complete":
               this.loading = false;
@@ -58,15 +60,17 @@ export class CollateSearchComponent {
               this.progress = "";
               this.showSnackBar(`Search complete in ${elapsedTime} seconds`);
               this.searchResultID.emit(parseInt(data["id"]));
-              //window.open(`/#/search-session/${data["id"]}`, "_blank")
+              this.cdr.markForCheck();
               break
             case "in_progress":
               this.progress = `Current progress: ${data["current_progress"]}/${data["found_files"]}`
+              this.cdr.markForCheck();
               break;
             case "error":
               this.loading = false;
               this.progress = "Search error";
               this.showSnackBar("Search error");
+              this.cdr.markForCheck();
               break;
           }
         }
@@ -138,5 +142,13 @@ export class CollateSearchComponent {
       return elapsedTime;
     }
     return 0;
+  }
+
+  ngOnDestroy() {
+    if (this.timerInterval !== undefined) {
+      clearInterval(this.timerInterval);
+    }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

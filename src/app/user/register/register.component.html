@@ -1,7 +1,7 @@
-<div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
-  <div style="width: 600px">
-    <h1><a href="/#/user/register/{{token}}"><span style="color:#ba0000">Registration</span></a></h1>
-    <form [formGroup]="form" (ngSubmit)="createAccount()" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
+<div class="page-container">
+  <div class="content-wrapper">
+    <h1><a href="/#/user/register/{{token}}"><span class="accent-text">Registration</span></a></h1>
+    <form [formGroup]="form" (ngSubmit)="createAccount()" class="form-section">
       <mat-form-field>
         <input matInput formControlName="username" placeholder="Username" type="text" readonly>
         <mat-label>Username</mat-label>
@@ -37,7 +37,7 @@
         <mat-label>Last Name</mat-label>
       </mat-form-field>
       <mat-divider></mat-divider>
-      <div style="display: flex; flex-direction: column; gap: 10px">
+      <div class="lab-group-section">
         <div>
           Lab Group Selection:
         </div>

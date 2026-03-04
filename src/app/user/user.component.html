@@ -1,7 +1,7 @@
-<div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
-  <div style="width: 600px">
+<div class="page-container">
+  <div class="content-wrapper">
     <h1>Basic Information</h1>
-    <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 20px; padding: 20px" (ngSubmit)="updateUser()">
+    <form [formGroup]="form" class="form-section" (ngSubmit)="updateUser()">
       <mat-form-field>
         <input matInput formControlName="first_name">
         <mat-label>First Name</mat-label>
@@ -20,7 +20,7 @@
     </form>
     <mat-divider></mat-divider>
     <h1>Lab Group</h1>
-    <form [formGroup]="labGroupForm" style="display: flex; flex-direction: column; gap: 20px; padding: 20px">
+    <form [formGroup]="labGroupForm" class="form-section">
       User Belongs To Lab Groups:
       <mat-chip-set>
         @for (labGroup of labGroupForm.controls.lab_group.value; track labGroup.id) {
@@ -50,7 +50,7 @@
       @if (!userProfile.created_by_allauth) {
         <mat-divider></mat-divider>
         <h1>Change Password</h1>
-        <form [formGroup]="passwordForm" style="display: flex; flex-direction: column; gap: 20px; padding: 20px" (ngSubmit)="updatePassword()">
+        <form [formGroup]="passwordForm" class="form-section" (ngSubmit)="updatePassword()">
           <mat-form-field>
             <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="new_password" placeholder="Password">
             <mat-label>Password</mat-label>

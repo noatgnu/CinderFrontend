@@ -1,20 +1,29 @@
-@if (canEdit) {
+@if (isLoading) {
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+}
+@if (canEdit && !isLoading) {
   <mat-toolbar>
     <mat-toolbar-row>
       <span class="spacer"></span>
       @if (collate) {
         <mat-checkbox [(ngModel)]="collate.settings.showTags">Show Tags</mat-checkbox>
       }
-      <button type="button" aria-label="View Collate" mat-icon-button (click)="goToCollateView()">
+      <button type="button" mat-icon-button matTooltip="View Collate" (click)="goToCollateView()">
         <mat-icon>visibility</mat-icon>
       </button>
-      <button type="button" aria-label="Add Projects" mat-icon-button (click)="openProjectAddDialog()">
+      <button type="button" mat-icon-button matTooltip="Add Projects" (click)="openProjectAddDialog()">
         <mat-icon>add</mat-icon>
       </button>
-      <button type="button" aria-label="Update Collate" mat-icon-button (click)="updateCollate()">
-        <mat-icon>save</mat-icon>
+      <button type="button" mat-icon-button matTooltip="Save Collate" (click)="updateCollate()" [disabled]="isSaving">
+        @if (isSaving) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
       </button>
-      <button mat-icon-button [matMenuTriggerFor]="extraActionsMenu">
+      <button mat-icon-button [matMenuTriggerFor]="extraActionsMenu" matTooltip="More Actions">
         <mat-icon>more_vert</mat-icon>
       </button>
       <mat-menu #extraActionsMenu="matMenu">
@@ -27,47 +36,46 @@
     </mat-toolbar-row>
   </mat-toolbar>
   @if (collate) {
-    <div class="header-container" style="display: flex; flex-direction: row; justify-content: center; align-items: center; height: 200px">
-      <div class="header" style="text-align: center; font-family: Roboto, Helvetica Neue, sans-serif">
+    <div class="header-container">
+      <div class="header">
         @if (!editTitle) {
           <h1 (click)="toggleEditTitle()">{{collate.title}}</h1><br>
         } @else {
           <div>
-            <mat-form-field style="font-size: 2em; text-align: center; font-family: Roboto, Helvetica Neue, sans-serif; padding:5px">
+            <mat-form-field class="title-input">
               <input (keydown.enter)="toggleEditTitle()" [(ngModel)]="collate.title" matInput>
             </mat-form-field>
             <button mat-icon-button (click)="toggleEditTitle()"><mat-icon>save</mat-icon></button>
           </div>
         }
         @if (!editGreeting) {
-          <div (click)="toggleEditGreeting()" style="font-size: 25px; font-family: 'Roboto', 'Arial Narrow', sans-serif">{{collate.greeting}}</div>
+          <div (click)="toggleEditGreeting()" class="greeting-text">{{collate.greeting}}</div>
         } @else {
           <div>
-            <mat-form-field style="font-size: 25px; text-align: center; font-family: 'Roboto', 'Arial Narrow', sans-serif; padding: 5px">
+            <mat-form-field class="greeting-input">
               <input (keydown.enter)="toggleEditGreeting()" matInput [(ngModel)]="collate.greeting">
             </mat-form-field>
             <button mat-icon-button (click)="toggleEditGreeting()"><mat-icon>save</mat-icon></button>
           </div>
-
         }
       </div>
     </div>
   }
 
   @if (collate) {
-    <div style="display: flex; justify-content: center">
+    <div class="center-content">
       <button mat-button (click)="openCollateTagCreateDialog()">Add Tag +</button>
     </div>
-    <div style="display: flex; justify-content: center; padding: 20px">
+    <div class="tags-container">
       <app-collate-tags [collageTags]="collate.tags" (collageTagsChange)="handleCollageTagsChange($event)"></app-collate-tags>
     </div>
   }
 
-  <div style="display: flex; justify-content: center">
+  <div class="center-content">
     <app-collate-search [projects]="projects" (searchResultID)="getSearchFromID($event)"></app-collate-search>
   </div>
   @if (searchTerms.length > 0) {
-    <div style="padding: 20px">
+    <div class="tabs-container">
       <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">
         @for (term of searchTerms; track term) {
           <mat-tab [label]="term"></mat-tab>
@@ -96,9 +104,7 @@
 
 
 } @else {
-  <div style="display: flex; justify-content: center">
-    <p>
-      You do not have permission to edit this collate.
-    </p>
+  <div class="no-permission">
+    <p>You do not have permission to edit this collate.</p>
   </div>
 }

@@ -1,25 +1,25 @@
-<div style="display: flex; flex-direction: row">
+<div class="main-container">
   @if(sidebarOpen) {
     <div class="project-side-nav">
       <mat-toolbar>
         <mat-toolbar-row>
           <span>Project</span>
-          <button mat-icon-button (click)="openCreateProjectDialog()">
+          <button mat-icon-button (click)="openCreateProjectDialog()" matTooltip="Create new project">
             <mat-icon>create_new_folder</mat-icon>
           </button>
         </mat-toolbar-row>
       </mat-toolbar>
 
-      <div style="display: flex; flex-direction: column; padding: 5px">
+      <div class="sidebar-content">
         <form [formGroup]="form">
-          <mat-form-field style="width: 100%">
+          <mat-form-field class="full-width">
             <input matInput formControlName="name" type="search" placeholder="Search Project">
             <mat-label>Search Project</mat-label>
           </mat-form-field>
         </form>
         @if (projectQuery) {
           @if (projectQuery.count > 0) {
-            <div style="height: calc(100vh - 64px*4 - 20px); overflow: auto">
+            <div class="list-container">
               <app-project-list [projectQuery]="projectQuery" (projectSelected)="handleProjectSelect($event)"></app-project-list>
             </div>
             <mat-paginator #paginator
@@ -42,8 +42,8 @@
   <div class="project-main-content">
     <mat-toolbar>
       <mat-toolbar-row>
-        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center">
-          <button mat-icon-button (click)="toggleSidePanel()"><mat-icon>menu</mat-icon></button>
+        <div class="toolbar-content">
+          <button mat-icon-button (click)="toggleSidePanel()" matTooltip="Toggle sidebar"><mat-icon>menu</mat-icon></button>
           <span>@if (selectedProject) {
             {{selectedProject.name}}
           } @else {
@@ -52,7 +52,7 @@
         </div>
       </mat-toolbar-row>
     </mat-toolbar>
-    <div style="height: calc(100vh - 64px*2 - 20px); overflow: auto">
+    <div class="main-content-area">
       @if (selectedProject) {
         <app-project-view [project]="selectedProject" (deleted)="refreshData()" (updated)="handleUpdateData($event)"></app-project-view>
       }

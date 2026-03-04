@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {Collate, CollateQuery, CollateTag} from "./collate";
 import {CollateService} from "./collate.service";
 import {MatDialog} from "@angular/material/dialog";
@@ -20,7 +20,7 @@ import {
   MatAutocompleteTrigger,
   MatOption
 } from "@angular/material/autocomplete";
-import {filter, map, Observable, startWith, switchMap} from "rxjs";
+import {filter, map, Observable, startWith, Subject, switchMap, takeUntil} from "rxjs";
 import {AsyncPipe} from "@angular/common";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
@@ -29,6 +29,7 @@ import {BreadcrumbComponent} from "../shared/breadcrumb/breadcrumb.component";
 
 @Component({
     selector: 'app-collate',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatFormField,
         FormsModule,
@@ -58,7 +59,8 @@ import {BreadcrumbComponent} from "../shared/breadcrumb/breadcrumb.component";
     templateUrl: './collate.component.html',
     styleUrl: './collate.component.scss'
 })
-export class CollateComponent implements OnInit{
+export class CollateComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   collates: Collate[] = [];
   searchTags: CollateTag[] = [];
   selectedCollate: Collate | null = null;
@@ -73,7 +75,7 @@ export class CollateComponent implements OnInit{
   filteredTags!: Observable<CollateTag[]>;
   loading: boolean = false;
 
-  constructor(private snackBar: MatSnackBar, private fb: FormBuilder, private router: Router, private collateService: CollateService, private dialog: MatDialog) {}
+  constructor(private cdr: ChangeDetectorRef, private snackBar: MatSnackBar, private fb: FormBuilder, private router: Router, private collateService: CollateService, private dialog: MatDialog) {}
 
   ngOnInit() {
     this.searchCollates();
@@ -93,34 +95,39 @@ export class CollateComponent implements OnInit{
 
   searchCollates() {
     this.loading = true;
-    this.collateService.getCollates(this.limit, this.offset, this.searchTerm, this.searchTags.map((s) => s.id)).subscribe({
-      next: (data: CollateQuery) => {
-        this.collates = data.results;
-        this.totalCount = data.count;
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        this.snackBar.open('Error loading collates', 'Dismiss')
-      }
-    });
+    this.cdr.markForCheck();
+    this.collateService.getCollates(this.limit, this.offset, this.searchTerm, this.searchTags.map((s) => s.id))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: CollateQuery) => {
+          this.collates = data.results;
+          this.totalCount = data.count;
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.loading = false;
+          this.cdr.markForCheck();
+          this.snackBar.open('Error loading collates', 'Dismiss')
+        }
+      });
   }
 
   onCollateSelect(event: MatSelectionListChange) {
     this.selectedCollate = event.options[0].value;
-    console.log(event.options[0].value)
     window.open(`/#/collate/view/${event.options[0].value.id}`, '_blank')
-    //this.router.navigate([`/collate/view/${event.options[0].value.id}`]).then(r => console.log(r));
   }
 
   openCreateCollateDialog() {
     const dialogRef = this.dialog.open(CreateCollateDialogComponent);
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(result => {
       if (result) {
-        this.collateService.createCollate(result.title, result.greeting).subscribe((data) => {
-          this.router.navigate([`/collate/edit/${data.id}`]).then(r => console.log(r));
-        });
+        this.collateService.createCollate(result.title, result.greeting)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((data) => {
+            this.router.navigate([`/collate/edit/${data.id}`]);
+          });
       }
     });
   }
@@ -146,5 +153,10 @@ export class CollateComponent implements OnInit{
       this.searchTags.splice(index, 1);
     }
     this.searchCollates();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -1,0 +1,27 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.content-wrapper {
+  width: 600px;
+}
+
+.accent-text {
+  color: #ba0000;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.lab-group-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

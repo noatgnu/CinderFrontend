@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {MatFormField, MatInput} from "@angular/material/input";
@@ -7,6 +7,7 @@ import {MatLabel} from "@angular/material/form-field";
 
 @Component({
     selector: 'app-create-collate-dialog',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatInput,
         MatFormField,
@@ -23,7 +24,10 @@ import {MatLabel} from "@angular/material/form-field";
 export class CreateCollateDialogComponent {
   form: FormGroup;
 
-  constructor(private fb: FormBuilder, private dialogRef: MatDialogRef<CreateCollateDialogComponent>) {
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<CreateCollateDialogComponent>
+  ) {
     this.form = this.fb.group({
       title: ['', Validators.required],
       greeting: ['', Validators.required]

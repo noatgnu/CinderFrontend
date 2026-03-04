@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {
   MatDialogActions,
   MatDialogClose,
@@ -16,6 +16,7 @@ import {MatButton} from "@angular/material/button";
 
 @Component({
     selector: 'app-collate-project-analysis-group-reorder-dialog',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDialogTitle,
         MatDialogContent,
@@ -36,31 +37,33 @@ import {MatButton} from "@angular/material/button";
     styleUrl: './collate-project-analysis-group-reorder-dialog.component.scss'
 })
 export class CollateProjectAnalysisGroupReorderDialogComponent {
-  private _projectAnalysisGroupMap: {[projectID: number]: AnalysisGroup[]} = {}
-  private _projects: Project[] = []
+  private _projectAnalysisGroupMap: { [projectID: number]: AnalysisGroup[] } = {};
+  private _projects: Project[] = [];
+
   @Input() set projects(value: Project[]) {
-    this._projects = value.slice()
+    this._projects = value.slice();
   }
+
   get projects(): Project[] {
-    return this._projects
+    return this._projects;
   }
 
-  @Input() set projectAnalysisGroupMap(value: {[projectID: number]: AnalysisGroup[]}) {
-    this._projectAnalysisGroupMap = value
+  @Input() set projectAnalysisGroupMap(value: { [projectID: number]: AnalysisGroup[] }) {
+    this._projectAnalysisGroupMap = value;
   }
 
-  get projectAnalysisGroupMap(): {[projectID: number]: AnalysisGroup[]} {
-    return this._projectAnalysisGroupMap
+  get projectAnalysisGroupMap(): { [projectID: number]: AnalysisGroup[] } {
+    return this._projectAnalysisGroupMap;
   }
 
   constructor(private dialogRef: MatDialogRef<CollateProjectAnalysisGroupReorderDialogComponent>) {}
 
   save() {
-    this.dialogRef.close({projects: this.projects, projectAnalysisGroupMap: this.projectAnalysisGroupMap})
+    this.dialogRef.close({ projects: this.projects, projectAnalysisGroupMap: this.projectAnalysisGroupMap });
   }
 
   cancel() {
-    this.dialogRef.close()
+    this.dialogRef.close();
   }
 
   drop(event: CdkDragDrop<AnalysisGroup[]>, projectId: number) {
