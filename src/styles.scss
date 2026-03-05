@@ -177,8 +177,14 @@ mat-sidenav {
 .full-width { width: 100%; }
 .page-container { padding: 50px; }
 .form-container-lg { width: 600px; margin: 0 auto; }
-.text-brand { color: var(--app-brand-color); }
-.text-muted { color: var(--app-text-secondary); }
+
+.text-primary { color: var(--app-text-color) !important; }
+.text-secondary { color: var(--app-text-secondary) !important; }
+.text-hint { color: var(--app-text-hint) !important; }
+.text-brand { color: var(--app-brand-color) !important; }
+.text-error { color: var(--app-error-color) !important; }
+.text-success { color: #4caf50 !important; }
+.text-muted { color: var(--app-text-secondary) !important; }
 
 .sidebar-scroll-height {
   height: calc(100vh - 64px * 4 - 20px);

@@ -1,12 +1,12 @@
 @if (isLoading) {
   <div class="loading-container">
     <mat-spinner diameter="40"></mat-spinner>
-    <p>Loading collate...</p>
+    <p class="text-secondary">Loading collate...</p>
   </div>
 } @else if (errorMessage) {
   <div class="error-container">
-    <mat-icon>error_outline</mat-icon>
-    <p>{{ errorMessage }}</p>
+    <mat-icon class="text-error">error_outline</mat-icon>
+    <p class="text-primary">{{ errorMessage }}</p>
     <button mat-raised-button color="primary" (click)="navigateToHome()">Go to Home</button>
   </div>
 } @else {
@@ -63,7 +63,7 @@
   @if (searchTerms.length > 0) {
     <div class="visualization-controls">
       <button mat-button (click)="toggleCytoscapePlot()" [class.active-toggle]="showCytoscapePlot">
-        <mat-icon [class.active-icon]="showCytoscapePlot" [class.inactive-icon]="!showCytoscapePlot">account_tree</mat-icon>
+        <mat-icon [class.text-brand]="showCytoscapePlot" [class.text-secondary]="!showCytoscapePlot">account_tree</mat-icon>
         <span>Network Plot</span>
       </button>
       @if (showCytoscapePlot) {
@@ -104,9 +104,9 @@
     }
   } @else if (collate) {
     <div class="empty-state">
-      <mat-icon>search</mat-icon>
-      <p>No search results yet</p>
-      <span class="hint">Use the search box above to find proteins across projects</span>
+      <mat-icon class="text-hint">search</mat-icon>
+      <p class="text-secondary">No search results yet</p>
+      <span class="hint text-hint">Use the search box above to find proteins across projects</span>
     </div>
   }
 }

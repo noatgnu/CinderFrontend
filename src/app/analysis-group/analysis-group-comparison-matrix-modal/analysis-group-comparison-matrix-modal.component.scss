@@ -27,7 +27,6 @@
 .list-title {
   font-weight: 500;
   font-size: 14px;
-  color: var(--app-text-color);
 }
 
 .list-items {
@@ -86,7 +85,6 @@
 
 .item-conditions {
   font-size: 11px;
-  color: var(--app-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -119,7 +117,6 @@
   padding: 24px;
   gap: 12px;
   text-align: center;
-  color: var(--app-text-secondary);
 
   mat-icon {
     font-size: 40px;
@@ -150,7 +147,6 @@
 .detail-title {
   font-weight: 500;
   font-size: 14px;
-  color: var(--app-text-color);
 }
 
 .detail-actions {
@@ -176,14 +172,12 @@
 .section-title {
   font-size: 12px;
   font-weight: 500;
-  color: var(--app-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .section-hint {
   font-size: 12px;
-  color: var(--app-text-secondary);
   margin-bottom: 8px;
 }
 
@@ -211,7 +205,6 @@
   justify-content: center;
   height: 100%;
   gap: 16px;
-  color: var(--app-text-secondary);
 
   mat-icon {
     font-size: 48px;

@@ -4,7 +4,6 @@
 
   th.mat-mdc-header-cell {
     background-color: var(--app-surface-variant);
-    color: var(--app-text-color);
     font-weight: 600;
     white-space: nowrap;
     padding: 8px 16px;
@@ -40,7 +39,7 @@
 [subsheet].mat-mdc-form-field {
   --mdc-outlined-text-field-container-shape: 4px;
   font-size: 13px;
-  
+
   ::ng-deep .mat-mdc-text-field-wrapper {
     padding-left: 8px;
     padding-right: 8px;

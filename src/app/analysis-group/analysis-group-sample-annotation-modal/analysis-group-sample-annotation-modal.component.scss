@@ -34,12 +34,10 @@
 .panel-title {
   font-weight: 500;
   font-size: 14px;
-  color: var(--app-text-color);
 }
 
 .column-count {
   font-size: 12px;
-  color: var(--app-text-secondary);
 }
 
 .search-box {
@@ -85,7 +83,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--app-text-color);
 }
 
 .panel-footer {
@@ -95,7 +92,6 @@
 
 .hint-text {
   font-size: 11px;
-  color: var(--app-text-secondary);
 }
 
 .bulk-actions {
@@ -190,7 +186,6 @@ table {
   gap: 12px;
   padding: 24px;
   text-align: center;
-  color: var(--app-text-secondary);
 
   mat-icon {
     font-size: 40px;

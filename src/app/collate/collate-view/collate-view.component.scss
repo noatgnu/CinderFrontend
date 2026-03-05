@@ -20,14 +20,6 @@
   flex: 1 1 auto;
 }
 
-.active-icon {
-  color: var(--app-primary-color);
-}
-
-.inactive-icon {
-  color: var(--app-text-secondary);
-}
-
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -43,7 +35,6 @@
 
   p {
     font-size: 16px;
-    color: var(--app-text-secondary);
   }
 }
 
@@ -60,13 +51,11 @@
     height: 48px;
     width: 48px;
     margin-bottom: 16px;
-    color: var(--app-error-color);
   }
 
   p {
     font-size: 16px;
     margin-bottom: 24px;
-    color: var(--app-text-color);
   }
 }
 
@@ -83,18 +72,15 @@
     height: 64px;
     width: 64px;
     margin-bottom: 16px;
-    color: var(--app-text-hint);
   }
 
   p {
     font-size: 18px;
     margin-bottom: 8px;
-    color: var(--app-text-secondary);
   }
 
   .hint {
     font-size: 14px;
-    color: var(--app-text-hint);
   }
 }
 
