@@ -1,9 +1,10 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import * as PlotlyJS from 'plotly.js-dist-min';
 import {PlotlyModule} from "angular-plotly.js";
 import {SearchResult} from "../../../search-session";
 import {GraphService} from "../../../graph.service";
 import {AccountsService} from "../../../accounts/accounts.service";
+import {Subject, takeUntil} from "rxjs";
 
 @Component({
     selector: 'app-bar-chart',
@@ -14,7 +15,8 @@ import {AccountsService} from "../../../accounts/accounts.service";
     templateUrl: './bar-chart.component.html',
     styleUrl: './bar-chart.component.scss'
 })
-export class BarChartComponent {
+export class BarChartComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   private _data: SearchResult|null = null;
   private _renameCondition: {[key: string]: string} = {}
   private _searchTerm: string = ""
@@ -109,10 +111,20 @@ export class BarChartComponent {
   }
   currentColor = 0
 
-  constructor(private graph: GraphService, private accounts: AccountsService) {
-    this.graph.redrawTrigger.subscribe(() => {
+  constructor(
+    private graph: GraphService,
+    private accounts: AccountsService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.graph.redrawTrigger.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.drawGraph();
-    })
+      this.cdr.markForCheck();
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   drawGraph() {
@@ -208,31 +220,29 @@ export class BarChartComponent {
       dataCount = 2
       this.graphData = [traceA, boxA, traceB, boxB]
 
-    } else if (this.data && (this.expanded || (this.data.condition_A == "" || this.data.condition_B == ""))){
-      const uniqueConditions = Array.from(new Set(this.data.searched_data.map(x => x.Condition)))
+    } else if (this.data && (this.expanded || (this.data.condition_A == "" || this.data.condition_B == ""))) {
+      const searchedData = this.data.searched_data;
+      const uniqueConditions = Array.from(new Set(searchedData.map(x => x.Condition)));
       const meanValues = uniqueConditions.map(condition => {
-        // @ts-ignore
-        const values = this.data.searched_data.filter(x => x.Condition === condition).map(x => x.Value)
-        return this.calculateMean(values)
-      })
+        const values = searchedData.filter(x => x.Condition === condition).map(x => x.Value);
+        return this.calculateMean(values);
+      });
       const whiskerValues = uniqueConditions.map(condition => {
-        // @ts-ignore
-        const values = this.data.searched_data.filter(x => x.Condition === condition).map(x => x.Value)
-        return this.calculateWhisker(values)
-      })
-
+        const values = searchedData.filter(x => x.Condition === condition).map(x => x.Value);
+        return this.calculateWhisker(values);
+      });
 
       const traces = uniqueConditions.map((condition, i) => {
         if (!this.colorMap[condition]) {
-          this.colorMap[condition] = this.graph.defaultColorList[this.currentColor]
-          this.currentColor++
+          this.colorMap[condition] = this.graph.defaultColorList[this.currentColor];
+          this.currentColor++;
           if (this.currentColor >= this.graph.defaultColorList.length) {
-            this.currentColor = 0
+            this.currentColor = 0;
           }
         }
-        let renamedCondition = this.renameCondition[condition]
+        let renamedCondition = this.renameCondition[condition];
         if (!renamedCondition) {
-          renamedCondition = condition
+          renamedCondition = condition;
         }
         return {
           x: [renamedCondition],
@@ -252,19 +262,18 @@ export class BarChartComponent {
             color: this.colorMap[condition]
           },
           showlegend: false
-        }
-      })
-      const boxes = uniqueConditions.map((condition, i) => {
-        let renamedCondition = this.renameCondition[condition]
+        };
+      });
+      const boxes = uniqueConditions.map((condition) => {
+        let renamedCondition = this.renameCondition[condition];
         if (!renamedCondition) {
-          renamedCondition = condition
+          renamedCondition = condition;
         }
-        // @ts-ignore
-        const values = this.data.searched_data.filter(x => x.Condition === condition).map(x => x.Value)
-        return this.drawTransparentBoxPlot(values, renamedCondition)
-      })
-      dataCount = uniqueConditions.length
-      this.graphData = [...traces, ...boxes]
+        const values = searchedData.filter(x => x.Condition === condition).map(x => x.Value);
+        return this.drawTransparentBoxPlot(values, renamedCondition);
+      });
+      dataCount = uniqueConditions.length;
+      this.graphData = [...traces, ...boxes];
     }
     this.graphLayout.width = this.graphLayout.margin.l + this.graphLayout.margin.r + this.barSize * dataCount
     this.revision++

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {AsyncPipe} from "@angular/common";
@@ -8,10 +8,10 @@ import {
   MatAutocompleteTrigger,
   MatOption
 } from "@angular/material/autocomplete";
-import {filter, map, Observable, of, startWith, switchMap} from "rxjs";
-import {SubcellularLocation, SubcellularLocationQuery} from "../../../subcellular-location";
-import {HumanDisease, HumanDiseaseQuery} from "../../../human-disease";
-import {Tissue, TissueQuery} from "../../../tissue";
+import {filter, map, Observable, of, startWith, Subject, switchMap, takeUntil} from "rxjs";
+import {SubcellularLocation} from "../../../subcellular-location";
+import {HumanDisease} from "../../../human-disease";
+import {Tissue} from "../../../tissue";
 import {WebService} from "../../../web.service";
 import {MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
@@ -24,6 +24,7 @@ import {DataService} from "../../../data.service";
 
 @Component({
     selector: 'app-analysis-group-metadata-creation-dialog',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDialogTitle,
         MatDialogContent,
@@ -43,7 +44,8 @@ import {DataService} from "../../../data.service";
     templateUrl: './analysis-group-metadata-creation-dialog.component.html',
     styleUrl: './analysis-group-metadata-creation-dialog.component.scss'
 })
-export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
+export class AnalysisGroupMetadataCreationDialogComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   metadataTypeAutocomplete: string[] = ["Characteristics", "Comment", "Factor value", "Other"]
   metadataNameAutocomplete: string[] = ["Disease", "Tissue", "Subcellular location", "Organism", "Instrument", "Label", "Cleavage agent details", "Dissociation method", "Modification parameters", "Cell type", "Enrichment process"]
   metadataOtherAutocomplete: string[] = ["Source name", "Material type", "Assay name", "Technology type"]
@@ -102,11 +104,13 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
             this.form.controls.metadataValue.setValue(subSplitted[1].trim())
             if (this.form.controls.metadataName.value === "Modification parameters") {
               this.web.getUnimod(undefined, 5, 0, subSplitted[1].trim()).pipe(
+                takeUntil(this.destroy$),
                 map((response) => {
-                  this.optionsArray = response.results
-                  return response.results
+                  this.optionsArray = response.results;
+                  this.cdr.markForCheck();
+                  return response.results;
                 })
-              ).subscribe()
+              ).subscribe();
             }
             break
         }
@@ -114,11 +118,13 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
         this.form.controls.metadataValue.setValue(subSplitted[0].trim())
         if (this.form.controls.metadataName.value === "Modification parameters") {
           this.web.getUnimod(undefined, 5, 0, subSplitted[0].trim()).pipe(
+            takeUntil(this.destroy$),
             map((response) => {
-              this.optionsArray = response.results
-              return response.results
+              this.optionsArray = response.results;
+              this.cdr.markForCheck();
+              return response.results;
             })
-          ).subscribe()
+          ).subscribe();
         }
       }
     })
@@ -129,7 +135,17 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
   optionsArray: Unimod[] = []
 
 
-  constructor(private dialog: MatDialogRef<AnalysisGroupMetadataCreationDialogComponent>, private fb: FormBuilder, private web: WebService, public data: DataService) {
+  constructor(
+    private dialog: MatDialogRef<AnalysisGroupMetadataCreationDialogComponent>,
+    private fb: FormBuilder,
+    private web: WebService,
+    public data: DataService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngOnInit() {
@@ -224,7 +240,6 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
           const mapData: any = {}
           this.form.controls.metadataAC.setValue(this.selectedData.accession)
           for (const a of this.selectedData.additional_data) {
-            console.log(a)
             if (a["id"] === "delta_mono_mass") {
               this.form.controls.metadataMM.setValue(parseFloat(a["description"]))
             }
@@ -249,8 +264,8 @@ export class AnalysisGroupMetadataCreationDialogComponent implements OnInit{
               }
             }
           }
-          console.log(mapData)
           this.availableSpecs = Object.values(mapData)
+          this.cdr.markForCheck();
         }
       }
     }

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, signal, ViewChild, ViewChildren} from '@angular/core';
 import {MetadataColumn, SDRF} from "../metadata-column";
 import {WebService} from "../../web.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -21,7 +21,7 @@ import {MatFormField, MatInput, MatSuffix} from "@angular/material/input";
 import {MatHint, MatLabel} from "@angular/material/form-field";
 import {AsyncPipe} from "@angular/common";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
-import {Observable, of} from "rxjs";
+import {Observable, of, Subject, takeUntil} from "rxjs";
 import {map} from "rxjs/operators";
 import {SubcellularLocation} from "../../subcellular-location";
 import {HumanDisease} from "../../human-disease";
@@ -53,12 +53,12 @@ import {
 } from "./analysis-group-metadata-import/analysis-group-metadata-import.component";
 import {AnalysisGroup} from "../analysis-group";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
-import {signal, computed} from '@angular/core';
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 import {MatDivider} from "@angular/material/divider";
 
 @Component({
     selector: 'app-analysis-group-general-metadata',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatButton,
         MatCell,
@@ -107,7 +107,9 @@ import {MatDivider} from "@angular/material/divider";
     templateUrl: './analysis-group-general-metadata.component.html',
     styleUrl: './analysis-group-general-metadata.component.scss'
 })
-export class AnalysisGroupGeneralMetadataComponent implements OnInit {
+export class AnalysisGroupGeneralMetadataComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   @ViewChildren(MatExpansionPanel) expansionPanels!: QueryList<MatExpansionPanel>;
   @ViewChild("metaColAccordion") metaColAccordion!: MatAccordion
   sdrfValidating: boolean = false
@@ -214,55 +216,70 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   pageSize: number = 10
   pageIndex: number = 0
   pageSizeOptions: number[] = [5, 10, 25, 50]
-  constructor(private sb: MatSnackBar, private web: WebService, private dialog: MatDialog, private fb: FormBuilder, private ws: WebsocketService, public data: DataService) {
-
-    this.ws.curtainWSConnection?.subscribe((data) => {
+  constructor(
+    private sb: MatSnackBar,
+    private web: WebService,
+    private dialog: MatDialog,
+    private fb: FormBuilder,
+    private ws: WebsocketService,
+    public data: DataService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.ws.curtainWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       if (data.analysis_group_id === this.analysis_group_id) {
         if (data.type === "export_sdrf_status") {
           if (data.status === "complete") {
             if ("job_id" in data && "file" in data) {
               if (data.job_id === this.export_job_id) {
-                window.open(`${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`)
+                window.open(`${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`);
               }
             }
           }
         } else if (data.type === "sdrf_validation") {
-          this.sdrfValidating = false
+          this.sdrfValidating = false;
+          this.cdr.markForCheck();
           if (data.status === "error") {
-            const ref = this.dialog.open(AnalysisGroupSdrfValidationDialogComponent)
+            const ref = this.dialog.open(AnalysisGroupSdrfValidationDialogComponent);
             if ("errors" in data) {
-              ref.componentInstance.errors = data.errors as string[]
+              ref.componentInstance.errors = data.errors as string[];
             }
           }
         } else if (data.type === "sdrf_import") {
           if (data.status === "in_progress") {
             if ("progress" in data) {
-              this.sdrfImporting = true
-              const percentage = data["progress"] as number
+              this.sdrfImporting = true;
+              const percentage = data["progress"] as number;
               if (percentage > this.sdrfImportingProgress) {
-                this.sdrfImportingProgress = percentage
-                this.sdrfImportingText = `Importing data ${percentage.toFixed(2)}%`
+                this.sdrfImportingProgress = percentage;
+                this.sdrfImportingText = `Importing data ${percentage.toFixed(2)}%`;
+                this.cdr.markForCheck();
               }
             }
           } else if (data.status === "complete") {
             if (this.sourceFiles.length > 0) {
-              this.sdrfImportingProgress = 50
-              this.sdrfImportingText = "Retrieving updated Data."
+              this.sdrfImportingProgress = 50;
+              this.sdrfImportingText = "Retrieving updated Data.";
+              this.cdr.markForCheck();
 
-              this.sb.open("Retrieving updated Data.", "Dismiss", {duration: 5000})
-              this.web.getAnalysisGroup(this.analysis_group_id).subscribe((data) => {
-                this.sb.open("Data imported", "Dismiss", {duration: 5000})
-                this.sdrfImporting = false
-                this.sdrfImportingProgress = 0
-                this.sdrfImportingText = ""
-                this.handleImportedData(data)
-              })
+              this.sb.open("Retrieving updated Data.", "Dismiss", {duration: 5000});
+              this.web.getAnalysisGroup(this.analysis_group_id).pipe(takeUntil(this.destroy$)).subscribe((data) => {
+                this.sb.open("Data imported", "Dismiss", {duration: 5000});
+                this.sdrfImporting = false;
+                this.sdrfImportingProgress = 0;
+                this.sdrfImportingText = "";
+                this.handleImportedData(data);
+                this.cdr.markForCheck();
+              });
             }
-
           }
         }
       }
-    })
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   updateValueField(metadata: MetadataColumn, data: string) {
@@ -362,26 +379,27 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           break
       }
     }
-    ref.afterClosed().subscribe((result) => {
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result) => {
       if (result) {
-        this.web.createMetaDataColumn(this.analysis_group_id, result).subscribe((metadata) => {
-          this.metadata.push(...metadata)
-          this.metadataChange.emit(this.metadata)
+        this.web.createMetaDataColumn(this.analysis_group_id, result).pipe(takeUntil(this.destroy$)).subscribe((metadata) => {
+          this.metadata.push(...metadata);
+          this.metadataChange.emit(this.metadata);
           for (const m of metadata) {
             this.metadataFormMap[m.id] = this.fb.group({
               value: [m.value],
               name: [m.name],
               type: [m.type]
-            })
-            this.metadataFormMap[m.id].valueChanges.subscribe((data) => {
+            });
+            this.metadataFormMap[m.id].valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data) => {
               if (data.value) {
-                this.updateValueField(m, data.value)
+                this.updateValueField(m, data.value);
               }
-            })
+            });
           }
-        })
+          this.cdr.markForCheck();
+        });
       }
-    })
+    });
   }
 
   undoDeletion(metadata: MetadataColumn) {
@@ -405,44 +423,46 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   }
 
   addSampleFile() {
-    const ref = this.dialog.open(AnalysisGroupSampleFileComponent)
-    ref.afterClosed().subscribe((result) => {
+    const ref = this.dialog.open(AnalysisGroupSampleFileComponent);
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result) => {
       if (result) {
         if (result.name) {
-          this.web.createSourceFile(this.analysis_group_id, result.name, result.description).subscribe((sourceFile) => {
-            this.sourceFiles.push(sourceFile)
+          this.web.createSourceFile(this.analysis_group_id, result.name, result.description).pipe(takeUntil(this.destroy$)).subscribe((sourceFile) => {
+            this.sourceFiles.push(sourceFile);
             this.sourcefileFormMap[sourceFile.id] = this.fb.group({
               name: [sourceFile.name],
               description: [sourceFile.description]
-            })
+            });
             for (const m of sourceFile.metadata_columns) {
               this.metadataFormMap[m.id] = this.fb.group({
                 value: [m.value],
                 name: [m.name],
                 type: [m.type],
                 not_applicable: [m.not_applicable]
-              })
-              this.metadataFormMap[m.id].controls["value"].valueChanges.subscribe((data: string) => {
-                this.updateValueField(m, data)
-              })
+              });
+              this.metadataFormMap[m.id].controls["value"].valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data: string) => {
+                this.updateValueField(m, data);
+              });
             }
-            this.sourceFilesChanged.emit(this.sourceFiles)
-          })
+            this.sourceFilesChanged.emit(this.sourceFiles);
+            this.cdr.markForCheck();
+          });
         }
       }
-    })
+    });
   }
 
   removeSampleFile(id: number) {
-    const ref = this.dialog.open(AreYouSureDialogComponent)
-    ref.afterClosed().subscribe((result) => {
+    const ref = this.dialog.open(AreYouSureDialogComponent);
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result) => {
       if (result) {
-        this.web.deleteSourceFile(id).subscribe(() => {
-          this.sourceFiles = this.sourceFiles.filter((s) => s.id !== id)
-          this.sourceFilesChanged.emit(this.sourceFiles)
-        })
+        this.web.deleteSourceFile(id).pipe(takeUntil(this.destroy$)).subscribe(() => {
+          this.sourceFiles = this.sourceFiles.filter((s) => s.id !== id);
+          this.sourceFilesChanged.emit(this.sourceFiles);
+          this.cdr.markForCheck();
+        });
       }
-    })
+    });
   }
 
   createMetadataFileSpecific(customizationTemplate: string|undefined|null = null, fileId: number) {
@@ -493,42 +513,43 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
           break
       }
     }
-    ref.afterClosed().subscribe((result) => {
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result) => {
       if (result) {
-        this.web.createMetaDataColumn(this.analysis_group_id, result, fileId).subscribe((metadata) => {
+        this.web.createMetaDataColumn(this.analysis_group_id, result, fileId).pipe(takeUntil(this.destroy$)).subscribe((metadata) => {
           for (const m of metadata) {
-            const fId = m.source_file?.toString()
+            const fId = m.source_file?.toString();
             if (fId) {
-              this.sourceFileMap[fId].metadata_columns.push(m)
-              this.sourceFileMap[fId].metadata_columns = [...this.sourceFileMap[fId].metadata_columns]
+              this.sourceFileMap[fId].metadata_columns.push(m);
+              this.sourceFileMap[fId].metadata_columns = [...this.sourceFileMap[fId].metadata_columns];
               this.metadataFormMap[m.id] = this.fb.group({
                 value: [m.value],
                 name: [m.name],
                 type: [m.type],
                 not_applicable: [m.not_applicable]
-              })
-              this.metadataFormMap[m.id].controls["value"].valueChanges.subscribe((data: string) => {
-                this.updateValueField(m, data)
-              })
+              });
+              this.metadataFormMap[m.id].controls["value"].valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data: string) => {
+                this.updateValueField(m, data);
+              });
             }
-
           }
-        })
+          this.cdr.markForCheck();
+        });
       }
-    })
+    });
   }
 
   updateMetadata(metadata: MetadataColumn) {
-    this.web.updateMetaDataColumn(metadata.id, undefined, undefined, metadata.value).subscribe(() => {
+    this.web.updateMetaDataColumn(metadata.id, undefined, undefined, metadata.value).pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (metadata.source_file) {
         this.sourceFileMap[metadata.source_file].metadata_columns = this.sourceFileMap[metadata.source_file].metadata_columns.map((m) => {
           if (m.id === metadata.id) {
-            return metadata
+            return metadata;
           }
-          return m
-        })
+          return m;
+        });
+        this.cdr.markForCheck();
       }
-    })
+    });
   }
 
   markForDeleteOrUndo(metadata: MetadataColumn) {
@@ -605,11 +626,11 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
 
   exportSDRFFromBackend() {
     if (this.web.searchSessionID) {
-      this.web.exportSDRFFile(this.analysis_group_id, this.web.searchSessionID).subscribe((data) => {
-        this.export_job_id = data.job_id
-      })
+      this.web.exportSDRFFile(this.analysis_group_id, this.web.searchSessionID).pipe(takeUntil(this.destroy$)).subscribe((data) => {
+        this.export_job_id = data.job_id;
+        this.cdr.markForCheck();
+      });
     }
-
   }
 
   updateNotApplicable(metadata: MetadataColumn) {
@@ -637,15 +658,18 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
 
   validateSDRF() {
     if (!this.web.searchSessionID) {
-      return
+      return;
     }
-    this.sdrfValidating = true
-    this.web.validateSDRFFile(this.analysis_group_id, this.web.searchSessionID).subscribe((data) => {
-
-    }, (error) => {
-      this.sdrfValidating = false
-      this.sb.open("Error validating SDRF file", "Close", {duration: 5000})
-    })
+    this.sdrfValidating = true;
+    this.cdr.markForCheck();
+    this.web.validateSDRFFile(this.analysis_group_id, this.web.searchSessionID).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {},
+      error: () => {
+        this.sdrfValidating = false;
+        this.sb.open("Error validating SDRF file", "Close", {duration: 5000});
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   handleImportedData(analysisGroup: AnalysisGroup) {
@@ -653,32 +677,33 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   }
 
   copyMetadata(metadata: MetadataColumn, blank_only: boolean) {
-    if (this.metadataFormMap[metadata.id].controls["value"].dirty){
-      this.sb.open("Please save the metadata before copying", "Close", {duration: 5000})
-      return
+    if (this.metadataFormMap[metadata.id].controls["value"].dirty) {
+      this.sb.open("Please save the metadata before copying", "Close", {duration: 5000});
+      return;
     }
-    this.web.copyMetadataValueToAllInSamePosition(metadata.id, blank_only).subscribe((data) => {
+    this.web.copyMetadataValueToAllInSamePosition(metadata.id, blank_only).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       for (const m of data) {
         if (m.source_file) {
           this.sourceFileMap[m.source_file].metadata_columns = this.sourceFileMap[m.source_file].metadata_columns.map((md) => {
             if (md.id === m.id) {
-              this.metadataFormMap[m.id].controls["value"].patchValue(m.value)
-              return m
+              this.metadataFormMap[m.id].controls["value"].patchValue(m.value);
+              return m;
             }
-            return md
-          })
-
+            return md;
+          });
         }
       }
-    })
+      this.cdr.markForCheck();
+    });
   }
 
   reorderAnalysisGroupMetadataColumn() {
     if (this.sourceFiles.length > 0) {
-      this.web.analysisGroupReorderColumns(this.analysis_group_id).subscribe((data) => {
-        this.sourceFiles = data.source_files
-        this.sb.open("Metadata columns reordered", "Dismiss", {duration: 5000})
-      })
+      this.web.analysisGroupReorderColumns(this.analysis_group_id).pipe(takeUntil(this.destroy$)).subscribe((data) => {
+        this.sourceFiles = data.source_files;
+        this.sb.open("Metadata columns reordered", "Dismiss", {duration: 5000});
+        this.cdr.markForCheck();
+      });
     }
   }
 
@@ -716,24 +741,25 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
   }
 
   openMetadataEditorDialog(metadata: MetadataColumn) {
-    const ref = this.dialog.open(AnalysisGroupMetadataCreationDialogComponent)
-    ref.componentInstance.metadataType = metadata.type
-    ref.componentInstance.metadataName = metadata.name
-    ref.componentInstance.metadataValue = metadata.value
-    ref.componentInstance.readonlyName = true
-    ref.componentInstance.readonlyType = true
-    ref.afterClosed().subscribe((result) => {
+    const ref = this.dialog.open(AnalysisGroupMetadataCreationDialogComponent);
+    ref.componentInstance.metadataType = metadata.type;
+    ref.componentInstance.metadataName = metadata.name;
+    ref.componentInstance.metadataValue = metadata.value;
+    ref.componentInstance.readonlyName = true;
+    ref.componentInstance.readonlyType = true;
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result) => {
       if (result) {
-        this.web.updateMetaDataColumn(metadata.id, result.name, result.type, metadata.value).subscribe((data) => {
+        this.web.updateMetaDataColumn(metadata.id, result.name, result.type, metadata.value).pipe(takeUntil(this.destroy$)).subscribe((data) => {
           this.metadata = this.metadata.map((m) => {
             if (m.id === metadata.id) {
-              return data
+              return data;
             }
-            return m
-          })
-        })
+            return m;
+          });
+          this.cdr.markForCheck();
+        });
       }
-    })
+    });
   }
 
   syncAll(metadata: MetadataColumn) {
@@ -741,13 +767,14 @@ export class AnalysisGroupGeneralMetadataComponent implements OnInit {
       this.sb.open("Please save changes before syncing", "Dismiss", {duration: 3000});
       return;
     }
-    this.web.copyMetadataValueToAllInSamePosition(metadata.id, false).subscribe((data) => {
+    this.web.copyMetadataValueToAllInSamePosition(metadata.id, false).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.sb.open(`Propagated "${metadata.name}" to all samples`, "Dismiss", {duration: 3000});
       data.forEach(m => {
         if (m.source_file && this.metadataFormMap[m.id]) {
           this.metadataFormMap[m.id].controls['value'].patchValue(m.value, {emitEvent: false});
         }
       });
+      this.cdr.markForCheck();
     });
   }
 

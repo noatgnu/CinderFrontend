@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -12,6 +12,7 @@ import {MatButton} from "@angular/material/button";
 
 @Component({
     selector: 'app-delete-user-confirmation',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatButton,
         MatDialogActions,

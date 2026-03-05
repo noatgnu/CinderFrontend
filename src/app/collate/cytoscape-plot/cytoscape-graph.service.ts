@@ -77,6 +77,7 @@ export class CytoscapeGraphService {
         const source = result.log2_fc > 0 ? proteinId : comparisonId;
         const target = result.log2_fc > 0 ? comparisonId : proteinId;
 
+        const edgeVisuals = this.calculateEdgeVisuals(result.log10_p);
         elements.push({
           data: {
             id: `${proteinId}-${comparisonId}-${project.id}-${result.analysis_group.id}`,
@@ -92,8 +93,11 @@ export class CytoscapeGraphService {
             fc: result.log2_fc,
             p_value: result.log10_p,
             protein: proteinId,
-            searchTerm: result.search_term
-          } as CytoscapeEdgeData
+            searchTerm: result.search_term,
+            edgeWidth: edgeVisuals.width,
+            edgeOpacity: edgeVisuals.opacity
+          } as CytoscapeEdgeData,
+          classes: edgeVisuals.isSignificant ? 'significant' : 'non-significant'
         });
 
         heatmapData.push({
@@ -172,6 +176,21 @@ export class CytoscapeGraphService {
 
   generateRandomColor(): string {
     return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+  }
+
+  private calculateEdgeVisuals(log10P: number): { width: number; opacity: number; isSignificant: boolean } {
+    const minWidth = 1;
+    const maxWidth = 6;
+    const significanceThreshold = 1.3;
+
+    const clampedP = Math.min(Math.max(log10P, 0), 10);
+    const normalizedP = clampedP / 10;
+    const width = minWidth + (normalizedP * (maxWidth - minWidth));
+
+    const isSignificant = log10P >= significanceThreshold;
+    const opacity = isSignificant ? 1 : 0.5;
+
+    return { width, opacity, isSignificant };
   }
 
   private calculateIntensities(result: SearchResult): { intensityA: number; intensityB: number } {

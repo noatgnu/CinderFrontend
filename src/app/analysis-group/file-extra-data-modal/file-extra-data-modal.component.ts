@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy} from '@angular/core';
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {ProjectFile} from "../../project-file";
@@ -7,11 +7,12 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOption} from "@angular/material/core";
 import {MatSelect} from "@angular/material/select";
 import {MatButton} from "@angular/material/button";
-import {AnalysisGroup} from "../analysis-group";
 import {MatInput} from "@angular/material/input";
+import {Subject, takeUntil} from "rxjs";
 
 @Component({
     selector: 'app-file-extra-data-modal',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDialogTitle,
         MatDialogContent,
@@ -27,7 +28,8 @@ import {MatInput} from "@angular/material/input";
     templateUrl: './file-extra-data-modal.component.html',
     styleUrl: './file-extra-data-modal.component.scss'
 })
-export class FileExtraDataModalComponent {
+export class FileExtraDataModalComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   private _file: ProjectFile|undefined = undefined
   @Input() analysisGroupType: string|undefined = undefined
   @Input() set file(value: ProjectFile) {
@@ -53,9 +55,10 @@ export class FileExtraDataModalComponent {
         this.formCopyNumberColumn.controls.copy_number_col.setValue(value.extra_data.copy_number_col)
       }
     }
-    this.web.getProjectFileColumns(value.id).subscribe((data) => {
-      this.columns = data
-    })
+    this.web.getProjectFileColumns(value.id).pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      this.columns = data;
+      this.cdr.markForCheck();
+    });
   }
 
   get file(): ProjectFile {
@@ -89,8 +92,16 @@ export class FileExtraDataModalComponent {
 
   columns: string[] = []
 
-  constructor(private fb: FormBuilder, private matDialogRef: MatDialogRef<FileExtraDataModalComponent>, private web: WebService) {
+  constructor(
+    private fb: FormBuilder,
+    private matDialogRef: MatDialogRef<FileExtraDataModalComponent>,
+    private web: WebService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   save() {

@@ -1,7 +1,106 @@
-<form>
-  <button mat-icon-button type="button" (click)="file.click()"><mat-icon>upload</mat-icon></button>
-  <input type="file" hidden #file (change)="uploadData($event)">
-</form>
-@for (f of fileList; track f.name) {
-  <mat-progress-bar [value]="fileProgressMap[f.name].progress/fileProgressMap[f.name].total*100" [mode]="'determinate'"></mat-progress-bar>
+@if (compact) {
+  <div class="compact-upload">
+    <button mat-icon-button
+            type="button"
+            (click)="fileInput.click()"
+            [disabled]="hasActiveUploads"
+            matTooltip="Upload file ({{ allowedFileTypes.join(', ') }})">
+      <mat-icon>{{ hasActiveUploads ? 'hourglass_empty' : 'upload' }}</mat-icon>
+    </button>
+    <input type="file"
+           hidden
+           #fileInput
+           [accept]="'.' + allowedFileTypes.join(',.')"
+           (change)="onFileSelected($event)">
+
+    @if (uploadStatesList.length > 0) {
+      <div class="compact-progress">
+        @for (state of uploadStatesList; track state.file.name) {
+          <div class="compact-file-item" [class.error]="state.status === 'error'" [class.success]="state.status === 'success'">
+            <span class="file-name" [matTooltip]="state.file.name">{{ state.file.name }}</span>
+            @if (state.status === 'uploading') {
+              <mat-progress-bar
+                mode="determinate"
+                [value]="getProgressPercent(state)">
+              </mat-progress-bar>
+            } @else if (state.status === 'success') {
+              <mat-icon class="status-icon success">check_circle</mat-icon>
+            } @else if (state.status === 'error') {
+              <mat-icon class="status-icon error" [matTooltip]="state.error">error</mat-icon>
+            }
+            <button mat-icon-button
+                    class="remove-btn"
+                    (click)="removeFile(state.file.name)"
+                    [disabled]="state.status === 'uploading'">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+} @else {
+  <div class="upload-container"
+       [class.drag-over]="isDragOver"
+       (click)="fileInput.click()">
+    <input type="file"
+           hidden
+           #fileInput
+           [accept]="'.' + allowedFileTypes.join(',.')"
+           (change)="onFileSelected($event)">
+
+    <div class="upload-content">
+      <mat-icon class="upload-icon">cloud_upload</mat-icon>
+      <span class="upload-text">
+        @if (isDragOver) {
+          Drop file here
+        } @else {
+          Drag & drop or click to upload
+        }
+      </span>
+      <span class="upload-hint">Allowed: {{ allowedFileTypes.join(', ') }}</span>
+    </div>
+  </div>
+
+  @if (uploadStatesList.length > 0) {
+    <div class="file-list">
+      @for (state of uploadStatesList; track state.file.name) {
+        <div class="file-item" [class.error]="state.status === 'error'" [class.success]="state.status === 'success'">
+          <div class="file-info">
+            <mat-icon class="file-icon">description</mat-icon>
+            <div class="file-details">
+              <span class="file-name">{{ state.file.name }}</span>
+              <span class="file-size">{{ formatFileSize(state.file.size) }}</span>
+            </div>
+          </div>
+
+          <div class="file-status">
+            @if (state.status === 'uploading') {
+              <div class="progress-container">
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="getProgressPercent(state)">
+                </mat-progress-bar>
+                <span class="progress-text">{{ getProgressPercent(state) | number:'1.0-0' }}%</span>
+              </div>
+            } @else if (state.status === 'success') {
+              <mat-icon class="status-icon success">check_circle</mat-icon>
+            } @else if (state.status === 'error') {
+              <div class="error-info">
+                <mat-icon class="status-icon error">error</mat-icon>
+                <span class="error-text">{{ state.error }}</span>
+              </div>
+            }
+          </div>
+
+          <button mat-icon-button
+                  class="remove-btn"
+                  (click)="removeFile(state.file.name); $event.stopPropagation()"
+                  [disabled]="state.status === 'uploading'">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  }
 }

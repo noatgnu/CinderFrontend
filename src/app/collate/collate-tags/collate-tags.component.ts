@@ -1,6 +1,5 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {FormBuilder, Validators} from "@angular/forms";
-import {Collate, CollateTag} from "../collate";
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
+import {CollateTag} from "../collate";
 import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
 import {MatChip, MatChipRemove, MatChipSet} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
@@ -8,6 +7,7 @@ import {AccountsService} from "../../accounts/accounts.service";
 
 @Component({
     selector: 'app-collate-tags',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDropList,
         MatChipSet,

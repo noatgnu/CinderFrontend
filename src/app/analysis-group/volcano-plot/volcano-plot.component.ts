@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
 import {CurtainData} from "../analysis-group";
 
 import * as PlotlyJS from 'plotly.js-dist-min';
@@ -8,20 +8,24 @@ import {GraphService} from "../../graph.service";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
+import {Subject, takeUntil} from "rxjs";
 
 @Component({
     selector: 'app-volcano-plot',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [PlotlyModule, MatIconButton, MatIcon, MatTooltip],
     templateUrl: './volcano-plot.component.html',
     styleUrl: './volcano-plot.component.scss'
 })
-export class VolcanoPlotComponent {
+export class VolcanoPlotComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
   @Input() plotType: string = "proteomics"
   @Output() selected: EventEmitter<{"Primary ID": string, "Gene Names": string|null, "Entry": string, "Fold Change": number, "P-value": number }[]> = new EventEmitter<{"Primary ID": string, "Gene Names": string|null, "Entry": string, "Fold Change": number, "P-value": number }[]>()
   private _curtainData: CurtainData|undefined = undefined
   @Input() set curtainData(value: CurtainData) {
-    this._curtainData = value
-    this.drawVolcanoPlot()
+    this._curtainData = value;
+    this.drawVolcanoPlot();
+    this.cdr.markForCheck();
   }
 
   get curtainData(): CurtainData {
@@ -84,17 +88,28 @@ export class VolcanoPlotComponent {
 
   colorMap: any = {}
 
-  constructor(private accounts: AccountsService, private graph: GraphService) {
-    this.graph.redrawTrigger.subscribe(() => {
-      this.drawVolcanoPlot()
-    })
+  constructor(
+    private accounts: AccountsService,
+    private graph: GraphService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.graph.redrawTrigger
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.drawVolcanoPlot();
+        this.cdr.markForCheck();
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   drawVolcanoPlot() {
     if (!this.curtainData && !this.curtainData["settings"]) {
       return
     }
-    console.log(this.curtainData)
     this.graphLayout.title.text = this.curtainData.settings["title"]
     this.colorMap = this.curtainData.settings.colorMap
     const allColorLabels = Object.keys(this.colorMap)

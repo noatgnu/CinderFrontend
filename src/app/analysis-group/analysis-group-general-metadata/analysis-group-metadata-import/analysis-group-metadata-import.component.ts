@@ -1,13 +1,13 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {MatDialogRef} from "@angular/material/dialog";
-import {FormBuilder} from "@angular/forms";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
 import jsSHA from "jssha";
 import {WebService} from "../../../web.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {firstValueFrom} from "rxjs";
 
 @Component({
     selector: 'app-analysis-group-metadata-import',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatIconButton,
         MatButton,
@@ -31,22 +31,24 @@ export class AnalysisGroupMetadataImportComponent {
 
   @Output() fileUploaded = new EventEmitter<any>()
 
-  constructor(private web: WebService) {
-
-  }
+  constructor(
+    private web: WebService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   submit() {
 
   }
 
-  async uploadData(event: Event){
-    const files = (event.target as HTMLInputElement).files
+  async uploadData(event: Event) {
+    const files = (event.target as HTMLInputElement).files;
     if (files) {
-      this.fileList = []
+      this.fileList = [];
       for (let i = 0; i < files.length; i++) {
-        this.fileList.push(files[i])
-        this.fileProgressMap[files[i].name] = {progress: 0, total: files[i].size}
+        this.fileList.push(files[i]);
+        this.fileProgressMap[files[i].name] = {progress: 0, total: files[i].size};
       }
+      this.cdr.markForCheck();
       for (let i = 0; i < files.length; i++) {
         await this.uploadFile(files[i]);
       }
@@ -69,50 +71,58 @@ export class AnalysisGroupMetadataImportComponent {
     if (this.allowFileType.indexOf(extension) === -1) {
       return;
     }
-    if (chunkSize > fileSize && this.web.searchSessionID) {
-      const chunk = await file.arrayBuffer();
-      hashObj.update(chunk)
-      const hashDigest = hashObj.getHash("HEX");
-      const result = await this.web.uploadDataChunkComplete("", hashDigest, file, file.name).toPromise()
-      this.fileProgressMap[file.name].progress = fileSize;
-      console.log(result)
-      if (result?.completed_at) {
-        this.web.bindUploadedMetadataFile(this.analysisGroupId, result?.id, this.fileType, this.web.searchSessionID).subscribe((data) => {
-
-          //this.fileUploaded.emit(data)
-        })
-      }
-    } else {
-      let currentURL = "";
-      let currentOffset = 0;
-      while (fileSize > currentOffset) {
-        let end = currentOffset + chunkSize;
-        if (end >= fileSize) {
-          end = fileSize;
-        }
-        const chunk = await file.slice(currentOffset, end).arrayBuffer();
-        hashObj.update(chunk)
-        const filePart = new File([chunk], file.name, {type: file.type})
-        console.log(filePart.size)
-        const contentRange = `bytes ${currentOffset}-${end - 1}/${fileSize}`;
-        console.log(contentRange)
-        const result = await this.web.uploadDataChunk(currentURL, filePart, file.name, contentRange).toPromise()
-        if (result) {
-          currentURL = result.url;
-          currentOffset = result.offset;
-          this.fileProgressMap[file.name].progress = currentOffset;
-        }
-      }
-      if (currentURL !== "") {
+    try {
+      if (chunkSize > fileSize && this.web.searchSessionID) {
+        const chunk = await file.arrayBuffer();
+        hashObj.update(chunk);
         const hashDigest = hashObj.getHash("HEX");
-        const result = await this.web.uploadDataChunkComplete(currentURL, hashDigest).toPromise()
-        if (result?.completed_at && this.web.searchSessionID) {
-          this.web.bindUploadedMetadataFile(this.analysisGroupId, result?.id, this.fileType, this.web.searchSessionID).subscribe((data) => {
+        const result = await firstValueFrom(
+          this.web.uploadDataChunkComplete("", hashDigest, file, file.name)
+        );
+        this.fileProgressMap[file.name].progress = fileSize;
+        this.cdr.markForCheck();
+        if (result?.completed_at) {
+          await firstValueFrom(
+            this.web.bindUploadedMetadataFile(this.analysisGroupId, result?.id, this.fileType, this.web.searchSessionID)
+          );
+        }
+      } else {
+        let currentURL = "";
+        let currentOffset = 0;
+        while (fileSize > currentOffset) {
+          let end = currentOffset + chunkSize;
+          if (end >= fileSize) {
+            end = fileSize;
+          }
+          const chunk = await file.slice(currentOffset, end).arrayBuffer();
+          hashObj.update(chunk);
+          const filePart = new File([chunk], file.name, {type: file.type});
+          const contentRange = `bytes ${currentOffset}-${end - 1}/${fileSize}`;
+          const result = await firstValueFrom(
+            this.web.uploadDataChunk(currentURL, filePart, file.name, contentRange)
+          );
+          if (result) {
+            currentURL = result.url;
+            currentOffset = result.offset;
+            this.fileProgressMap[file.name].progress = currentOffset;
+            this.cdr.markForCheck();
+          }
+        }
+        if (currentURL !== "" && this.web.searchSessionID) {
+          const hashDigest = hashObj.getHash("HEX");
+          const result = await firstValueFrom(
+            this.web.uploadDataChunkComplete(currentURL, hashDigest)
+          );
+          if (result?.completed_at) {
+            await firstValueFrom(
+              this.web.bindUploadedMetadataFile(this.analysisGroupId, result?.id, this.fileType, this.web.searchSessionID)
+            );
             this.fileProgressMap[file.name].progress = fileSize;
-            //this.fileUploaded.emit(data)
-          })
+            this.cdr.markForCheck();
+          }
         }
       }
+    } catch {
     }
   }
 

@@ -11,7 +11,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       setHeaders: {"X-Cinder-Instance-Id": webService.cinderInstanceID}
     })
     const csrf = webService.getCSRFTokenFromCookies()
-    console.log(csrf)
     if (csrf) {
       // check if the csrf token is in the headers
       req = req.clone({

@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -9,12 +9,12 @@ import {
 import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {filter} from "rxjs";
 import {MatButton} from "@angular/material/button";
 import {MatOption, MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-cytoscape-plot-filter-dialog',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatDialogTitle,
     MatDialogContent,
@@ -54,6 +54,4 @@ export class CytoscapePlotFilterDialogComponent {
   submit() {
     this.dialogRef.close(this.form.value)
   }
-
-  protected readonly filter = filter;
 }

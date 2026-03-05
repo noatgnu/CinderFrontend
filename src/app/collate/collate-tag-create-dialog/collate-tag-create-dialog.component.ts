@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
-import {map, Observable, startWith, switchMap} from "rxjs";
+import {map, Observable, startWith, Subject, switchMap, takeUntil} from "rxjs";
 import {
   MatAutocomplete,
   MatAutocompleteSelectedEvent,
@@ -16,6 +16,7 @@ import {AsyncPipe} from "@angular/common";
 
 @Component({
     selector: 'app-collate-tag-create-dialog',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDialogTitle,
         MatDialogContent,
@@ -33,25 +34,28 @@ import {AsyncPipe} from "@angular/common";
     templateUrl: './collate-tag-create-dialog.component.html',
     styleUrl: './collate-tag-create-dialog.component.scss'
 })
-export class CollateTagCreateDialogComponent implements OnInit{
+export class CollateTagCreateDialogComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
   form = this.fb.group({
     name: ["", Validators.required],
     existing: [false],
-    id: [-1]
+    id: [-1 as number | null]
   })
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return this.tags.filter(tag => tag.toLowerCase().includes(filterValue));
-  }
-
   tags: string[] = [];
-
   filteredTags!: Observable<string[]>;
 
-  constructor(private fb: FormBuilder, private dialogRef: MatDialogRef<CollateTagCreateDialogComponent>, private collateService: CollateService) {
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<CollateTagCreateDialogComponent>,
+    private collateService: CollateService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngOnInit() {
@@ -65,8 +69,8 @@ export class CollateTagCreateDialogComponent implements OnInit{
 
   submit() {
     const tagName = this.form.controls.name.value;
-    this.collateService.getCollateTags(tagName).subscribe(response => {
-      // @ts-ignore
+    if (!tagName) return;
+    this.collateService.getCollateTags(tagName).pipe(takeUntil(this.destroy$)).subscribe(response => {
       const existingTag = response.results.find(tag => tag.name.toLowerCase() === tagName.toLowerCase());
       const tagExists = !!existingTag;
       this.form.controls.existing.setValue(tagExists);
@@ -76,16 +80,17 @@ export class CollateTagCreateDialogComponent implements OnInit{
   }
 
   cancel() {
-    this.dialogRef.close()
+    this.dialogRef.close();
   }
 
   onTagSelected(event: MatAutocompleteSelectedEvent) {
     const selectedTag = event.option.value;
     this.form.controls.name.setValue(selectedTag);
-    this.collateService.getCollateTags(selectedTag).subscribe(response => {
+    this.collateService.getCollateTags(selectedTag).pipe(takeUntil(this.destroy$)).subscribe(response => {
       const existingTag = response.results.find(tag => tag.name.toLowerCase() === selectedTag.toLowerCase());
       this.form.controls.existing.setValue(!!existingTag);
       this.form.controls.id.setValue(existingTag ? existingTag.id : null);
+      this.cdr.markForCheck();
     });
   }
 

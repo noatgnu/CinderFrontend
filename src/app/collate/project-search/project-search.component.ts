@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
 import {Project, ProjectQuery} from "../../project/project";
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {WebService} from "../../web.service";
@@ -7,9 +7,11 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatChip, MatChipSet} from "@angular/material/chips";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
+import {Subject, takeUntil} from "rxjs";
 
 @Component({
     selector: 'app-project-search',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ReactiveFormsModule,
         MatFormField,
@@ -24,7 +26,9 @@ import {MatListOption, MatSelectionList} from "@angular/material/list";
     templateUrl: './project-search.component.html',
     styleUrl: './project-search.component.scss'
 })
-export class ProjectSearchComponent {
+export class ProjectSearchComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
+
   @Input() multipleSelection: boolean = false;
   @Output() selectedProjects: EventEmitter<Project[]> = new EventEmitter<Project[]>();
 
@@ -38,30 +42,47 @@ export class ProjectSearchComponent {
   projectQuery: ProjectQuery | undefined = undefined;
   selectedMultipleProjects: Project[] = [];
 
-  constructor(private fb: FormBuilder, private web: WebService) {
-    this.formProjectSearch.controls.searchTerm.valueChanges.subscribe((value: string | null) => {
-      if (value) {
-        this.fetchProjects(value, this.projectPageSize, 0);
-      }
-    });
-
-    this.formProjectSearch.controls.selectedProjects.valueChanges.subscribe((value: Project[] | null) => {
-      if (value) {
-        for (const project of value) {
-          if (!this.selectedMultipleProjects.includes(project)) {
-            this.selectedMultipleProjects.push(project);
-          }
+  constructor(
+    private fb: FormBuilder,
+    private web: WebService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.formProjectSearch.controls.searchTerm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((value: string | null) => {
+        if (value) {
+          this.fetchProjects(value, this.projectPageSize, 0);
         }
-        this.selectedProjects.emit(this.selectedMultipleProjects);
-      }
-    });
+      });
+
+    this.formProjectSearch.controls.selectedProjects.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((value: Project[] | null) => {
+        if (value) {
+          for (const project of value) {
+            if (!this.selectedMultipleProjects.includes(project)) {
+              this.selectedMultipleProjects.push(project);
+            }
+          }
+          this.selectedProjects.emit(this.selectedMultipleProjects);
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   fetchProjects(searchTerm: string, pageSize: number, pageIndex: number) {
     const offset = pageIndex * pageSize;
-    this.web.getProjects(undefined, pageSize, offset, searchTerm, undefined).subscribe((data) => {
-      this.projectQuery = data;
-    });
+    this.web.getProjects(undefined, pageSize, offset, searchTerm, undefined)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data) => {
+        this.projectQuery = data;
+        this.cdr.markForCheck();
+      });
   }
 
   handleProjectPageEvent(e: PageEvent) {

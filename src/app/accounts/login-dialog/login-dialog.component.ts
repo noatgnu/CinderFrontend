@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy} from '@angular/core';
 import { AccountsService } from "../accounts.service";
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from "@angular/material/dialog";
@@ -7,11 +7,12 @@ import { MatInput } from "@angular/material/input";
 import { MatButton } from "@angular/material/button";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { WebService } from "../../web.service";
-import { finalize, catchError } from "rxjs/operators";
-import { of } from "rxjs";
+import { finalize, catchError, takeUntil } from "rxjs/operators";
+import {of, Subject} from "rxjs";
 
 @Component({
   selector: 'app-login-dialog',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatDialogTitle,
     MatDialogContent,
@@ -27,7 +28,9 @@ import { of } from "rxjs";
   templateUrl: './login-dialog.component.html',
   styleUrl: './login-dialog.component.scss'
 })
-export class LoginDialogComponent {
+export class LoginDialogComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
+
   form = this.fb.group({
     username: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required])
@@ -40,8 +43,14 @@ export class LoginDialogComponent {
     private accounts: AccountsService,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<LoginDialogComponent>,
-    private web: WebService
+    private web: WebService,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   close() {
     this.dialogRef.close();
@@ -59,15 +68,21 @@ export class LoginDialogComponent {
     if (username && password) {
       this.isLoading = true;
       this.loginError = null;
+      this.cdr.markForCheck();
 
       this.accounts.login(username, password).pipe(
+        takeUntil(this.destroy$),
         catchError(error => {
           this.loginError = error.status === 401 ?
             'Invalid username or password' :
             'Login failed. Please try again.';
+          this.cdr.markForCheck();
           return of(null);
         }),
-        finalize(() => this.isLoading = false)
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        })
       ).subscribe(data => {
         if (data) {
           this.accounts.loggedIn = true;
@@ -76,7 +91,7 @@ export class LoginDialogComponent {
           this.accounts.saveToStorage();
           this.dialogRef.close(true);
 
-          this.web.getCurrentUser().subscribe(userData => {
+          this.web.getCurrentUser().pipe(takeUntil(this.destroy$)).subscribe(userData => {
             if (userData) {
               this.accounts.currentUser = userData;
             }
@@ -89,6 +104,7 @@ export class LoginDialogComponent {
   connectKeycloak() {
     this.isLoading = true;
     this.loginError = null;
+    this.cdr.markForCheck();
     this.web.getLoginProviderRedirect();
   }
 }

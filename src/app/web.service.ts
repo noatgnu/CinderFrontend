@@ -41,8 +41,6 @@ export class WebService {
     form.append('filename', filename)
     let headers = new HttpHeaders()
     headers = headers.append('Content-Range', contentRange)
-    //headers.append('Content-Disposition', `attachment; filename=${filename}`)
-    console.log(headers)
     if (url !== "") {
       if (url.startsWith("http://") && !url.startsWith("http://localhost")) {
         url = url.replace("http://", "https://")
@@ -878,7 +876,6 @@ export class WebService {
 
   createMetaDataColumn(analysis_group: number, metadataColumn?: any, source_file?: number) {
     const payload: any = {analysis_group: analysis_group}
-    console.log(metadataColumn)
     if (metadataColumn) {
       payload["name"] = metadataColumn.metadataName
       payload["type"] = metadataColumn.metadataType
@@ -907,7 +904,6 @@ export class WebService {
     if (source_file) {
       payload["source_file"] = source_file
     }
-    console.log(payload)
     return this.http.post<MetadataColumn[]>(
       `${this.baseURL}/api/metadata_columns/`,
       payload,

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, effect, Renderer2} from '@angular/core';
+import {AfterViewInit, Component, effect, OnDestroy, Renderer2} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {NavbarComponent} from "./navbar/navbar.component";
 import {AccountsService} from "./accounts/accounts.service";
@@ -8,6 +8,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {UiSettingsService} from "./ui-settings.service";
 import {OperationCenterComponent} from "./shared/operation-center/operation-center.component";
 import {CommandPaletteComponent} from "./shared/command-palette/command-palette.component";
+import {firstValueFrom, Subject, takeUntil} from "rxjs";
 
 @Component({
     selector: 'app-root',
@@ -15,7 +16,8 @@ import {CommandPaletteComponent} from "./shared/command-palette/command-palette.
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss'
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements AfterViewInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   title = 'CinderNG';
 
   ready: boolean = false;
@@ -38,8 +40,13 @@ export class AppComponent implements AfterViewInit {
     });
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngAfterViewInit() {
-    this.ws.lostConnectionSubject.subscribe((connectionType) => {
+    this.ws.lostConnectionSubject.pipe(takeUntil(this.destroy$)).subscribe((connectionType) => {
       if (connectionType) {
         const status = connectionType === 'search' ? this.ws.getSearchConnectionStatus() : this.ws.getCurtainConnectionStatus()
         
@@ -74,12 +81,12 @@ export class AppComponent implements AfterViewInit {
     this.login().then(
       (loggedIn) => {
         if (!this.web.searchSessionID) {
-          this.web.getSearchSessionID().subscribe((data) => {
+          this.web.getSearchSessionID().pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.ws.connectSearchWS(data)
             this.ws.connectCurtainWS(data)
             localStorage.setItem("cinderSearchSessionID", data)
             this.web.searchSessionID = data
-            this.ws.searchWSConnection?.subscribe((data) => {
+            this.ws.searchWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
               if (data && data["type"] === "search_status") {
                 const id = data["id"]?.toString();
                 if (!id) return;
@@ -107,7 +114,7 @@ export class AppComponent implements AfterViewInit {
               }
             })
             this.ws.connectSearchWS(data)
-            this.ws.curtainWSConnection?.subscribe((data) => {
+            this.ws.curtainWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
               if (data) {
                 if (data.status === 'complete' || data.status === 'error') {
                   if (data.id) this.ws.removeOperation(data.id.toString());
@@ -122,9 +129,8 @@ export class AppComponent implements AfterViewInit {
         } else {
           this.ws.connectSearchWS(this.web.searchSessionID)
           this.ws.connectCurtainWS(this.web.searchSessionID)
-          this.ws.searchWSConnection?.subscribe((data) => {
+          this.ws.searchWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             if (data) {
-              console.log(data)
               if (data.type === "logout") {
                 this.accounts.logout()
               } else if (data.type === "search_status") {
@@ -144,8 +150,7 @@ export class AppComponent implements AfterViewInit {
               }
             }
           })
-          //this.ws.connectCurtainWS(this.web.searchSessionID)
-          this.ws.curtainWSConnection?.subscribe((data) => {
+          this.ws.curtainWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             if (data) {
               if (data.status === 'complete' || data.status === 'error') {
                 if (data.id) this.ws.removeOperation(data.id.toString());
@@ -159,7 +164,7 @@ export class AppComponent implements AfterViewInit {
         }
         this.ready = true
         if (loggedIn) {
-          this.web.getCurrentUser().subscribe((data) => {
+          this.web.getCurrentUser().pipe(takeUntil(this.destroy$)).subscribe((data) => {
             if (data) {
               this.accounts.currentUser = data
             }
@@ -173,27 +178,23 @@ export class AppComponent implements AfterViewInit {
     this.accounts.loadAuthFromStorage()
     if (!this.accounts.loggedIn) {
       try {
-        const resp = await this.web.getCSRFToken().toPromise()
+        const resp = await firstValueFrom(this.web.getCSRFToken())
         if (resp) {
           if (resp.status === 200) {
             try {
-              const userSession = await this.web.getAuthenticationStatus().toPromise()
+              const userSession = await firstValueFrom(this.web.getAuthenticationStatus())
               if (userSession) {
                 if (userSession.status === 200) {
                   this.accounts.userSession = userSession
                   this.accounts.loggedIn = true
                 }
               }
-            } catch (e) {
-              console.log(e)
+            } catch {
             }
           }
         }
-      } catch (e) {
-        console.log(e)
+      } catch {
       }
-
-
     }
     return this.accounts.loggedIn
   }

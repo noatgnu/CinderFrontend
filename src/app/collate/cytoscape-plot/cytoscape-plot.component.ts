@@ -16,14 +16,13 @@ import {MatDialog} from "@angular/material/dialog";
 import {CytoscapePlotFilterDialogComponent} from "./cytoscape-plot-filter-dialog/cytoscape-plot-filter-dialog.component";
 import {StringDbDialogComponent} from "./string-db-dialog/string-db-dialog.component";
 import {WebService} from "../../web.service";
-// @ts-ignore
 import C2S from 'canvas-to-svg';
-// @ts-ignore
 import pdf from 'cytoscape-pdf-export';
 import {HeatmapPlotComponent} from "./heatmap-plot/heatmap-plot.component";
 import {MatToolbar} from "@angular/material/toolbar";
 import {GraphService} from "../../graph.service";
-import {CytoscapeElement, CytoscapeFilter, HeatmapDataPoint, StringDBInteraction} from "./cytoscape-plot.types";
+import {CytoscapeEdgeData, CytoscapeElement, CytoscapeFilter, HeatmapDataPoint, StringDBInteraction} from "./cytoscape-plot.types";
+import type {CytoscapeLayers, FcoseLayoutOptions} from "./cytoscape-plot.types";
 import {Subscription} from "rxjs";
 import {CytoscapeGraphService} from "./cytoscape-graph.service";
 
@@ -102,7 +101,7 @@ export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
   projectColorMap: Record<string, string> = {};
   cytoscapeElements: CytoscapeElement[] = [];
   currentFilter: CytoscapeFilter = { log2fc: 0, pvalue: 0, projectNames: [], analysisGroupNames: [] };
-  layers: any = null;
+  layers: CytoscapeLayers | null = null;
   defaultSticky = true;
   isExpanded = false;
 
@@ -205,31 +204,24 @@ export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
             }
           },
           { selector: 'edge[color]', style: {
-              'width': 2,
+              'width': 'data(edgeWidth)',
               'line-color': 'data(color)',
               'target-arrow-color': 'data(color)',
               'target-arrow-shape': 'triangle',
               'curve-style': 'bezier',
               'control-point-step-size': 40
             }
+          },
+          { selector: 'edge.significant', style: {
+              'opacity': 1
+            }
+          },
+          { selector: 'edge.non-significant', style: {
+              'opacity': 0.4
+            }
           }
         ],
-        //@ts-ignore
-        layout: { name: 'fcose', animate: true, animationDuration: 1000,
-          padding: 30,
-          nodeSeparation: 200,
-          idealEdgeLength: 100,
-          nodeRepulsion: 4500,
-          edgeElasticity: 0.45,
-          gravity: 0.25,
-          numIter: 2500,
-          tile: true,
-          tilingPaddingVertical: 10,
-          tilingPaddingHorizontal: 10,
-          gravityRangeCompound: 1.5,
-          gravityCompound: 1.0,
-          gravityRange: 3.8,
-          initialEnergyOnIncremental: 0.5},
+        layout: this.buildFcoseLayout(),
       });
       /*const edgeHandleOptions: edgehandles.EdgeHandlesOptions = {
         canConnect: (source, target) => source !== target, // Disable self loops
@@ -299,8 +291,7 @@ export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
         });
       });
 
-      //@ts-ignore
-      const layers: any = this.cy.layers()
+      const layers = this.cy.layers();
       this.layers = layers;
       this.cy.edges().forEach(edge => {
         edge.on('click', (event) => {
@@ -534,9 +525,8 @@ export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
         }
       })
 
-    })
-    //@ts-ignore
-    this.cy.layout({ name: 'fcose', animate: true, animationDuration: 1000}).run()
+    });
+    this.cy.layout(this.buildFcoseLayout()).run();
     // update heatmap data
     const heatmapData: any[] = [];
     this.cy.edges().forEach(edge => {
@@ -695,8 +685,7 @@ export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
         'target-arrow-shape': 'none'
       })
       .update();
-    //@ts-ignore
-    this.cy.layout({ name: 'fcose', animate: true, animationDuration: 1000}).run()
+    this.cy.layout(this.buildFcoseLayout()).run();
   }
 
   exportToSvg() {
@@ -808,9 +797,9 @@ export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
   }
 
   async exportToPDF() {
-    // @ts-ignore
     const blobPromise = this.cy.pdf({
-      paperSize: 'LETTER', orientation: 'landscape', full: true, ignoreUnsupportedLayerOrder: true });
+      paperSize: 'LETTER', orientation: 'landscape', full: true, ignoreUnsupportedLayerOrder: true
+    });
     const blob = await blobPromise;
     const url = URL.createObjectURL(blob);
 
@@ -873,6 +862,58 @@ export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
       this.cy.resize();
       this.cy.fit();
     }, 300);
+  }
+
+  private buildFcoseLayout(): FcoseLayoutOptions {
+    const maxFc = this.getMaxAbsFoldChange();
+    const baseEdgeLength = 150;
+    const minEdgeLength = 50;
+
+    return {
+      name: 'fcose',
+      animate: true,
+      animationDuration: 1000,
+      padding: 30,
+      nodeSeparation: 200,
+      idealEdgeLength: (edge: cytoscape.EdgeSingular) => {
+        const fc = Math.abs(edge.data('fc') || 0);
+        if (maxFc === 0) return baseEdgeLength;
+        const normalizedFc = fc / maxFc;
+        return baseEdgeLength - (normalizedFc * (baseEdgeLength - minEdgeLength));
+      },
+      nodeRepulsion: (node: cytoscape.NodeSingular) => {
+        if (node.hasClass('protein')) {
+          return 6000;
+        }
+        return 4000;
+      },
+      edgeElasticity: (edge: cytoscape.EdgeSingular) => {
+        const fc = Math.abs(edge.data('fc') || 0);
+        if (maxFc === 0) return 0.45;
+        const normalizedFc = fc / maxFc;
+        return 0.3 + (normalizedFc * 0.5);
+      },
+      gravity: 0.25,
+      numIter: 2500,
+      tile: true,
+      tilingPaddingVertical: 10,
+      tilingPaddingHorizontal: 10,
+      gravityRangeCompound: 1.5,
+      gravityCompound: 1.0,
+      gravityRange: 3.8,
+      initialEnergyOnIncremental: 0.5
+    };
+  }
+
+  private getMaxAbsFoldChange(): number {
+    let maxFc = 0;
+    this.cytoscapeElements.forEach(element => {
+      if ('fc' in element.data) {
+        const fc = Math.abs((element.data as CytoscapeEdgeData).fc);
+        if (fc > maxFc) maxFc = fc;
+      }
+    });
+    return maxFc;
   }
 
   handleHoverTarget(data: HeatmapDataPoint | undefined): void {
