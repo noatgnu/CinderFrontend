@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input} from '@angular/core';
 import QRCodeStyling from "qr-code-styling";
 import {Options} from "qr-code-styling";
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
@@ -22,6 +22,7 @@ export class CollateQrCodeDialogComponent implements AfterViewInit {
   @Input() set url(value: string) {
     this.config.data = value;
     this._url = value;
+    this.cdr.markForCheck();
   }
 
   config: Options = {
@@ -44,7 +45,7 @@ export class CollateQrCodeDialogComponent implements AfterViewInit {
 
   qrCode?: QRCodeStyling;
 
-  constructor(private dialogRef: MatDialogRef<CollateQrCodeDialogComponent>) {}
+  constructor(private dialogRef: MatDialogRef<CollateQrCodeDialogComponent>, private cdr: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
     const qrCode = new QRCodeStyling(this.config);

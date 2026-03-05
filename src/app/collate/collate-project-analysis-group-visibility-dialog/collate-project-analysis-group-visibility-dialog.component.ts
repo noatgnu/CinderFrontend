@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input} from '@angular/core';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {Project} from "../../project/project";
 import {AnalysisGroup} from "../../analysis-group/analysis-group";
@@ -29,6 +29,7 @@ export class CollateProjectAnalysisGroupVisibilityDialogComponent {
   private _projects: Project[] = []
   @Input() set projects(value: Project[]) {
     this._projects = value
+    this.cdr.markForCheck()
   }
   get projects(): Project[] {
     return this._projects
@@ -38,6 +39,7 @@ export class CollateProjectAnalysisGroupVisibilityDialogComponent {
 
   @Input() set projectAnalysisGroupMap(value: {[projectID: number]: AnalysisGroup[]}) {
     this._projectAnalysisGroupMap = value
+    this.cdr.markForCheck()
   }
 
   get projectAnalysisGroupMap(): {[projectID: number]: AnalysisGroup[]} {
@@ -60,7 +62,7 @@ export class CollateProjectAnalysisGroupVisibilityDialogComponent {
     return this._projectAnalysisGroupVisibilityMap
   }
 
-  constructor(private dialog: MatDialogRef<CollateProjectAnalysisGroupVisibilityDialogComponent>) {}
+  constructor(private dialog: MatDialogRef<CollateProjectAnalysisGroupVisibilityDialogComponent>, private cdr: ChangeDetectorRef) {}
 
   close() {
     this.dialog.close()

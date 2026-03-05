@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input} from '@angular/core';
 import {
   MatDialogActions,
   MatDialogClose,
@@ -42,6 +42,7 @@ export class CollateProjectAnalysisGroupReorderDialogComponent {
 
   @Input() set projects(value: Project[]) {
     this._projects = value.slice();
+    this.cdr.markForCheck();
   }
 
   get projects(): Project[] {
@@ -50,13 +51,14 @@ export class CollateProjectAnalysisGroupReorderDialogComponent {
 
   @Input() set projectAnalysisGroupMap(value: { [projectID: number]: AnalysisGroup[] }) {
     this._projectAnalysisGroupMap = value;
+    this.cdr.markForCheck();
   }
 
   get projectAnalysisGroupMap(): { [projectID: number]: AnalysisGroup[] } {
     return this._projectAnalysisGroupMap;
   }
 
-  constructor(private dialogRef: MatDialogRef<CollateProjectAnalysisGroupReorderDialogComponent>) {}
+  constructor(private dialogRef: MatDialogRef<CollateProjectAnalysisGroupReorderDialogComponent>, private cdr: ChangeDetectorRef) {}
 
   save() {
     this.dialogRef.close({ projects: this.projects, projectAnalysisGroupMap: this.projectAnalysisGroupMap });

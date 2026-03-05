@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input} from '@angular/core';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {MatButton} from "@angular/material/button";
 
@@ -15,9 +15,16 @@ import {MatButton} from "@angular/material/button";
     styleUrl: './analysis-group-sdrf-validation-dialog.component.scss'
 })
 export class AnalysisGroupSdrfValidationDialogComponent {
-  @Input() errors: string[] = []
+  private _errors: string[] = [];
+  @Input() set errors(value: string[]) {
+    this._errors = value;
+    this.cdr.markForCheck();
+  }
+  get errors(): string[] {
+    return this._errors;
+  }
 
-  constructor(private dialog: MatDialogRef<AnalysisGroupSdrfValidationDialogComponent>) {
+  constructor(private dialog: MatDialogRef<AnalysisGroupSdrfValidationDialogComponent>, private cdr: ChangeDetectorRef) {
 
   }
 

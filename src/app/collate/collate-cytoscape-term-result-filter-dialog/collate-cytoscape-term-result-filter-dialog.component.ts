@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input} from '@angular/core';
 import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
@@ -23,16 +23,24 @@ import {MatButton} from "@angular/material/button";
   styleUrl: './collate-cytoscape-term-result-filter-dialog.component.scss'
 })
 export class CollateCytoscapeTermResultFilterDialogComponent {
-  @Input() searchTerms: string[] = []
+  private _searchTerms: string[] = [];
+  @Input() set searchTerms(value: string[]) {
+    this._searchTerms = value;
+    this.cdr.markForCheck();
+  }
+  get searchTerms(): string[] {
+    return this._searchTerms;
+  }
   @Input() set selectedSearchTerms(value: string[]) {
     // @ts-ignore
     this.form.controls.searchTerms.setValue(value)
+    this.cdr.markForCheck();
   }
   form = this.fb.group({
     searchTerms: this.fb.control([],),
   })
 
-  constructor(private fb: FormBuilder, private dialogRef: MatDialogRef<CollateCytoscapeTermResultFilterDialogComponent>) {
+  constructor(private fb: FormBuilder, private dialogRef: MatDialogRef<CollateCytoscapeTermResultFilterDialogComponent>, private cdr: ChangeDetectorRef) {
   }
 
   close() {
