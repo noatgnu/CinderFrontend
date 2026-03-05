@@ -91,6 +91,28 @@ mat-sidenav {
     background: var(--app-background-color);
     color: var(--app-primary-color);
   }
+
+  p, span, div, h1, h2, h3, h4, h5, h6, label, li, td, th {
+    color: inherit;
+  }
+
+  .mat-mdc-card-title,
+  .mat-mdc-card-subtitle,
+  .mat-mdc-card-content,
+  .mdc-list-item__primary-text,
+  .mdc-list-item__secondary-text,
+  .mat-mdc-tab-labels,
+  .mat-mdc-menu-content,
+  .mat-mdc-menu-item-text,
+  .mat-mdc-option,
+  .mat-mdc-select-value-text {
+    color: var(--app-text-color) !important;
+  }
+
+  .mat-mdc-form-field-hint,
+  .mat-mdc-form-field-error {
+    color: var(--app-text-secondary) !important;
+  }
 }
 
 .compact-mode {
