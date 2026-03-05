@@ -5,6 +5,46 @@
 @include mat.elevation-classes();
 @include mat.app-background();
 
+:root {
+  --app-text-color: #201a19;
+  --app-text-secondary: #534341;
+  --app-text-hint: rgba(0, 0, 0, 0.38);
+  --app-primary-color: #c00100;
+  --app-on-primary: #ffffff;
+  --app-secondary-color: #ba005c;
+  --app-tertiary-color: #705c2e;
+  --app-error-color: #ba1a1a;
+  --app-surface-color: #fffbff;
+  --app-surface-variant: #f5ddda;
+  --app-background-color: #fffbff;
+  --app-outline-color: #857370;
+  --app-outline-variant: #d8c2be;
+  --app-divider-color: rgba(0, 0, 0, 0.12);
+  --app-hover-overlay: rgba(0, 0, 0, 0.04);
+  --app-card-background: #fffbff;
+  --app-brand-color: #ba0000;
+}
+
+body.dark-theme {
+  --app-text-color: #ede0dd;
+  --app-text-secondary: #d8c2be;
+  --app-text-hint: rgba(255, 255, 255, 0.5);
+  --app-primary-color: #ffb4a8;
+  --app-on-primary: #690000;
+  --app-secondary-color: #ffb1c5;
+  --app-tertiary-color: #dec48c;
+  --app-error-color: #ffb4ab;
+  --app-surface-color: #201a19;
+  --app-surface-variant: #534341;
+  --app-background-color: #201a19;
+  --app-outline-color: #a08c89;
+  --app-outline-variant: #534341;
+  --app-divider-color: rgba(255, 255, 255, 0.12);
+  --app-hover-overlay: rgba(255, 255, 255, 0.08);
+  --app-card-background: #201a19;
+  --app-brand-color: #ffb4a8;
+}
+
 mat-sidenav {
   border-radius: 0 !important;
 }
@@ -13,31 +53,12 @@ mat-sidenav {
   @include mat.all-component-themes(m3.$light-theme);
   @include mat.system-level-colors(m3.$light-theme);
   @include mat.system-level-typography(m3.$light-theme);
-  background: mat.get-theme-color(m3.$light-theme, background);
-
-  --app-text-color: #{mat.get-theme-color(m3.$light-theme, on-surface)};
-  --app-text-secondary: #{mat.get-theme-color(m3.$light-theme, on-surface-variant)};
-  --app-text-hint: rgba(0, 0, 0, 0.38);
-  --app-primary-color: #{mat.get-theme-color(m3.$light-theme, primary)};
-  --app-on-primary: #{mat.get-theme-color(m3.$light-theme, on-primary)};
-  --app-secondary-color: #{mat.get-theme-color(m3.$light-theme, secondary)};
-  --app-tertiary-color: #{mat.get-theme-color(m3.$light-theme, tertiary)};
-  --app-error-color: #{mat.get-theme-color(m3.$light-theme, error)};
-  --app-surface-color: #{mat.get-theme-color(m3.$light-theme, surface)};
-  --app-surface-variant: #{mat.get-theme-color(m3.$light-theme, surface-variant)};
-  --app-background-color: #{mat.get-theme-color(m3.$light-theme, background)};
-  --app-outline-color: #{mat.get-theme-color(m3.$light-theme, outline)};
-  --app-outline-variant: #{mat.get-theme-color(m3.$light-theme, outline-variant)};
-  --app-divider-color: rgba(0, 0, 0, 0.12);
-  --app-hover-overlay: rgba(0, 0, 0, 0.04);
-  --app-card-background: #{mat.get-theme-color(m3.$light-theme, surface)};
-  --app-brand-color: #ba0000;
-
+  background: var(--app-background-color);
   color: var(--app-text-color);
 
   .header-container {
-    background: mat.get-theme-color(m3.$light-theme, background);
-    color: mat.get-theme-color(m3.$light-theme, primary);
+    background: var(--app-background-color);
+    color: var(--app-primary-color);
   }
 }
 
@@ -45,109 +66,12 @@ mat-sidenav {
   @include mat.all-component-themes(m3.$dark-theme);
   @include mat.system-level-colors(m3.$dark-theme);
   @include mat.system-level-typography(m3.$dark-theme);
-  background: mat.get-theme-color(m3.$dark-theme, background);
-
-  --app-text-color: #{mat.get-theme-color(m3.$dark-theme, on-surface)};
-  --app-text-secondary: #{mat.get-theme-color(m3.$dark-theme, on-surface-variant)};
-  --app-text-hint: rgba(255, 255, 255, 0.38);
-  --app-primary-color: #{mat.get-theme-color(m3.$dark-theme, primary)};
-  --app-on-primary: #{mat.get-theme-color(m3.$dark-theme, on-primary)};
-  --app-secondary-color: #{mat.get-theme-color(m3.$dark-theme, secondary)};
-  --app-tertiary-color: #{mat.get-theme-color(m3.$dark-theme, tertiary)};
-  --app-error-color: #{mat.get-theme-color(m3.$dark-theme, error)};
-  --app-surface-color: #{mat.get-theme-color(m3.$dark-theme, surface)};
-  --app-surface-variant: #{mat.get-theme-color(m3.$dark-theme, surface-variant)};
-  --app-background-color: #{mat.get-theme-color(m3.$dark-theme, background)};
-  --app-outline-color: #{mat.get-theme-color(m3.$dark-theme, outline)};
-  --app-outline-variant: #{mat.get-theme-color(m3.$dark-theme, outline-variant)};
-  --app-divider-color: rgba(255, 255, 255, 0.12);
-  --app-hover-overlay: rgba(255, 255, 255, 0.04);
-  --app-card-background: #{mat.get-theme-color(m3.$dark-theme, surface)};
-  --app-brand-color: #ff8a78;
-
-  color: var(--app-text-color) !important;
+  background: var(--app-background-color);
+  color: var(--app-text-color);
 
   .header-container {
-    background: mat.get-theme-color(m3.$dark-theme, background);
-    color: mat.get-theme-color(m3.$dark-theme, primary);
-  }
-
-  h1, h2, h3, h4, h5, h6, b, strong {
-    color: var(--app-text-color) !important;
-  }
-
-  p, span, label, small {
-    color: var(--app-text-color) !important;
-  }
-
-  div, li, td, th {
-    color: inherit;
-  }
-
-  a {
-    color: var(--app-primary-color) !important;
-  }
-
-  a:visited {
-    color: var(--app-tertiary-color) !important;
-  }
-
-  .mat-mdc-card {
-    color: var(--app-text-color) !important;
-  }
-
-  .mat-mdc-card-content {
-    color: var(--app-text-color) !important;
-  }
-
-  .mat-mdc-card-title {
-    color: var(--app-text-color) !important;
-  }
-
-  .mat-mdc-card-subtitle {
-    color: var(--app-text-secondary) !important;
-  }
-
-  .breadcrumb-nav,
-  .breadcrumb-item,
-  .breadcrumb-current {
-    color: var(--app-text-color) !important;
-  }
-
-  .breadcrumb-link {
-    color: var(--app-primary-color) !important;
-  }
-
-  .mat-mdc-list-item {
-    color: var(--app-text-color) !important;
-  }
-
-  .mdc-list-item__primary-text {
-    color: var(--app-text-color) !important;
-  }
-
-  .mdc-list-item__secondary-text {
-    color: var(--app-text-secondary) !important;
-  }
-
-  .mat-mdc-form-field {
-    color: var(--app-text-color);
-  }
-
-  .mat-mdc-select-value {
-    color: var(--app-text-color) !important;
-  }
-
-  .mat-mdc-option {
-    color: var(--app-text-color) !important;
-  }
-
-  .mat-mdc-tab:not(.mat-mdc-tab-disabled) .mdc-tab__text-label {
-    color: var(--app-text-secondary) !important;
-  }
-
-  .mat-mdc-tab:not(.mat-mdc-tab-disabled).mdc-tab--active .mdc-tab__text-label {
-    color: var(--app-primary-color) !important;
+    background: var(--app-background-color);
+    color: var(--app-primary-color);
   }
 }
 
