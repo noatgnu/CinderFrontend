@@ -19,4 +19,12 @@
   display: flex;
   align-items: center;
   gap: 4px;
+
+  span {
+    color: var(--app-text-color);
+  }
+}
+
+p {
+  color: var(--app-text-secondary);
 }

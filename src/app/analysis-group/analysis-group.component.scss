@@ -5,7 +5,12 @@
   flex-direction: column;
   height: calc(100vh - 64px);
 }
-.analysis-main-content{
+
+.analysis-main-content {
   flex: 1;
+}
+
+p {
+  color: var(--app-text-color);
 }
 

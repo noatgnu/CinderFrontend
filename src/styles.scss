@@ -76,7 +76,11 @@ mat-sidenav {
     color: var(--app-text-color) !important;
   }
 
-  p, span, div, li, td, th, label, small {
+  p {
+    color: var(--app-text-color);
+  }
+
+  span, div, li, td, th, label, small {
     color: inherit;
   }
 
@@ -86,6 +90,26 @@ mat-sidenav {
 
   a:visited {
     color: var(--app-tertiary-color);
+  }
+
+  .mat-mdc-card {
+    color: var(--app-text-color);
+
+    p, span {
+      color: var(--app-text-color);
+    }
+  }
+
+  .mat-mdc-card-content {
+    color: var(--app-text-color);
+  }
+
+  .breadcrumb-nav {
+    color: var(--app-text-color);
+  }
+
+  .mat-mdc-list-item {
+    color: var(--app-text-color);
   }
 }
 
