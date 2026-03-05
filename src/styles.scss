@@ -201,10 +201,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .spacer { flex: 1 1 auto; }
 
 body.dark-theme {
-  * {
-    color: inherit;
-  }
-
   p, span, div, h1, h2, h3, h4, h5, h6, label, a, li, td, th, small, strong, b, i, em {
     color: #ede0dd;
   }
@@ -217,6 +213,16 @@ body.dark-theme {
 
   .text-hint {
     color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  .mat-mdc-tooltip {
+    --mdc-plain-tooltip-container-color: #534341;
+    --mdc-plain-tooltip-supporting-text-color: #ede0dd;
+  }
+
+  .mdc-tooltip__surface {
+    background-color: #534341 !important;
+    color: #ede0dd !important;
   }
 }
 
