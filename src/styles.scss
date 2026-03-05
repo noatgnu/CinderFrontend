@@ -61,7 +61,8 @@ mat-sidenav {
   }
 }
 
-.dark-theme {
+.dark-theme,
+body.dark-theme .cdk-overlay-container {
   @include mat.all-component-themes(m3.$dark-theme);
   @include mat.system-level-colors(m3.$dark-theme);
   @include mat.system-level-typography(m3.$dark-theme);
@@ -90,28 +91,6 @@ mat-sidenav {
   .header-container {
     background: var(--app-background-color);
     color: var(--app-primary-color);
-  }
-
-  p, span, div, h1, h2, h3, h4, h5, h6, label, li, td, th {
-    color: inherit;
-  }
-
-  .mat-mdc-card-title,
-  .mat-mdc-card-subtitle,
-  .mat-mdc-card-content,
-  .mdc-list-item__primary-text,
-  .mdc-list-item__secondary-text,
-  .mat-mdc-tab-labels,
-  .mat-mdc-menu-content,
-  .mat-mdc-menu-item-text,
-  .mat-mdc-option,
-  .mat-mdc-select-value-text {
-    color: var(--app-text-color) !important;
-  }
-
-  .mat-mdc-form-field-hint,
-  .mat-mdc-form-field-error {
-    color: var(--app-text-secondary) !important;
   }
 }
 
@@ -200,31 +179,6 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .spacer { flex: 1 1 auto; }
 
-body.dark-theme {
-  p, span, div, h1, h2, h3, h4, h5, h6, label, a, li, td, th, small, strong, b, i, em {
-    color: #ede0dd;
-  }
-
-  .text-secondary, .search-hint, .hint, .hint-text, .section-hint,
-  .column-count, .item-conditions, .file-size, .progress-text, .upload-hint,
-  .project-hint, .section-title {
-    color: #d8c2be !important;
-  }
-
-  .text-hint {
-    color: rgba(255, 255, 255, 0.5) !important;
-  }
-
-  .mat-mdc-tooltip {
-    --mdc-plain-tooltip-container-color: #534341;
-    --mdc-plain-tooltip-supporting-text-color: #ede0dd;
-  }
-
-  .mdc-tooltip__surface {
-    background-color: #534341 !important;
-    color: #ede0dd !important;
-  }
-}
 
 .loading-overlay {
   position: fixed;
