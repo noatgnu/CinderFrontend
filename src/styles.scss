@@ -25,7 +25,47 @@
   --app-brand-color: #ba0000;
 }
 
-body.dark-theme {
+mat-sidenav {
+  border-radius: 0 !important;
+}
+
+.light-theme {
+  @include mat.all-component-themes(m3.$light-theme);
+  @include mat.system-level-colors(m3.$light-theme);
+  @include mat.system-level-typography(m3.$light-theme);
+
+  --app-text-color: #201a19;
+  --app-text-secondary: #534341;
+  --app-text-hint: rgba(0, 0, 0, 0.38);
+  --app-primary-color: #c00100;
+  --app-on-primary: #ffffff;
+  --app-secondary-color: #ba005c;
+  --app-tertiary-color: #705c2e;
+  --app-error-color: #ba1a1a;
+  --app-surface-color: #fffbff;
+  --app-surface-variant: #f5ddda;
+  --app-background-color: #fffbff;
+  --app-outline-color: #857370;
+  --app-outline-variant: #d8c2be;
+  --app-divider-color: rgba(0, 0, 0, 0.12);
+  --app-hover-overlay: rgba(0, 0, 0, 0.04);
+  --app-card-background: #fffbff;
+  --app-brand-color: #ba0000;
+
+  background: var(--app-background-color);
+  color: var(--app-text-color);
+
+  .header-container {
+    background: var(--app-background-color);
+    color: var(--app-primary-color);
+  }
+}
+
+.dark-theme {
+  @include mat.all-component-themes(m3.$dark-theme);
+  @include mat.system-level-colors(m3.$dark-theme);
+  @include mat.system-level-typography(m3.$dark-theme);
+
   --app-text-color: #ede0dd;
   --app-text-secondary: #d8c2be;
   --app-text-hint: rgba(255, 255, 255, 0.5);
@@ -43,29 +83,7 @@ body.dark-theme {
   --app-hover-overlay: rgba(255, 255, 255, 0.08);
   --app-card-background: #201a19;
   --app-brand-color: #ffb4a8;
-}
 
-mat-sidenav {
-  border-radius: 0 !important;
-}
-
-.light-theme {
-  @include mat.all-component-themes(m3.$light-theme);
-  @include mat.system-level-colors(m3.$light-theme);
-  @include mat.system-level-typography(m3.$light-theme);
-  background: var(--app-background-color);
-  color: var(--app-text-color);
-
-  .header-container {
-    background: var(--app-background-color);
-    color: var(--app-primary-color);
-  }
-}
-
-.dark-theme {
-  @include mat.all-component-themes(m3.$dark-theme);
-  @include mat.system-level-colors(m3.$dark-theme);
-  @include mat.system-level-typography(m3.$dark-theme);
   background: var(--app-background-color);
   color: var(--app-text-color);
 

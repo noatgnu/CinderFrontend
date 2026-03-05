@@ -19,7 +19,32 @@ export class AccountsService {
   is_staff: boolean = false
   currentUser: User|null = null
   userSession?: UserSession
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.initializeTheme();
+  }
+
+  private initializeTheme() {
+    const body = document.getElementsByTagName('body')[0];
+    if (!body) return;
+
+    const userAccount = localStorage.getItem("cinderUserAccount");
+    if (userAccount) {
+      try {
+        const parsed = JSON.parse(userAccount);
+        if (parsed.darkMode) {
+          body.classList.add('dark-theme');
+          body.classList.remove('light-theme');
+        } else {
+          body.classList.remove('dark-theme');
+          body.classList.add('light-theme');
+        }
+      } catch {
+        body.classList.add('light-theme');
+      }
+    } else {
+      body.classList.add('light-theme');
+    }
+  }
 
   login(username: string, password: string): Observable<any> {
     this.loggedIn = false
