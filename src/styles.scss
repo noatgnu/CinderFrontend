@@ -65,7 +65,7 @@ mat-sidenav {
   --app-card-background: #{mat.get-theme-color(m3.$dark-theme, surface)};
   --app-brand-color: #ff8a78;
 
-  color: var(--app-text-color);
+  color: var(--app-text-color) !important;
 
   .header-container {
     background: mat.get-theme-color(m3.$dark-theme, background);
@@ -76,40 +76,78 @@ mat-sidenav {
     color: var(--app-text-color) !important;
   }
 
-  p {
-    color: var(--app-text-color);
+  p, span, label, small {
+    color: var(--app-text-color) !important;
   }
 
-  span, div, li, td, th, label, small {
+  div, li, td, th {
     color: inherit;
   }
 
   a {
-    color: var(--app-primary-color);
+    color: var(--app-primary-color) !important;
   }
 
   a:visited {
-    color: var(--app-tertiary-color);
+    color: var(--app-tertiary-color) !important;
   }
 
   .mat-mdc-card {
-    color: var(--app-text-color);
-
-    p, span {
-      color: var(--app-text-color);
-    }
+    color: var(--app-text-color) !important;
   }
 
   .mat-mdc-card-content {
-    color: var(--app-text-color);
+    color: var(--app-text-color) !important;
   }
 
-  .breadcrumb-nav {
-    color: var(--app-text-color);
+  .mat-mdc-card-title {
+    color: var(--app-text-color) !important;
+  }
+
+  .mat-mdc-card-subtitle {
+    color: var(--app-text-secondary) !important;
+  }
+
+  .breadcrumb-nav,
+  .breadcrumb-item,
+  .breadcrumb-current {
+    color: var(--app-text-color) !important;
+  }
+
+  .breadcrumb-link {
+    color: var(--app-primary-color) !important;
   }
 
   .mat-mdc-list-item {
+    color: var(--app-text-color) !important;
+  }
+
+  .mdc-list-item__primary-text {
+    color: var(--app-text-color) !important;
+  }
+
+  .mdc-list-item__secondary-text {
+    color: var(--app-text-secondary) !important;
+  }
+
+  .mat-mdc-form-field {
     color: var(--app-text-color);
+  }
+
+  .mat-mdc-select-value {
+    color: var(--app-text-color) !important;
+  }
+
+  .mat-mdc-option {
+    color: var(--app-text-color) !important;
+  }
+
+  .mat-mdc-tab:not(.mat-mdc-tab-disabled) .mdc-tab__text-label {
+    color: var(--app-text-secondary) !important;
+  }
+
+  .mat-mdc-tab:not(.mat-mdc-tab-disabled).mdc-tab--active .mdc-tab__text-label {
+    color: var(--app-primary-color) !important;
   }
 }
 
