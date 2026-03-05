@@ -5,6 +5,8 @@ import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {provideHttpClient, withInterceptors} from "@angular/common/http";
 import {authInterceptor} from "./auth.interceptor";
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { ThemedOverlayContainer } from './themed-overlay-container';
 
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { PlotlyModule } from 'angular-plotly.js';
@@ -22,6 +24,7 @@ export const appConfig: ApplicationConfig = {
         withInterceptors([authInterceptor])
       ),
       provideAnimationsAsync(),
-      importProvidersFrom(PlotlyModule.forRoot(PlotlyJS))
+      importProvidersFrom(PlotlyModule.forRoot(PlotlyJS)),
+      { provide: OverlayContainer, useClass: ThemedOverlayContainer }
     ]
 };

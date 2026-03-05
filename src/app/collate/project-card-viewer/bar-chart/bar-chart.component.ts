@@ -82,6 +82,11 @@ export class BarChartComponent implements OnDestroy {
       b: 100,
       t: 100,
     },
+    xaxis: {
+      tickfont: {
+        size: 14
+      }
+    },
     yaxis: {
       title: this.searchTerm,
       tickfont: {

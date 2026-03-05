@@ -62,7 +62,7 @@ mat-sidenav {
 }
 
 .dark-theme,
-body.dark-theme .cdk-overlay-container {
+.cdk-overlay-container.dark-theme {
   @include mat.all-component-themes(m3.$dark-theme);
   @include mat.system-level-colors(m3.$dark-theme);
   @include mat.system-level-typography(m3.$dark-theme);
