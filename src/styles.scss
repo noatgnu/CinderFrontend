@@ -93,29 +93,6 @@ mat-sidenav {
   }
 }
 
-.cdk-overlay-container.dark-theme {
-  @include mat.all-component-themes(m3.$dark-theme);
-  @include mat.system-level-colors(m3.$dark-theme);
-  @include mat.system-level-typography(m3.$dark-theme);
-
-  --app-text-color: #ede0dd;
-  --app-text-secondary: #d8c2be;
-  --app-text-hint: rgba(255, 255, 255, 0.5);
-  --app-primary-color: #ffb4a8;
-  --app-on-primary: #690000;
-  --app-secondary-color: #ffb1c5;
-  --app-tertiary-color: #dec48c;
-  --app-error-color: #ffb4ab;
-  --app-surface-color: #201a19;
-  --app-surface-variant: #534341;
-  --app-background-color: #201a19;
-  --app-outline-color: #a08c89;
-  --app-outline-variant: #534341;
-  --app-divider-color: rgba(255, 255, 255, 0.12);
-  --app-hover-overlay: rgba(255, 255, 255, 0.08);
-  --app-card-background: #201a19;
-  --app-brand-color: #ffb4a8;
-}
 
 .compact-mode {
   .mat-mdc-list-base {
