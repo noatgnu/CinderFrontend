@@ -42,7 +42,7 @@
             <input matInput formControlName="curtain_link" type="text" placeholder="Curtain Link" [readonly]="!canEdit">
             <mat-label>Curtain Link</mat-label>
           </mat-form-field>
-          <button mat-icon-button (click)="refreshCurtainLink()" [disabled]="!canEdit" type="button">
+          <button mat-icon-button (click)="refreshCurtainLink()" [disabled]="!canEdit" type="button" aria-label="Refresh Curtain link">
             <mat-icon>refresh</mat-icon>
           </button>
         </div>
@@ -102,9 +102,9 @@
           <app-upload-file (fileUploaded)="handleFileUploaded($event, 'df')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'df'"></app-upload-file>
         }
         @if (analysisGroupDF) {
-          <button mat-icon-button (click)="downloadFile(analysisGroupDF)"><mat-icon>download</mat-icon></button>
+          <button mat-icon-button (click)="downloadFile(analysisGroupDF)" aria-label="Download differential analysis file"><mat-icon>download</mat-icon></button>
           @if (canEdit) {
-            <button mat-icon-button (click)="deleteFile(analysisGroupDF)"><mat-icon>delete</mat-icon></button>
+            <button mat-icon-button (click)="deleteFile(analysisGroupDF)" aria-label="Delete differential analysis file"><mat-icon>delete</mat-icon></button>
             <button mat-flat-button color="primary" (click)="openExtraDataModal(analysisGroupDF)" [disabled]="!accounts.loggedIn">Extra Data</button>
           }
         }
@@ -117,9 +117,9 @@
           <app-upload-file (fileUploaded)="handleFileUploaded($event, 'searched')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'searched'"></app-upload-file>
         }
         @if (analysisGroupSearched) {
-          <button mat-icon-button (click)="downloadFile(analysisGroupSearched)"><mat-icon>download</mat-icon></button>
+          <button mat-icon-button (click)="downloadFile(analysisGroupSearched)" aria-label="Download searched file"><mat-icon>download</mat-icon></button>
           @if (canEdit) {
-            <button mat-icon-button (click)="deleteFile(analysisGroupSearched)"><mat-icon>delete</mat-icon></button>
+            <button mat-icon-button (click)="deleteFile(analysisGroupSearched)" aria-label="Delete searched file"><mat-icon>delete</mat-icon></button>
             <button mat-flat-button color="primary" (click)="openExtraDataModal(analysisGroupSearched)" [disabled]="!accounts.loggedIn">Extra Data</button>
           }
         }
@@ -132,9 +132,9 @@
           <app-upload-file (fileUploaded)="handleFileUploaded($event, 'copy_number')" [analysisGroupId]="analysisGroup.id" [fileCategory]="'copy_number'"></app-upload-file>
         }
         @if (analysisGroupCopyNumber) {
-          <button mat-icon-button (click)="downloadFile(analysisGroupCopyNumber)"><mat-icon>download</mat-icon></button>
+          <button mat-icon-button (click)="downloadFile(analysisGroupCopyNumber)" aria-label="Download copy number file"><mat-icon>download</mat-icon></button>
           @if (canEdit) {
-            <button mat-icon-button (click)="deleteFile(analysisGroupCopyNumber)"><mat-icon>delete</mat-icon></button>
+            <button mat-icon-button (click)="deleteFile(analysisGroupCopyNumber)" aria-label="Delete copy number file"><mat-icon>delete</mat-icon></button>
             <button mat-flat-button color="primary" (click)="openExtraDataModal(analysisGroupCopyNumber)" [disabled]="!canEdit">Extra Data</button>
           }
         }

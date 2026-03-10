@@ -6,8 +6,10 @@
       @if (projectConditionMap[p.id]) {
         @for (c of projectConditionMap[p.id]; track c) {
           <div class="condition-row">
-            <ngx-colors ngx-colors-trigger [(ngModel)]="projectConditionColorMap[p.id][c]"></ngx-colors>
-            <div class="condition-name">{{c}}</div>
+            <label class="color-label">
+              <input type="color" class="color-picker" [(ngModel)]="projectConditionColorMap[p.id][c]" [attr.aria-label]="'Color for ' + c">
+              <span class="condition-name">{{c}}</span>
+            </label>
           </div>
         }
       }

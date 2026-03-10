@@ -3,17 +3,60 @@
 }
 
 .project-name {
-  font-weight: bold;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--app-text-color);
   margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--app-divider-color);
 }
 
 .condition-row {
+  margin-bottom: 6px;
+}
+
+.color-label {
   display: flex;
-  gap: 5px;
+  gap: 8px;
   align-items: center;
-  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.color-picker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--app-outline-variant);
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 2px;
+  }
+
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+  }
+
+  &::-moz-color-swatch {
+    border: none;
+    border-radius: 2px;
+  }
+
+  &:hover {
+    border-color: var(--app-primary-color);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--app-primary-color);
+    box-shadow: 0 0 0 2px rgba(192, 1, 0, 0.2);
+  }
 }
 
 .condition-name {
-  font-size: 14px;
+  font-size: 13px;
+  color: var(--app-text-color);
 }

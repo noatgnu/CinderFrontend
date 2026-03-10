@@ -217,3 +217,42 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--app-primary-color);
+  color: white;
+  padding: 8px 16px;
+  z-index: 10000;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 0 0 4px 0;
+  transition: top 0.2s;
+
+  &:focus {
+    top: 0;
+    outline: 2px solid var(--app-primary-color);
+    outline-offset: 2px;
+  }
+}
+
+*:focus-visible {
+  outline: 2px solid var(--app-primary-color);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--app-primary-color);
+  outline-offset: 2px;
+}
+
+.mat-mdc-icon-button:focus-visible {
+  outline: 2px solid var(--app-primary-color);
+  outline-offset: 2px;
+}

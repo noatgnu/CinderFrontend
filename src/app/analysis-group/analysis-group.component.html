@@ -4,7 +4,7 @@
       <mat-toolbar>
         <mat-toolbar-row>
           <span>Analysis Group</span>
-          <button mat-icon-button (click)="openCreateAnalysisGroupDialog()">
+          <button mat-icon-button (click)="openCreateAnalysisGroupDialog()" aria-label="Create new analysis group">
             <mat-icon>create_new_folder</mat-icon>
           </button>
         </mat-toolbar-row>
@@ -41,7 +41,7 @@
     <mat-toolbar>
       <mat-toolbar-row>
         <div style="display: flex; flex-direction: row; justify-content: center; align-items: center">
-          <button mat-icon-button (click)="toggleSidePanel()"><mat-icon>menu</mat-icon></button>
+          <button mat-icon-button (click)="toggleSidePanel()" aria-label="Toggle sidebar"><mat-icon>menu</mat-icon></button>
           <span>
             @if (selectedAnalysisGroup) {
               {{selectedAnalysisGroup.name}} ({{dataService.getAnalysisGroupTypeLabel(selectedAnalysisGroup.analysis_group_type)}})

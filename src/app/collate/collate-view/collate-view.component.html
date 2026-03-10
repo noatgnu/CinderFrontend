@@ -12,10 +12,10 @@
 } @else {
   <mat-toolbar>
     <mat-toolbar-row>
-      <a href="/#/home" class="logo-link"><img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'"></a>
+      <a href="/#/home" class="logo-link" aria-label="Go to home"><img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'" alt="C|nder logo"></a>
       <span class="spacer"></span>
       @if (collate) {
-        <button mat-icon-button [matMenuTriggerFor]="previousSearch" matTooltip="View previous searches">
+        <button mat-icon-button [matMenuTriggerFor]="previousSearch" matTooltip="View previous searches" aria-label="View previous searches">
           <mat-icon>history</mat-icon>
         </button>
         <mat-menu #previousSearch="matMenu">
@@ -30,14 +30,14 @@
           }
         </mat-menu>
       }
-      <button mat-icon-button (click)="openQRCodeDialog()" matTooltip="Share QR Code">
+      <button mat-icon-button (click)="openQRCodeDialog()" matTooltip="Share QR Code" aria-label="Share QR Code">
         <mat-icon>qr_code</mat-icon>
       </button>
-      <button mat-icon-button (click)="openVisibilityDialog()" matTooltip="Change Analysis Group Visibility">
+      <button mat-icon-button (click)="openVisibilityDialog()" matTooltip="Change Analysis Group Visibility" aria-label="Change Analysis Group Visibility">
         <mat-icon>visibility</mat-icon>
       </button>
       @if (accounts.loggedIn) {
-        <button mat-icon-button (click)="navigateToEdit()" matTooltip="Edit Collate">
+        <button mat-icon-button (click)="navigateToEdit()" matTooltip="Edit Collate" aria-label="Edit Collate">
           <mat-icon>edit</mat-icon>
         </button>
       }

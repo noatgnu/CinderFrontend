@@ -14,7 +14,7 @@
         <mat-form-field class="full-width">
           <input matInput [value]="userTokenLink" type="text" readonly>
           <mat-label>Registration Link</mat-label>
-          <button mat-icon-button  matSuffix (click)="copyTokenLink()">
+          <button mat-icon-button matSuffix (click)="copyTokenLink()" aria-label="Copy registration link">
             <mat-icon>content_paste</mat-icon>
           </button>
         </mat-form-field>

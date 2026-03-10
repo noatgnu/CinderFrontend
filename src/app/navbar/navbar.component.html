@@ -2,7 +2,7 @@
   <mat-toolbar>
     <mat-toolbar-row>
       <div class="logo-container">
-        <img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'">
+        <img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'" alt="C|nder logo">
         <a href="/#/home" class="logo-text">C|nder</a>
       </div>
 
@@ -34,16 +34,16 @@
         </button>
       }
 
-      <button mat-icon-button class="nav-icon-button" [matMenuTriggerFor]="menu" matTooltip="Navigation menu">
+      <button mat-icon-button class="nav-icon-button" [matMenuTriggerFor]="menu" matTooltip="Navigation menu" aria-label="Navigation menu">
         <mat-icon>view_list</mat-icon>
       </button>
 
       @if (accounts.loggedIn) {
-        <button mat-icon-button class="logout-button" matTooltip="Logout" (click)="logout()">
+        <button mat-icon-button class="logout-button" matTooltip="Logout" aria-label="Logout" (click)="logout()">
           <mat-icon>logout</mat-icon>
         </button>
       } @else {
-        <button mat-icon-button class="nav-icon-button" matTooltip="Login" (click)="openLoginDialog()">
+        <button mat-icon-button class="nav-icon-button" matTooltip="Login" aria-label="Login" (click)="openLoginDialog()">
           <mat-icon>login</mat-icon>
         </button>
       }

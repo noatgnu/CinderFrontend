@@ -38,7 +38,7 @@
   <div class="search-session-main-content">
     <mat-toolbar>
       <mat-toolbar-row>
-        <button mat-icon-button (click)="toggleSidePanel()"><mat-icon>menu</mat-icon></button>
+        <button mat-icon-button (click)="toggleSidePanel()" aria-label="Toggle sidebar"><mat-icon>menu</mat-icon></button>
         <div>
           @if (searchSession) {
             <a href="/#/search-session/{{searchSession.id}}"><span style="color:#ba0000"><b>{{searchSession.search_term}}</b></span></a>
@@ -48,7 +48,7 @@
         </div>
         <div class="spacer"></div>
         @if (searchSession) {
-          <button mat-icon-button color="accent" (click)="deleteSearchSession(searchSession.id)">
+          <button mat-icon-button color="accent" (click)="deleteSearchSession(searchSession.id)" aria-label="Delete search session">
             <mat-icon>delete</mat-icon>
           </button>
         }

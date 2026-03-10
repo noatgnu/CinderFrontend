@@ -32,7 +32,6 @@
     "cytoscape-pdf-export": "^0.0.3",
     "cytoscape-popper": "^4.0.1",
     "jssha": "^3.3.1",
-    "ngx-colors": "^3.6.0",
     "parchment": "^3.0.0",
     "plotly.js-dist-min": "^3.4.0",
     "qr-code-styling": "1.9.2",

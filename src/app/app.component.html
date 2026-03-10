@@ -1,9 +1,10 @@
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <app-navbar></app-navbar>
-<div class="container">
+<main id="main-content" class="container" tabindex="-1">
   @if (ready) {
     <router-outlet></router-outlet>
   }
-</div>
+</main>
 <app-operation-center></app-operation-center>
 <app-command-palette></app-command-palette>
 

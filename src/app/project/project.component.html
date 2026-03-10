@@ -4,7 +4,7 @@
       <mat-toolbar>
         <mat-toolbar-row>
           <span>Project</span>
-          <button mat-icon-button (click)="openCreateProjectDialog()" matTooltip="Create new project">
+          <button mat-icon-button (click)="openCreateProjectDialog()" matTooltip="Create new project" aria-label="Create new project">
             <mat-icon>create_new_folder</mat-icon>
           </button>
         </mat-toolbar-row>
@@ -43,7 +43,7 @@
     <mat-toolbar>
       <mat-toolbar-row>
         <div class="toolbar-content">
-          <button mat-icon-button (click)="toggleSidePanel()" matTooltip="Toggle sidebar"><mat-icon>menu</mat-icon></button>
+          <button mat-icon-button (click)="toggleSidePanel()" matTooltip="Toggle sidebar" aria-label="Toggle sidebar"><mat-icon>menu</mat-icon></button>
           <span>@if (selectedProject) {
             {{selectedProject.name}}
           } @else {
