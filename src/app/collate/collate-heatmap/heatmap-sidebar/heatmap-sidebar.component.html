@@ -1,4 +1,13 @@
 <div class="sidebar">
+  <div class="back-section">
+    <button mat-stroked-button class="back-btn" (click)="backClick.emit()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Search
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
   <div class="sidebar-section">
     <div class="section-header">
       <span class="section-title">Filter Proteins</span>

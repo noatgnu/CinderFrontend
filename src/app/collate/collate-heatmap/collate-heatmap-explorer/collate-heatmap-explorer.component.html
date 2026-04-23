@@ -31,7 +31,8 @@
         [projects]="projects"
         [projectAnalysisGroups]="projectAnalysisGroups"
         [state]="viewState"
-        (stateChange)="onStateChange($event)">
+        (stateChange)="onStateChange($event)"
+        (backClick)="navigateToStandardView()">
       </app-heatmap-sidebar>
 
       <div class="main-panel">

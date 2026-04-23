@@ -6,7 +6,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
-import { MatIconButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { Collate } from '../../collate';
 import { Project } from '../../../project/project';
@@ -25,6 +25,7 @@ import { HeatmapViewState } from '../collate-heatmap.types';
     MatSlideToggle,
     MatDivider,
     MatIcon,
+    MatButton,
     MatIconButton,
     MatTooltip,
   ],
@@ -37,6 +38,7 @@ export class HeatmapSidebarComponent {
   @Input() projectAnalysisGroups: { [projectId: number]: AnalysisGroup[] } = {};
   @Input() state!: HeatmapViewState;
   @Output() stateChange = new EventEmitter<HeatmapViewState>();
+  @Output() backClick = new EventEmitter<void>();
 
   collapsedProjects: Set<number> = new Set();
 
