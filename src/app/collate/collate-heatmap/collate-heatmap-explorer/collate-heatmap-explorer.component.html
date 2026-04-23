@@ -1,0 +1,56 @@
+@if (isLoading) {
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading collate...</p>
+  </div>
+} @else if (errorMessage) {
+  <div class="error-container">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ errorMessage }}</p>
+  </div>
+} @else {
+  <mat-toolbar>
+    <mat-toolbar-row>
+      <a href="/#/home" class="logo-link" aria-label="Go to home">
+        <img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'" alt="C|nder logo">
+      </a>
+      <span class="toolbar-title">{{ collate?.title }} — Heatmap</span>
+      <span class="spacer"></span>
+      <button mat-icon-button (click)="navigateToStandardView()" matTooltip="Back to standard view" aria-label="Back to standard view">
+        <mat-icon>view_list</mat-icon>
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+  <app-breadcrumb></app-breadcrumb>
+
+  @if (searchTerms.length > 0) {
+    <div class="explorer-layout">
+      <app-heatmap-sidebar
+        [collate]="collate"
+        [projects]="projects"
+        [projectAnalysisGroups]="projectAnalysisGroups"
+        [state]="viewState"
+        (stateChange)="onStateChange($event)">
+      </app-heatmap-sidebar>
+
+      <div class="main-panel">
+        <app-heatmap-tab-panel
+          [searchTerms]="searchTerms"
+          [dataByTerm]="heatmapDataByTerm"
+          [selectedIndex]="selectedTermIndex"
+          (selectedIndexChange)="onTermIndexChange($event)">
+        </app-heatmap-tab-panel>
+      </div>
+    </div>
+  } @else if (collate) {
+    <div class="empty-state">
+      <mat-icon>bar_chart</mat-icon>
+      <p>No search results loaded</p>
+      <span>Navigate to the standard collate view and run a search first.</span>
+      <button mat-icon-button (click)="navigateToStandardView()" matTooltip="Go to standard view">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+  }
+}

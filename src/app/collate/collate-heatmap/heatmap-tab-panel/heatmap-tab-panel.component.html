@@ -1,0 +1,26 @@
+<div class="tab-panel">
+  <mat-tab-group
+    [selectedIndex]="selectedIndex"
+    (selectedIndexChange)="onTabChange($event)"
+    [mat-stretch-tabs]="false"
+    animationDuration="150ms">
+    @for (term of searchTerms; track term) {
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">search</mat-icon>
+          <span>{{ term }}</span>
+        </ng-template>
+        <div class="tab-content">
+          @if (hasData(term)) {
+            <app-heatmap-plot [data]="dataByTerm[term]"></app-heatmap-plot>
+          } @else {
+            <div class="no-data">
+              <mat-icon>filter_alt_off</mat-icon>
+              <p>No proteins pass the current filters for <strong>{{ term }}</strong></p>
+            </div>
+          }
+        </div>
+      </mat-tab>
+    }
+  </mat-tab-group>
+</div>

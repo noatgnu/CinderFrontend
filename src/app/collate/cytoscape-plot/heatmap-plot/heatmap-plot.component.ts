@@ -52,220 +52,178 @@ export class HeatmapPlotComponent {
     modeBarButtonsToRemove: ['zoom2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d', 'pan2d', 'select2d', 'lasso2d'],
     displaylogo: false
   };
-  drawHeatmap() {
-    // Group data by project
-    const projectGroups: any = {};
+  drawHeatmap(): void {
+    if (!this.data.length) return;
+
+    this.reversePointIndexToProject = {};
+    this.reversePointIndexToColumn = {};
+    this.reversePointIndexToData = {};
+
+    const searchTerm = this.data[0].searchTerm;
+
+    const projectGroups: Record<string, HeatmapDataPoint[]> = {};
     for (const d of this.data) {
-      if (!projectGroups[d.project]) {
-        projectGroups[d.project] = [];
-      }
-      projectGroups[d.project].push(d);
+      (projectGroups[d.project] ??= []).push(d);
     }
 
-    // Sort data within each project by comparison
     for (const project in projectGroups) {
-      projectGroups[project].sort((a: any, b: any) => a.comparison.localeCompare(b.comparison));
+      projectGroups[project].sort((a, b) => {
+        const c = a.comparison.localeCompare(b.comparison);
+        return c !== 0 ? c : a.protein.localeCompare(b.protein);
+      });
     }
 
-    // Transform data to heatmap
-    const x: string[] = [];
+    const xNums: number[] = [];
     const y: string[] = [];
-    const text: string[] = [];
     const z: number[] = [];
     const tickvals: number[] = [];
     const ticktext: string[] = [];
-    let tickIndex = 0;
+    const shapes: any[] = [];
 
-    let lastProject = '';
-    const searchTerm = this.data[0].searchTerm;
+    let colOffset = 0;
+    let dataIdx = 0;
+
     for (const project in projectGroups) {
       const group = projectGroups[project];
-      let inGroupIndex = 0;
-      let lastComparison = '';
 
-
+      const colKeys: string[] = [];
+      const seenCols = new Set<string>();
       for (const d of group) {
-        const comparison = `${d.analysis_group} ${d.conditionA} vs ${d.conditionB}`;
-        x.push(`${comparison} ${d.project} ${inGroupIndex}`);
-        y.push(d.protein);
-        z.push(d.log2fc);
-        text.push(`${d.project}`);
-        if (inGroupIndex === 0) {
-          tickvals.push(tickIndex);
-          ticktext.push(d.comparison);
-          lastComparison = d.comparison;
-        } else if (d.comparison !== lastComparison) {
-          tickvals.push(tickIndex);
-          ticktext.push(d.comparison);
-          lastComparison = d.comparison;
-        } else {
-          tickvals.push(tickIndex);
-          ticktext.push('');
+        const ck = `${d.analysis_group}||${d.conditionA}||${d.conditionB}`;
+        if (!seenCols.has(ck)) {
+          seenCols.add(ck);
+          colKeys.push(ck);
         }
-
-        inGroupIndex++;
-        tickIndex++;
       }
-      lastProject = project;
-    }
-    // disable hoverinfo
-    const trace = {
-      x: x,
-      y: y,
-      z: z,
-      text: text,
-      type: 'heatmap',
-      colorscale: 'Viridis',
-      colorbar: {
-        orientation: 'h',
-      },
-      hoverinfo: 'none'
-    };
 
-    // Calculate shapes for each project and individual columns
-    const shapes = [];
-    let currentIndex = 0;
-    for (const project in projectGroups) {
-      const group = projectGroups[project];
-      const groupSize = group.length;
-      const projectShape = {
+      const colIndexMap = new Map<string, number>();
+      colKeys.forEach((ck, ci) => colIndexMap.set(ck, ci));
+
+      const colRepresentative = new Map<string, HeatmapDataPoint>();
+      for (const d of group) {
+        const ck = `${d.analysis_group}||${d.conditionA}||${d.conditionB}`;
+        if (!colRepresentative.has(ck)) colRepresentative.set(ck, d);
+      }
+
+      const numCols = colKeys.length;
+
+      const projectShape: any = {
         type: 'rect',
-        x0: currentIndex - 0.5,
-        x1: currentIndex + groupSize - 0.5,
-        y0: 1,
-        y1: 0,
-        xref: 'x',
-        yref: 'paper',
-        line: {
-          color: 'red',
-          width: 4
-        },
+        x0: colOffset - 0.5,
+        x1: colOffset + numCols - 0.5,
+        y0: 1, y1: 0,
+        xref: 'x', yref: 'paper',
+        line: { color: 'red', width: 4 },
         fillcolor: 'rgba(0,0,0,0)',
         opacity: 0.5,
         hoverinfo: 'none',
-        hoveron: 'fills'
+        hoveron: 'fills',
       };
       shapes.push(projectShape);
 
-      let lastComparison = group[0].comparison
-      for (let i = 0; i < groupSize; i++) {
-        const horizontalLine = {
+      const columnShapes: any[] = [];
+      let lastComp = '';
+
+      colKeys.forEach((ck, ci) => {
+        const rep = colRepresentative.get(ck)!;
+        const colPos = colOffset + ci;
+
+        tickvals.push(colPos);
+        ticktext.push(rep.comparison !== lastComp ? rep.comparison : '');
+
+        if (ci > 0) {
+          const prevRep = colRepresentative.get(colKeys[ci - 1])!;
+          if (prevRep.comparison !== rep.comparison) {
+            shapes.push({
+              type: 'line',
+              x0: colPos - 0.5, x1: colPos - 0.5,
+              y0: 1, y1: 0,
+              xref: 'x', yref: 'paper',
+              line: { color: 'rgba(186,104,166)', width: 3 },
+            });
+          }
+        }
+
+        const prevComp = ci > 0 ? colRepresentative.get(colKeys[ci - 1])!.comparison : null;
+        const nextComp = ci < numCols - 1 ? colRepresentative.get(colKeys[ci + 1])!.comparison : null;
+        shapes.push({
           type: 'line',
-          x0: currentIndex +i,
-          x1: currentIndex + i,
-          y0: -0.1,
-          y1: -0.1,
-          xref: 'x',
-          yref: 'paper',
-          line: {
-            color: "rgb(179,0,137)",
-            width: 4
-          }
-        }
-        if (i === 0) {
-          horizontalLine.x0 = currentIndex +i - 0.4
-        }
-        if (i - 1 >=0) {
-          if (group[i].comparison !== group[i-1].comparison) {
-            horizontalLine.x0 = currentIndex +i- 0.4
-          } else {
-            horizontalLine.x0 = currentIndex +i- 0.5
-          }
-        }
-        if (group[i+1]) {
-          if (group[i].comparison !== group[i+1].comparison) {
-            horizontalLine.x1 = currentIndex +i+ 0.4
-          } else {
-            horizontalLine.x1 = currentIndex +i+ 0.5
-          }
-        } else {
-          if (group[i].comparison !== lastComparison) {
-            horizontalLine.x1 = currentIndex +i+ 0.4
-          } else {
-            horizontalLine.x1 = currentIndex +i+ 0.5
-          }
-        }
-        shapes.push(horizontalLine)
-      }
+          x0: (ci === 0 || prevComp !== rep.comparison) ? colPos - 0.4 : colPos - 0.5,
+          x1: (ci === numCols - 1 || nextComp !== rep.comparison) ? colPos + 0.4 : colPos + 0.5,
+          y0: -0.1, y1: -0.1,
+          xref: 'x', yref: 'paper',
+          line: { color: 'rgb(179,0,137)', width: 4 },
+        });
 
-      for (let i = 1; i < groupSize; i++) {
-        if (group[i].comparison !== lastComparison) {
-          const verticalLine = {
-            type: 'line',
-            x0: currentIndex + i - 0.5,
-            x1: currentIndex + i - 0.5,
-            y0: 1,
-            y1: 0,
-            xref: 'x',
-            yref: 'paper',
-            line: {
-              color: "rgba(186,104,166)",
-              width: 3
-            }
-          };
-          shapes.push(verticalLine);
-          lastComparison = group[i].comparison;
-        }
-      }
-
-      for (let i = 0; i < groupSize; i++) {
-        const columnShape = {
+        const columnShape: any = {
           type: 'rect',
-          x0: currentIndex + i - 0.5,
-          x1: currentIndex + i + 0.5,
-          y0: 1,
-          y1: 0,
-          xref: 'x',
-          yref: 'paper',
-          line: {
-            color: 'rgba(0,0,0,0)',
-            width: 2
-          },
+          x0: colPos - 0.5, x1: colPos + 0.5,
+          y0: 1, y1: 0,
+          xref: 'x', yref: 'paper',
+          line: { color: 'rgba(0,0,0,0)', width: 2 },
           fillcolor: 'rgba(0,0,0,0)',
           opacity: 0.5,
           hoverinfo: 'none',
-          hoveron: 'fills'
+          hoveron: 'fills',
         };
         shapes.push(columnShape);
-        this.reversePointIndexToProject[currentIndex + i] = projectShape;
-        this.reversePointIndexToColumn[currentIndex + i] = columnShape;
-        this.reversePointIndexToData[currentIndex + i] = group[i];
+        columnShapes.push(columnShape);
+
+        lastComp = rep.comparison;
+      });
+
+      for (const d of group) {
+        const ck = `${d.analysis_group}||${d.conditionA}||${d.conditionB}`;
+        const ci = colIndexMap.get(ck)!;
+        xNums.push(colOffset + ci);
+        y.push(d.protein);
+        z.push(d.log2fc);
+        this.reversePointIndexToProject[dataIdx] = projectShape;
+        this.reversePointIndexToColumn[dataIdx] = columnShapes[ci];
+        this.reversePointIndexToData[dataIdx] = d;
+        dataIdx++;
       }
-      currentIndex += groupSize;
+
+      colOffset += numCols;
     }
 
-    // Calculate width and height based on the number of unique cells
+    const trace = {
+      x: xNums,
+      y,
+      z,
+      type: 'heatmap',
+      colorscale: 'Viridis',
+      colorbar: { orientation: 'h' },
+      hoverinfo: 'none',
+    };
+
     const cellSize = 50;
-    const uniqueX = Array.from(new Set(x)).length;
     const uniqueY = Array.from(new Set(y)).length;
     const margin = { l: 300, r: 50, t: 100, b: 300 };
-    const width = uniqueX * cellSize + margin.l + margin.r;
-    const height = uniqueY * cellSize + margin.t + margin.b;
 
-    const layout: any = {
+    this.graphData = [trace];
+    this.layout = {
       title: `Search term: ${searchTerm}`,
-      width: width,
-      height: height,
-      margin: margin,
+      width: colOffset * cellSize + margin.l + margin.r,
+      height: uniqueY * cellSize + margin.t + margin.b,
+      margin,
       xaxis: {
         title: 'Analysis',
         showgrid: false,
         scaleanchor: 'y',
         scaleratio: 1,
-        tickvals: tickvals,
-        ticktext: ticktext,
+        tickvals,
+        ticktext,
         ticklen: 0,
-        fixedrange: true
+        fixedrange: true,
       },
       yaxis: {
         title: 'Protein',
         showgrid: false,
-        fixedrange: true
+        fixedrange: true,
       },
-      shapes: shapes
+      shapes,
     };
-    this.graphData = [trace];
-    this.layout = layout;
     this.revision++;
   }
 

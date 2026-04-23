@@ -1,0 +1,46 @@
+.tab-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  mat-tab-group {
+    flex: 1;
+    height: 100%;
+  }
+}
+
+.tab-content {
+  padding: 12px;
+  overflow: auto;
+}
+
+.tab-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 24px;
+  color: var(--app-text-secondary, #888);
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    text-align: center;
+  }
+}

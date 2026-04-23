@@ -369,6 +369,12 @@ export class CollateViewComponent implements OnDestroy {
     }
   }
 
+  openHeatmapView(): void {
+    if (this.collate && this.searchSession) {
+      this.router.navigate([`/collate/heatmap/${this.collate.id}/${this.searchSession.id}`]);
+    }
+  }
+
   navigateToEdit() {
     if (this.collate) {
       this.router.navigate([`/collate/edit/${this.collate.id}`]);

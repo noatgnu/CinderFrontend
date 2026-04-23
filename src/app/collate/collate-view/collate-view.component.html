@@ -30,6 +30,11 @@
           }
         </mat-menu>
       }
+      @if (searchSession && collate) {
+        <button mat-icon-button (click)="openHeatmapView()" matTooltip="Open Heatmap View" aria-label="Open Heatmap View">
+          <mat-icon>grid_on</mat-icon>
+        </button>
+      }
       <button mat-icon-button (click)="openQRCodeDialog()" matTooltip="Share QR Code" aria-label="Share QR Code">
         <mat-icon>qr_code</mat-icon>
       </button>

@@ -29,7 +29,11 @@ const routes: Routes = [
   {
     component: CollateEditorComponent,
     path: 'edit/:collateId',
-  }
+  },
+  {
+    path: 'heatmap',
+    loadChildren: () => import('./collate-heatmap/collate-heatmap.module').then(m => m.CollateHeatmapModule),
+  },
 
 ]
 @NgModule({

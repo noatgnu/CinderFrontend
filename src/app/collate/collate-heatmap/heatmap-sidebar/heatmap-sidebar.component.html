@@ -1,0 +1,80 @@
+<div class="sidebar">
+  <div class="sidebar-section">
+    <div class="section-header">
+      <span class="section-title">Filter Proteins</span>
+    </div>
+    <mat-form-field appearance="outline" class="full-width compact">
+      <mat-label>Name / ID</mat-label>
+      <input matInput [ngModel]="state.proteinFilter" (ngModelChange)="onProteinFilterChange($event)" placeholder="gene name, uniprot...">
+    </mat-form-field>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="sidebar-section">
+    <div class="section-header">
+      <span class="section-title">Significance Thresholds</span>
+      <button mat-icon-button matTooltip="Reset thresholds" (click)="resetFilters()" class="small-btn">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+    <mat-form-field appearance="outline" class="full-width compact">
+      <mat-label>|log2FC| ≥</mat-label>
+      <input matInput type="number" min="0" step="0.1"
+             [ngModel]="state.log2fcCutoff" (ngModelChange)="onLog2fcCutoffChange(+$event)">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width compact">
+      <mat-label>-log10(p) ≥</mat-label>
+      <input matInput type="number" min="0" step="0.5"
+             [ngModel]="state.pValueCutoff" (ngModelChange)="onPValueCutoffChange(+$event)">
+    </mat-form-field>
+    <div class="toggle-row">
+      <mat-slide-toggle
+        [checked]="state.maskSubThreshold"
+        (change)="onMaskToggle($event.checked)"
+        class="compact-toggle">
+        Exclude sub-threshold
+      </mat-slide-toggle>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="sidebar-section">
+    <div class="section-header">
+      <span class="section-title">Analysis Groups</span>
+    </div>
+    @for (project of projects; track project.id) {
+      @if (projectAnalysisGroups[project.id]?.length) {
+        <div class="project-group">
+          <div class="project-header" (click)="toggleProjectCollapse(project.id)">
+            <mat-icon class="collapse-icon">
+              {{ isProjectCollapsed(project.id) ? 'chevron_right' : 'expand_more' }}
+            </mat-icon>
+            <span class="project-name" [title]="project.name">{{ project.name }}</span>
+          </div>
+          @if (!isProjectCollapsed(project.id)) {
+            @for (ag of projectAnalysisGroups[project.id]; track ag.id) {
+              <div class="ag-row">
+                <mat-checkbox
+                  [checked]="isVisible(project.id, ag.id)"
+                  (change)="toggleVisibility(project.id, ag.id)"
+                  class="ag-checkbox">
+                  <span class="ag-name" [title]="ag.name">{{ ag.name }}</span>
+                </mat-checkbox>
+                <button
+                  mat-icon-button
+                  class="flip-btn"
+                  [class.flipped]="isFlipped(ag.id)"
+                  matTooltip="Flip log2FC sign"
+                  (click)="toggleFlip(ag.id)">
+                  <mat-icon>swap_vert</mat-icon>
+                </button>
+              </div>
+            }
+          }
+        </div>
+      }
+    }
+  </div>
+</div>

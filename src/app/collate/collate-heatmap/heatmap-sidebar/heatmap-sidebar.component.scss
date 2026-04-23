@@ -1,0 +1,139 @@
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  height: 100%;
+  overflow-y: auto;
+  border-right: 1px solid var(--app-border-color, #e0e0e0);
+  background: var(--app-surface-color, #fff);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sidebar-section {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--app-text-secondary, #666);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.compact {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  padding: 2px 0;
+}
+
+.compact-toggle {
+  font-size: 12px;
+}
+
+.small-btn {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.project-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 4px;
+}
+
+.project-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 3px 0;
+  border-radius: 4px;
+
+  &:hover {
+    background: var(--app-hover-color, rgba(0, 0, 0, 0.04));
+  }
+}
+
+.collapse-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--app-text-secondary, #666);
+}
+
+.project-name {
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+
+.ag-row {
+  display: flex;
+  align-items: center;
+  padding: 1px 0 1px 16px;
+  gap: 2px;
+}
+
+.ag-checkbox {
+  flex: 1;
+  min-width: 0;
+
+  .ag-name {
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 130px;
+    display: inline-block;
+  }
+}
+
+.flip-btn {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  color: var(--app-text-secondary, #999);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &.flipped {
+    color: var(--app-primary-color, #3f51b5);
+  }
+}
