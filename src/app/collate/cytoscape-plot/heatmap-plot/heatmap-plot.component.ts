@@ -17,8 +17,8 @@ export class HeatmapPlotComponent {
   private _data: HeatmapDataPoint[] = [];
   private _highlightedProtein: string | null = null;
 
-  @Input() set data(value: HeatmapDataPoint[]) {
-    this._data = value;
+  @Input() set data(value: HeatmapDataPoint[] | null | undefined) {
+    this._data = value ?? [];
     this.drawHeatmap();
   }
 
@@ -68,8 +68,8 @@ export class HeatmapPlotComponent {
 
     for (const project in projectGroups) {
       projectGroups[project].sort((a, b) => {
-        const c = a.comparison.localeCompare(b.comparison);
-        return c !== 0 ? c : a.protein.localeCompare(b.protein);
+        const c = (a.comparison ?? '').localeCompare(b.comparison ?? '');
+        return c !== 0 ? c : (a.protein ?? '').localeCompare(b.protein ?? '');
       });
     }
 

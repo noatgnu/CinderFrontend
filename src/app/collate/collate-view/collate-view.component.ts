@@ -326,7 +326,8 @@ export class CollateViewComponent implements OnDestroy {
     return filteredResults;
   }
 
-  filterDataBySearchTerm() {
+  filterDataBySearchTerm(index: number = this.selectedIndex) {
+    this.selectedIndex = index;
     this.selectedSearchTerm = this.searchTerms[this.selectedIndex];
     this.filteredResults = this.getFilteredSearchResults([this.selectedSearchTerm]);
     if (Object.keys(this.cytoscapePlotFilteredResults).length === 0 && this.filteredResults) {

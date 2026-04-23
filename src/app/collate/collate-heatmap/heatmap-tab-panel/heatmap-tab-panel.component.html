@@ -12,7 +12,7 @@
         </ng-template>
         <div class="tab-content">
           @if (hasData(term)) {
-            <app-heatmap-plot [data]="dataByTerm[term]"></app-heatmap-plot>
+            <app-heatmap-plot [data]="dataByTerm[term] ?? []"></app-heatmap-plot>
           } @else {
             <div class="no-data">
               <mat-icon>filter_alt_off</mat-icon>

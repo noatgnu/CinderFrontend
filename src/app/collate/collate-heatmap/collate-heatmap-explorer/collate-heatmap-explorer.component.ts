@@ -170,7 +170,7 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
           conditionB: r.condition_B,
           log2fc: flipped ? -r.log2_fc : r.log2_fc,
           p_value: r.log10_p,
-          comparison: r.comparison_label,
+          comparison: r.comparison_label ?? `${r.condition_A} vs ${r.condition_B}`,
           protein: r.gene_name ?? r.primary_id ?? r.uniprot_id ?? String(r.id),
           searchTerm: r.search_term,
         };

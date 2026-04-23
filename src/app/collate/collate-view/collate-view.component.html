@@ -86,7 +86,7 @@
     }
 
     <div class="search-results">
-      <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">
+      <mat-tab-group (selectedIndexChange)="filterDataBySearchTerm($event)" [selectedIndex]="selectedIndex" [mat-stretch-tabs]="false">
         @for (term of searchTerms; track term) {
           <mat-tab>
             <ng-template mat-tab-label>
