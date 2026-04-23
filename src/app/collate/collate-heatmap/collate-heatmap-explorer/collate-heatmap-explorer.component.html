@@ -36,12 +36,68 @@
       </app-heatmap-sidebar>
 
       <div class="main-panel">
-        <app-heatmap-tab-panel
-          [searchTerms]="searchTerms"
-          [dataByTerm]="heatmapDataByTerm"
+        @if (selectedProteinIds.size > 0) {
+          <div class="selection-bar">
+            <mat-icon>done_all</mat-icon>
+            <span>{{ selectedProteinIds.size }} protein{{ selectedProteinIds.size !== 1 ? 's' : '' }} selected</span>
+            <button mat-button (click)="createSubsetFromSelection()">
+              <mat-icon>add_chart</mat-icon>
+              Create subset
+            </button>
+            <button mat-button (click)="clearSelection()">
+              <mat-icon>clear</mat-icon>
+              Clear
+            </button>
+          </div>
+        }
+
+        <mat-tab-group
           [selectedIndex]="selectedTermIndex"
-          (selectedIndexChange)="onTermIndexChange($event)">
-        </app-heatmap-tab-panel>
+          (selectedIndexChange)="onTermIndexChange($event)"
+          [mat-stretch-tabs]="false"
+          animationDuration="100ms">
+          @for (term of searchTerms; track term) {
+            <mat-tab [label]="term">
+              <mat-tab-group
+                [selectedIndex]="getActiveSubsetIndex(term)"
+                (selectedIndexChange)="onSubsetTabChange(term, $event)"
+                [mat-stretch-tabs]="false"
+                animationDuration="100ms"
+                class="inner-tabs">
+                <mat-tab label="All proteins">
+                  @if (hasData(term)) {
+                    <app-heatmap-plot
+                      [data]="heatmapDataByTerm[term] ?? []"
+                      [selectedProteinIds]="selectedProteinIds"
+                      (proteinClicked)="onProteinClicked($event)">
+                    </app-heatmap-plot>
+                  } @else {
+                    <div class="no-data">
+                      <mat-icon>filter_alt_off</mat-icon>
+                      <p>No proteins pass the current filters for <strong>{{ term }}</strong></p>
+                    </div>
+                  }
+                </mat-tab>
+
+                @for (tab of getSubsetTabs(term); track tab.id) {
+                  <mat-tab>
+                    <ng-template mat-tab-label>
+                      <span>{{ tab.name }}</span>
+                      <button mat-icon-button class="close-tab-btn" (click)="removeSubsetTab(term, tab.id, $event)" matTooltip="Remove tab">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </ng-template>
+                    <app-heatmap-plot
+                      [data]="getSubsetData(term, tab.proteinIds)"
+                      [selectedProteinIds]="selectedProteinIds"
+                      (proteinClicked)="onProteinClicked($event)">
+                    </app-heatmap-plot>
+                  </mat-tab>
+                }
+              </mat-tab-group>
+            </mat-tab>
+          }
+        </mat-tab-group>
       </div>
     </div>
   } @else if (collate) {

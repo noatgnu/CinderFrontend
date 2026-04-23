@@ -57,4 +57,59 @@
   flex: 1;
   overflow: auto;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.selection-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(79, 70, 229, 0.1);
+  border-bottom: 1px solid rgba(79, 70, 229, 0.3);
+  font-size: 13px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: rgb(79, 70, 229);
+  }
+
+  span {
+    font-weight: 500;
+    color: rgb(79, 70, 229);
+  }
+
+  button {
+    font-size: 12px;
+  }
+}
+
+.inner-tabs {
+  --mat-tab-header-label-text-size: 12px;
+}
+
+.close-tab-btn {
+  --mdc-icon-button-state-layer-size: 20px;
+  --mdc-icon-button-icon-size: 14px;
+  padding: 0;
+  margin-left: 4px;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 16px;
+  color: var(--app-text-secondary);
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    opacity: 0.5;
+  }
 }

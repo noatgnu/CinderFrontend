@@ -39,6 +39,6 @@
     </div>
   }
   <div class="heatmap-content">
-    <plotly-plot (hover)="handleHoverIn($event)" (unhover)="handleHoverOut($event)" [data]="graphData" [layout]="layout" [config]="plotConfig" [updateOnlyWithRevision]="true" [revision]="revision"></plotly-plot>
+    <plotly-plot (hover)="handleHoverIn($event)" (unhover)="handleHoverOut($event)" (plotly_click)="onClick($event)" [data]="graphData" [layout]="layout" [config]="plotConfig" [updateOnlyWithRevision]="true" [revision]="revision"></plotly-plot>
   </div>
 </div>

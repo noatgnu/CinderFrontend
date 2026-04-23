@@ -4,10 +4,11 @@ import { Title } from '@angular/platform-browser';
 import { catchError, finalize, Subject, takeUntil } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbar, MatToolbarRow } from '@angular/material/toolbar';
-import { MatIconButton } from '@angular/material/button';
+import { MatIconButton, MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatTab, MatTabGroup, MatTabLabel } from '@angular/material/tabs';
 import { NgOptimizedImage } from '@angular/common';
 import { CollateService } from '../../collate.service';
 import { CollateSettingsService } from '../../collate-settings.service';
@@ -18,8 +19,14 @@ import { AnalysisGroup } from '../../../analysis-group/analysis-group';
 import { SearchResult, SearchSession } from '../../../search-session';
 import { BreadcrumbComponent } from '../../../shared/breadcrumb/breadcrumb.component';
 import { HeatmapSidebarComponent } from '../heatmap-sidebar/heatmap-sidebar.component';
-import { HeatmapTabPanelComponent } from '../heatmap-tab-panel/heatmap-tab-panel.component';
+import { HeatmapPlotComponent } from '../../cytoscape-plot/heatmap-plot/heatmap-plot.component';
 import { defaultHeatmapViewState, HeatmapDataPoint, HeatmapViewState } from '../collate-heatmap.types';
+
+interface SubsetTab {
+  id: string;
+  name: string;
+  proteinIds: string[];
+}
 
 @Component({
   selector: 'app-collate-heatmap-explorer',
@@ -27,13 +34,17 @@ import { defaultHeatmapViewState, HeatmapDataPoint, HeatmapViewState } from '../
   imports: [
     BreadcrumbComponent,
     HeatmapSidebarComponent,
-    HeatmapTabPanelComponent,
+    HeatmapPlotComponent,
     MatToolbar,
     MatToolbarRow,
     MatIconButton,
+    MatButton,
     MatIcon,
     MatTooltip,
     MatProgressSpinner,
+    MatTabGroup,
+    MatTab,
+    MatTabLabel,
     NgOptimizedImage,
   ],
   templateUrl: './collate-heatmap-explorer.component.html',
@@ -41,6 +52,7 @@ import { defaultHeatmapViewState, HeatmapDataPoint, HeatmapViewState } from '../
 })
 export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  private subsetCounter = 0;
 
   collate: Collate | null = null;
   projects: Project[] = [];
@@ -57,6 +69,10 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
 
   viewState: HeatmapViewState = defaultHeatmapViewState();
   heatmapDataByTerm: { [term: string]: HeatmapDataPoint[] } = {};
+
+  selectedProteinIds: Set<string> = new Set();
+  subsetTabsByTerm: { [term: string]: SubsetTab[] } = {};
+  activeSubsetIndexByTerm: { [term: string]: number } = {};
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -205,6 +221,76 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
 
   onTermIndexChange(index: number): void {
     this.selectedTermIndex = index;
+    this.selectedProteinIds = new Set();
+    this.cdr.markForCheck();
+  }
+
+  onSubsetTabChange(term: string, index: number): void {
+    this.activeSubsetIndexByTerm = { ...this.activeSubsetIndexByTerm, [term]: index };
+    this.cdr.markForCheck();
+  }
+
+  getActiveSubsetIndex(term: string): number {
+    return this.activeSubsetIndexByTerm[term] ?? 0;
+  }
+
+  getSubsetTabs(term: string): SubsetTab[] {
+    return this.subsetTabsByTerm[term] ?? [];
+  }
+
+  hasData(term: string): boolean {
+    return (this.heatmapDataByTerm[term]?.length ?? 0) > 0;
+  }
+
+  getSubsetData(term: string, proteinIds: string[]): HeatmapDataPoint[] {
+    const proteinSet = new Set(proteinIds);
+    return (this.heatmapDataByTerm[term] ?? []).filter(d => proteinSet.has(d.protein));
+  }
+
+  onProteinClicked(protein: string): void {
+    const next = new Set(this.selectedProteinIds);
+    if (next.has(protein)) {
+      next.delete(protein);
+    } else {
+      next.add(protein);
+    }
+    this.selectedProteinIds = next;
+    this.cdr.markForCheck();
+  }
+
+  clearSelection(): void {
+    this.selectedProteinIds = new Set();
+    this.cdr.markForCheck();
+  }
+
+  createSubsetFromSelection(): void {
+    const proteinIds = Array.from(this.selectedProteinIds);
+    if (proteinIds.length === 0) return;
+
+    const term = this.searchTerms[this.selectedTermIndex];
+    if (!term) return;
+
+    this.subsetCounter++;
+    const id = `subset_${this.subsetCounter}`;
+    const name = `Subset ${this.subsetCounter} (${proteinIds.length})`;
+
+    const existing = this.subsetTabsByTerm[term] ?? [];
+    this.subsetTabsByTerm = {
+      ...this.subsetTabsByTerm,
+      [term]: [...existing, { id, name, proteinIds }],
+    };
+
+    const newIdx = 1 + (this.subsetTabsByTerm[term].length - 1);
+    this.activeSubsetIndexByTerm = { ...this.activeSubsetIndexByTerm, [term]: newIdx };
+    this.selectedProteinIds = new Set();
+    this.cdr.markForCheck();
+  }
+
+  removeSubsetTab(term: string, tabId: string, event: Event): void {
+    event.stopPropagation();
+    const tabs = (this.subsetTabsByTerm[term] ?? []).filter(t => t.id !== tabId);
+    this.subsetTabsByTerm = { ...this.subsetTabsByTerm, [term]: tabs };
+    this.activeSubsetIndexByTerm = { ...this.activeSubsetIndexByTerm, [term]: 0 };
     this.cdr.markForCheck();
   }
 
