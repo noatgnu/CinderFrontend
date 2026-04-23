@@ -61,18 +61,16 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
 
   searchSession: SearchSession | undefined;
   rawResults: SearchResult[] = [];
-  searchTerms: string[] = [];
-  selectedTermIndex = 0;
 
   isLoading = false;
   errorMessage: string | null = null;
 
   viewState: HeatmapViewState = defaultHeatmapViewState();
-  heatmapDataByTerm: { [term: string]: HeatmapDataPoint[] } = {};
+  allHeatmapData: HeatmapDataPoint[] = [];
 
   selectedProteinIds: Set<string> = new Set();
-  subsetTabsByTerm: { [term: string]: SubsetTab[] } = {};
-  activeSubsetIndexByTerm: { [term: string]: number } = {};
+  subsetTabs: SubsetTab[] = [];
+  activeTabIndex = 0;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -158,18 +156,13 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
         ),
       };
 
-      this.searchTerms = Array.from(new Set(this.rawResults.map(r => r.search_term))).sort();
       this.rebuildHeatmapData();
       this.cdr.markForCheck();
     });
   }
 
   rebuildHeatmapData(): void {
-    const byTerm: { [term: string]: HeatmapDataPoint[] } = {};
-    for (const term of this.searchTerms) {
-      byTerm[term] = this.transformResults(this.rawResults.filter(r => r.search_term === term));
-    }
-    this.heatmapDataByTerm = byTerm;
+    this.allHeatmapData = this.transformResults(this.rawResults);
     this.cdr.markForCheck();
   }
 
@@ -219,32 +212,14 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
     this.rebuildHeatmapData();
   }
 
-  onTermIndexChange(index: number): void {
-    this.selectedTermIndex = index;
-    this.selectedProteinIds = new Set();
+  onTabChange(index: number): void {
+    this.activeTabIndex = index;
     this.cdr.markForCheck();
   }
 
-  onSubsetTabChange(term: string, index: number): void {
-    this.activeSubsetIndexByTerm = { ...this.activeSubsetIndexByTerm, [term]: index };
-    this.cdr.markForCheck();
-  }
-
-  getActiveSubsetIndex(term: string): number {
-    return this.activeSubsetIndexByTerm[term] ?? 0;
-  }
-
-  getSubsetTabs(term: string): SubsetTab[] {
-    return this.subsetTabsByTerm[term] ?? [];
-  }
-
-  hasData(term: string): boolean {
-    return (this.heatmapDataByTerm[term]?.length ?? 0) > 0;
-  }
-
-  getSubsetData(term: string, proteinIds: string[]): HeatmapDataPoint[] {
+  getSubsetData(proteinIds: string[]): HeatmapDataPoint[] {
     const proteinSet = new Set(proteinIds);
-    return (this.heatmapDataByTerm[term] ?? []).filter(d => proteinSet.has(d.protein));
+    return this.allHeatmapData.filter(d => proteinSet.has(d.protein));
   }
 
   onProteinClicked(protein: string): void {
@@ -267,30 +242,21 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
     const proteinIds = Array.from(this.selectedProteinIds);
     if (proteinIds.length === 0) return;
 
-    const term = this.searchTerms[this.selectedTermIndex];
-    if (!term) return;
-
     this.subsetCounter++;
     const id = `subset_${this.subsetCounter}`;
     const name = `Subset ${this.subsetCounter} (${proteinIds.length})`;
-
-    const existing = this.subsetTabsByTerm[term] ?? [];
-    this.subsetTabsByTerm = {
-      ...this.subsetTabsByTerm,
-      [term]: [...existing, { id, name, proteinIds }],
-    };
-
-    const newIdx = 1 + (this.subsetTabsByTerm[term].length - 1);
-    this.activeSubsetIndexByTerm = { ...this.activeSubsetIndexByTerm, [term]: newIdx };
+    this.subsetTabs = [...this.subsetTabs, { id, name, proteinIds }];
+    this.activeTabIndex = this.subsetTabs.length;
     this.selectedProteinIds = new Set();
     this.cdr.markForCheck();
   }
 
-  removeSubsetTab(term: string, tabId: string, event: Event): void {
+  removeSubsetTab(tabId: string, event: Event): void {
     event.stopPropagation();
-    const tabs = (this.subsetTabsByTerm[term] ?? []).filter(t => t.id !== tabId);
-    this.subsetTabsByTerm = { ...this.subsetTabsByTerm, [term]: tabs };
-    this.activeSubsetIndexByTerm = { ...this.activeSubsetIndexByTerm, [term]: 0 };
+    this.subsetTabs = this.subsetTabs.filter(t => t.id !== tabId);
+    if (this.activeTabIndex > this.subsetTabs.length) {
+      this.activeTabIndex = this.subsetTabs.length;
+    }
     this.cdr.markForCheck();
   }
 
