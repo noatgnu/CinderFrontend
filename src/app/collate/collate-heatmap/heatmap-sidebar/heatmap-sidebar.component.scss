@@ -53,15 +53,9 @@
 }
 
 .small-btn {
-  width: 28px;
-  height: 28px;
-  line-height: 28px;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
+  --mdc-icon-button-state-layer-size: 28px;
+  --mdc-icon-button-icon-size: 16px;
+  padding: 0;
 }
 
 .project-group {
@@ -122,16 +116,10 @@
 }
 
 .flip-btn {
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
+  --mdc-icon-button-state-layer-size: 24px;
+  --mdc-icon-button-icon-size: 14px;
+  padding: 0;
   color: var(--app-text-secondary, #999);
-
-  mat-icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-  }
 
   &.flipped {
     color: var(--app-primary-color, #3f51b5);
