@@ -23,7 +23,7 @@
         @if (searchResults.length > 0) {
           @for (s of searchResults; track s.id) {
             <div cdkDrag>
-              @if (s.searched_data.length > 0) {
+              @if (s.searched_data?.length > 0) {
                 <div>
                   <app-bar-chart [searchTerm]="s.gene_name" [expanded]="expanded" [renameCondition]="renameCondition" [colorMap]="colorMap" [data]="s"></app-bar-chart>
                 </div>
