@@ -4,6 +4,28 @@
   gap: 20px;
 }
 
+.protein-group {
+  margin-top: 12px;
+  border-top: 1px solid var(--mat-divider-color, rgba(0,0,0,0.12));
+  padding-top: 8px;
+}
+
+.protein-group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.protein-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.protein-count {
+  font-size: 11px;
+}
+
 .results-container {
   display: flex;
   gap: 20px;

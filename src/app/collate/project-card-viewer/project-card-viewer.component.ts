@@ -86,9 +86,21 @@ export class ProjectCardViewerComponent {
 
   expanded: boolean = false;
   viewDifferentialAnalysis: boolean = false;
+
   get searchResults(): SearchResult[] {
     return this._searchResults;
   }
+
+  get resultsByProtein(): { proteinLabel: string; results: SearchResult[] }[] {
+    const map = new Map<string, SearchResult[]>();
+    for (const r of this._searchResults) {
+      const key = r.gene_name ?? r.primary_id ?? r.uniprot_id ?? String(r.id);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(r);
+    }
+    return Array.from(map.entries()).map(([proteinLabel, results]) => ({ proteinLabel, results }));
+  }
+
   constructor(public accounts: AccountsService) {}
 
   drop(event: CdkDragDrop<SearchResult[]>) {
