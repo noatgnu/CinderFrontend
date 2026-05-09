@@ -194,15 +194,24 @@ export class HeatmapPlotComponent {
     }
     if (maxAbs === 0) maxAbs = 1;
 
-    const cellSize = 25;
+    const cellSize = 36;
+    const minCanvasWidth = 800;
+    const minCanvasHeight = 600;
     const maxProteinLen = Math.max(...allProteins.map(p => p.length));
     const maxLabelLen = Math.max(...ticktext.filter(t => t).map(t => t.length), 4);
     const margin = {
-      l: Math.max(120, maxProteinLen * 7 + 20),
-      t: Math.max(120, maxLabelLen * 7 + 20),
-      r: 80,
-      b: 60,
+      l: Math.max(140, maxProteinLen * 7 + 20),
+      t: Math.max(140, maxLabelLen * 7 + 20),
+      r: 100,
+      b: 80,
     };
+
+    const dataWidth = totalCols * cellSize;
+    const dataHeight = allProteins.length * cellSize;
+    const totalWidth = dataWidth + margin.l + margin.r;
+    const totalHeight = dataHeight + margin.t + margin.b;
+    if (totalWidth < minCanvasWidth) margin.r += minCanvasWidth - totalWidth;
+    if (totalHeight < minCanvasHeight) margin.b += minCanvasHeight - totalHeight;
 
     const xVals = Array.from({ length: totalCols }, (_, i) => i);
     const yVals = allProteins.map((_, i) => i);
@@ -266,20 +275,17 @@ export class HeatmapPlotComponent {
     this.graphData = [trace];
     this.layout = {
       title: `Search term: ${searchTerm}`,
-      width: totalCols * cellSize + margin.l + margin.r,
-      height: allProteins.length * cellSize + margin.t + margin.b,
+      width: dataWidth + margin.l + margin.r,
+      height: dataHeight + margin.t + margin.b,
       margin,
       xaxis: {
         side: 'top',
         showgrid: false,
         zeroline: false,
         fixedrange: false,
-        scaleanchor: 'y',
-        scaleratio: 1,
-        constrain: 'domain',
         tickvals,
         ticktext,
-        tickangle: 90,
+        tickangle: 45,
         tickfont: { size: 9 },
         dtick: 1,
       },
@@ -288,13 +294,16 @@ export class HeatmapPlotComponent {
         showgrid: false,
         zeroline: false,
         fixedrange: false,
-        scaleanchor: 'x',
-        scaleratio: 1,
-        constrain: 'domain',
         tickvals: yVals,
         ticktext: allProteins,
         tickfont: { size: 9 },
         dtick: 1,
+      },
+      hoverlabel: {
+        bgcolor: 'rgba(255,255,255,0.95)',
+        bordercolor: '#555',
+        font: { size: 11 },
+        align: 'left',
       },
       plot_bgcolor: '#e2e8f0',
       paper_bgcolor: 'rgba(0,0,0,0)',
