@@ -127,7 +127,15 @@
         </app-heatmap-sidebar>
       }
       <div class="heatmap-editor-main">
-        <app-heatmap-plot [data]="displayedHeatmapData" [heatmapSettings]="heatmapSettings"></app-heatmap-plot>
+        @if (displayedHeatmapData.length > 0) {
+          <app-heatmap-plot [data]="displayedHeatmapData" [heatmapSettings]="heatmapSettings"></app-heatmap-plot>
+        } @else {
+          <div class="heatmap-empty">
+            <mat-icon>grid_on</mat-icon>
+            <p>No search results</p>
+            <span>Run a search in Collate View first</span>
+          </div>
+        }
       </div>
     </div>
   }
