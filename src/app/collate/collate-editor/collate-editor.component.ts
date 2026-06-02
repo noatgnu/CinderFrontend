@@ -206,41 +206,20 @@ export class CollateEditorComponent implements OnDestroy {
   removedTags: CollateTag[] = [];
 
   editorView: 'collate' | 'heatmap' = 'collate';
-  allHeatmapData: HeatmapDataPoint[] = [];
+  displayedHeatmapData: HeatmapDataPoint[] = [];
   heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
   heatmapViewState: HeatmapViewState = defaultHeatmapViewState();
 
   onHeatmapStateChange(state: HeatmapViewState): void {
     this.heatmapViewState = state;
-    this.applyHeatmapFilters();
+    this.rebuildHeatmapData();
   }
 
   onHeatmapSettingsChange(settings: HeatmapPersistentSettings): void {
-    this.heatmapSettings = settings;
+    this.heatmapSettings = { ...settings };
     if (this._collate) {
-      this._collate.settings['heatmapSettings'] = settings;
+      this._collate.settings['heatmapSettings'] = this.heatmapSettings;
     }
-    this.cdr.markForCheck();
-  }
-
-  private filteredHeatmapData: HeatmapDataPoint[] = [];
-
-  get displayedHeatmapData(): HeatmapDataPoint[] {
-    return this.filteredHeatmapData;
-  }
-
-  private applyHeatmapFilters(): void {
-    this.filteredHeatmapData = this.allHeatmapData.filter(d => {
-      if (this.heatmapViewState.proteinFilter) {
-        const f = this.heatmapViewState.proteinFilter.toLowerCase();
-        if (!d.protein.toLowerCase().includes(f)) return false;
-      }
-      if (this.heatmapViewState.maskSubThreshold) {
-        if (this.heatmapViewState.log2fcCutoff > 0 && Math.abs(d.log2fc) < this.heatmapViewState.log2fcCutoff) return false;
-        if (this.heatmapViewState.pValueCutoff > 0 && d.p_value < this.heatmapViewState.pValueCutoff) return false;
-      }
-      return true;
-    });
     this.cdr.markForCheck();
   }
 
@@ -251,23 +230,47 @@ export class CollateEditorComponent implements OnDestroy {
   }
 
   private rebuildHeatmapData(): void {
-    const results: SearchResult[] = Object.values(this.searchResults).flat();
-    this.allHeatmapData = results.map(r => {
-      const project = this.analysisGroupProjects[r.analysis_group.id];
-      return {
-        project: project?.name ?? 'Unknown',
-        analysis_group: r.analysis_group.name,
-        conditionA: r.condition_A,
-        conditionB: r.condition_B,
-        log2fc: r.log2_fc,
-        p_value: r.log10_p,
-        comparison: r.comparison_label ?? `${r.condition_A} vs ${r.condition_B}`,
-        protein: r.gene_name ?? r.primary_id ?? r.uniprot_id ?? String(r.id),
-        searchTerm: r.search_term,
-      };
-    });
-    this.applyHeatmapFilters();
+    const rawResults: SearchResult[] = Object.values(this.searchResults).flat();
+    this.displayedHeatmapData = rawResults
+      .filter(r => this.passesHeatmapFilter(r))
+      .map(r => {
+        const project = this.analysisGroupProjects[r.analysis_group.id];
+        const flipped = this.heatmapViewState.flippedAnalysisGroupIds.has(r.analysis_group.id);
+        return {
+          project: project?.name ?? 'Unknown',
+          analysis_group: r.analysis_group.name,
+          conditionA: r.condition_A,
+          conditionB: r.condition_B,
+          log2fc: flipped ? -r.log2_fc : r.log2_fc,
+          p_value: r.log10_p,
+          comparison: r.comparison_label ?? `${r.condition_A} vs ${r.condition_B}`,
+          protein: r.gene_name ?? r.primary_id ?? r.uniprot_id ?? String(r.id),
+          searchTerm: r.search_term,
+        };
+      });
+    this.cdr.markForCheck();
   }
+
+  private passesHeatmapFilter(r: SearchResult): boolean {
+    const project = this.analysisGroupProjects[r.analysis_group.id];
+    if (project) {
+      const vis = this.heatmapViewState.visibilityMap[project.id]?.[r.analysis_group.id];
+      if (vis === false) return false;
+    }
+    if (this.heatmapViewState.proteinFilter) {
+      const f = this.heatmapViewState.proteinFilter.toLowerCase();
+      const matches = r.gene_name?.toLowerCase().includes(f) ||
+        r.primary_id?.toLowerCase().includes(f) ||
+        r.uniprot_id?.toLowerCase().includes(f);
+      if (!matches) return false;
+    }
+    if (this.heatmapViewState.maskSubThreshold) {
+      if (this.heatmapViewState.log2fcCutoff > 0 && Math.abs(r.log2_fc) < this.heatmapViewState.log2fcCutoff) return false;
+      if (this.heatmapViewState.pValueCutoff > 0 && r.log10_p < this.heatmapViewState.pValueCutoff) return false;
+    }
+    return true;
+  }
+
 
   constructor(
     private cdr: ChangeDetectorRef,
