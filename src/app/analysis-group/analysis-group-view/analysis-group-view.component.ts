@@ -375,7 +375,7 @@ export class AnalysisGroupViewComponent implements OnDestroy {
   }
 
   setAnnotationModal(annotationFile: ProjectFile) {
-    const ref = this.matDialog.open(AnalysisGroupSampleAnnotationModalComponent)
+    const ref = this.matDialog.open(AnalysisGroupSampleAnnotationModalComponent, { width: '85vw', maxWidth: '1200px' })
     ref.componentInstance.projectFile = annotationFile
     if (this.sampleAnnotations) {
       ref.componentInstance.annotation = this.sampleAnnotations
@@ -401,7 +401,7 @@ export class AnalysisGroupViewComponent implements OnDestroy {
   }
 
   setComparisonMatrixModal(sampleAnnotations: SampleAnnotation, analysisGroupSearched: ProjectFile, analysisGroupDF: ProjectFile) {
-    const ref = this.matDialog.open(AnalysisGroupComparisonMatrixModalComponent)
+    const ref = this.matDialog.open(AnalysisGroupComparisonMatrixModalComponent, { width: '85vw', maxWidth: '1200px' })
     ref.componentInstance.sampleAnnotations = sampleAnnotations
     ref.componentInstance.projectFile = analysisGroupDF
     if (this.comparisonMatrix) {
