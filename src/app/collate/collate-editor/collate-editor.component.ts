@@ -32,6 +32,9 @@ import {GraphService} from "../../graph.service";
 import {CollateTagCreateDialogComponent} from "../collate-tag-create-dialog/collate-tag-create-dialog.component";
 import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
 import {filter, forkJoin, Observable, Subject, switchMap, takeUntil} from "rxjs";
+import {HeatmapDataPoint} from "../cytoscape-plot/cytoscape-plot.types";
+import {HeatmapPlotComponent} from "../cytoscape-plot/heatmap-plot/heatmap-plot.component";
+import {defaultHeatmapPersistentSettings, HeatmapPersistentSettings} from "../collate-heatmap/collate-heatmap.types";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {AccountsService} from "../../accounts/accounts.service";
@@ -80,7 +83,8 @@ import {MatTooltip} from "@angular/material/tooltip";
         MatLabel,
         MatCheckbox,
         MatProgressSpinner,
-        MatTooltip
+        MatTooltip,
+        HeatmapPlotComponent,
     ],
     templateUrl: './collate-editor.component.html',
     styleUrl: './collate-editor.component.scss'
@@ -139,6 +143,8 @@ export class CollateEditorComponent implements OnDestroy {
             }
           }
 
+          this.heatmapSettings = currentCollate.settings['heatmapSettings'] ?? defaultHeatmapPersistentSettings();
+
           if (!currentCollate.settings['projectConditionOrder']) {
             currentCollate.settings['projectConditionOrder'] = {};
           }
@@ -193,6 +199,35 @@ export class CollateEditorComponent implements OnDestroy {
   }
   filteredResults: { [projectId: number]: SearchResult[] } = {};
   removedTags: CollateTag[] = [];
+
+  showHeatmap = false;
+  allHeatmapData: HeatmapDataPoint[] = [];
+  heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
+
+  toggleHeatmap(): void {
+    this.showHeatmap = !this.showHeatmap;
+    if (this.showHeatmap) this.rebuildHeatmapData();
+    this.cdr.markForCheck();
+  }
+
+  private rebuildHeatmapData(): void {
+    const results: SearchResult[] = Object.values(this.searchResults).flat();
+    this.allHeatmapData = results.map(r => {
+      const project = this.analysisGroupProjects[r.analysis_group.id];
+      return {
+        project: project?.name ?? 'Unknown',
+        analysis_group: r.analysis_group.name,
+        conditionA: r.condition_A,
+        conditionB: r.condition_B,
+        log2fc: r.log2_fc,
+        p_value: r.log10_p,
+        comparison: r.comparison_label ?? `${r.condition_A} vs ${r.condition_B}`,
+        protein: r.gene_name ?? r.primary_id ?? r.uniprot_id ?? String(r.id),
+        searchTerm: r.search_term,
+      };
+    });
+    this.cdr.markForCheck();
+  }
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -268,7 +303,10 @@ export class CollateEditorComponent implements OnDestroy {
     this.updateCollate();
   }
 
+  currentSessionId: number | null = null;
+
   getSearchFromID(id: number) {
+    this.currentSessionId = id;
     this.web.getSearchSession(id).pipe(takeUntil(this.destroy$)).subscribe();
     this.web.getSearchResults(id, 99999).pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.distributeSearchResults(data.results);
@@ -303,6 +341,7 @@ export class CollateEditorComponent implements OnDestroy {
       });
       this.selectedSearchTerm = this.searchTerms[0];
       this.filterDataBySearchTerm();
+      if (this.showHeatmap) this.rebuildHeatmapData();
       this.cdr.markForCheck();
     });
   }
@@ -373,6 +412,15 @@ export class CollateEditorComponent implements OnDestroy {
   goToCollateView() {
     if (this._collate) {
       this.router.navigate(['/collate/view', this._collate.id]);
+    }
+  }
+
+  goToHeatmapView() {
+    if (!this._collate) return;
+    if (this.currentSessionId) {
+      this.router.navigate(['/collate/heatmap', this._collate.id, this.currentSessionId]);
+    } else {
+      this.router.navigate(['/collate/heatmap', this._collate.id]);
     }
   }
 

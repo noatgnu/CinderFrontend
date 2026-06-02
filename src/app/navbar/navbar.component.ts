@@ -71,7 +71,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$),
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe(event => {
-      this.isCollateView = event.urlAfterRedirects.includes('/collate/view');
+      const url = event.urlAfterRedirects;
+      this.isCollateView = url.includes('/collate/view') || url.includes('/collate/heatmap');
       this.cdr.markForCheck();
     });
   }

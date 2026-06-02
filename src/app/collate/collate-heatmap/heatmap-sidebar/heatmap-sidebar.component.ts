@@ -11,7 +11,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { Collate } from '../../collate';
 import { Project } from '../../../project/project';
 import { AnalysisGroup } from '../../../analysis-group/analysis-group';
-import { HeatmapViewState } from '../collate-heatmap.types';
+import { HeatmapPersistentSettings, HeatmapViewState, defaultHeatmapPersistentSettings } from '../collate-heatmap.types';
 
 @Component({
   selector: 'app-heatmap-sidebar',
@@ -37,7 +37,9 @@ export class HeatmapSidebarComponent {
   @Input() projects: Project[] = [];
   @Input() projectAnalysisGroups: { [projectId: number]: AnalysisGroup[] } = {};
   @Input() state!: HeatmapViewState;
+  @Input() heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
   @Output() stateChange = new EventEmitter<HeatmapViewState>();
+  @Output() heatmapSettingsChange = new EventEmitter<HeatmapPersistentSettings>();
   @Output() backClick = new EventEmitter<void>();
 
   collapsedProjects: Set<number> = new Set();
@@ -102,6 +104,22 @@ export class HeatmapSidebarComponent {
       maskSubThreshold: false,
       proteinFilter: '',
     });
+  }
+
+  onColorScaleFixedChange(fixed: boolean): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, colorScaleFixed: fixed });
+  }
+
+  onColorScaleMaxChange(value: number): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, colorScaleMax: Math.max(0.1, value) });
+  }
+
+  onMinLabelChange(value: string): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, minLabel: value });
+  }
+
+  onMaxLabelChange(value: string): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, maxLabel: value });
   }
 
   private emit(partial: Partial<HeatmapViewState>): void {

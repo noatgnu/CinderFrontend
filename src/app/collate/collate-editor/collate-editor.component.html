@@ -13,6 +13,9 @@
       <button type="button" mat-icon-button matTooltip="View Collate" (click)="goToCollateView()">
         <mat-icon>visibility</mat-icon>
       </button>
+      <button type="button" mat-icon-button matTooltip="View Heatmap" (click)="goToHeatmapView()">
+        <mat-icon>grid_on</mat-icon>
+      </button>
       <button type="button" mat-icon-button matTooltip="Add Projects" (click)="openProjectAddDialog()">
         <mat-icon>add</mat-icon>
       </button>
@@ -76,6 +79,15 @@
     <app-collate-search [projects]="projects" (searchResultID)="getSearchFromID($event)"></app-collate-search>
   </div>
   @if (searchTerms.length > 0) {
+    <div class="visualization-controls">
+      <button mat-button (click)="toggleHeatmap()" [class.active-toggle]="showHeatmap">
+        <mat-icon [class.text-brand]="showHeatmap" [class.text-secondary]="!showHeatmap">grid_on</mat-icon>
+        <span>Heatmap</span>
+      </button>
+    </div>
+    @if (showHeatmap) {
+      <app-heatmap-plot [data]="allHeatmapData" [heatmapSettings]="heatmapSettings"></app-heatmap-plot>
+    }
     <div class="tabs-container">
       <mat-tab-group (selectedTabChange)="filterDataBySearchTerm()" [(selectedIndex)]="selectedIndex" [mat-stretch-tabs]="false">
         @for (term of searchTerms; track term) {

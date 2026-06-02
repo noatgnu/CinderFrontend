@@ -12,15 +12,14 @@
   <mat-toolbar>
     <mat-toolbar-row>
       <span class="spacer"></span>
-      <button mat-icon-button [matMenuTriggerFor]="heatmapMenu" matTooltip="Heatmap Settings" aria-label="Heatmap Settings">
-        <mat-icon>more_vert</mat-icon>
-      </button>
-      <mat-menu #heatmapMenu="matMenu">
-        <button mat-menu-item (click)="openHeatmapSettingsDialog()">Color Scale &amp; Labels</button>
-      </mat-menu>
       <button mat-icon-button (click)="navigateToStandardView()" matTooltip="Back to collate view" aria-label="Back to collate view">
         <mat-icon>visibility</mat-icon>
       </button>
+      @if (accounts.loggedIn) {
+        <button mat-icon-button (click)="navigateToEdit()" matTooltip="Edit Collate" aria-label="Edit Collate">
+          <mat-icon>edit</mat-icon>
+        </button>
+      }
     </mat-toolbar-row>
   </mat-toolbar>
 
@@ -33,7 +32,9 @@
         [projects]="projects"
         [projectAnalysisGroups]="projectAnalysisGroups"
         [state]="viewState"
+        [heatmapSettings]="heatmapSettings"
         (stateChange)="onStateChange($event)"
+        (heatmapSettingsChange)="onHeatmapSettingsChange($event)"
         (backClick)="navigateToStandardView()">
       </app-heatmap-sidebar>
 

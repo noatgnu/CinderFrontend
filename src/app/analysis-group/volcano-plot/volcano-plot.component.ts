@@ -346,6 +346,12 @@ export class VolcanoPlotComponent implements OnDestroy {
     this.graphLayout.font = { color: textColor, size: 14 };
     this.graphLayout.xaxis.tickfont.color = textColor;
     this.graphLayout.yaxis.tickfont.color = textColor;
+    if (typeof this.graphLayout.xaxis.title === 'string') {
+      this.graphLayout.xaxis.title = { text: this.graphLayout.xaxis.title };
+    }
+    if (typeof this.graphLayout.yaxis.title === 'string') {
+      this.graphLayout.yaxis.title = { text: this.graphLayout.yaxis.title };
+    }
     this.graphLayout.xaxis.title.font = { color: textColor };
     this.graphLayout.yaxis.title.font = { color: textColor };
     this.graphLayout.title.font.color = textColor;

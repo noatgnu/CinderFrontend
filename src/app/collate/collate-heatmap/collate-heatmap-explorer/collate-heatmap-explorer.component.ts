@@ -29,6 +29,7 @@ import { CollateConditionColorEditorDialogComponent } from '../../collate-condit
 import { CollateRenameSampleConditionDialogComponent } from '../../collate-rename-sample-condition-dialog/collate-rename-sample-condition-dialog.component';
 import { CollateConditionOrderDialogComponent } from '../../collate-condition-order-dialog/collate-condition-order-dialog.component';
 import { GraphService } from '../../../graph.service';
+import { AccountsService } from '../../../accounts/accounts.service';
 import { HeatmapSettingsDialogComponent } from '../heatmap-settings-dialog/heatmap-settings-dialog.component';
 import { HeatmapPersistentSettings, defaultHeatmapPersistentSettings } from '../collate-heatmap.types';
 
@@ -97,6 +98,7 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
     private settingsService: CollateSettingsService,
     private dialog: MatDialog,
     private graph: GraphService,
+    public accounts: AccountsService,
   ) {}
 
   private saveCollate(): void {
@@ -349,6 +351,15 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
     this.rebuildHeatmapData();
   }
 
+  onHeatmapSettingsChange(settings: HeatmapPersistentSettings): void {
+    this.heatmapSettings = settings;
+    if (this.collate) {
+      this.collate.settings['heatmapSettings'] = settings;
+      this.saveCollate();
+    }
+    this.cdr.markForCheck();
+  }
+
   onTabChange(index: number): void {
     this.activeTabIndex = index;
     this.cdr.markForCheck();
@@ -395,6 +406,11 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
       this.activeTabIndex = this.subsetTabs.length;
     }
     this.cdr.markForCheck();
+  }
+
+  navigateToEdit(): void {
+    if (!this.collate) return;
+    this.router.navigate([`/collate/edit/${this.collate.id}`]);
   }
 
   navigateToStandardView(): void {

@@ -51,6 +51,38 @@
 
   <div class="sidebar-section">
     <div class="section-header">
+      <span class="section-title">Color Scale</span>
+    </div>
+    <div class="toggle-row">
+      <mat-slide-toggle
+        [checked]="heatmapSettings.colorScaleFixed"
+        (change)="onColorScaleFixedChange($event.checked)"
+        class="compact-toggle">
+        Fixed range
+      </mat-slide-toggle>
+    </div>
+    @if (heatmapSettings.colorScaleFixed) {
+      <mat-form-field appearance="outline" class="full-width compact">
+        <mat-label>Max value (±N)</mat-label>
+        <input matInput type="number" min="0.1" step="0.5"
+               [ngModel]="heatmapSettings.colorScaleMax"
+               (ngModelChange)="onColorScaleMaxChange(+$event)">
+      </mat-form-field>
+    }
+    <mat-form-field appearance="outline" class="full-width compact">
+      <mat-label>Min label (optional)</mat-label>
+      <input matInput [ngModel]="heatmapSettings.minLabel" (ngModelChange)="onMinLabelChange($event)" placeholder="e.g. Down-regulated">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width compact">
+      <mat-label>Max label (optional)</mat-label>
+      <input matInput [ngModel]="heatmapSettings.maxLabel" (ngModelChange)="onMaxLabelChange($event)" placeholder="e.g. Up-regulated">
+    </mat-form-field>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="sidebar-section">
+    <div class="section-header">
       <span class="section-title">Analysis Groups</span>
     </div>
     @for (project of projects; track project.id) {
