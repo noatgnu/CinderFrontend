@@ -124,6 +124,10 @@ export class CollateConditionOrderDialogComponent implements OnDestroy {
     return Object.keys(this.projectConditionOrder[projectId]?.perAnalysisGroup ?? {}).map(Number);
   }
 
+  agConditions(projectId: number, agId: number): string[] {
+    return this.projectConditionOrder[projectId]?.perAnalysisGroup?.[agId] ?? [];
+  }
+
   agName(projectId: number, agId: number): string {
     return this.projectAnalysisGroups[projectId]?.find(a => a.id === agId)?.name ?? `AG ${agId}`;
   }

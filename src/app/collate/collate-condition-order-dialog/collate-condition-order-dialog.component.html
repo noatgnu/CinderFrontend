@@ -28,7 +28,7 @@
             </div>
             <mat-list dense>
               <div cdkDropList (cdkDropListDropped)="dropAgOverride($event, project.id, agId)">
-                @for (condition of (projectConditionOrder[project.id]?.perAnalysisGroup[agId] ?? []); track condition) {
+                @for (condition of agConditions(project.id, agId); track condition) {
                   <mat-list-item cdkDrag class="order-item">
                     <mat-icon cdkDragHandle matListItemIcon class="drag-handle">drag_handle</mat-icon>
                     <div matListItemTitle>{{ condition }}</div>
