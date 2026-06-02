@@ -32,12 +32,15 @@ export class HeatmapPlotComponent {
 
   @Input() set highlightedProtein(value: string | null) {
     this._highlightedProtein = value;
-    this.highlightProteinColumns(value);
+    if (this._data.length) { this.rebuildShapes(); this.cdr.markForCheck(); }
   }
 
   @Input() set selectedProteinIds(value: Set<string>) {
     this._selectedProteinIds = value ?? new Set();
-    if (this._data.length) this.drawHeatmap();
+    if (this._data.length) {
+      this.rebuildShapes();
+      this.cdr.markForCheck();
+    }
   }
 
   private _heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
@@ -58,12 +61,15 @@ export class HeatmapPlotComponent {
   showLegend = false;
 
   private allProteins: string[] = [];
-  columnShapeByColIdx: Record<number, any> = {};
-  projectShapeByColIdx: Record<number, any> = {};
   dataByColProtein: Record<string, HeatmapDataPoint> = {};
   proteinsByColIdx: Record<number, Set<string>> = {};
-  colLabelToColIdxs: Record<string, number[]> = {};
-  colIdxToLabel: Record<number, string> = {};
+
+  // Shape-building data stored from drawHeatmap(), used by rebuildShapes()
+  private projectBoundaries: { x0: number; x1: number }[] = [];
+  private separatorLines: number[] = [];
+  private columnGroups: { groupKey: string; colIdxs: number[] }[] = [];
+  private colIdxToGroupKey: Record<number, string> = {};
+  private hoveredGroupKey: string | null = null;
 
   plotConfig = {
     responsive: true,
@@ -76,12 +82,13 @@ export class HeatmapPlotComponent {
   drawHeatmap(): void {
     if (!this._data.length) return;
 
-    this.columnShapeByColIdx = {};
-    this.projectShapeByColIdx = {};
     this.dataByColProtein = {};
     this.proteinsByColIdx = {};
-    this.colLabelToColIdxs = {};
-    this.colIdxToLabel = {};
+    this.projectBoundaries = [];
+    this.separatorLines = [];
+    this.columnGroups = [];
+    this.colIdxToGroupKey = {};
+    this.hoveredGroupKey = null;
 
     const searchTerm = this._data[0].searchTerm;
 
@@ -98,10 +105,11 @@ export class HeatmapPlotComponent {
     }
 
     const globalColIndexMap = new Map<string, number>();
-    const shapes: any[] = [];
     const tickvals: number[] = [];
     const ticktext: string[] = [];
     let colOffset = 0;
+
+    const groupMap = new Map<string, number[]>();
 
     for (const project in projectGroups) {
       const group = projectGroups[project];
@@ -116,16 +124,7 @@ export class HeatmapPlotComponent {
       }
 
       const numCols = localColKeys.length;
-
-      const projectShape: any = {
-        type: 'rect',
-        x0: colOffset - 0.5, x1: colOffset + numCols - 0.5,
-        y0: 0, y1: 1,
-        xref: 'x', yref: 'paper',
-        line: { color: '#e53e3e', width: 3 },
-        fillcolor: 'rgba(0,0,0,0)',
-      };
-      shapes.push(projectShape);
+      this.projectBoundaries.push({ x0: colOffset - 0.5, x1: colOffset + numCols - 0.5 });
 
       const useAgName = this._heatmapSettings.useAgNameForAxis;
       let lastLabel = '';
@@ -135,44 +134,31 @@ export class HeatmapPlotComponent {
         globalColIndexMap.set(`${project}||${ck}`, colPos);
 
         const colLabel = useAgName ? rep.analysis_group : (rep.comparison ?? '');
+        // Scope group key to project to avoid cross-project collisions
+        const groupKey = `${project}||${colLabel}`;
         tickvals.push(colPos);
         ticktext.push(colLabel !== lastLabel ? colLabel : '');
-        this.colIdxToLabel[colPos] = colLabel;
-        if (!this.colLabelToColIdxs[colLabel]) this.colLabelToColIdxs[colLabel] = [];
-        this.colLabelToColIdxs[colLabel].push(colPos);
+
+        this.colIdxToGroupKey[colPos] = groupKey;
+        if (!groupMap.has(groupKey)) groupMap.set(groupKey, []);
+        groupMap.get(groupKey)!.push(colPos);
 
         if (ci > 0) {
           const prevRep = colRepresentative.get(localColKeys[ci - 1])!;
           const prevLabel = useAgName ? prevRep.analysis_group : (prevRep.comparison ?? '');
           if (prevLabel !== colLabel) {
-            shapes.push({
-              type: 'line',
-              x0: colPos - 0.5, x1: colPos - 0.5,
-              y0: 0, y1: 1,
-              xref: 'x', yref: 'paper',
-              line: { color: 'rgba(186,104,166,0.8)', width: 2 },
-            });
+            this.separatorLines.push(colPos - 0.5);
           }
         }
 
-        const columnShape: any = {
-          type: 'rect',
-          x0: colPos - 0.5, x1: colPos + 0.5,
-          y0: 0, y1: 1,
-          xref: 'x', yref: 'paper',
-          line: { color: 'rgba(0,0,0,0)', width: 2 },
-          fillcolor: 'rgba(0,0,0,0)',
-        };
-        shapes.push(columnShape);
-        this.columnShapeByColIdx[colPos] = columnShape;
-        this.projectShapeByColIdx[colPos] = projectShape;
         this.proteinsByColIdx[colPos] = new Set();
-
         lastLabel = colLabel;
       });
 
       colOffset += numCols;
     }
+
+    this.columnGroups = Array.from(groupMap.entries()).map(([groupKey, colIdxs]) => ({ groupKey, colIdxs }));
 
     const totalCols = colOffset;
 
@@ -287,19 +273,6 @@ export class HeatmapPlotComponent {
       },
     };
 
-    allProteins.forEach((protein, i) => {
-      if (this._selectedProteinIds.has(protein)) {
-        shapes.push({
-          type: 'rect',
-          xref: 'paper', yref: 'y',
-          x0: -0.015, x1: 0,
-          y0: i - 0.5, y1: i + 0.5,
-          fillcolor: 'rgba(79, 70, 229, 0.7)',
-          line: { width: 0 },
-        });
-      }
-    });
-
     this.graphData = [trace];
     this.layout = {
       title: `Search term: ${searchTerm}`,
@@ -335,8 +308,69 @@ export class HeatmapPlotComponent {
       },
       plot_bgcolor: '#e2e8f0',
       paper_bgcolor: 'rgba(0,0,0,0)',
-      shapes,
+      shapes: [],
     };
+    this.rebuildShapes();
+  }
+
+  private rebuildShapes(): void {
+    const shapes: any[] = [];
+
+    // Project boundary rectangles
+    for (const b of this.projectBoundaries) {
+      shapes.push({
+        type: 'rect',
+        x0: b.x0, x1: b.x1,
+        y0: 0, y1: 1,
+        xref: 'x', yref: 'paper',
+        line: { color: '#e53e3e', width: 3 },
+        fillcolor: 'rgba(0,0,0,0)',
+      });
+    }
+
+    // Comparison group separator lines
+    for (const x of this.separatorLines) {
+      shapes.push({
+        type: 'line',
+        x0: x, x1: x,
+        y0: 0, y1: 1,
+        xref: 'x', yref: 'paper',
+        line: { color: 'rgba(186,104,166,0.8)', width: 2 },
+      });
+    }
+
+    // Hover highlight — all columns in the hovered group
+    if (this.hoveredGroupKey !== null) {
+      const group = this.columnGroups.find(g => g.groupKey === this.hoveredGroupKey);
+      if (group) {
+        for (const ci of group.colIdxs) {
+          shapes.push({
+            type: 'rect',
+            x0: ci - 0.5, x1: ci + 0.5,
+            y0: 0, y1: 1,
+            xref: 'x', yref: 'paper',
+            line: { color: '#1a202c', width: 2 },
+            fillcolor: 'rgba(0,0,0,0)',
+          });
+        }
+      }
+    }
+
+    // Selection highlight — rectangle on the left margin for each selected protein row
+    this.allProteins.forEach((protein, i) => {
+      if (this._selectedProteinIds.has(protein)) {
+        shapes.push({
+          type: 'rect',
+          xref: 'paper', yref: 'y',
+          x0: -0.015, x1: 0,
+          y0: i - 0.5, y1: i + 0.5,
+          fillcolor: 'rgba(79, 70, 229, 0.7)',
+          line: { width: 0 },
+        });
+      }
+    });
+
+    this.layout = { ...this.layout, shapes };
     this.revision++;
   }
 
@@ -352,52 +386,18 @@ export class HeatmapPlotComponent {
     const colIdx: number = event.points[0].x;
     const rowIdx: number = event.points[0].y;
     const protein = this.allProteins[rowIdx];
-    const label = this.colIdxToLabel[colIdx];
-    const groupCols = label !== undefined ? (this.colLabelToColIdxs[label] ?? [colIdx]) : [colIdx];
-
-    for (const ci of groupCols) {
-      const projectShape = this.projectShapeByColIdx[ci];
-      if (projectShape) projectShape.line.color = 'white';
-      const columnShape = this.columnShapeByColIdx[ci];
-      if (columnShape) {
-        columnShape.line.color = '#1a202c';
-        columnShape.line.width = 2;
-      }
-    }
+    this.hoveredGroupKey = this.colIdxToGroupKey[colIdx] ?? null;
     if (protein) {
       this.currentHoverTarget.emit(this.dataByColProtein[`${colIdx}_${protein}`]);
     }
-    this.revision++;
+    this.rebuildShapes();
     this.cdr.markForCheck();
   }
 
-  handleHoverOut(event: any): void {
-    const colIdx: number = event.points[0].x;
-    const label = this.colIdxToLabel[colIdx];
-    const groupCols = label !== undefined ? (this.colLabelToColIdxs[label] ?? [colIdx]) : [colIdx];
-
-    for (const ci of groupCols) {
-      const projectShape = this.projectShapeByColIdx[ci];
-      if (projectShape) projectShape.line.color = '#e53e3e';
-      const columnShape = this.columnShapeByColIdx[ci];
-      if (columnShape) columnShape.line.color = 'rgba(0,0,0,0)';
-    }
+  handleHoverOut(_event: any): void {
+    this.hoveredGroupKey = null;
     this.currentHoverTarget.emit(undefined);
-    this.revision++;
-    this.cdr.markForCheck();
-  }
-
-  private highlightProteinColumns(proteinId: string | null): void {
-    Object.keys(this.columnShapeByColIdx).forEach(key => {
-      const colIdx = parseInt(key, 10);
-      const shape = this.columnShapeByColIdx[colIdx];
-      if (shape) {
-        const hasProtein = proteinId ? this.proteinsByColIdx[colIdx]?.has(proteinId) : false;
-        shape.line.color = hasProtein ? '#00e676' : 'rgba(0,0,0,0)';
-        shape.line.width = hasProtein ? 3 : 2;
-      }
-    });
-    this.revision++;
+    this.rebuildShapes();
     this.cdr.markForCheck();
   }
 
