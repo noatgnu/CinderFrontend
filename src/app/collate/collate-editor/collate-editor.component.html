@@ -97,6 +97,7 @@
           [filteredResults]="filteredResults"
           (projectOrderChanged)="onProjectOrderChanged($event)"
           [renameCondition]="collate.settings.renameSampleCondition"
+          [projectConditionOrder]="collate.settings['projectConditionOrder']"
         ></app-collate-project-list>
       }
     }

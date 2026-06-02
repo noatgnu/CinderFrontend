@@ -225,6 +225,10 @@ export class CollateViewComponent implements OnDestroy {
           }
         }
 
+        if (!this.collate.settings['projectConditionOrder']) {
+          this.collate.settings['projectConditionOrder'] = {};
+        }
+
         if (!this.collate.settings.renameSampleCondition) {
           this.collate.settings.renameSampleCondition = {};
         }
