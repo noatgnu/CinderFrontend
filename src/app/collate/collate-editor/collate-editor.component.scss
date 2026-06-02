@@ -75,6 +75,28 @@ mat-card {
   padding: 20px;
 }
 
+.visualization-controls {
+  display: flex;
+  padding: 8px 16px;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--app-divider-color);
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    mat-icon {
+      margin-right: 4px;
+    }
+  }
+
+  .active-toggle {
+    background-color: var(--app-hover-overlay);
+  }
+}
+
 .no-permission {
   display: flex;
   justify-content: center;
