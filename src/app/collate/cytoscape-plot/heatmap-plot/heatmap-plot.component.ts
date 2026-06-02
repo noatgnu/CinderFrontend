@@ -62,6 +62,8 @@ export class HeatmapPlotComponent {
   projectShapeByColIdx: Record<number, any> = {};
   dataByColProtein: Record<string, HeatmapDataPoint> = {};
   proteinsByColIdx: Record<number, Set<string>> = {};
+  colLabelToColIdxs: Record<string, number[]> = {};
+  colIdxToLabel: Record<number, string> = {};
 
   plotConfig = {
     responsive: true,
@@ -78,6 +80,8 @@ export class HeatmapPlotComponent {
     this.projectShapeByColIdx = {};
     this.dataByColProtein = {};
     this.proteinsByColIdx = {};
+    this.colLabelToColIdxs = {};
+    this.colIdxToLabel = {};
 
     const searchTerm = this._data[0].searchTerm;
 
@@ -133,6 +137,9 @@ export class HeatmapPlotComponent {
         const colLabel = useAgName ? rep.analysis_group : (rep.comparison ?? '');
         tickvals.push(colPos);
         ticktext.push(colLabel !== lastLabel ? colLabel : '');
+        this.colIdxToLabel[colPos] = colLabel;
+        if (!this.colLabelToColIdxs[colLabel]) this.colLabelToColIdxs[colLabel] = [];
+        this.colLabelToColIdxs[colLabel].push(colPos);
 
         if (ci > 0) {
           const prevRep = colRepresentative.get(localColKeys[ci - 1])!;
@@ -345,33 +352,39 @@ export class HeatmapPlotComponent {
     const colIdx: number = event.points[0].x;
     const rowIdx: number = event.points[0].y;
     const protein = this.allProteins[rowIdx];
-    const projectShape = this.projectShapeByColIdx[colIdx];
-    if (projectShape) {
-      projectShape.line.color = 'white';
-      const columnShape = this.columnShapeByColIdx[colIdx];
+    const label = this.colIdxToLabel[colIdx];
+    const groupCols = label !== undefined ? (this.colLabelToColIdxs[label] ?? [colIdx]) : [colIdx];
+
+    for (const ci of groupCols) {
+      const projectShape = this.projectShapeByColIdx[ci];
+      if (projectShape) projectShape.line.color = 'white';
+      const columnShape = this.columnShapeByColIdx[ci];
       if (columnShape) {
         columnShape.line.color = '#1a202c';
         columnShape.line.width = 2;
       }
-      if (protein) {
-        this.currentHoverTarget.emit(this.dataByColProtein[`${colIdx}_${protein}`]);
-      }
-      this.revision++;
     }
+    if (protein) {
+      this.currentHoverTarget.emit(this.dataByColProtein[`${colIdx}_${protein}`]);
+    }
+    this.revision++;
+    this.cdr.markForCheck();
   }
 
   handleHoverOut(event: any): void {
     const colIdx: number = event.points[0].x;
-    const projectShape = this.projectShapeByColIdx[colIdx];
-    if (projectShape) {
-      projectShape.line.color = '#e53e3e';
-      const columnShape = this.columnShapeByColIdx[colIdx];
-      if (columnShape) {
-        columnShape.line.color = 'rgba(0,0,0,0)';
-      }
-      this.currentHoverTarget.emit(undefined);
-      this.revision++;
+    const label = this.colIdxToLabel[colIdx];
+    const groupCols = label !== undefined ? (this.colLabelToColIdxs[label] ?? [colIdx]) : [colIdx];
+
+    for (const ci of groupCols) {
+      const projectShape = this.projectShapeByColIdx[ci];
+      if (projectShape) projectShape.line.color = '#e53e3e';
+      const columnShape = this.columnShapeByColIdx[ci];
+      if (columnShape) columnShape.line.color = 'rgba(0,0,0,0)';
     }
+    this.currentHoverTarget.emit(undefined);
+    this.revision++;
+    this.cdr.markForCheck();
   }
 
   private highlightProteinColumns(proteinId: string | null): void {
@@ -385,6 +398,7 @@ export class HeatmapPlotComponent {
       }
     });
     this.revision++;
+    this.cdr.markForCheck();
   }
 
   exportToCsv(): void {
