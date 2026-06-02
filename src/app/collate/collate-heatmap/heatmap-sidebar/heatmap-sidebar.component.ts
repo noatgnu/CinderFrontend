@@ -38,6 +38,7 @@ export class HeatmapSidebarComponent {
   @Input() projectAnalysisGroups: { [projectId: number]: AnalysisGroup[] } = {};
   @Input() state!: HeatmapViewState;
   @Input() heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
+  @Input() showBackButton = true;
   @Output() stateChange = new EventEmitter<HeatmapViewState>();
   @Output() heatmapSettingsChange = new EventEmitter<HeatmapPersistentSettings>();
   @Output() backClick = new EventEmitter<void>();
