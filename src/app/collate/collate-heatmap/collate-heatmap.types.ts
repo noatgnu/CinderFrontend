@@ -2,6 +2,17 @@ import { HeatmapDataPoint } from '../cytoscape-plot/cytoscape-plot.types';
 
 export { HeatmapDataPoint };
 
+export interface HeatmapPersistentSettings {
+  colorScaleFixed: boolean;
+  colorScaleMax: number;
+  minLabel: string;
+  maxLabel: string;
+}
+
+export function defaultHeatmapPersistentSettings(): HeatmapPersistentSettings {
+  return { colorScaleFixed: false, colorScaleMax: 3, minLabel: '', maxLabel: '' };
+}
+
 export interface HeatmapViewState {
   log2fcCutoff: number;
   pValueCutoff: number;

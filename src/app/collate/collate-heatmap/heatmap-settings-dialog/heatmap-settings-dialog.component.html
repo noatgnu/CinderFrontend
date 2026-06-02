@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Heatmap Settings</h2>
+<div mat-dialog-content>
+  <div class="section">
+    <div class="section-title">Color Scale</div>
+
+    <mat-slide-toggle [(ngModel)]="settings.colorScaleFixed" class="toggle">
+      Fixed range (instead of auto ±max)
+    </mat-slide-toggle>
+
+    @if (settings.colorScaleFixed) {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Max value (scale shows −N to +N)</mat-label>
+        <input matInput type="number" min="0.1" step="0.5" [(ngModel)]="settings.colorScaleMax">
+      </mat-form-field>
+    }
+  </div>
+
+  <div class="section">
+    <div class="section-title">Color Scale End Labels <span class="optional">(optional)</span></div>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Min end label (left / low)</mat-label>
+      <input matInput [(ngModel)]="settings.minLabel" placeholder="e.g. Down-regulated">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Max end label (right / high)</mat-label>
+      <input matInput [(ngModel)]="settings.maxLabel" placeholder="e.g. Up-regulated">
+    </mat-form-field>
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-button (click)="save()">Save</button>
+</div>

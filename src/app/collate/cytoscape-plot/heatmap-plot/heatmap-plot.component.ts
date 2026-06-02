@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {PlotlyModule} from "angular-plotly.js";
 import {HeatmapDataPoint} from "../cytoscape-plot.types";
+import {HeatmapPersistentSettings, defaultHeatmapPersistentSettings} from '../../collate-heatmap/collate-heatmap.types';
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
@@ -30,6 +31,12 @@ export class HeatmapPlotComponent {
 
   @Input() set selectedProteinIds(value: Set<string>) {
     this._selectedProteinIds = value ?? new Set();
+    if (this._data.length) this.drawHeatmap();
+  }
+
+  private _heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
+  @Input() set heatmapSettings(value: HeatmapPersistentSettings | null | undefined) {
+    this._heatmapSettings = value ?? defaultHeatmapPersistentSettings();
     if (this._data.length) this.drawHeatmap();
   }
 
@@ -194,6 +201,11 @@ export class HeatmapPlotComponent {
     }
     if (maxAbs === 0) maxAbs = 1;
 
+    const s = this._heatmapSettings;
+    const scaleMax = s.colorScaleFixed && s.colorScaleMax > 0 ? s.colorScaleMax : maxAbs;
+    const minTickLabel = s.minLabel || (-scaleMax).toFixed(1);
+    const maxTickLabel = s.maxLabel || scaleMax.toFixed(1);
+
     const cellSize = 36;
     const minCanvasWidth = 800;
     const minCanvasHeight = 600;
@@ -229,8 +241,8 @@ export class HeatmapPlotComponent {
         [0.75, 'rgb(214, 96, 77)'],
         [1, 'rgb(103, 0, 31)'],
       ],
-      zmin: -maxAbs,
-      zmax: maxAbs,
+      zmin: -scaleMax,
+      zmax: scaleMax,
       zauto: false,
       xgap: 1,
       ygap: 1,
@@ -253,8 +265,8 @@ export class HeatmapPlotComponent {
         yanchor: 'top',
         y: 0,
         ypad: 20,
-        tickvals: [-maxAbs, 0, maxAbs],
-        ticktext: [(-maxAbs).toFixed(1), '0', maxAbs.toFixed(1)],
+        tickvals: [-scaleMax, 0, scaleMax],
+        ticktext: [minTickLabel, '0', maxTickLabel],
         tickfont: { size: 9 },
       },
     };

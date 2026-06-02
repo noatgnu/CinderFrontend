@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { catchError, finalize, Subject, takeUntil } from 'rxjs';
+import { catchError, filter, finalize, Subject, takeUntil } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbar, MatToolbarRow } from '@angular/material/toolbar';
 import { MatIconButton, MatButton } from '@angular/material/button';
@@ -9,7 +9,9 @@ import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTab, MatTabGroup, MatTabLabel } from '@angular/material/tabs';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { NgOptimizedImage } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
 import { CollateService } from '../../collate.service';
 import { CollateSettingsService } from '../../collate-settings.service';
 import { WebService } from '../../../web.service';
@@ -21,6 +23,14 @@ import { BreadcrumbComponent } from '../../../shared/breadcrumb/breadcrumb.compo
 import { HeatmapSidebarComponent } from '../heatmap-sidebar/heatmap-sidebar.component';
 import { HeatmapPlotComponent } from '../../cytoscape-plot/heatmap-plot/heatmap-plot.component';
 import { defaultHeatmapViewState, HeatmapDataPoint, HeatmapViewState } from '../collate-heatmap.types';
+import { CollateProjectAnalysisGroupReorderDialogComponent } from '../../collate-project-analysis-group-reorder-dialog/collate-project-analysis-group-reorder-dialog.component';
+import { CollateProjectAnalysisGroupVisibilityDialogComponent } from '../../collate-project-analysis-group-visibility-dialog/collate-project-analysis-group-visibility-dialog.component';
+import { CollateConditionColorEditorDialogComponent } from '../../collate-condition-color-editor-dialog/collate-condition-color-editor-dialog.component';
+import { CollateRenameSampleConditionDialogComponent } from '../../collate-rename-sample-condition-dialog/collate-rename-sample-condition-dialog.component';
+import { CollateConditionOrderDialogComponent } from '../../collate-condition-order-dialog/collate-condition-order-dialog.component';
+import { GraphService } from '../../../graph.service';
+import { HeatmapSettingsDialogComponent } from '../heatmap-settings-dialog/heatmap-settings-dialog.component';
+import { HeatmapPersistentSettings, defaultHeatmapPersistentSettings } from '../collate-heatmap.types';
 
 interface SubsetTab {
   id: string;
@@ -45,6 +55,9 @@ interface SubsetTab {
     MatTabGroup,
     MatTab,
     MatTabLabel,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
     NgOptimizedImage,
   ],
   templateUrl: './collate-heatmap-explorer.component.html',
@@ -66,6 +79,7 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
 
   viewState: HeatmapViewState = defaultHeatmapViewState();
+  heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
   allHeatmapData: HeatmapDataPoint[] = [];
 
   selectedProteinIds: Set<string> = new Set();
@@ -81,7 +95,129 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
     private collateService: CollateService,
     private web: WebService,
     private settingsService: CollateSettingsService,
+    private dialog: MatDialog,
+    private graph: GraphService,
   ) {}
+
+  private saveCollate(): void {
+    if (!this.collate) return;
+    this.collateService.updateCollate(this.collate.id, this.collate)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.sb.open('Settings saved', 'Dismiss', { duration: 2000 }));
+  }
+
+  openReorderDialog(): void {
+    if (!this.collate) return;
+    const ref = this.dialog.open(CollateProjectAnalysisGroupReorderDialogComponent);
+    ref.componentInstance.projects = this.projects;
+    ref.componentInstance.projectAnalysisGroupMap = { ...this.projectAnalysisGroups };
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter(r => !!r)
+    ).subscribe(result => {
+      if (!this.collate) return;
+      this.projects = result.projects;
+      this.projectAnalysisGroups = result.projectAnalysisGroupMap;
+      this.collate.settings.analysisGroupOrderMap = {};
+      for (const p of this.projects) {
+        const ags = this.projectAnalysisGroups[p.id];
+        if (ags) this.collate.settings.analysisGroupOrderMap[p.id] = ags.map((a: AnalysisGroup) => a.id);
+      }
+      this.saveCollate();
+      this.rebuildHeatmapData();
+      this.cdr.markForCheck();
+    });
+  }
+
+  openVisibilityDialog(): void {
+    if (!this.collate) return;
+    const ref = this.dialog.open(CollateProjectAnalysisGroupVisibilityDialogComponent);
+    ref.componentInstance.projects = this.projects;
+    ref.componentInstance.projectAnalysisGroupMap = this.projectAnalysisGroups;
+    ref.componentInstance.projectAnalysisGroupVisibilityMap = this.collate.settings.projectAnalysisGroupVisibility;
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter(r => !!r)
+    ).subscribe(result => {
+      if (!this.collate) return;
+      this.collate.settings.projectAnalysisGroupVisibility = result;
+      this.viewState = {
+        ...this.viewState,
+        visibilityMap: this.settingsService.initializeVisibilityMap(
+          this.projectAnalysisGroups,
+          result,
+        ),
+      };
+      this.saveCollate();
+      this.rebuildHeatmapData();
+      this.cdr.markForCheck();
+    });
+  }
+
+  openConditionColorDialog(): void {
+    if (!this.collate) return;
+    const ref = this.dialog.open(CollateConditionColorEditorDialogComponent);
+    ref.componentInstance.projects = this.projects;
+    ref.componentInstance.projectConditionColorMap = this.collate.settings.projectConditionColorMap;
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter(r => !!r)
+    ).subscribe(result => {
+      if (!this.collate) return;
+      this.collate.settings.projectConditionColorMap = result;
+      this.graph.projectConditionColorMap = { ...result };
+      this.saveCollate();
+      this.cdr.markForCheck();
+    });
+  }
+
+  openRenameConditionDialog(): void {
+    if (!this.collate) return;
+    const ref = this.dialog.open(CollateRenameSampleConditionDialogComponent);
+    ref.componentInstance.projects = this.collate.projects;
+    ref.componentInstance.renameSampleCondition = this.collate.settings.renameSampleCondition;
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter(r => !!r)
+    ).subscribe(result => {
+      if (!this.collate) return;
+      this.collate.settings.renameSampleCondition = { ...result };
+      this.saveCollate();
+      this.cdr.markForCheck();
+    });
+  }
+
+  openHeatmapSettingsDialog(): void {
+    if (!this.collate) return;
+    const ref = this.dialog.open(HeatmapSettingsDialogComponent, { width: '400px' });
+    ref.componentInstance.initialSettings = this.heatmapSettings;
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter(r => !!r)
+    ).subscribe((result: HeatmapPersistentSettings) => {
+      if (!this.collate) return;
+      this.heatmapSettings = result;
+      this.collate.settings['heatmapSettings'] = result;
+      this.saveCollate();
+      this.cdr.markForCheck();
+    });
+  }
+
+  openConditionOrderDialog(): void {
+    if (!this.collate) return;
+    const ref = this.dialog.open(CollateConditionOrderDialogComponent);
+    ref.componentInstance.projects = this.collate.projects;
+    ref.componentInstance.initialOrder = this.collate.settings['projectConditionOrder'];
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter(r => !!r)
+    ).subscribe(result => {
+      if (!this.collate) return;
+      this.collate.settings['projectConditionOrder'] = { ...result };
+      this.saveCollate();
+      this.cdr.markForCheck();
+    });
+  }
 
   ngOnInit(): void {
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -114,6 +250,7 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
         collate.projects,
         collate.settings?.projectOrder,
       );
+      this.heatmapSettings = collate.settings['heatmapSettings'] ?? defaultHeatmapPersistentSettings();
       if (sessionId) {
         this.loadSearchResults(sessionId);
       }

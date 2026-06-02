@@ -1,0 +1,29 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--app-text-secondary);
+}
+
+.optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.6;
+}
+
+.toggle {
+  font-size: 13px;
+}
+
+.full-width {
+  width: 100%;
+}

@@ -11,13 +11,15 @@
 } @else {
   <mat-toolbar>
     <mat-toolbar-row>
-      <a href="/#/home" class="logo-link" aria-label="Go to home">
-        <img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'" alt="C|nder logo">
-      </a>
-      <span class="toolbar-title">{{ collate?.title }} — Heatmap</span>
       <span class="spacer"></span>
-      <button mat-icon-button (click)="navigateToStandardView()" matTooltip="Back to standard view" aria-label="Back to standard view">
-        <mat-icon>view_list</mat-icon>
+      <button mat-icon-button [matMenuTriggerFor]="heatmapMenu" matTooltip="Heatmap Settings" aria-label="Heatmap Settings">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #heatmapMenu="matMenu">
+        <button mat-menu-item (click)="openHeatmapSettingsDialog()">Color Scale &amp; Labels</button>
+      </mat-menu>
+      <button mat-icon-button (click)="navigateToStandardView()" matTooltip="Back to collate view" aria-label="Back to collate view">
+        <mat-icon>visibility</mat-icon>
       </button>
     </mat-toolbar-row>
   </mat-toolbar>
@@ -62,6 +64,7 @@
               <app-heatmap-plot
                 [data]="allHeatmapData"
                 [selectedProteinIds]="selectedProteinIds"
+                [heatmapSettings]="heatmapSettings"
                 (proteinClicked)="onProteinClicked($event)">
               </app-heatmap-plot>
             } @else {
@@ -83,6 +86,7 @@
               <app-heatmap-plot
                 [data]="getSubsetData(tab.proteinIds)"
                 [selectedProteinIds]="selectedProteinIds"
+                [heatmapSettings]="heatmapSettings"
                 (proteinClicked)="onProteinClicked($event)">
               </app-heatmap-plot>
             </mat-tab>
