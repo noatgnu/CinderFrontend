@@ -34,7 +34,9 @@ import {CollateTagsComponent} from "../collate-tags/collate-tags.component";
 import {filter, forkJoin, Observable, Subject, switchMap, takeUntil} from "rxjs";
 import {HeatmapDataPoint} from "../cytoscape-plot/cytoscape-plot.types";
 import {HeatmapPlotComponent} from "../cytoscape-plot/heatmap-plot/heatmap-plot.component";
-import {defaultHeatmapPersistentSettings, HeatmapPersistentSettings} from "../collate-heatmap/collate-heatmap.types";
+import {defaultHeatmapPersistentSettings, defaultHeatmapViewState, HeatmapPersistentSettings, HeatmapViewState} from "../collate-heatmap/collate-heatmap.types";
+import {HeatmapSidebarComponent} from "../collate-heatmap/heatmap-sidebar/heatmap-sidebar.component";
+import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {AccountsService} from "../../accounts/accounts.service";
@@ -85,6 +87,9 @@ import {MatTooltip} from "@angular/material/tooltip";
         MatProgressSpinner,
         MatTooltip,
         HeatmapPlotComponent,
+        HeatmapSidebarComponent,
+        MatButtonToggleGroup,
+        MatButtonToggle,
     ],
     templateUrl: './collate-editor.component.html',
     styleUrl: './collate-editor.component.scss'
@@ -200,13 +205,48 @@ export class CollateEditorComponent implements OnDestroy {
   filteredResults: { [projectId: number]: SearchResult[] } = {};
   removedTags: CollateTag[] = [];
 
-  showHeatmap = false;
+  editorView: 'collate' | 'heatmap' = 'collate';
   allHeatmapData: HeatmapDataPoint[] = [];
   heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
+  heatmapViewState: HeatmapViewState = defaultHeatmapViewState();
 
-  toggleHeatmap(): void {
-    this.showHeatmap = !this.showHeatmap;
-    if (this.showHeatmap) this.rebuildHeatmapData();
+  onHeatmapStateChange(state: HeatmapViewState): void {
+    this.heatmapViewState = state;
+    this.applyHeatmapFilters();
+  }
+
+  onHeatmapSettingsChange(settings: HeatmapPersistentSettings): void {
+    this.heatmapSettings = settings;
+    if (this._collate) {
+      this._collate.settings['heatmapSettings'] = settings;
+    }
+    this.cdr.markForCheck();
+  }
+
+  private filteredHeatmapData: HeatmapDataPoint[] = [];
+
+  get displayedHeatmapData(): HeatmapDataPoint[] {
+    return this.filteredHeatmapData;
+  }
+
+  private applyHeatmapFilters(): void {
+    this.filteredHeatmapData = this.allHeatmapData.filter(d => {
+      if (this.heatmapViewState.proteinFilter) {
+        const f = this.heatmapViewState.proteinFilter.toLowerCase();
+        if (!d.protein.toLowerCase().includes(f)) return false;
+      }
+      if (this.heatmapViewState.maskSubThreshold) {
+        if (this.heatmapViewState.log2fcCutoff > 0 && Math.abs(d.log2fc) < this.heatmapViewState.log2fcCutoff) return false;
+        if (this.heatmapViewState.pValueCutoff > 0 && d.p_value < this.heatmapViewState.pValueCutoff) return false;
+      }
+      return true;
+    });
+    this.cdr.markForCheck();
+  }
+
+  onEditorViewChange(view: 'collate' | 'heatmap'): void {
+    this.editorView = view;
+    if (view === 'heatmap') this.rebuildHeatmapData();
     this.cdr.markForCheck();
   }
 
@@ -226,7 +266,7 @@ export class CollateEditorComponent implements OnDestroy {
         searchTerm: r.search_term,
       };
     });
-    this.cdr.markForCheck();
+    this.applyHeatmapFilters();
   }
 
   constructor(
@@ -341,7 +381,7 @@ export class CollateEditorComponent implements OnDestroy {
       });
       this.selectedSearchTerm = this.searchTerms[0];
       this.filterDataBySearchTerm();
-      if (this.showHeatmap) this.rebuildHeatmapData();
+      if (this.editorView === 'heatmap') this.rebuildHeatmapData();
       this.cdr.markForCheck();
     });
   }
