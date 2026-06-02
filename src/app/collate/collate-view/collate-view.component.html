@@ -105,7 +105,7 @@
     </div>
 
     @if (collate) {
-      <app-collate-project-list [searchTerm]="selectedSearchTerm" [renameCondition]="collate.settings.renameSampleCondition" [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
+      <app-collate-project-list [searchTerm]="selectedSearchTerm" [renameCondition]="collate.settings.renameSampleCondition" [projectConditionOrder]="collate.settings.projectConditionOrder" [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
     }
   } @else if (collate) {
     <div class="empty-state">

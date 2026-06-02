@@ -1,4 +1,5 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
+import {ProjectConditionOrderEntry} from '../collate';
 import {SearchResult} from "../../search-session";
 import {Project} from "../../project/project";
 import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray} from "@angular/cdk/drag-drop";
@@ -44,6 +45,7 @@ export class CollateProjectListComponent {
 
   @Input() projectConditionColorMap: { [projectID: number]: { [condition: string]: string } }|undefined|null = {};
   @Input() renameCondition: {[projectId: number]: {[key: string]: string}}|undefined|null  = {}
+  @Input() projectConditionOrder: { [projectID: number]: ProjectConditionOrderEntry }|undefined|null = {};
   @Output() projectOrderChanged = new EventEmitter<Project[]>();
   @Output() deleteProject = new EventEmitter<Project>();
   drop(event: CdkDragDrop<Project[]>) {

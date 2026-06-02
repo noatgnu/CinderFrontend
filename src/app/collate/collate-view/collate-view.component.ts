@@ -201,6 +201,7 @@ export class CollateViewComponent implements OnDestroy {
             projectOrder: [],
             analysisGroupOrderMap: {},
             projectConditionColorMap: {},
+            projectConditionOrder: {},
             renameSampleCondition: {},
             projectAnalysisGroupVisibility: {},
             plotSettings: {},

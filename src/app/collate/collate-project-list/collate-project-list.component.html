@@ -9,7 +9,8 @@
           (deleteProject)="deleteProject.emit($event)"
           [project]="project"
           [searchResults]="filteredResults[project.id] || []"
-          [renameCondition]="renameCondition?.[project.id]" cdkDrag>
+          [renameCondition]="renameCondition?.[project.id]"
+          [conditionOrderEntry]="projectConditionOrder?.[project.id]" cdkDrag>
 
         </app-project-card-viewer>
       }

@@ -39,6 +39,9 @@ import {
   CollateRenameSampleConditionDialogComponent
 } from "../collate-rename-sample-condition-dialog/collate-rename-sample-condition-dialog.component";
 import {
+  CollateConditionOrderDialogComponent
+} from "../collate-condition-order-dialog/collate-condition-order-dialog.component";
+import {
   CollateProjectAnalysisGroupVisibilityDialogComponent
 } from "../collate-project-analysis-group-visibility-dialog/collate-project-analysis-group-visibility-dialog.component";
 import {CollatePlotSettingsComponent} from "../collate-plot-settings/collate-plot-settings.component";
@@ -105,6 +108,7 @@ export class CollateEditorComponent implements OnDestroy {
             projectOrder: this.projects.map(project => project.id),
             analysisGroupOrderMap: {},
             projectConditionColorMap: {},
+            projectConditionOrder: {},
             renameSampleCondition: {},
             projectAnalysisGroupVisibility: {},
             plotSettings: {},
@@ -132,6 +136,15 @@ export class CollateEditorComponent implements OnDestroy {
           for (const p of this.projects) {
             if (!currentCollate.settings.projectConditionColorMap[p.id]) {
               currentCollate.settings.projectConditionColorMap[p.id] = {};
+            }
+          }
+
+          if (!currentCollate.settings['projectConditionOrder']) {
+            currentCollate.settings['projectConditionOrder'] = {};
+          }
+          for (const p of this.projects) {
+            if (!currentCollate.settings['projectConditionOrder'][p.id]) {
+              currentCollate.settings['projectConditionOrder'][p.id] = { global: [], perAnalysisGroup: {} };
             }
           }
 
@@ -487,6 +500,22 @@ export class CollateEditorComponent implements OnDestroy {
       this.removedTags = this.collate.tags.filter(tag => !tags.includes(tag));
       this.collate.tags = tags;
     }
+  }
+
+  openConditionOrderDialog() {
+    if (!this.collate) return;
+    const ref = this.dialog.open(CollateConditionOrderDialogComponent);
+    ref.componentInstance.projects = this.collate.projects;
+    ref.componentInstance.initialOrder = this.collate.settings['projectConditionOrder'];
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((result): result is { [projectId: number]: any } => !!result)
+    ).subscribe(result => {
+      if (this.collate) {
+        this.collate.settings['projectConditionOrder'] = { ...result };
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   openRenameConditionDialog() {

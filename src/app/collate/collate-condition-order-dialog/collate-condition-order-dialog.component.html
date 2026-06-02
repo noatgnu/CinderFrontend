@@ -1,0 +1,65 @@
+<h2 mat-dialog-title>Condition Order</h2>
+<div mat-dialog-content>
+  @for (project of projects; track project.id) {
+    <div class="project-section">
+      <div class="project-header">{{ project.name }}</div>
+
+      <div class="section-label">Global order</div>
+      <mat-list dense>
+        <div cdkDropList (cdkDropListDropped)="dropGlobal($event, project.id)">
+          @for (condition of projectConditionOrder[project.id]?.global; track condition) {
+            <mat-list-item cdkDrag class="order-item">
+              <mat-icon cdkDragHandle matListItemIcon class="drag-handle">drag_handle</mat-icon>
+              <div matListItemTitle>{{ condition }}</div>
+            </mat-list-item>
+          }
+        </div>
+      </mat-list>
+
+      @if (agOverrideIds(project.id).length > 0) {
+        <div class="section-label">Analysis group overrides</div>
+        @for (agId of agOverrideIds(project.id); track agId) {
+          <div class="ag-override-block">
+            <div class="ag-override-header">
+              <span>{{ agName(project.id, agId) }}</span>
+              <button mat-icon-button (click)="removeAgOverride(project.id, agId)" matTooltip="Remove override">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <mat-list dense>
+              <div cdkDropList (cdkDropListDropped)="dropAgOverride($event, project.id, agId)">
+                @for (condition of projectConditionOrder[project.id]?.perAnalysisGroup[agId]; track condition) {
+                  <mat-list-item cdkDrag class="order-item">
+                    <mat-icon cdkDragHandle matListItemIcon class="drag-handle">drag_handle</mat-icon>
+                    <div matListItemTitle>{{ condition }}</div>
+                  </mat-list-item>
+                }
+              </div>
+            </mat-list>
+          </div>
+        }
+      }
+
+      @if (availableAgsForOverride(project.id).length > 0) {
+        <div class="add-override-row">
+          <mat-form-field appearance="outline" class="ag-select">
+            <mat-label>Add AG-specific override</mat-label>
+            <mat-select [(value)]="selectedAgOverride[project.id]">
+              @for (ag of availableAgsForOverride(project.id); track ag.id) {
+                <mat-option [value]="ag.id">{{ ag.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <button mat-icon-button (click)="addAgOverride(project.id)" [disabled]="!selectedAgOverride[project.id]" matTooltip="Add override">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+    <mat-divider></mat-divider>
+  }
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-button (click)="save()">Save</button>
+</div>

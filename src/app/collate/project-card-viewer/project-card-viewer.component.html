@@ -23,7 +23,7 @@
               @for (s of group.results; track s.id) {
                 <div cdkDrag>
                   @if ((s.searched_data?.length ?? 0) > 0) {
-                    <app-bar-chart [searchTerm]="s.gene_name" [expanded]="expanded" [renameCondition]="renameCondition" [colorMap]="colorMap" [data]="s"></app-bar-chart>
+                    <app-bar-chart [searchTerm]="s.gene_name" [expanded]="expanded" [renameCondition]="renameCondition" [colorMap]="colorMap" [conditionOrder]="getConditionOrderForAg(s.analysis_group.id)" [data]="s"></app-bar-chart>
                   } @else {
                     <p class="text-secondary">No intensity data for {{ s.analysis_group.name }}</p>
                   }

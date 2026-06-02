@@ -63,6 +63,7 @@ export class AnalysisGroupViewComponent implements OnDestroy {
   @ViewChild('generalMetadata') generalMetadata?: AnalysisGroupGeneralMetadataComponent
   associatedProject?: Project|undefined
   private _analysisGroup: AnalysisGroup|undefined
+  private pendingOperationIds = new Set<string>()
   analysisType: string = "proteomics"
   reorderMetadataColumnSourceFile: MetadataColumn[] = []
   canEdit: boolean = false
@@ -196,6 +197,7 @@ export class AnalysisGroupViewComponent implements OnDestroy {
               this.composingCurtainProgress.downloadedBytes = data.downloaded_bytes || 0
               this.composingCurtainProgress.totalBytes = data.total_bytes || 0
               const downloadOpId = `download_${data.id || this.analysisGroup?.id}`
+              this.pendingOperationIds.add(downloadOpId)
               this.ws.addCurtainOperation(downloadOpId, `Downloading: ${this.analysisGroup?.name || 'Data'}`)
               this.ws.updateOperationProgress(downloadOpId, 'curtain', 'downloading', data.percentage || 0, data.message || "Downloading...");
               break
@@ -204,6 +206,7 @@ export class AnalysisGroupViewComponent implements OnDestroy {
               this.composingCurtainProgress.downloadMessage = data.message || "Download complete"
               this.composingCurtainProgress.downloadActive = false
               const completeOpId = `download_${data.id || this.analysisGroup?.id}`
+              this.pendingOperationIds.delete(completeOpId)
               this.ws.removeCurtainOperation(completeOpId)
               break
           }
@@ -215,6 +218,8 @@ export class AnalysisGroupViewComponent implements OnDestroy {
           const phaseDisplay = data.current_phase ? data.current_phase.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) : 'Processing'
           const message = `${phaseDisplay} (${(data.phase_progress || 0).toFixed(1)}%)`
           const enhancedOpId = `enhanced_${data.id || this.analysisGroup?.id}`
+          this.pendingOperationIds.add(enhancedOpId)
+          this.ws.addCurtainOperation(enhancedOpId, `Importing: ${this.analysisGroup?.name || 'Data'}`)
           this.ws.updateOperationProgress(enhancedOpId, 'curtain', data.current_phase || 'processing', data.overall_progress || 0, message, `Importing: ${this.analysisGroup?.name || 'Data'}`);
           if (data.current_phase === 'data_download') {
             this.composingCurtainProgress.downloadProgress = data.phase_progress || 0
@@ -226,7 +231,6 @@ export class AnalysisGroupViewComponent implements OnDestroy {
             this.composingCurtainProgress.processingActive = true
           }
           this.composingCurtainProgress.message = message
-          this.ws.addCurtainOperation(enhancedOpId)
         } else if (data.type === "curtain_phase_complete") {
           const phaseDisplay = data.phase?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || 'Phase'
           this.sb.open(`${phaseDisplay} completed`, "Dismiss", {duration: 3000})
@@ -248,11 +252,13 @@ export class AnalysisGroupViewComponent implements OnDestroy {
               this.composingCurtainProgress.downloadActive = false
               this.composingCurtainProgress.processingProgress = 0
               this.composingCurtainProgress.processingActive = false
+              this.pendingOperationIds.add(`compose_${this.analysisGroup?.id}`)
               this.ws.addCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
             case "in_progress":
               this.composingCurtainProgress.progress = data.percentage || 0
               this.composingCurtainProgress.message = data.message || "Processing data from Curtain"
+              this.pendingOperationIds.add(`compose_${this.analysisGroup?.id}`)
               this.ws.addCurtainOperation(`compose_${this.analysisGroup?.id}`)
               break
             case "complete":
@@ -264,7 +270,7 @@ export class AnalysisGroupViewComponent implements OnDestroy {
               this.composingCurtainProgress.downloadActive = false
               this.composingCurtainProgress.processingProgress = 100
               this.composingCurtainProgress.processingActive = false
-              this.ws.removeCurtainOperation(`compose_${this.analysisGroup?.id}`)
+              this.clearPendingOperations()
               this.web.getAnalysisGroup(this.analysisGroup!.id).pipe(takeUntil(this.destroy$)).subscribe((data) => {
                 this.analysisGroup = data
                 this.cdr.markForCheck()
@@ -276,7 +282,7 @@ export class AnalysisGroupViewComponent implements OnDestroy {
               this.composingCurtainProgress.error = true
               this.composingCurtainProgress.downloadActive = false
               this.composingCurtainProgress.processingActive = false
-              this.ws.removeCurtainOperation(`compose_${this.analysisGroup?.id}`)
+              this.clearPendingOperations()
               break
           }
         }
@@ -592,7 +598,13 @@ export class AnalysisGroupViewComponent implements OnDestroy {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 
+  private clearPendingOperations(): void {
+    this.pendingOperationIds.forEach(id => this.ws.removeCurtainOperation(id))
+    this.pendingOperationIds.clear()
+  }
+
   ngOnDestroy() {
+    this.clearPendingOperations()
     this.destroy$.next()
     this.destroy$.complete()
   }

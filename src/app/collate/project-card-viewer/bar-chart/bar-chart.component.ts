@@ -56,6 +56,13 @@ export class BarChartComponent implements OnDestroy {
     return this._data;
   }
 
+  private _conditionOrder: string[] = [];
+  @Input() set conditionOrder(value: string[]) {
+    this._conditionOrder = value ?? [];
+    if (this._data) this.drawGraph();
+  }
+  get conditionOrder(): string[] { return this._conditionOrder; }
+
   private _expanded: boolean = false;
   @Input() set expanded(value: boolean) {
     this._expanded = value;
@@ -227,7 +234,14 @@ export class BarChartComponent implements OnDestroy {
 
     } else if (this.data && (this.expanded || (this.data.condition_A == "" || this.data.condition_B == ""))) {
       const searchedData = this.data.searched_data;
-      const uniqueConditions = Array.from(new Set(searchedData.map(x => x.Condition)));
+      let uniqueConditions = Array.from(new Set(searchedData.map(x => x.Condition)));
+      if (this._conditionOrder.length > 0) {
+        const orderIndex = (c: string) => {
+          const i = this._conditionOrder.indexOf(c);
+          return i === -1 ? this._conditionOrder.length : i;
+        };
+        uniqueConditions = uniqueConditions.sort((a, b) => orderIndex(a) - orderIndex(b));
+      }
       const meanValues = uniqueConditions.map(condition => {
         const values = searchedData.filter(x => x.Condition === condition).map(x => x.Value);
         return this.calculateMean(values);

@@ -1,5 +1,10 @@
 import {Project} from "../project/project";
 
+export interface ProjectConditionOrderEntry {
+  global: string[];
+  perAnalysisGroup: { [agID: number]: string[] };
+}
+
 export interface Collate {
   title: string
   greeting: string
@@ -21,6 +26,7 @@ export interface Collate {
       [projectID: number]: { [analysisGroupID: number]: boolean }
     };
     projectConditionColorMap: { [projectID: number]: { [condition: string]: string } };
+    projectConditionOrder: { [projectID: number]: ProjectConditionOrderEntry };
     plotSettings: any,
     showTags: boolean;
     [key: string]: any;

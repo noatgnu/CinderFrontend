@@ -1,4 +1,5 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
+import {ProjectConditionOrderEntry} from '../collate';
 import {Project} from "../../project/project";
 import {
   MatCard,
@@ -77,6 +78,7 @@ export class ProjectCardViewerComponent {
 
   @Input() colorMap: { [condition: string]: string } | undefined = {};
   @Input() renameCondition: {[key: string]: string} | undefined = {}
+  @Input() conditionOrderEntry: ProjectConditionOrderEntry | null | undefined = null;
 
   @Output() deleteProject: EventEmitter<Project> = new EventEmitter<Project>();
 
@@ -99,6 +101,13 @@ export class ProjectCardViewerComponent {
       map.get(key)!.push(r);
     }
     return Array.from(map.entries()).map(([proteinLabel, results]) => ({ proteinLabel, results }));
+  }
+
+  getConditionOrderForAg(agId: number): string[] {
+    if (!this.conditionOrderEntry) return [];
+    const agOrder = this.conditionOrderEntry.perAnalysisGroup?.[agId];
+    if (agOrder && agOrder.length > 0) return agOrder;
+    return this.conditionOrderEntry.global ?? [];
   }
 
   constructor(public accounts: AccountsService) {}

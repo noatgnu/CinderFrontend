@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Collate } from './collate';
+import { Collate, ProjectConditionOrderEntry } from './collate';
 import { Project } from '../project/project';
 import { SearchResult } from '../search-session';
 import { AnalysisGroup } from '../analysis-group/analysis-group';
+
+export { ProjectConditionOrderEntry };
 
 export interface CollateSettings {
   projectOrder: number[];
@@ -10,6 +12,7 @@ export interface CollateSettings {
   renameSampleCondition: { [projectID: number]: { [key: string]: string } };
   projectAnalysisGroupVisibility: { [projectID: number]: { [analysisGroupID: number]: boolean } };
   projectConditionColorMap: { [projectID: number]: { [condition: string]: string } };
+  projectConditionOrder: { [projectID: number]: ProjectConditionOrderEntry };
   plotSettings: any;
   showTags: boolean;
 }
@@ -25,6 +28,7 @@ export class CollateSettingsService {
       renameSampleCondition: this.createEmptyProjectMap(projects),
       projectAnalysisGroupVisibility: this.createEmptyProjectMap(projects),
       projectConditionColorMap: this.createEmptyProjectMap(projects),
+      projectConditionOrder: this.createEmptyProjectMap(projects),
       plotSettings: {},
       showTags: false,
     };
@@ -53,7 +57,11 @@ export class CollateSettingsService {
       settings.projectConditionColorMap = this.createEmptyProjectMap(collate.projects);
     }
 
-    return settings;
+    if (!settings['projectConditionOrder']) {
+      settings['projectConditionOrder'] = this.createEmptyProjectMap(collate.projects);
+    }
+
+    return settings as CollateSettings;
   }
 
   orderProjectsBySettings(projects: Project[], projectOrder: number[]): Project[] {

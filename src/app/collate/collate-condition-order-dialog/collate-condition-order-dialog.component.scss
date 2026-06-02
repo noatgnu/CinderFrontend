@@ -1,0 +1,60 @@
+.project-section {
+  padding: 8px 0;
+}
+
+.project-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text-color);
+  margin-bottom: 4px;
+}
+
+.section-label {
+  font-size: 11px;
+  color: var(--app-text-secondary);
+  margin: 6px 0 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.order-item {
+  cursor: grab;
+  border-radius: 4px;
+
+  &:hover {
+    background: var(--app-surface-variant);
+  }
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--app-text-secondary);
+}
+
+.ag-override-block {
+  border: 1px solid var(--app-outline-variant);
+  border-radius: 6px;
+  margin: 4px 0 8px;
+  padding: 4px 8px;
+}
+
+.ag-override-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 0;
+}
+
+.add-override-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.ag-select {
+  flex: 1;
+  font-size: 12px;
+}
