@@ -122,6 +122,10 @@ export class HeatmapSidebarComponent {
     this.heatmapSettingsChange.emit({ ...this.heatmapSettings, maxLabel: value });
   }
 
+  onUseAgNameChange(value: boolean): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, useAgNameForAxis: value });
+  }
+
   private emit(partial: Partial<HeatmapViewState>): void {
     this.stateChange.emit({ ...this.state, ...partial });
   }

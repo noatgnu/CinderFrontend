@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
 import {PlotlyModule} from "angular-plotly.js";
 import {HeatmapDataPoint} from "../cytoscape-plot.types";
 import {HeatmapPersistentSettings, defaultHeatmapPersistentSettings} from '../../collate-heatmap/collate-heatmap.types';
@@ -15,6 +15,12 @@ import {MatToolbar} from "@angular/material/toolbar";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeatmapPlotComponent {
+  constructor(private cdr: ChangeDetectorRef) {}
+
+  toggleLegend(): void {
+    this.showLegend = !this.showLegend;
+    this.cdr.markForCheck();
+  }
   private _data: HeatmapDataPoint[] = [];
   private _highlightedProtein: string | null = null;
   private _selectedProteinIds: Set<string> = new Set();
@@ -117,18 +123,21 @@ export class HeatmapPlotComponent {
       };
       shapes.push(projectShape);
 
-      let lastComp = '';
+      const useAgName = this._heatmapSettings.useAgNameForAxis;
+      let lastLabel = '';
       localColKeys.forEach((ck, ci) => {
         const rep = colRepresentative.get(ck)!;
         const colPos = colOffset + ci;
         globalColIndexMap.set(`${project}||${ck}`, colPos);
 
+        const colLabel = useAgName ? rep.analysis_group : (rep.comparison ?? '');
         tickvals.push(colPos);
-        ticktext.push(rep.comparison !== lastComp ? (rep.comparison ?? '') : '');
+        ticktext.push(colLabel !== lastLabel ? colLabel : '');
 
         if (ci > 0) {
           const prevRep = colRepresentative.get(localColKeys[ci - 1])!;
-          if (prevRep.comparison !== rep.comparison) {
+          const prevLabel = useAgName ? prevRep.analysis_group : (prevRep.comparison ?? '');
+          if (prevLabel !== colLabel) {
             shapes.push({
               type: 'line',
               x0: colPos - 0.5, x1: colPos - 0.5,
@@ -152,7 +161,7 @@ export class HeatmapPlotComponent {
         this.projectShapeByColIdx[colPos] = projectShape;
         this.proteinsByColIdx[colPos] = new Set();
 
-        lastComp = rep.comparison ?? '';
+        lastLabel = colLabel;
       });
 
       colOffset += numCols;

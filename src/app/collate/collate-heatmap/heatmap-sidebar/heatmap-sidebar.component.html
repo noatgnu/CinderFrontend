@@ -83,6 +83,22 @@
 
   <div class="sidebar-section">
     <div class="section-header">
+      <span class="section-title">X-Axis</span>
+    </div>
+    <div class="toggle-row">
+      <mat-slide-toggle
+        [checked]="heatmapSettings.useAgNameForAxis"
+        (change)="onUseAgNameChange($event.checked)"
+        class="compact-toggle">
+        Use analysis group name
+      </mat-slide-toggle>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="sidebar-section">
+    <div class="section-header">
       <span class="section-title">Analysis Groups</span>
     </div>
     @for (project of projects; track project.id) {
@@ -99,9 +115,7 @@
               <div class="ag-row">
                 <mat-checkbox
                   [checked]="isVisible(project.id, ag.id)"
-                  (change)="toggleVisibility(project.id, ag.id)"
-                  class="ag-checkbox">
-                  <span class="ag-name" [title]="ag.name">{{ ag.name }}</span>
+                  (change)="toggleVisibility(project.id, ag.id)">
                 </mat-checkbox>
                 <button
                   mat-icon-button
@@ -111,6 +125,7 @@
                   (click)="toggleFlip(ag.id)">
                   <mat-icon>swap_vert</mat-icon>
                 </button>
+                <span class="ag-name" [title]="ag.name">{{ ag.name }}</span>
               </div>
             }
           }

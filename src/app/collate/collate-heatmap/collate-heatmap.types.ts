@@ -7,10 +7,11 @@ export interface HeatmapPersistentSettings {
   colorScaleMax: number;
   minLabel: string;
   maxLabel: string;
+  useAgNameForAxis: boolean;
 }
 
 export function defaultHeatmapPersistentSettings(): HeatmapPersistentSettings {
-  return { colorScaleFixed: false, colorScaleMax: 3, minLabel: '', maxLabel: '' };
+  return { colorScaleFixed: false, colorScaleMax: 3, minLabel: '', maxLabel: '', useAgNameForAxis: false };
 }
 
 export interface HeatmapViewState {

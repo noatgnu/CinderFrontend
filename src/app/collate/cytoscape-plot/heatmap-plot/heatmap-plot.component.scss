@@ -11,11 +11,16 @@
 .heatmap-card {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--app-outline-variant);
-  border-radius: 4px;
   background-color: var(--app-surface-color);
   overflow: hidden;
-  margin-bottom: 16px;
+  position: relative;
+}
+
+.heatmap-card mat-toolbar {
+  background: transparent;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 8px;
 }
 
 .toolbar-title {
@@ -30,6 +35,8 @@
 .heatmap-content {
   overflow: auto;
   position: relative;
+  display: flex;
+  justify-content: center;
 }
 
 .heatmap-legend {

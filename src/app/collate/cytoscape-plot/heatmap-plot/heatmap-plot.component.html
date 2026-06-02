@@ -5,7 +5,7 @@
     <button mat-icon-button matTooltip="Export to CSV" (click)="exportToCsv()">
       <mat-icon>download</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Toggle Legend" (click)="showLegend = !showLegend">
+    <button mat-icon-button matTooltip="Toggle Legend" (click)="toggleLegend()">
       <mat-icon>{{ showLegend ? 'visibility_off' : 'help_outline' }}</mat-icon>
     </button>
   </mat-toolbar>
