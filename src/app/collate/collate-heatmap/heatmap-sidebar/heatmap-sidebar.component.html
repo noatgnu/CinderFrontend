@@ -84,6 +84,50 @@
 
   <div class="sidebar-section">
     <div class="section-header">
+      <span class="section-title">Layout</span>
+    </div>
+    <mat-form-field appearance="outline" class="full-width compact">
+      <mat-label>Cell size (px)</mat-label>
+      <input matInput type="number" min="5" max="200" step="1"
+             [ngModel]="heatmapSettings.cellSize"
+             (ngModelChange)="onCellSizeChange(+$event)">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width compact">
+      <mat-label>Font size (px)</mat-label>
+      <input matInput type="number" min="4" max="24" step="1"
+             [ngModel]="heatmapSettings.labelFontSize"
+             (ngModelChange)="onLabelFontSizeChange(+$event)">
+    </mat-form-field>
+    <div class="toggle-row">
+      <mat-slide-toggle
+        [checked]="heatmapSettings.swapAxes"
+        (change)="onSwapAxesChange($event.checked)"
+        class="compact-toggle">
+        Swap axes
+      </mat-slide-toggle>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="sidebar-section">
+    <div class="section-header">
+      <span class="section-title">Summary Stats</span>
+    </div>
+    <mat-form-field appearance="outline" class="full-width compact">
+      <mat-label>Display</mat-label>
+      <mat-select [ngModel]="heatmapSettings.summaryMode" (ngModelChange)="onSummaryModeChange($event)">
+        <mat-option value="none">None</mat-option>
+        <mat-option value="count">Count</mat-option>
+        <mat-option value="percentage">Percentage</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="sidebar-section">
+    <div class="section-header">
       <span class="section-title">X-Axis</span>
     </div>
     <div class="toggle-row">

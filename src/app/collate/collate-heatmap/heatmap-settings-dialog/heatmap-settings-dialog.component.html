@@ -1,33 +1,66 @@
 <h2 mat-dialog-title>Heatmap Settings</h2>
-<div mat-dialog-content>
+<div mat-dialog-content class="settings-content">
   <div class="section">
     <div class="section-title">Color Scale</div>
-
-    <mat-slide-toggle [(ngModel)]="settings.colorScaleFixed" class="toggle">
-      Fixed range (instead of auto ±max)
-    </mat-slide-toggle>
-
+    <mat-slide-toggle [(ngModel)]="settings.colorScaleFixed" class="toggle">Fixed range</mat-slide-toggle>
     @if (settings.colorScaleFixed) {
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Max value (scale shows −N to +N)</mat-label>
-        <input matInput type="number" min="0.1" step="0.5" [(ngModel)]="settings.colorScaleMax">
+        <mat-label>Min value</mat-label>
+        <input matInput type="number" step="0.5" [(ngModel)]="settings.colorScaleMin">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Max value</mat-label>
+        <input matInput type="number" step="0.5" [(ngModel)]="settings.colorScaleMax">
       </mat-form-field>
     }
-  </div>
-
-  <div class="section">
-    <div class="section-title">Color Scale End Labels <span class="optional">(optional)</span></div>
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Min end label (left / low)</mat-label>
+      <mat-label>Min label <span class="optional">(optional)</span></mat-label>
       <input matInput [(ngModel)]="settings.minLabel" placeholder="e.g. Down-regulated">
     </mat-form-field>
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Max end label (right / high)</mat-label>
+      <mat-label>Max label <span class="optional">(optional)</span></mat-label>
       <input matInput [(ngModel)]="settings.maxLabel" placeholder="e.g. Up-regulated">
     </mat-form-field>
   </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="section">
+    <div class="section-title">Layout</div>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Cell size (px)</mat-label>
+      <input matInput type="number" min="5" max="200" step="1" [(ngModel)]="settings.cellSize">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Label font size (px)</mat-label>
+      <input matInput type="number" min="4" max="24" step="1" [(ngModel)]="settings.labelFontSize">
+    </mat-form-field>
+    <mat-slide-toggle [(ngModel)]="settings.swapAxes" class="toggle">Swap axes (genes on X)</mat-slide-toggle>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="section">
+    <div class="section-title">Summary Statistics</div>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Display mode</mat-label>
+      <mat-select [(ngModel)]="settings.summaryMode">
+        <mat-option value="none">None</mat-option>
+        <mat-option value="count">Count (↑3 ↓2)</mat-option>
+        <mat-option value="percentage">Percentage (↑60% ↓40%)</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="section">
+    <div class="section-title">X-Axis</div>
+    <mat-slide-toggle [(ngModel)]="settings.useAgNameForAxis" class="toggle">Use analysis group name</mat-slide-toggle>
+  </div>
 </div>
 <div mat-dialog-actions align="end">
+  <button mat-button (click)="reset()">Reset</button>
   <button mat-button (click)="cancel()">Cancel</button>
   <button mat-button (click)="save()">Save</button>
 </div>

@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Reorder Proteins</h2>
+<div mat-dialog-content class="dialog-content">
+  <div class="section">
+    <div class="section-title">Drag to reorder</div>
+    <div class="protein-list" cdkDropList #proteinList="cdkDropList" [cdkDropListData]="currentOrder" (cdkDropListDropped)="dropGene($event)">
+      @for (protein of currentOrder; track protein; let i = $index) {
+        <div class="protein-item" cdkDrag [cdkDragData]="protein">
+          <mat-icon class="drag-handle">drag_handle</mat-icon>
+          <span>{{ protein }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="section">
+    <div class="section-title">Sort by comparison</div>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Select comparison</mat-label>
+      <mat-select [(ngModel)]="selectedComparison">
+        <mat-option value="">-- None --</mat-option>
+        @for (comp of availableComparisons; track comp) {
+          <mat-option [value]="comp">{{ comp }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    @if (selectedComparison) {
+      <div class="sort-controls">
+        <button mat-button [class.active]="sortDirection === 'asc'" (click)="sortDirection = 'asc'">
+          <mat-icon>arrow_upward</mat-icon> Ascending
+        </button>
+        <button mat-button [class.active]="sortDirection === 'desc'" (click)="sortDirection = 'desc'">
+          <mat-icon>arrow_downward</mat-icon> Descending
+        </button>
+        <button mat-button (click)="sortByComparison()">
+          <mat-icon>sort</mat-icon> Apply Sort
+        </button>
+      </div>
+    }
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="section">
+    <div class="section-title">Bulk entry (comma or newline separated)</div>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Enter protein names</mat-label>
+      <textarea matInput [(ngModel)]="bulkText" rows="4" placeholder="e.g. BRCA1, EGFR&#10;TP53"></textarea>
+    </mat-form-field>
+    <button mat-button (click)="applyBulkOrder()" [disabled]="!bulkText.trim()">
+      <mat-icon>check</mat-icon> Apply
+    </button>
+  </div>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="reset()">Reset</button>
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="save()">Save</button>
+</div>

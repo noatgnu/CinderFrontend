@@ -8,6 +8,8 @@ import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
 import { Collate } from '../../collate';
 import { Project } from '../../../project/project';
 import { AnalysisGroup } from '../../../analysis-group/analysis-group';
@@ -28,6 +30,8 @@ import { HeatmapPersistentSettings, HeatmapViewState, defaultHeatmapPersistentSe
     MatButton,
     MatIconButton,
     MatTooltip,
+    MatSelect,
+    MatOption,
   ],
   templateUrl: './heatmap-sidebar.component.html',
   styleUrl: './heatmap-sidebar.component.scss',
@@ -125,6 +129,26 @@ export class HeatmapSidebarComponent {
 
   onUseAgNameChange(value: boolean): void {
     this.heatmapSettingsChange.emit({ ...this.heatmapSettings, useAgNameForAxis: value });
+  }
+
+  onColorScaleMinChange(value: number): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, colorScaleMin: value });
+  }
+
+  onSwapAxesChange(value: boolean): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, swapAxes: value });
+  }
+
+  onCellSizeChange(value: number): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, cellSize: Math.max(5, Math.min(200, value)) });
+  }
+
+  onLabelFontSizeChange(value: number): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, labelFontSize: Math.max(4, Math.min(24, value)) });
+  }
+
+  onSummaryModeChange(mode: 'none' | 'count' | 'percentage'): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, summaryMode: mode });
   }
 
   private emit(partial: Partial<HeatmapViewState>): void {

@@ -31,6 +31,7 @@ import { CollateConditionOrderDialogComponent } from '../../collate-condition-or
 import { GraphService } from '../../../graph.service';
 import { AccountsService } from '../../../accounts/accounts.service';
 import { HeatmapSettingsDialogComponent } from '../heatmap-settings-dialog/heatmap-settings-dialog.component';
+import { HeatmapProteinOrderDialogComponent } from '../heatmap-protein-order-dialog/heatmap-protein-order-dialog.component';
 import { HeatmapPersistentSettings, defaultHeatmapPersistentSettings } from '../collate-heatmap.types';
 
 interface SubsetTab {
@@ -82,6 +83,7 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
   viewState: HeatmapViewState = defaultHeatmapViewState();
   heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
   allHeatmapData: HeatmapDataPoint[] = [];
+  proteinOrder: string[] = [];
 
   selectedProteinIds: Set<string> = new Set();
   subsetTabs: SubsetTab[] = [];
@@ -406,6 +408,70 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
       this.activeTabIndex = this.subsetTabs.length;
     }
     this.cdr.markForCheck();
+  }
+
+  selectedProteinsArray(): string[] {
+    return Array.from(this.selectedProteinIds);
+  }
+
+  removeFromSelection(protein: string): void {
+    this.selectedProteinIds = new Set(this.selectedProteinIds);
+    this.selectedProteinIds.delete(protein);
+    this.cdr.markForCheck();
+  }
+
+  isolateSelection(): void {
+    const selected = new Set(this.selectedProteinIds);
+    if (selected.size === 0) return;
+    this.subsetCounter++;
+    const id = `subset_${this.subsetCounter}`;
+    const name = `Isolated (${selected.size})`;
+    this.subsetTabs = [...this.subsetTabs, { id, name, proteinIds: Array.from(selected) }];
+    this.activeTabIndex = this.subsetTabs.length;
+    this.selectedProteinIds = new Set();
+    this.cdr.markForCheck();
+  }
+
+  exportSelected(): void {
+    const proteins = Array.from(this.selectedProteinIds);
+    const data = this.allHeatmapData.filter(d => proteins.includes(d.protein));
+    this.downloadCsv(data, 'selected_proteins.csv');
+  }
+
+  private downloadCsv(data: HeatmapDataPoint[], filename: string): void {
+    const headers = ['Protein', 'Project', 'Analysis Group', 'Condition A', 'Condition B', 'Comparison', 'Log2FC', 'P-value', 'Search Term'];
+    const rows = data.map(d => [
+      d.protein, d.project, d.analysis_group, d.conditionA, d.conditionB,
+      d.comparison ?? '', d.log2fc.toString(), d.p_value.toString(), d.searchTerm ?? ''
+    ]);
+    const csv = [headers, ...rows.map(r => r.map(cell => `"${cell}"`).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  openProteinOrderDialog(): void {
+    const dialogRef = this.dialog.open(HeatmapProteinOrderDialogComponent, {
+      width: '500px',
+      maxHeight: '80vh',
+    });
+
+    dialogRef.componentInstance.allProteins = Array.from(new Set(this.allHeatmapData.map(d => d.protein)));
+    dialogRef.componentInstance.allHeatmapData = this.allHeatmapData;
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && Array.isArray(result)) {
+        this.proteinOrder = result;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   navigateToEdit(): void {

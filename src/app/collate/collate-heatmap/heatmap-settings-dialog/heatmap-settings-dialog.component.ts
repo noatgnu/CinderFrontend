@@ -5,6 +5,9 @@ import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatDivider } from '@angular/material/divider';
 import { HeatmapPersistentSettings, defaultHeatmapPersistentSettings } from '../collate-heatmap.types';
 
 @Component({
@@ -20,6 +23,9 @@ import { HeatmapPersistentSettings, defaultHeatmapPersistentSettings } from '../
     MatLabel,
     MatInput,
     MatSlideToggle,
+    MatSelect,
+    MatOption,
+    MatDivider,
   ],
   templateUrl: './heatmap-settings-dialog.component.html',
   styleUrl: './heatmap-settings-dialog.component.scss',
@@ -41,5 +47,9 @@ export class HeatmapSettingsDialogComponent {
 
   cancel(): void {
     this.dialogRef.close();
+  }
+
+  reset(): void {
+    this.settings = defaultHeatmapPersistentSettings();
   }
 }

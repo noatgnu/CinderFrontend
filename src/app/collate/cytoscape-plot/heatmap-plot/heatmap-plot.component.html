@@ -2,8 +2,20 @@
   <mat-toolbar>
     <span class="toolbar-title">Heatmap</span>
     <span class="toolbar-spacer"></span>
-    <button mat-icon-button matTooltip="Export to CSV" (click)="exportToCsv()">
+    <button mat-icon-button matTooltip="Zoom in" (click)="zoomIn()">
+      <mat-icon>zoom_in</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Zoom out" (click)="zoomOut()">
+      <mat-icon>zoom_out</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Reset zoom" (click)="resetZoom()">
+      <mat-icon>fit_screen</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Export all" (click)="exportToCsv('all')">
       <mat-icon>download</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Export selected" [disabled]="selectedProteinIds.size === 0" (click)="exportToCsv('selected')">
+      <mat-icon>cloud_download</mat-icon>
     </button>
     <button mat-icon-button matTooltip="Toggle Legend" (click)="toggleLegend()">
       <mat-icon>{{ showLegend ? 'visibility_off' : 'help_outline' }}</mat-icon>
@@ -38,7 +50,7 @@
       </div>
     </div>
   }
-  <div class="heatmap-content">
+  <div class="heatmap-content" #plotContainer>
     <plotly-plot (hover)="handleHoverIn($event)" (unhover)="handleHoverOut($event)" (plotly_click)="onClick($event)" [data]="graphData" [layout]="layout" [config]="plotConfig" [updateOnlyWithRevision]="true" [revision]="revision"></plotly-plot>
   </div>
 </div>

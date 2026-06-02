@@ -12,6 +12,9 @@
   <mat-toolbar>
     <mat-toolbar-row>
       <span class="spacer"></span>
+      <button mat-icon-button (click)="openProteinOrderDialog()" matTooltip="Reorder proteins" aria-label="Reorder proteins">
+        <mat-icon>sort</mat-icon>
+      </button>
       <button mat-icon-button (click)="navigateToStandardView()" matTooltip="Back to collate view" aria-label="Back to collate view">
         <mat-icon>visibility</mat-icon>
       </button>
@@ -39,20 +42,6 @@
       </app-heatmap-sidebar>
 
       <div class="main-panel">
-        @if (selectedProteinIds.size > 0) {
-          <div class="selection-bar">
-            <mat-icon>done_all</mat-icon>
-            <span>{{ selectedProteinIds.size }} protein{{ selectedProteinIds.size !== 1 ? 's' : '' }} selected</span>
-            <button mat-button (click)="createSubsetFromSelection()">
-              <mat-icon>add_chart</mat-icon>
-              Create subset
-            </button>
-            <button mat-button (click)="clearSelection()">
-              <mat-icon>clear</mat-icon>
-              Clear
-            </button>
-          </div>
-        }
 
         <mat-tab-group
           [selectedIndex]="activeTabIndex"
@@ -66,6 +55,7 @@
                 [data]="allHeatmapData"
                 [selectedProteinIds]="selectedProteinIds"
                 [heatmapSettings]="heatmapSettings"
+                [proteinOrder]="proteinOrder"
                 (proteinClicked)="onProteinClicked($event)">
               </app-heatmap-plot>
             } @else {
@@ -88,6 +78,7 @@
                 [data]="getSubsetData(tab.proteinIds)"
                 [selectedProteinIds]="selectedProteinIds"
                 [heatmapSettings]="heatmapSettings"
+                [proteinOrder]="proteinOrder"
                 (proteinClicked)="onProteinClicked($event)">
               </app-heatmap-plot>
             </mat-tab>
@@ -103,6 +94,34 @@
       <button mat-icon-button (click)="navigateToStandardView()" matTooltip="Go to standard view">
         <mat-icon>arrow_back</mat-icon>
       </button>
+    </div>
+  }
+
+  @if (selectedProteinIds.size > 0) {
+    <div class="selection-panel">
+      <div class="selection-panel-header">
+        <span>{{ selectedProteinIds.size }} selected</span>
+        <button mat-icon-button (click)="clearSelection()"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="selection-panel-list">
+        @for (protein of selectedProteinsArray(); track protein) {
+          <div class="selection-panel-item">
+            <span>{{ protein }}</span>
+            <button mat-icon-button (click)="removeFromSelection(protein)"><mat-icon>close</mat-icon></button>
+          </div>
+        }
+      </div>
+      <div class="selection-panel-actions">
+        <button mat-button (click)="createSubsetFromSelection()">
+          <mat-icon>add_chart</mat-icon> Create Subset
+        </button>
+        <button mat-button (click)="isolateSelection()">
+          <mat-icon>filter_alt</mat-icon> Isolate
+        </button>
+        <button mat-button (click)="exportSelected()">
+          <mat-icon>download</mat-icon> Export
+        </button>
+      </div>
     </div>
   }
 }

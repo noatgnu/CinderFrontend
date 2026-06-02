@@ -4,14 +4,30 @@ export { HeatmapDataPoint };
 
 export interface HeatmapPersistentSettings {
   colorScaleFixed: boolean;
+  colorScaleMin: number;
   colorScaleMax: number;
   minLabel: string;
   maxLabel: string;
   useAgNameForAxis: boolean;
+  swapAxes: boolean;
+  cellSize: number;
+  labelFontSize: number;
+  summaryMode: 'none' | 'count' | 'percentage';
 }
 
 export function defaultHeatmapPersistentSettings(): HeatmapPersistentSettings {
-  return { colorScaleFixed: false, colorScaleMax: 3, minLabel: '', maxLabel: '', useAgNameForAxis: false };
+  return {
+    colorScaleFixed: false,
+    colorScaleMin: -3,
+    colorScaleMax: 3,
+    minLabel: '',
+    maxLabel: '',
+    useAgNameForAxis: false,
+    swapAxes: false,
+    cellSize: 36,
+    labelFontSize: 9,
+    summaryMode: 'none',
+  };
 }
 
 export interface HeatmapViewState {
