@@ -32,6 +32,7 @@ import { GraphService } from '../../../graph.service';
 import { AccountsService } from '../../../accounts/accounts.service';
 import { HeatmapSettingsDialogComponent } from '../heatmap-settings-dialog/heatmap-settings-dialog.component';
 import { HeatmapProteinOrderDialogComponent } from '../heatmap-protein-order-dialog/heatmap-protein-order-dialog.component';
+import { HeatmapColumnOrderDialogComponent, HeatmapColumnGroup } from '../heatmap-column-order-dialog/heatmap-column-order-dialog.component';
 import { HeatmapPersistentSettings, defaultHeatmapPersistentSettings } from '../collate-heatmap.types';
 
 interface SubsetTab {
@@ -84,6 +85,7 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
   heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
   allHeatmapData: HeatmapDataPoint[] = [];
   proteinOrder: string[] = [];
+  columnOrder: { [project: string]: string[] } = {};
 
   selectedProteinIds: Set<string> = new Set();
   subsetTabs: SubsetTab[] = [];
@@ -457,6 +459,30 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  }
+
+  openColumnOrderDialog(): void {
+    const useAgName = this.heatmapSettings.useAgNameForAxis;
+    const projectMap = new Map<string, Set<string>>();
+    for (const d of this.allHeatmapData) {
+      if (!projectMap.has(d.project)) projectMap.set(d.project, new Set());
+      projectMap.get(d.project)!.add(useAgName ? d.analysis_group : (d.comparison ?? ''));
+    }
+    const groups: HeatmapColumnGroup[] = Array.from(projectMap.entries()).map(([project, labels]) => ({
+      project,
+      labels: (this.columnOrder[project] && this.columnOrder[project].length)
+        ? this.columnOrder[project]
+        : Array.from(labels).sort(),
+    }));
+
+    const dialogRef = this.dialog.open(HeatmapColumnOrderDialogComponent, { width: '480px', maxHeight: '80vh' });
+    dialogRef.componentInstance.columnGroups = groups;
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.columnOrder = result;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   openProteinOrderDialog(): void {

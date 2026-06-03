@@ -1,0 +1,71 @@
+.dialog-content {
+  min-width: 380px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-top: 8px;
+}
+
+.project-section {
+  margin-bottom: 12px;
+}
+
+.project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.project-name {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--app-text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.column-list {
+  border: 1px solid var(--app-divider-color);
+  border-radius: 4px;
+  background: var(--app-surface-color);
+}
+
+.column-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--app-divider-color);
+  cursor: move;
+  font-size: 13px;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba(0, 0, 0, 0.02); }
+
+  .drag-handle {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--app-text-secondary);
+    flex-shrink: 0;
+  }
+
+  span {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.cdk-drag-preview {
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: var(--app-surface-color);
+  border: 1px solid var(--app-primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

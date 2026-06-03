@@ -102,7 +102,9 @@ export class CytoscapeGraphService {
 
         heatmapData.push({
           project: project.name,
+          project_id: project.id,
           analysis_group: result.analysis_group.name,
+          analysis_group_id: result.analysis_group.id,
           conditionA: conditionA,
           conditionB: conditionB,
           log2fc: result.log2_fc,

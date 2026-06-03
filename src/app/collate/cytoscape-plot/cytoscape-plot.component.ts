@@ -534,7 +534,9 @@ export class CytoscapePlotComponent implements AfterViewInit, OnDestroy {
       if (data.conditionA && data.conditionB && data.protein) {
         heatmapData.push({
           project: data.project,
+          project_id: data.project_id ?? 0,
           analysis_group: data.analysis_group,
+          analysis_group_id: data.analysis_group_id ?? 0,
           conditionA: data.conditionA,
           conditionB: data.conditionB,
           log2fc: data.fc,

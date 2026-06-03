@@ -9,7 +9,6 @@ import {MatToolbar} from "@angular/material/toolbar";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatDivider} from "@angular/material/divider";
 import {AccountsService} from '../../../accounts/accounts.service';
-import {ProjectConditionOrderEntry} from '../../collate';
 
 @Component({
   selector: 'app-heatmap-plot',
@@ -83,9 +82,9 @@ export class HeatmapPlotComponent {
     if (this._data.length) this.drawHeatmap();
   }
 
-  private _projectConditionOrder: { [projectId: number]: ProjectConditionOrderEntry } | null = null;
-  @Input() set projectConditionOrder(value: { [projectId: number]: ProjectConditionOrderEntry } | null | undefined) {
-    this._projectConditionOrder = value ?? null;
+  private _columnOrder: { [project: string]: string[] } | null = null;
+  @Input() set columnOrder(value: { [project: string]: string[] } | null | undefined) {
+    this._columnOrder = value ?? null;
     if (this._data.length) this.drawHeatmap();
   }
 
@@ -168,26 +167,16 @@ export class HeatmapPlotComponent {
         if (!colRepresentative.has(ck)) colRepresentative.set(ck, d);
       }
 
-      // Sort columns by user-specified condition order if available
-      if (this._projectConditionOrder && localColKeys.length > 0) {
+      // Sort columns by user-specified label order if available
+      if (this._columnOrder && localColKeys.length > 0) {
         const firstRep = colRepresentative.get(localColKeys[0]);
-        const entry = firstRep ? this._projectConditionOrder[firstRep.project_id] : null;
-        if (entry) {
-          const getOrder = (agId: number) => {
-            const ag = entry.perAnalysisGroup?.[agId];
-            return (ag && ag.length) ? ag : entry.global;
-          };
-          const getIdx = (order: string[], cond: string) => {
-            const i = order.indexOf(cond);
-            return i === -1 ? order.length : i;
-          };
+        const order = firstRep ? (this._columnOrder[firstRep.project] ?? null) : null;
+        if (order && order.length) {
           localColKeys.sort((a, b) => {
-            const ra = colRepresentative.get(a)!;
-            const rb = colRepresentative.get(b)!;
-            const oa = getOrder(ra.analysis_group_id);
-            const ob = getOrder(rb.analysis_group_id);
-            const diff = getIdx(oa, ra.conditionA) - getIdx(ob, rb.conditionA);
-            return diff !== 0 ? diff : getIdx(oa, ra.conditionB) - getIdx(ob, rb.conditionB);
+            const la = useAgName ? colRepresentative.get(a)!.analysis_group : (colRepresentative.get(a)!.comparison ?? '');
+            const lb = useAgName ? colRepresentative.get(b)!.analysis_group : (colRepresentative.get(b)!.comparison ?? '');
+            const ia = order.indexOf(la); const ib = order.indexOf(lb);
+            return (ia === -1 ? order.length : ia) - (ib === -1 ? order.length : ib);
           });
         }
       }
