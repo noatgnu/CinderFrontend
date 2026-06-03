@@ -6,10 +6,14 @@ import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatToolbar} from "@angular/material/toolbar";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {MatDivider} from "@angular/material/divider";
+import {AccountsService} from '../../../accounts/accounts.service';
+import {ProjectConditionOrderEntry} from '../../collate';
 
 @Component({
   selector: 'app-heatmap-plot',
-  imports: [PlotlyModule, MatIconButton, MatIcon, MatTooltip, MatToolbar],
+  imports: [PlotlyModule, MatIconButton, MatIcon, MatTooltip, MatToolbar, MatMenu, MatMenuItem, MatMenuTrigger, MatDivider],
   templateUrl: './heatmap-plot.component.html',
   styleUrl: './heatmap-plot.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -17,7 +21,7 @@ import {MatToolbar} from "@angular/material/toolbar";
 export class HeatmapPlotComponent {
   @ViewChild('plotContainer') plotContainerRef!: ElementRef<HTMLElement>;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private accounts: AccountsService) {}
 
   toggleLegend(): void {
     this.showLegend = !this.showLegend;
@@ -79,6 +83,12 @@ export class HeatmapPlotComponent {
     if (this._data.length) this.drawHeatmap();
   }
 
+  private _projectConditionOrder: { [projectId: number]: ProjectConditionOrderEntry } | null = null;
+  @Input() set projectConditionOrder(value: { [projectId: number]: ProjectConditionOrderEntry } | null | undefined) {
+    this._projectConditionOrder = value ?? null;
+    if (this._data.length) this.drawHeatmap();
+  }
+
   @Output() currentHoverTarget = new EventEmitter<HeatmapDataPoint | undefined>();
   @Output() proteinClicked = new EventEmitter<string>();
 
@@ -105,13 +115,15 @@ export class HeatmapPlotComponent {
   plotConfig = {
     responsive: true,
     scrollZoom: false,
-    displayModeBar: true,
-    modeBarButtonsToRemove: ['zoom2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d', 'pan2d', 'select2d', 'lasso2d'],
-    displaylogo: false
+    displayModeBar: false,
   };
 
   drawHeatmap(): void {
     if (!this._data.length) return;
+
+    const isDark = this.accounts.userAccount.darkMode;
+    const textColor = isDark ? '#e2e8f0' : '#1a202c';
+    const paperBg = isDark ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0)';
 
     this.dataByColProtein = {};
     this.proteinsByColIdx = {};
@@ -154,6 +166,30 @@ export class HeatmapPlotComponent {
         const ck = `${d.analysis_group}||${d.conditionA}||${d.conditionB}`;
         if (!seenLocal.has(ck)) { seenLocal.add(ck); localColKeys.push(ck); }
         if (!colRepresentative.has(ck)) colRepresentative.set(ck, d);
+      }
+
+      // Sort columns by user-specified condition order if available
+      if (this._projectConditionOrder && localColKeys.length > 0) {
+        const firstRep = colRepresentative.get(localColKeys[0]);
+        const entry = firstRep ? this._projectConditionOrder[firstRep.project_id] : null;
+        if (entry) {
+          const getOrder = (agId: number) => {
+            const ag = entry.perAnalysisGroup?.[agId];
+            return (ag && ag.length) ? ag : entry.global;
+          };
+          const getIdx = (order: string[], cond: string) => {
+            const i = order.indexOf(cond);
+            return i === -1 ? order.length : i;
+          };
+          localColKeys.sort((a, b) => {
+            const ra = colRepresentative.get(a)!;
+            const rb = colRepresentative.get(b)!;
+            const oa = getOrder(ra.analysis_group_id);
+            const ob = getOrder(rb.analysis_group_id);
+            const diff = getIdx(oa, ra.conditionA) - getIdx(ob, rb.conditionA);
+            return diff !== 0 ? diff : getIdx(oa, ra.conditionB) - getIdx(ob, rb.conditionB);
+          });
+        }
       }
 
       const numCols = localColKeys.length;
@@ -254,7 +290,7 @@ export class HeatmapPlotComponent {
       thicknessmode: 'pixels', thickness: 12,
       xanchor: 'center', x: 0.5, yanchor: 'top', y: 0, ypad: 20,
       tickvals: [zmin, 0, zmax], ticktext: [minTickLabel, '0', maxTickLabel],
-      tickfont: { size: 9 },
+      tickfont: { size: 9, color: textColor },
     };
 
     const minCanvasWidth = 800;
@@ -310,10 +346,10 @@ export class HeatmapPlotComponent {
       this.graphData = [{ x: xVals, y: yVals, z: zNormal, customdata: cdNormal, type: 'heatmap', colorscale, zmin, zmax, zauto: false, xgap: 1, ygap: 1, hoverongaps: true, hovertemplate: hoverTpl, colorbar }];
       this.layout = {
         width: dataWidth + margin.l + margin.r, height: dataHeight + margin.t + margin.b, margin, annotations,
-        xaxis: { side: 'top', showgrid: false, zeroline: false, fixedrange: false, tickvals: compTickvals, ticktext: compTicktext, tickangle: 45, tickfont: { size: fontSize }, dtick: 1 },
-        yaxis: { autorange: 'reversed', showgrid: false, zeroline: false, fixedrange: false, tickvals: yVals, ticktext: allProteins, tickfont: { size: fontSize }, dtick: 1 },
-        hoverlabel: { bgcolor: 'rgba(255,255,255,0.95)', bordercolor: '#555', font: { size: 11 }, align: 'left' },
-        plot_bgcolor: '#cccccc', paper_bgcolor: 'rgba(0,0,0,0)', shapes: [],
+        xaxis: { side: 'top', showgrid: false, zeroline: false, fixedrange: false, tickvals: compTickvals, ticktext: compTicktext, tickangle: 45, tickfont: { size: fontSize, color: textColor }, dtick: 1 },
+        yaxis: { autorange: 'reversed', showgrid: false, zeroline: false, fixedrange: false, tickvals: yVals, ticktext: allProteins, tickfont: { size: fontSize, color: textColor }, dtick: 1 },
+        hoverlabel: { bgcolor: isDark ? 'rgba(30,30,30,0.95)' : 'rgba(255,255,255,0.95)', bordercolor: isDark ? '#888' : '#555', font: { size: 11, color: textColor }, align: 'left' },
+        plot_bgcolor: '#cccccc', paper_bgcolor: paperBg, shapes: [],
       };
     } else {
       // Swapped: x=proteins, y=comparisons; transpose z
@@ -337,10 +373,10 @@ export class HeatmapPlotComponent {
       this.graphData = [{ x: xVals, y: yVals, z: zSwapped, customdata: cdSwapped, type: 'heatmap', colorscale, zmin, zmax, zauto: false, xgap: 1, ygap: 1, hoverongaps: true, hovertemplate: hoverTpl, colorbar: { ...colorbar, y: 0, ypad: summaryBottomMargin + 20 } }];
       this.layout = {
         width: dataWidth + margin.l + margin.r, height: dataHeight + margin.t + margin.b, margin, annotations,
-        xaxis: { side: 'top', showgrid: false, zeroline: false, fixedrange: false, tickvals: xVals, ticktext: allProteins, tickangle: 45, tickfont: { size: fontSize }, dtick: 1 },
-        yaxis: { autorange: 'reversed', showgrid: false, zeroline: false, fixedrange: false, tickvals: yVals, ticktext: compTicktext, tickfont: { size: fontSize }, dtick: 1 },
-        hoverlabel: { bgcolor: 'rgba(255,255,255,0.95)', bordercolor: '#555', font: { size: 11 }, align: 'left' },
-        plot_bgcolor: '#cccccc', paper_bgcolor: 'rgba(0,0,0,0)', shapes: [],
+        xaxis: { side: 'top', showgrid: false, zeroline: false, fixedrange: false, tickvals: xVals, ticktext: allProteins, tickangle: 45, tickfont: { size: fontSize, color: textColor }, dtick: 1 },
+        yaxis: { autorange: 'reversed', showgrid: false, zeroline: false, fixedrange: false, tickvals: yVals, ticktext: compTicktext, tickfont: { size: fontSize, color: textColor }, dtick: 1 },
+        hoverlabel: { bgcolor: isDark ? 'rgba(30,30,30,0.95)' : 'rgba(255,255,255,0.95)', bordercolor: isDark ? '#888' : '#555', font: { size: 11, color: textColor }, align: 'left' },
+        plot_bgcolor: '#cccccc', paper_bgcolor: paperBg, shapes: [],
       };
     }
 
@@ -463,5 +499,18 @@ export class HeatmapPlotComponent {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  }
+
+  exportImage(format: 'png' | 'svg'): void {
+    const el = this.plotContainerRef?.nativeElement?.querySelector('.js-plotly-plot');
+    if (!el) return;
+    const plotly = (window as any).Plotly;
+    if (!plotly) return;
+    plotly.downloadImage(el, {
+      format,
+      filename: 'heatmap',
+      width: (el as any).layout?.width,
+      height: (el as any).layout?.height,
+    });
   }
 }

@@ -315,7 +315,9 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
         const flipped = this.viewState.flippedAnalysisGroupIds.has(r.analysis_group.id);
         return {
           project: project?.name ?? 'Unknown',
+          project_id: project?.id ?? 0,
           analysis_group: r.analysis_group.name,
+          analysis_group_id: r.analysis_group.id,
           conditionA: r.condition_A,
           conditionB: r.condition_B,
           log2fc: flipped ? -r.log2_fc : r.log2_fc,

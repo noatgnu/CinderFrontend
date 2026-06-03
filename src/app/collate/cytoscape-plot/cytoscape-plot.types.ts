@@ -62,7 +62,9 @@ declare module 'cytoscape' {
 
 export interface HeatmapDataPoint {
   project: string;
+  project_id: number;
   analysis_group: string;
+  analysis_group_id: number;
   conditionA: string;
   conditionB: string;
   log2fc: number;

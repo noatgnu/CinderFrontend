@@ -11,12 +11,24 @@
     <button mat-icon-button matTooltip="Reset zoom" (click)="resetZoom()">
       <mat-icon>fit_screen</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Export all" (click)="exportToCsv('all')">
+    <button mat-icon-button matTooltip="Export" [matMenuTriggerFor]="exportMenu">
       <mat-icon>download</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Export selected" [disabled]="selectedProteinIds.size === 0" (click)="exportToCsv('selected')">
-      <mat-icon>cloud_download</mat-icon>
-    </button>
+    <mat-menu #exportMenu="matMenu">
+      <button mat-menu-item (click)="exportToCsv('all')">
+        <mat-icon>table_chart</mat-icon> CSV — all proteins
+      </button>
+      <button mat-menu-item [disabled]="selectedProteinIds.size === 0" (click)="exportToCsv('selected')">
+        <mat-icon>table_rows</mat-icon> CSV — selected only
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="exportImage('png')">
+        <mat-icon>image</mat-icon> PNG image
+      </button>
+      <button mat-menu-item (click)="exportImage('svg')">
+        <mat-icon>draw</mat-icon> SVG image
+      </button>
+    </mat-menu>
     <button mat-icon-button matTooltip="Toggle Legend" (click)="toggleLegend()">
       <mat-icon>{{ showLegend ? 'visibility_off' : 'help_outline' }}</mat-icon>
     </button>
