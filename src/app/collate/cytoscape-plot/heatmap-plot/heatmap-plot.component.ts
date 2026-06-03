@@ -207,15 +207,17 @@ export class HeatmapPlotComponent {
     const proteinRowMap = new Map(allProteins.map((p, i) => [p, i]));
 
     // Build z-matrix and customdata (rows=proteins, cols=comparisons)
+    // Pre-fill customdata with "no data" strings so blank cells show a proper tooltip
+    const noData = { protein: '—', comparison: 'No data', fc: '—', pval: '—', empty: true };
     const zNormal: (number | null)[][] = allProteins.map(() => new Array(totalCols).fill(null));
-    const cdNormal: any[][] = allProteins.map(() => new Array(totalCols).fill(null));
+    const cdNormal: any[][] = allProteins.map(() => new Array(totalCols).fill(noData));
     for (const d of this._data) {
       const ck = `${d.analysis_group}||${d.conditionA}||${d.conditionB}`;
       const colIdx = globalColIndexMap.get(`${d.project}||${ck}`);
       const rowIdx = proteinRowMap.get(d.protein);
       if (colIdx !== undefined && rowIdx !== undefined) {
         zNormal[rowIdx][colIdx] = d.log2fc;
-        cdNormal[rowIdx][colIdx] = { protein: d.protein, project: d.project, ag: d.analysis_group, comparison: d.comparison ?? '', log2fc: d.log2fc, pval: d.p_value };
+        cdNormal[rowIdx][colIdx] = { protein: d.protein, comparison: d.comparison ?? '', fc: d.log2fc.toFixed(3), pval: d.p_value.toFixed(3), empty: false };
       }
     }
 
@@ -242,12 +244,10 @@ export class HeatmapPlotComponent {
     ];
 
     const hoverTpl =
-      '<b>Protein:</b> %{customdata.protein}<br>' +
-      '<b>Project:</b> %{customdata.project}<br>' +
-      '<b>Analysis Group:</b> %{customdata.ag}<br>' +
-      '<b>Comparison:</b> %{customdata.comparison}<br>' +
-      '<b>Log2FC:</b> %{customdata.log2fc:.3f}<br>' +
-      '<b>-Log10(p):</b> %{customdata.pval:.3f}<extra></extra>';
+      '<b>%{customdata.protein}</b><br>' +
+      '%{customdata.comparison}<br>' +
+      'Log2FC: %{customdata.fc}<br>' +
+      '-Log10(p): %{customdata.pval}<extra></extra>';
 
     const colorbar = {
       orientation: 'h', lenmode: 'pixels', len: 200,
@@ -307,13 +307,13 @@ export class HeatmapPlotComponent {
 
       const xVals = Array.from({ length: totalCols }, (_, i) => i);
       const yVals = allProteins.map((_, i) => i);
-      this.graphData = [{ x: xVals, y: yVals, z: zNormal, customdata: cdNormal, type: 'heatmap', colorscale, zmin, zmax, zauto: false, xgap: 1, ygap: 1, hoverongaps: false, hovertemplate: hoverTpl, colorbar }];
+      this.graphData = [{ x: xVals, y: yVals, z: zNormal, customdata: cdNormal, type: 'heatmap', colorscale, zmin, zmax, zauto: false, xgap: 1, ygap: 1, hoverongaps: true, hovertemplate: hoverTpl, colorbar }];
       this.layout = {
         width: dataWidth + margin.l + margin.r, height: dataHeight + margin.t + margin.b, margin, annotations,
         xaxis: { side: 'top', showgrid: false, zeroline: false, fixedrange: false, tickvals: compTickvals, ticktext: compTicktext, tickangle: 45, tickfont: { size: fontSize }, dtick: 1 },
         yaxis: { autorange: 'reversed', showgrid: false, zeroline: false, fixedrange: false, tickvals: yVals, ticktext: allProteins, tickfont: { size: fontSize }, dtick: 1 },
         hoverlabel: { bgcolor: 'rgba(255,255,255,0.95)', bordercolor: '#555', font: { size: 11 }, align: 'left' },
-        plot_bgcolor: '#e2e8f0', paper_bgcolor: 'rgba(0,0,0,0)', shapes: [],
+        plot_bgcolor: '#cccccc', paper_bgcolor: 'rgba(0,0,0,0)', shapes: [],
       };
     } else {
       // Swapped: x=proteins, y=comparisons; transpose z
@@ -334,13 +334,13 @@ export class HeatmapPlotComponent {
 
       const xVals = allProteins.map((_, i) => i);
       const yVals = Array.from({ length: totalCols }, (_, i) => i);
-      this.graphData = [{ x: xVals, y: yVals, z: zSwapped, customdata: cdSwapped, type: 'heatmap', colorscale, zmin, zmax, zauto: false, xgap: 1, ygap: 1, hoverongaps: false, hovertemplate: hoverTpl, colorbar: { ...colorbar, y: 0, ypad: summaryBottomMargin + 20 } }];
+      this.graphData = [{ x: xVals, y: yVals, z: zSwapped, customdata: cdSwapped, type: 'heatmap', colorscale, zmin, zmax, zauto: false, xgap: 1, ygap: 1, hoverongaps: true, hovertemplate: hoverTpl, colorbar: { ...colorbar, y: 0, ypad: summaryBottomMargin + 20 } }];
       this.layout = {
         width: dataWidth + margin.l + margin.r, height: dataHeight + margin.t + margin.b, margin, annotations,
         xaxis: { side: 'top', showgrid: false, zeroline: false, fixedrange: false, tickvals: xVals, ticktext: allProteins, tickangle: 45, tickfont: { size: fontSize }, dtick: 1 },
         yaxis: { autorange: 'reversed', showgrid: false, zeroline: false, fixedrange: false, tickvals: yVals, ticktext: compTicktext, tickfont: { size: fontSize }, dtick: 1 },
         hoverlabel: { bgcolor: 'rgba(255,255,255,0.95)', bordercolor: '#555', font: { size: 11 }, align: 'left' },
-        plot_bgcolor: '#e2e8f0', paper_bgcolor: 'rgba(0,0,0,0)', shapes: [],
+        plot_bgcolor: '#cccccc', paper_bgcolor: 'rgba(0,0,0,0)', shapes: [],
       };
     }
 
@@ -349,58 +349,49 @@ export class HeatmapPlotComponent {
 
   private rebuildShapes(): void {
     const shapes: any[] = [];
+    const swapped = this._heatmapSettings.swapAxes;
 
     // Project boundary rectangles
+    // Not swapped: comparisons on x-axis → vertical bands; Swapped: comparisons on y-axis → horizontal bands
     for (const b of this.projectBoundaries) {
-      shapes.push({
-        type: 'rect',
-        x0: b.x0, x1: b.x1,
-        y0: 0, y1: 1,
-        xref: 'x', yref: 'paper',
-        line: { color: '#e53e3e', width: 3 },
-        fillcolor: 'rgba(0,0,0,0)',
-      });
+      if (!swapped) {
+        shapes.push({ type: 'rect', x0: b.x0, x1: b.x1, y0: 0, y1: 1, xref: 'x', yref: 'paper', line: { color: '#e53e3e', width: 3 }, fillcolor: 'rgba(0,0,0,0)' });
+      } else {
+        shapes.push({ type: 'rect', x0: 0, x1: 1, y0: b.x0, y1: b.x1, xref: 'paper', yref: 'y', line: { color: '#e53e3e', width: 3 }, fillcolor: 'rgba(0,0,0,0)' });
+      }
     }
 
     // Comparison group separator lines
-    for (const x of this.separatorLines) {
-      shapes.push({
-        type: 'line',
-        x0: x, x1: x,
-        y0: 0, y1: 1,
-        xref: 'x', yref: 'paper',
-        line: { color: 'rgba(186,104,166,0.8)', width: 2 },
-      });
+    for (const sepPos of this.separatorLines) {
+      if (!swapped) {
+        shapes.push({ type: 'line', x0: sepPos, x1: sepPos, y0: 0, y1: 1, xref: 'x', yref: 'paper', line: { color: 'rgba(186,104,166,0.8)', width: 2 } });
+      } else {
+        shapes.push({ type: 'line', x0: 0, x1: 1, y0: sepPos, y1: sepPos, xref: 'paper', yref: 'y', line: { color: 'rgba(186,104,166,0.8)', width: 2 } });
+      }
     }
 
-    // Hover highlight — all columns in the hovered group
+    // Hover highlight — all columns in the hovered comparison group
     if (this.hoveredGroupKey !== null) {
       const group = this.columnGroups.find(g => g.groupKey === this.hoveredGroupKey);
       if (group) {
         for (const ci of group.colIdxs) {
-          shapes.push({
-            type: 'rect',
-            x0: ci - 0.5, x1: ci + 0.5,
-            y0: 0, y1: 1,
-            xref: 'x', yref: 'paper',
-            line: { color: '#1a202c', width: 2 },
-            fillcolor: 'rgba(0,0,0,0)',
-          });
+          if (!swapped) {
+            shapes.push({ type: 'rect', x0: ci - 0.5, x1: ci + 0.5, y0: 0, y1: 1, xref: 'x', yref: 'paper', line: { color: '#1a202c', width: 2 }, fillcolor: 'rgba(0,0,0,0)' });
+          } else {
+            shapes.push({ type: 'rect', x0: 0, x1: 1, y0: ci - 0.5, y1: ci + 0.5, xref: 'paper', yref: 'y', line: { color: '#1a202c', width: 2 }, fillcolor: 'rgba(0,0,0,0)' });
+          }
         }
       }
     }
 
-    // Selection highlight — rectangle on the left margin for each selected protein row
+    // Selection highlight — bar next to each selected protein row (or column when swapped)
     this.allProteins.forEach((protein, i) => {
       if (this._selectedProteinIds.has(protein)) {
-        shapes.push({
-          type: 'rect',
-          xref: 'paper', yref: 'y',
-          x0: -0.015, x1: 0,
-          y0: i - 0.5, y1: i + 0.5,
-          fillcolor: 'rgba(79, 70, 229, 0.7)',
-          line: { width: 0 },
-        });
+        if (!swapped) {
+          shapes.push({ type: 'rect', xref: 'paper', yref: 'y', x0: -0.015, x1: 0, y0: i - 0.5, y1: i + 0.5, fillcolor: 'rgba(79, 70, 229, 0.7)', line: { width: 0 } });
+        } else {
+          shapes.push({ type: 'rect', xref: 'x', yref: 'paper', x0: i - 0.5, x1: i + 0.5, y0: 1, y1: 1.015, fillcolor: 'rgba(79, 70, 229, 0.7)', line: { width: 0 } });
+        }
       }
     });
 
@@ -409,20 +400,28 @@ export class HeatmapPlotComponent {
   }
 
   onClick(event: any): void {
-    const rowIdx: number = event.points[0].y;
-    const protein = this.allProteins[rowIdx];
+    const pt = event.points[0];
+    const swapped = this._heatmapSettings.swapAxes;
+    const protein = swapped ? this.allProteins[pt.x as number] : this.allProteins[pt.y as number];
     if (protein) {
       this.proteinClicked.emit(protein);
     }
   }
 
   handleHoverIn(event: any): void {
-    const colIdx: number = event.points[0].x;
-    const rowIdx: number = event.points[0].y;
-    const protein = this.allProteins[rowIdx];
+    const pt = event.points[0];
+    const swapped = this._heatmapSettings.swapAxes;
+    // When not swapped: x=colIdx, y=rowIdx (protein index)
+    // When swapped:     x=proteinIdx, y=colIdx (comparison index)
+    const colIdx: number = swapped ? (pt.y as number) : (pt.x as number);
+    const protein = swapped ? this.allProteins[pt.x as number] : this.allProteins[pt.y as number];
+    const cd = pt.customdata;
+
     this.hoveredGroupKey = this.colIdxToGroupKey[colIdx] ?? null;
-    if (protein) {
+    if (protein && cd && !cd.empty) {
       this.currentHoverTarget.emit(this.dataByColProtein[`${colIdx}_${protein}`]);
+    } else {
+      this.currentHoverTarget.emit(undefined);
     }
     this.rebuildShapes();
     this.cdr.markForCheck();
