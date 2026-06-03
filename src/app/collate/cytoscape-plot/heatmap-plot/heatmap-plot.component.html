@@ -29,6 +29,12 @@
         <mat-icon>draw</mat-icon> SVG image
       </button>
     </mat-menu>
+    <button mat-icon-button matTooltip="Reorder columns" (click)="reorderColumns.emit()">
+      <mat-icon>reorder</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Reorder rows" (click)="reorderRows.emit()">
+      <mat-icon>sort</mat-icon>
+    </button>
     <button mat-icon-button matTooltip="Toggle Legend" (click)="toggleLegend()">
       <mat-icon>{{ showLegend ? 'visibility_off' : 'help_outline' }}</mat-icon>
     </button>

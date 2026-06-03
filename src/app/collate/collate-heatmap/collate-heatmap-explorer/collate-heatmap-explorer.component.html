@@ -12,12 +12,6 @@
   <mat-toolbar>
     <mat-toolbar-row>
       <span class="spacer"></span>
-      <button mat-icon-button (click)="openColumnOrderDialog()" matTooltip="Reorder columns" aria-label="Reorder columns">
-        <mat-icon>view_column</mat-icon>
-      </button>
-      <button mat-icon-button (click)="openProteinOrderDialog()" matTooltip="Reorder rows" aria-label="Reorder rows">
-        <mat-icon>sort</mat-icon>
-      </button>
       <button mat-icon-button (click)="navigateToStandardView()" matTooltip="Back to collate view" aria-label="Back to collate view">
         <mat-icon>visibility</mat-icon>
       </button>
@@ -60,7 +54,9 @@
                 [heatmapSettings]="heatmapSettings"
                 [proteinOrder]="proteinOrder"
                 [columnOrder]="columnOrder"
-                (proteinClicked)="onProteinClicked($event)">
+                (proteinClicked)="onProteinClicked($event)"
+                (reorderColumns)="openColumnOrderDialog()"
+                (reorderRows)="openProteinOrderDialog()">
               </app-heatmap-plot>
             } @else {
               <div class="no-data">
@@ -84,7 +80,9 @@
                 [heatmapSettings]="heatmapSettings"
                 [proteinOrder]="proteinOrder"
                 [columnOrder]="columnOrder"
-                (proteinClicked)="onProteinClicked($event)">
+                (proteinClicked)="onProteinClicked($event)"
+                (reorderColumns)="openColumnOrderDialog()"
+                (reorderRows)="openProteinOrderDialog()">
               </app-heatmap-plot>
             </mat-tab>
           }

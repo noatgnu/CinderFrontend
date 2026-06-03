@@ -90,6 +90,8 @@ export class HeatmapPlotComponent {
 
   @Output() currentHoverTarget = new EventEmitter<HeatmapDataPoint | undefined>();
   @Output() proteinClicked = new EventEmitter<string>();
+  @Output() reorderColumns = new EventEmitter<void>();
+  @Output() reorderRows = new EventEmitter<void>();
 
   get data(): HeatmapDataPoint[] { return this._data; }
   get highlightedProtein(): string | null { return this._highlightedProtein; }
