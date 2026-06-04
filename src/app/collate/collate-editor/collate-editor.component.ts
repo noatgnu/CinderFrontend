@@ -215,6 +215,40 @@ export class CollateEditorComponent implements OnDestroy {
   heatmapViewState: HeatmapViewState = defaultHeatmapViewState();
   heatmapProteinOrder: string[] = [];
   heatmapColumnOrder: { [project: string]: string[] } = {};
+  heatmapSelectedIds: Set<string> = new Set();
+
+  onHeatmapProteinClicked(protein: string): void {
+    const next = new Set(this.heatmapSelectedIds);
+    if (next.has(protein)) { next.delete(protein); } else { next.add(protein); }
+    this.heatmapSelectedIds = next;
+    this.cdr.markForCheck();
+  }
+
+  heatmapSelectedArray(): string[] { return Array.from(this.heatmapSelectedIds); }
+
+  removeHeatmapSelected(protein: string): void {
+    this.heatmapSelectedIds = new Set(this.heatmapSelectedIds);
+    this.heatmapSelectedIds.delete(protein);
+    this.cdr.markForCheck();
+  }
+
+  clearHeatmapSelection(): void {
+    this.heatmapSelectedIds = new Set();
+    this.cdr.markForCheck();
+  }
+
+  exportHeatmapSelected(): void {
+    const proteins = this.heatmapSelectedIds;
+    const data = this.displayedHeatmapData.filter(d => proteins.has(d.protein));
+    const headers = ['Protein', 'Project', 'Analysis Group', 'Comparison', 'Log2FC', 'P-value'];
+    const rows = data.map(d => [d.protein, d.project, d.analysis_group, d.comparison, d.log2fc.toFixed(3), d.p_value.toFixed(3)]);
+    const csv = [headers, ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'heatmap_selected.csv';
+    a.style.display = 'none'; document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  }
 
   onHeatmapStateChange(state: HeatmapViewState): void {
     this.heatmapViewState = state;

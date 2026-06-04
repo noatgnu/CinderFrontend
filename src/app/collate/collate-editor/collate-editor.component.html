@@ -140,7 +140,9 @@
           @if (displayedHeatmapData.length > 0) {
             <app-heatmap-plot
               [data]="displayedHeatmapData"
-              [heatmapSettings]="heatmapSettings">
+              [heatmapSettings]="heatmapSettings"
+              [selectedProteinIds]="heatmapSelectedIds"
+              (proteinClicked)="onHeatmapProteinClicked($event)">
             </app-heatmap-plot>
           } @else {
             <div class="heatmap-empty">
@@ -152,10 +154,29 @@
         </mat-card-content>
       </mat-card>
     </div>
+
+    @if (editorView === 'heatmap' && heatmapSelectedIds.size > 0) {
+      <div class="heatmap-selection-panel">
+        <div class="heatmap-selection-header">
+          <span>{{ heatmapSelectedIds.size }} selected</span>
+          <button mat-icon-button (click)="clearHeatmapSelection()"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="heatmap-selection-list">
+          @for (protein of heatmapSelectedArray(); track protein) {
+            <div class="heatmap-selection-item">
+              <span>{{ protein }}</span>
+              <button mat-icon-button (click)="removeHeatmapSelected(protein)"><mat-icon>close</mat-icon></button>
+            </div>
+          }
+        </div>
+        <div class="heatmap-selection-actions">
+          <button mat-button (click)="exportHeatmapSelected()">
+            <mat-icon>download</mat-icon> Export
+          </button>
+        </div>
+      </div>
+    }
   }
-
-
-
 } @else {
   <div class="no-permission">
     <p>You do not have permission to edit this collate.</p>

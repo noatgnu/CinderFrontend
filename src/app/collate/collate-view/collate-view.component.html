@@ -140,11 +140,35 @@
           <mat-card-content>
             <app-heatmap-plot
               [data]="allHeatmapData"
-              [heatmapSettings]="localHeatmapSettings">
+              [heatmapSettings]="localHeatmapSettings"
+              [selectedProteinIds]="heatmapSelectedIds"
+              (proteinClicked)="onHeatmapProteinClicked($event)">
             </app-heatmap-plot>
           </mat-card-content>
         </mat-card>
       </div>
+
+      @if (heatmapSelectedIds.size > 0) {
+        <div class="heatmap-selection-panel">
+          <div class="heatmap-selection-header">
+            <span>{{ heatmapSelectedIds.size }} selected</span>
+            <button mat-icon-button (click)="clearHeatmapSelection()"><mat-icon>close</mat-icon></button>
+          </div>
+          <div class="heatmap-selection-list">
+            @for (protein of heatmapSelectedArray(); track protein) {
+              <div class="heatmap-selection-item">
+                <span>{{ protein }}</span>
+                <button mat-icon-button (click)="removeHeatmapSelected(protein)"><mat-icon>close</mat-icon></button>
+              </div>
+            }
+          </div>
+          <div class="heatmap-selection-actions">
+            <button mat-button (click)="exportHeatmapSelected()">
+              <mat-icon>download</mat-icon> Export
+            </button>
+          </div>
+        </div>
+      }
     }
   } @else if (collate) {
     <div class="empty-state">
