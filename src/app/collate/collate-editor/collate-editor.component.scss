@@ -82,14 +82,32 @@ mat-card {
 
 .heatmap-editor-layout {
   display: flex;
+  gap: 12px;
+  padding: 12px;
   height: calc(100vh - 128px);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
-.heatmap-editor-main {
+.heatmap-sidebar-card {
+  flex-shrink: 0;
+  width: 260px;
+  overflow-y: auto;
+
+  mat-card-content {
+    padding: 0;
+    height: 100%;
+  }
+}
+
+.heatmap-main-card {
   flex: 1;
-  overflow: auto;
   min-width: 0;
+  overflow: auto;
+
+  mat-card-content {
+    padding: 0;
+  }
 }
 
 .heatmap-empty {

@@ -120,31 +120,37 @@
   @if (editorView === 'heatmap') {
     <div class="heatmap-editor-layout">
       @if (collate) {
-        <app-heatmap-sidebar
-          [collate]="collate"
-          [projects]="projects"
-          [projectAnalysisGroups]="projectAnalysisGroups"
-          [state]="heatmapViewState"
-          [heatmapSettings]="heatmapSettings"
-          [showBackButton]="false"
-          (stateChange)="onHeatmapStateChange($event)"
-          (heatmapSettingsChange)="onHeatmapSettingsChange($event)">
-        </app-heatmap-sidebar>
+        <mat-card appearance="outlined" class="heatmap-sidebar-card">
+          <mat-card-content>
+            <app-heatmap-sidebar
+              [collate]="collate"
+              [projects]="projects"
+              [projectAnalysisGroups]="projectAnalysisGroups"
+              [state]="heatmapViewState"
+              [heatmapSettings]="heatmapSettings"
+              [showBackButton]="false"
+              (stateChange)="onHeatmapStateChange($event)"
+              (heatmapSettingsChange)="onHeatmapSettingsChange($event)">
+            </app-heatmap-sidebar>
+          </mat-card-content>
+        </mat-card>
       }
-      <div class="heatmap-editor-main">
-        @if (displayedHeatmapData.length > 0) {
-          <app-heatmap-plot
-            [data]="displayedHeatmapData"
-            [heatmapSettings]="heatmapSettings">
-          </app-heatmap-plot>
-        } @else {
-          <div class="heatmap-empty">
-            <mat-icon>grid_on</mat-icon>
-            <p>No search results</p>
-            <span>Run a search in Collate View first</span>
-          </div>
-        }
-      </div>
+      <mat-card appearance="outlined" class="heatmap-main-card">
+        <mat-card-content>
+          @if (displayedHeatmapData.length > 0) {
+            <app-heatmap-plot
+              [data]="displayedHeatmapData"
+              [heatmapSettings]="heatmapSettings">
+            </app-heatmap-plot>
+          } @else {
+            <div class="heatmap-empty">
+              <mat-icon>grid_on</mat-icon>
+              <p>No search results</p>
+              <span>Run a search in Collate View first</span>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
     </div>
   }
 
