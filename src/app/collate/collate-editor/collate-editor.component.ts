@@ -52,6 +52,9 @@ import {
 import {CollatePlotSettingsComponent} from "../collate-plot-settings/collate-plot-settings.component";
 import {CollateSettingsService} from "../collate-settings.service";
 import {MatTooltip} from "@angular/material/tooltip";
+import {MatDivider} from "@angular/material/divider";
+import {HeatmapColumnOrderDialogComponent, HeatmapColumnGroup} from "../collate-heatmap/heatmap-column-order-dialog/heatmap-column-order-dialog.component";
+import {HeatmapProteinOrderDialogComponent} from "../collate-heatmap/heatmap-protein-order-dialog/heatmap-protein-order-dialog.component";
 
 @Component({
     selector: 'app-collate-editor',
@@ -90,6 +93,7 @@ import {MatTooltip} from "@angular/material/tooltip";
         HeatmapSidebarComponent,
         MatButtonToggleGroup,
         MatButtonToggle,
+        MatDivider,
     ],
     templateUrl: './collate-editor.component.html',
     styleUrl: './collate-editor.component.scss'
@@ -209,6 +213,8 @@ export class CollateEditorComponent implements OnDestroy {
   displayedHeatmapData: HeatmapDataPoint[] = [];
   heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
   heatmapViewState: HeatmapViewState = defaultHeatmapViewState();
+  heatmapProteinOrder: string[] = [];
+  heatmapColumnOrder: { [project: string]: string[] } = {};
 
   onHeatmapStateChange(state: HeatmapViewState): void {
     this.heatmapViewState = state;
@@ -227,6 +233,41 @@ export class CollateEditorComponent implements OnDestroy {
     this.editorView = view;
     if (view === 'heatmap') this.rebuildHeatmapData();
     this.cdr.markForCheck();
+  }
+
+  openHeatmapColumnOrderDialog(): void {
+    const useAgName = this.heatmapSettings.useAgNameForAxis;
+    const projectMap = new Map<string, Set<string>>();
+    for (const d of this.displayedHeatmapData) {
+      if (!projectMap.has(d.project)) projectMap.set(d.project, new Set());
+      projectMap.get(d.project)!.add(useAgName ? d.analysis_group : (d.comparison ?? ''));
+    }
+    const groups: HeatmapColumnGroup[] = Array.from(projectMap.entries()).map(([project, labels]) => ({
+      project,
+      labels: (this.heatmapColumnOrder[project]?.length)
+        ? this.heatmapColumnOrder[project]
+        : Array.from(labels).sort(),
+    }));
+    const ref = this.dialog.open(HeatmapColumnOrderDialogComponent, { width: '480px', maxHeight: '80vh', data: groups });
+    ref.afterClosed().pipe(filter(r => !!r), takeUntil(this.destroy$)).subscribe(result => {
+      this.heatmapColumnOrder = result;
+      this.cdr.markForCheck();
+    });
+  }
+
+  openHeatmapProteinOrderDialog(): void {
+    const ref = this.dialog.open(HeatmapProteinOrderDialogComponent, {
+      width: '500px',
+      maxHeight: '80vh',
+      data: {
+        allProteins: Array.from(new Set(this.displayedHeatmapData.map(d => d.protein))),
+        allHeatmapData: this.displayedHeatmapData,
+      },
+    });
+    ref.afterClosed().pipe(filter(r => !!r), takeUntil(this.destroy$)).subscribe(result => {
+      this.heatmapProteinOrder = result;
+      this.cdr.markForCheck();
+    });
   }
 
   private rebuildHeatmapData(): void {

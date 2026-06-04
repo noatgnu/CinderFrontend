@@ -46,6 +46,10 @@
         <button mat-menu-item (click)="openPlotSettings()">Change Plot General Settings</button>
         <button mat-menu-item (click)="openRenameConditionDialog()">Rename Condition</button>
         <button mat-menu-item (click)="openConditionOrderDialog()">Set Condition Order</button>
+        @if (editorView === 'heatmap') {
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="openHeatmapColumnOrderDialog()">Reorder Heatmap Comparisons</button>
+        }
       </mat-menu>
     </mat-toolbar-row>
   </mat-toolbar>
@@ -129,7 +133,12 @@
       }
       <div class="heatmap-editor-main">
         @if (displayedHeatmapData.length > 0) {
-          <app-heatmap-plot [data]="displayedHeatmapData" [heatmapSettings]="heatmapSettings"></app-heatmap-plot>
+          <app-heatmap-plot
+            [data]="displayedHeatmapData"
+            [heatmapSettings]="heatmapSettings"
+            [proteinOrder]="heatmapProteinOrder"
+            [columnOrder]="heatmapColumnOrder">
+          </app-heatmap-plot>
         } @else {
           <div class="heatmap-empty">
             <mat-icon>grid_on</mat-icon>
