@@ -257,6 +257,10 @@ export class CollateViewComponent implements OnDestroy {
           this.projects = collate.settings.projectOrder.map(id => collate.projects.find(project => project.id === id) as Project);
         }
 
+        if (collate.settings['heatmapSettings']) {
+          this.heatmapSettings = collate.settings['heatmapSettings'];
+        }
+
         if (!this.collate.settings.projectAnalysisGroupVisibility) {
           this.collate.settings.projectAnalysisGroupVisibility = {};
         }
