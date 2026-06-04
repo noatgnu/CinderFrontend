@@ -305,8 +305,23 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
   }
 
   rebuildHeatmapData(): void {
-    this.allHeatmapData = this.transformResults(this.rawResults);
+    const points = this.transformResults(this.rawResults);
+    this.allHeatmapData = this.applyCollateOrder(points);
     this.cdr.markForCheck();
+  }
+
+  private applyCollateOrder(points: HeatmapDataPoint[]): HeatmapDataPoint[] {
+    const projectOrder = this.projects.map(p => p.id);
+    const agOrderMap = this.collate?.settings?.analysisGroupOrderMap ?? {};
+    return [...points].sort((a, b) => {
+      const pa = projectOrder.indexOf(a.project_id);
+      const pb = projectOrder.indexOf(b.project_id);
+      if (pa !== pb) return (pa === -1 ? projectOrder.length : pa) - (pb === -1 ? projectOrder.length : pb);
+      const agOrder = agOrderMap[a.project_id] ?? [];
+      const ia = agOrder.indexOf(a.analysis_group_id);
+      const ib = agOrder.indexOf(b.analysis_group_id);
+      return (ia === -1 ? agOrder.length : ia) - (ib === -1 ? agOrder.length : ib);
+    });
   }
 
   private transformResults(results: SearchResult[]): HeatmapDataPoint[] {
@@ -464,13 +479,18 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
   openColumnOrderDialog(): void {
     const useAgName = this.heatmapSettings.useAgNameForAxis;
     const projectMap = new Map<string, Set<string>>();
-    for (const d of this.allHeatmapData) {
-      if (!projectMap.has(d.project)) projectMap.set(d.project, new Set());
-      projectMap.get(d.project)!.add(useAgName ? d.analysis_group : (d.comparison ?? ''));
+    for (const r of this.rawResults) {
+      const project = this.analysisGroupProjects[r.analysis_group.id];
+      if (!project) continue;
+      if (!projectMap.has(project.name)) projectMap.set(project.name, new Set());
+      const label = useAgName
+        ? r.analysis_group.name
+        : (r.comparison_label ?? `${r.condition_A} vs ${r.condition_B}`);
+      projectMap.get(project.name)!.add(label);
     }
     const groups: HeatmapColumnGroup[] = Array.from(projectMap.entries()).map(([project, labels]) => ({
       project,
-      labels: (this.columnOrder[project] && this.columnOrder[project].length)
+      labels: (this.columnOrder[project]?.length)
         ? this.columnOrder[project]
         : Array.from(labels).sort(),
     }));

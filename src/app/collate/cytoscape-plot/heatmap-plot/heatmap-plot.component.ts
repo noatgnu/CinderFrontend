@@ -82,11 +82,6 @@ export class HeatmapPlotComponent {
     if (this._data.length) this.drawHeatmap();
   }
 
-  private _columnOrder: { [project: string]: string[] } | null = null;
-  @Input() set columnOrder(value: { [project: string]: string[] } | null | undefined) {
-    this._columnOrder = value ?? null;
-    if (this._data.length) this.drawHeatmap();
-  }
 
   @Output() currentHoverTarget = new EventEmitter<HeatmapDataPoint | undefined>();
   @Output() proteinClicked = new EventEmitter<string>();
@@ -139,15 +134,15 @@ export class HeatmapPlotComponent {
     const cellSize = Math.max(5, s.cellSize ?? 36);
     const fontSize = Math.max(4, s.labelFontSize ?? 9);
 
+    // Preserve input order — callers are responsible for ordering by project + AG + comparison
+    const projectKeys: string[] = [];
     const projectGroups: Record<string, HeatmapDataPoint[]> = {};
     for (const d of this._data) {
-      (projectGroups[d.project] ??= []).push(d);
-    }
-    for (const project in projectGroups) {
-      projectGroups[project].sort((a, b) => {
-        const c = (a.comparison ?? '').localeCompare(b.comparison ?? '');
-        return c !== 0 ? c : (a.protein ?? '').localeCompare(b.protein ?? '');
-      });
+      if (!projectGroups[d.project]) {
+        projectKeys.push(d.project);
+        projectGroups[d.project] = [];
+      }
+      projectGroups[d.project].push(d);
     }
 
     // Build comparison columns (axis that is NOT proteins)
@@ -157,7 +152,7 @@ export class HeatmapPlotComponent {
     let colOffset = 0;
     const groupMap = new Map<string, number[]>();
 
-    for (const project in projectGroups) {
+    for (const project of projectKeys) {
       const group = projectGroups[project];
       const localColKeys: string[] = [];
       const seenLocal = new Set<string>();
@@ -167,20 +162,6 @@ export class HeatmapPlotComponent {
         const ck = `${d.analysis_group}||${d.conditionA}||${d.conditionB}`;
         if (!seenLocal.has(ck)) { seenLocal.add(ck); localColKeys.push(ck); }
         if (!colRepresentative.has(ck)) colRepresentative.set(ck, d);
-      }
-
-      // Sort columns by user-specified label order if available
-      if (this._columnOrder && localColKeys.length > 0) {
-        const firstRep = colRepresentative.get(localColKeys[0]);
-        const order = firstRep ? (this._columnOrder[firstRep.project] ?? null) : null;
-        if (order && order.length) {
-          localColKeys.sort((a, b) => {
-            const la = useAgName ? colRepresentative.get(a)!.analysis_group : (colRepresentative.get(a)!.comparison ?? '');
-            const lb = useAgName ? colRepresentative.get(b)!.analysis_group : (colRepresentative.get(b)!.comparison ?? '');
-            const ia = order.indexOf(la); const ib = order.indexOf(lb);
-            return (ia === -1 ? order.length : ia) - (ib === -1 ? order.length : ib);
-          });
-        }
       }
 
       const numCols = localColKeys.length;

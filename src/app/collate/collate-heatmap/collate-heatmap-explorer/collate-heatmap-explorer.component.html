@@ -12,11 +12,6 @@
   <mat-toolbar>
     <mat-toolbar-row>
       <span class="spacer"></span>
-      @if (allHeatmapData.length > 0) {
-        <button mat-icon-button (click)="openColumnOrderDialog()" matTooltip="Reorder comparisons">
-          <mat-icon>reorder</mat-icon>
-        </button>
-      }
       <button mat-icon-button (click)="navigateToStandardView()" matTooltip="Back to collate view" aria-label="Back to collate view">
         <mat-icon>visibility</mat-icon>
       </button>
@@ -57,7 +52,7 @@
                 [data]="allHeatmapData"
                 [selectedProteinIds]="selectedProteinIds"
                 [heatmapSettings]="heatmapSettings"
-                [columnOrder]="columnOrder"
+
                 (proteinClicked)="onProteinClicked($event)">
               </app-heatmap-plot>
             } @else {
@@ -80,7 +75,7 @@
                 [data]="getSubsetData(tab.proteinIds)"
                 [selectedProteinIds]="selectedProteinIds"
                 [heatmapSettings]="heatmapSettings"
-                [columnOrder]="columnOrder"
+
                 (proteinClicked)="onProteinClicked($event)">
               </app-heatmap-plot>
             </mat-tab>

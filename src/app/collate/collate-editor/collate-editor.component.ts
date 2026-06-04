@@ -272,7 +272,7 @@ export class CollateEditorComponent implements OnDestroy {
 
   private rebuildHeatmapData(): void {
     const rawResults: SearchResult[] = Object.values(this.searchResults).flat();
-    this.displayedHeatmapData = rawResults
+    const points = rawResults
       .filter(r => this.passesHeatmapFilter(r))
       .map(r => {
         const project = this.analysisGroupProjects[r.analysis_group.id];
@@ -291,6 +291,17 @@ export class CollateEditorComponent implements OnDestroy {
           searchTerm: r.search_term,
         };
       });
+    const projectOrder = this.projects.map(p => p.id);
+    const agOrderMap = this._collate?.settings?.analysisGroupOrderMap ?? {};
+    this.displayedHeatmapData = [...points].sort((a, b) => {
+      const pa = projectOrder.indexOf(a.project_id);
+      const pb = projectOrder.indexOf(b.project_id);
+      if (pa !== pb) return (pa === -1 ? projectOrder.length : pa) - (pb === -1 ? projectOrder.length : pb);
+      const agOrder = agOrderMap[a.project_id] ?? [];
+      const ia = agOrder.indexOf(a.analysis_group_id);
+      const ib = agOrder.indexOf(b.analysis_group_id);
+      return (ia === -1 ? agOrder.length : ia) - (ib === -1 ? agOrder.length : ib);
+    });
     this.cdr.markForCheck();
   }
 

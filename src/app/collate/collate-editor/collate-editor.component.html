@@ -135,9 +135,7 @@
         @if (displayedHeatmapData.length > 0) {
           <app-heatmap-plot
             [data]="displayedHeatmapData"
-            [heatmapSettings]="heatmapSettings"
-            [proteinOrder]="heatmapProteinOrder"
-            [columnOrder]="heatmapColumnOrder">
+            [heatmapSettings]="heatmapSettings">
           </app-heatmap-plot>
         } @else {
           <div class="heatmap-empty">
