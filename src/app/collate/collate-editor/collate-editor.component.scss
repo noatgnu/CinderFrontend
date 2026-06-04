@@ -91,7 +91,7 @@ mat-card {
 
 .heatmap-sidebar-card {
   flex-shrink: 0;
-  width: 260px;
+  width: 280px;
   overflow-y: auto;
 
   mat-card-content {
@@ -104,9 +104,14 @@ mat-card {
   flex: 1;
   min-width: 0;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
 
   mat-card-content {
     padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 }
 
@@ -115,7 +120,8 @@ mat-card {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  flex: 1;
+  min-height: 200px;
   gap: 8px;
   color: var(--app-text-secondary);
 
