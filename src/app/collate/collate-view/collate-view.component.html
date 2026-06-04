@@ -13,10 +13,19 @@
   <mat-toolbar>
     <mat-toolbar-row>
       <a href="/#/home" class="logo-link" aria-label="Go to home"><img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'" alt="C|nder logo"></a>
-      @if (collate) {
-        <button mat-button (click)="openHeatmapView()" aria-label="Heatmap View">
-          <mat-icon>grid_on</mat-icon>
-          Heatmap
+      @if (collate && searchTerms.length > 0) {
+        <mat-button-toggle-group [value]="contentView" (change)="setContentView($event.value)" class="view-toggle">
+          <mat-button-toggle value="collate" matTooltip="Bar chart view">
+            <mat-icon>bar_chart</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="heatmap" matTooltip="Heatmap view">
+            <mat-icon>grid_on</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      }
+      @if (collate && contentView === 'heatmap') {
+        <button mat-icon-button (click)="openHeatmapView()" matTooltip="Open in dedicated heatmap view (shareable)" aria-label="Open dedicated heatmap view">
+          <mat-icon>open_in_new</mat-icon>
         </button>
       }
       <span class="spacer"></span>
@@ -86,27 +95,34 @@
       </div>
     }
 
-    <div class="search-results">
-      <mat-tab-group (selectedIndexChange)="filterDataBySearchTerm($event)" [selectedIndex]="selectedIndex" [mat-stretch-tabs]="false">
-        @for (term of searchTerms; track term) {
-          <mat-tab>
-            <ng-template mat-tab-label>
-              <span class="tab-label">{{term}}</span>
-              <button mat-icon-button (click)="exportData(term); $event.stopPropagation()" [disabled]="waitingForDownload" matTooltip="Export Data">
-                @if (waitingForDownload && selectedSearchTerm === term) {
-                  <mat-spinner diameter="18"></mat-spinner>
-                } @else {
-                  <mat-icon>download</mat-icon>
-                }
-              </button>
-            </ng-template>
-          </mat-tab>
-        }
-      </mat-tab-group>
-    </div>
+    @if (contentView === 'collate') {
+      <div class="search-results">
+        <mat-tab-group (selectedIndexChange)="filterDataBySearchTerm($event)" [selectedIndex]="selectedIndex" [mat-stretch-tabs]="false">
+          @for (term of searchTerms; track term) {
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <span class="tab-label">{{term}}</span>
+                <button mat-icon-button (click)="exportData(term); $event.stopPropagation()" [disabled]="waitingForDownload" matTooltip="Export Data">
+                  @if (waitingForDownload && selectedSearchTerm === term) {
+                    <mat-spinner diameter="18"></mat-spinner>
+                  } @else {
+                    <mat-icon>download</mat-icon>
+                  }
+                </button>
+              </ng-template>
+            </mat-tab>
+          }
+        </mat-tab-group>
+      </div>
 
-    @if (collate) {
-      <app-collate-project-list [searchTerm]="selectedSearchTerm" [renameCondition]="collate.settings.renameSampleCondition" [projectConditionOrder]="collate.settings.projectConditionOrder" [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
+      @if (collate) {
+        <app-collate-project-list [searchTerm]="selectedSearchTerm" [renameCondition]="collate.settings.renameSampleCondition" [projectConditionOrder]="collate.settings.projectConditionOrder" [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
+      }
+    } @else {
+      <app-heatmap-plot
+        [data]="allHeatmapData"
+        [heatmapSettings]="heatmapSettings">
+      </app-heatmap-plot>
     }
   } @else if (collate) {
     <div class="empty-state">

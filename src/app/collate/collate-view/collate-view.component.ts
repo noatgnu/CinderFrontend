@@ -8,6 +8,10 @@ import {CollateSearchComponent} from "../collate-search/collate-search.component
 import {MatTab, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
 import {CollateProjectListComponent} from "../collate-project-list/collate-project-list.component";
 import {WebService} from "../../web.service";
+import {MatButtonToggleGroup, MatButtonToggle} from "@angular/material/button-toggle";
+import {HeatmapPlotComponent} from "../cytoscape-plot/heatmap-plot/heatmap-plot.component";
+import {HeatmapDataPoint} from "../cytoscape-plot/cytoscape-plot.types";
+import {defaultHeatmapPersistentSettings, HeatmapPersistentSettings} from "../collate-heatmap/collate-heatmap.types";
 import {AnalysisGroup} from "../../analysis-group/analysis-group";
 import {MatIcon} from "@angular/material/icon";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -60,7 +64,10 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
     NgClass,
     MatButton,
     BreadcrumbComponent,
-    MatProgressSpinner
+    MatProgressSpinner,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    HeatmapPlotComponent,
   ],
     templateUrl: './collate-view.component.html',
     styleUrl: './collate-view.component.scss'
@@ -109,6 +116,40 @@ export class CollateViewComponent implements OnDestroy {
   pastSearches: {searchQuery: SearchResultQuery|null, termFounds: string[], collate: number, searchID:number}[] = [];
   waitingForDownload = false
   cytoscapePlotFilteredResults: { [projectId: number]: SearchResult[] } = {};
+
+  contentView: 'collate' | 'heatmap' = 'collate';
+  allHeatmapData: HeatmapDataPoint[] = [];
+  heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
+
+  setContentView(view: 'collate' | 'heatmap'): void {
+    this.contentView = view;
+    if (view === 'heatmap') this.rebuildHeatmapData();
+    this.cdr.markForCheck();
+  }
+
+  private rebuildHeatmapData(): void {
+    const points: HeatmapDataPoint[] = [];
+    for (const projectId in this.searchResults) {
+      for (const r of this.searchResults[projectId]) {
+        const project = this.analysisGroupProjects[r.analysis_group.id];
+        points.push({
+          project: project?.name ?? 'Unknown',
+          project_id: project?.id ?? 0,
+          analysis_group: r.analysis_group.name,
+          analysis_group_id: r.analysis_group.id,
+          conditionA: r.condition_A,
+          conditionB: r.condition_B,
+          log2fc: r.log2_fc,
+          p_value: r.log10_p,
+          comparison: r.comparison_label ?? `${r.condition_A} vs ${r.condition_B}`,
+          protein: r.gene_name ?? r.primary_id ?? r.uniprot_id ?? String(r.id),
+          searchTerm: r.search_term,
+        });
+      }
+    }
+    this.allHeatmapData = points;
+  }
+
   toggleCytoscapePlot() {
     this.showCytoscapePlot = !this.showCytoscapePlot;
     this.cdr.markForCheck();
@@ -281,6 +322,7 @@ export class CollateViewComponent implements OnDestroy {
       this.searchTerms.sort((a, b) => a.localeCompare(b));
       this.selectedSearchTerm = this.searchTerms[0];
       this.filterDataBySearchTerm();
+      if (this.contentView === 'heatmap') this.rebuildHeatmapData();
       this.cdr.markForCheck();
     });
   }
