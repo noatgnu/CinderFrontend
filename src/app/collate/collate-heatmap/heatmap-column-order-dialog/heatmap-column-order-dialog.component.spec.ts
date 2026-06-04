@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material/dialog';
-import { HeatmapColumnOrderDialogComponent } from './heatmap-column-order-dialog.component';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { HeatmapColumnOrderDialogComponent, HeatmapColumnGroup } from './heatmap-column-order-dialog.component';
+
+const mockGroups: HeatmapColumnGroup[] = [
+  { project: 'ProjectA', labels: ['ctrl_vs_treated', 'ctrl_vs_vehicle'] },
+  { project: 'ProjectB', labels: ['pre_vs_post'] },
+];
 
 describe('HeatmapColumnOrderDialogComponent', () => {
   let component: HeatmapColumnOrderDialogComponent;
@@ -12,15 +17,14 @@ describe('HeatmapColumnOrderDialogComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [HeatmapColumnOrderDialogComponent],
-      providers: [{ provide: MatDialogRef, useValue: mockDialogRef }],
+      providers: [
+        { provide: MatDialogRef, useValue: mockDialogRef },
+        { provide: MAT_DIALOG_DATA, useValue: mockGroups },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeatmapColumnOrderDialogComponent);
     component = fixture.componentInstance;
-    component.columnGroups = [
-      { project: 'ProjectA', labels: ['ctrl_vs_treated', 'ctrl_vs_vehicle'] },
-      { project: 'ProjectB', labels: ['pre_vs_post'] },
-    ];
     fixture.detectChanges();
   });
 
@@ -28,7 +32,7 @@ describe('HeatmapColumnOrderDialogComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize groups from input', () => {
+  it('should initialize groups from data', () => {
     expect(component.groups.length).toBe(2);
     expect(component.groups[0].labels).toEqual(['ctrl_vs_treated', 'ctrl_vs_vehicle']);
   });

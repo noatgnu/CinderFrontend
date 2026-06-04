@@ -1,7 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HeatmapProteinOrderDialogComponent } from './heatmap-protein-order-dialog.component';
 import { HeatmapDataPoint } from '../collate-heatmap.types';
+
+const mockProteins = ['TP53', 'BRCA1', 'EGFR', 'KRAS'];
+const mockData: HeatmapDataPoint[] = [
+  { protein: 'TP53', log2fc: 2.0, comparison: 'ctrl_vs_treated', project: 'p1', project_id: 1, analysis_group: 'ag1', analysis_group_id: 1, conditionA: 'ctrl', conditionB: 'treated', p_value: 0.01, searchTerm: 'test' },
+  { protein: 'BRCA1', log2fc: 1.5, comparison: 'ctrl_vs_treated', project: 'p1', project_id: 1, analysis_group: 'ag1', analysis_group_id: 1, conditionA: 'ctrl', conditionB: 'treated', p_value: 0.01, searchTerm: 'test' },
+  { protein: 'EGFR', log2fc: 3.0, comparison: 'ctrl_vs_treated', project: 'p1', project_id: 1, analysis_group: 'ag1', analysis_group_id: 1, conditionA: 'ctrl', conditionB: 'treated', p_value: 0.01, searchTerm: 'test' },
+];
 
 describe('HeatmapProteinOrderDialogComponent', () => {
   let component: HeatmapProteinOrderDialogComponent;
@@ -14,14 +21,13 @@ describe('HeatmapProteinOrderDialogComponent', () => {
     await TestBed.configureTestingModule({
       imports: [HeatmapProteinOrderDialogComponent],
       providers: [
-        { provide: MatDialogRef, useValue: mockDialogRef }
-      ]
-    })
-    .compileComponents();
+        { provide: MatDialogRef, useValue: mockDialogRef },
+        { provide: MAT_DIALOG_DATA, useValue: { allProteins: mockProteins, allHeatmapData: mockData } },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HeatmapProteinOrderDialogComponent);
     component = fixture.componentInstance;
-    component.allProteins = ['TP53', 'BRCA1', 'EGFR', 'KRAS'];
     fixture.detectChanges();
   });
 
@@ -34,26 +40,14 @@ describe('HeatmapProteinOrderDialogComponent', () => {
   });
 
   it('should sort by comparison ascending', () => {
-    const testData: HeatmapDataPoint[] = [
-      { protein: 'TP53', log2fc: 2.0, comparison: 'control_vs_treated', project: 'p1', analysis_group: 'ag1', conditionA: 'control', conditionB: 'treated', p_value: 0.01, searchTerm: 'test' },
-      { protein: 'BRCA1', log2fc: 1.5, comparison: 'control_vs_treated', project: 'p1', analysis_group: 'ag1', conditionA: 'control', conditionB: 'treated', p_value: 0.01, searchTerm: 'test' },
-      { protein: 'EGFR', log2fc: 3.0, comparison: 'control_vs_treated', project: 'p1', analysis_group: 'ag1', conditionA: 'control', conditionB: 'treated', p_value: 0.01, searchTerm: 'test' },
-    ];
-    component.allHeatmapData = testData;
-    component.selectedComparison = 'control_vs_treated';
+    component.selectedComparison = 'ctrl_vs_treated';
     component.sortDirection = 'asc';
     component.sortByComparison();
     expect(component.currentOrder).toEqual(['BRCA1', 'TP53', 'EGFR', 'KRAS']);
   });
 
   it('should sort by comparison descending', () => {
-    const testData: HeatmapDataPoint[] = [
-      { protein: 'TP53', log2fc: 2.0, comparison: 'control_vs_treated', project: 'p1', analysis_group: 'ag1', conditionA: 'control', conditionB: 'treated', p_value: 0.01, searchTerm: 'test' },
-      { protein: 'BRCA1', log2fc: 1.5, comparison: 'control_vs_treated', project: 'p1', analysis_group: 'ag1', conditionA: 'control', conditionB: 'treated', p_value: 0.01, searchTerm: 'test' },
-      { protein: 'EGFR', log2fc: 3.0, comparison: 'control_vs_treated', project: 'p1', analysis_group: 'ag1', conditionA: 'control', conditionB: 'treated', p_value: 0.01, searchTerm: 'test' },
-    ];
-    component.allHeatmapData = testData;
-    component.selectedComparison = 'control_vs_treated';
+    component.selectedComparison = 'ctrl_vs_treated';
     component.sortDirection = 'desc';
     component.sortByComparison();
     expect(component.currentOrder).toEqual(['EGFR', 'TP53', 'BRCA1', 'KRAS']);

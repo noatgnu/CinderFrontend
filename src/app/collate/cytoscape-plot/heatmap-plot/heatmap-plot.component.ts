@@ -124,7 +124,9 @@ export class HeatmapPlotComponent {
 
     const isDark = this.accounts.userAccount.darkMode;
     const textColor = isDark ? '#e2e8f0' : '#1a202c';
-    const paperBg = isDark ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0)';
+    const paperBg = 'rgba(0,0,0,0)';
+    const upColor = isDark ? 'rgb(252,129,129)' : 'rgb(103,0,31)';
+    const downColor = isDark ? 'rgb(100,180,255)' : 'rgb(5,48,97)';
 
     this.dataByColProtein = {};
     this.proteinsByColIdx = {};
@@ -305,12 +307,12 @@ export class HeatmapPlotComponent {
           upText = `↑${increase}`; downText = `↓${decrease}`;
         }
         if (!swapped) {
-          annotations.push({ x: 1, y: ri, xshift: 8, xref: 'paper', yref: 'y', text: upText, showarrow: false, font: { size: 8, color: 'rgb(103,0,31)' }, xanchor: 'left' });
-          annotations.push({ x: 1, y: ri, xshift: 38, xref: 'paper', yref: 'y', text: downText, showarrow: false, font: { size: 8, color: 'rgb(5,48,97)' }, xanchor: 'left' });
+          annotations.push({ x: 1, y: ri, xshift: 8, xref: 'paper', yref: 'y', text: upText, showarrow: false, font: { size: 8, color: upColor }, xanchor: 'left' });
+          annotations.push({ x: 1, y: ri, xshift: 38, xref: 'paper', yref: 'y', text: downText, showarrow: false, font: { size: 8, color: downColor }, xanchor: 'left' });
         } else {
           const stagger = ri % 2 !== 0 ? -20 : 0;
-          annotations.push({ x: ri, y: 0, yshift: -12 + stagger, xref: 'x', yref: 'paper', text: upText, showarrow: false, font: { size: 8, color: 'rgb(103,0,31)' }, yanchor: 'top' });
-          annotations.push({ x: ri, y: 0, yshift: -24 + stagger, xref: 'x', yref: 'paper', text: downText, showarrow: false, font: { size: 8, color: 'rgb(5,48,97)' }, yanchor: 'top' });
+          annotations.push({ x: ri, y: 0, yshift: -12 + stagger, xref: 'x', yref: 'paper', text: upText, showarrow: false, font: { size: 8, color: upColor }, yanchor: 'top' });
+          annotations.push({ x: ri, y: 0, yshift: -24 + stagger, xref: 'x', yref: 'paper', text: downText, showarrow: false, font: { size: 8, color: downColor }, yanchor: 'top' });
         }
       });
     }

@@ -475,8 +475,7 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
         : Array.from(labels).sort(),
     }));
 
-    const dialogRef = this.dialog.open(HeatmapColumnOrderDialogComponent, { width: '480px', maxHeight: '80vh' });
-    dialogRef.componentInstance.columnGroups = groups;
+    const dialogRef = this.dialog.open(HeatmapColumnOrderDialogComponent, { width: '480px', maxHeight: '80vh', data: groups });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.columnOrder = result;
@@ -489,10 +488,11 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(HeatmapProteinOrderDialogComponent, {
       width: '500px',
       maxHeight: '80vh',
+      data: {
+        allProteins: Array.from(new Set(this.allHeatmapData.map(d => d.protein))),
+        allHeatmapData: this.allHeatmapData,
+      },
     });
-
-    dialogRef.componentInstance.allProteins = Array.from(new Set(this.allHeatmapData.map(d => d.protein)));
-    dialogRef.componentInstance.allHeatmapData = this.allHeatmapData;
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && Array.isArray(result)) {
