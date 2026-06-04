@@ -27,17 +27,22 @@
 
   @if (allHeatmapData.length > 0 || rawResults.length > 0) {
     <div class="explorer-layout">
-      <app-heatmap-sidebar
-        [collate]="collate"
-        [projects]="projects"
-        [projectAnalysisGroups]="projectAnalysisGroups"
-        [state]="viewState"
-        [heatmapSettings]="heatmapSettings"
-        (stateChange)="onStateChange($event)"
-        (heatmapSettingsChange)="onHeatmapSettingsChange($event)"
-        (backClick)="navigateToStandardView()">
-      </app-heatmap-sidebar>
+      <mat-card appearance="outlined" class="sidebar-card">
+        <mat-card-content>
+          <app-heatmap-sidebar
+            [collate]="collate"
+            [projects]="projects"
+            [projectAnalysisGroups]="projectAnalysisGroups"
+            [state]="viewState"
+            [heatmapSettings]="heatmapSettings"
+            (stateChange)="onStateChange($event)"
+            (heatmapSettingsChange)="onHeatmapSettingsChange($event)"
+            (backClick)="navigateToStandardView()">
+          </app-heatmap-sidebar>
+        </mat-card-content>
+      </mat-card>
 
+      <mat-card appearance="outlined" class="main-card">
       <div class="main-panel">
 
         <mat-tab-group
@@ -82,6 +87,7 @@
           }
         </mat-tab-group>
       </div>
+      </mat-card>
     </div>
   } @else if (collate) {
     <div class="empty-state">

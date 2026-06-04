@@ -9,9 +9,11 @@ import {MatTab, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
 import {CollateProjectListComponent} from "../collate-project-list/collate-project-list.component";
 import {WebService} from "../../web.service";
 import {MatButtonToggleGroup, MatButtonToggle} from "@angular/material/button-toggle";
+import {MatCard, MatCardContent} from "@angular/material/card";
 import {HeatmapPlotComponent} from "../cytoscape-plot/heatmap-plot/heatmap-plot.component";
+import {HeatmapSidebarComponent} from "../collate-heatmap/heatmap-sidebar/heatmap-sidebar.component";
 import {HeatmapDataPoint} from "../cytoscape-plot/cytoscape-plot.types";
-import {defaultHeatmapPersistentSettings, HeatmapPersistentSettings} from "../collate-heatmap/collate-heatmap.types";
+import {defaultHeatmapPersistentSettings, defaultHeatmapViewState, HeatmapPersistentSettings, HeatmapViewState} from "../collate-heatmap/collate-heatmap.types";
 import {AnalysisGroup} from "../../analysis-group/analysis-group";
 import {MatIcon} from "@angular/material/icon";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -68,6 +70,9 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
     MatButtonToggleGroup,
     MatButtonToggle,
     HeatmapPlotComponent,
+    HeatmapSidebarComponent,
+    MatCard,
+    MatCardContent,
   ],
     templateUrl: './collate-view.component.html',
     styleUrl: './collate-view.component.scss'
@@ -119,27 +124,64 @@ export class CollateViewComponent implements OnDestroy {
 
   contentView: 'collate' | 'heatmap' = 'collate';
   allHeatmapData: HeatmapDataPoint[] = [];
+  /** Saved settings loaded from collate — not mutated by sidebar changes */
   heatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
+  /** Temporary local copy for the current session — never saved */
+  localHeatmapSettings: HeatmapPersistentSettings = defaultHeatmapPersistentSettings();
+  localHeatmapViewState: HeatmapViewState = defaultHeatmapViewState();
 
   setContentView(view: 'collate' | 'heatmap'): void {
     this.contentView = view;
-    if (view === 'heatmap') this.rebuildHeatmapData();
+    if (view === 'heatmap') {
+      this.localHeatmapSettings = { ...this.heatmapSettings };
+      this.localHeatmapViewState = defaultHeatmapViewState();
+      this.rebuildHeatmapData();
+    }
+    this.cdr.markForCheck();
+  }
+
+  onLocalHeatmapSettingsChange(settings: HeatmapPersistentSettings): void {
+    this.localHeatmapSettings = settings;
+    this.rebuildHeatmapData();
+    this.cdr.markForCheck();
+  }
+
+  onLocalHeatmapStateChange(state: HeatmapViewState): void {
+    this.localHeatmapViewState = state;
+    this.rebuildHeatmapData();
     this.cdr.markForCheck();
   }
 
   private rebuildHeatmapData(): void {
+    const agOrderMap = this.collate?.settings?.analysisGroupOrderMap ?? {};
+    const projectOrder = this.projects.map(p => p.id);
+    const state = this.localHeatmapViewState;
+
     const points: HeatmapDataPoint[] = [];
     for (const projectId in this.searchResults) {
       for (const r of this.searchResults[projectId]) {
         const project = this.analysisGroupProjects[r.analysis_group.id];
+        if (!project) continue;
+        const vis = state.visibilityMap[project.id]?.[r.analysis_group.id];
+        if (vis === false) continue;
+        if (state.proteinFilter) {
+          const f = state.proteinFilter.toLowerCase();
+          const name = (r.gene_name ?? r.primary_id ?? r.uniprot_id ?? '').toLowerCase();
+          if (!name.includes(f)) continue;
+        }
+        if (state.maskSubThreshold) {
+          if (state.log2fcCutoff > 0 && Math.abs(r.log2_fc) < state.log2fcCutoff) continue;
+          if (state.pValueCutoff > 0 && r.log10_p < state.pValueCutoff) continue;
+        }
+        const flipped = state.flippedAnalysisGroupIds.has(r.analysis_group.id);
         points.push({
-          project: project?.name ?? 'Unknown',
-          project_id: project?.id ?? 0,
+          project: project.name,
+          project_id: project.id,
           analysis_group: r.analysis_group.name,
           analysis_group_id: r.analysis_group.id,
           conditionA: r.condition_A,
           conditionB: r.condition_B,
-          log2fc: r.log2_fc,
+          log2fc: flipped ? -r.log2_fc : r.log2_fc,
           p_value: r.log10_p,
           comparison: r.comparison_label ?? `${r.condition_A} vs ${r.condition_B}`,
           protein: r.gene_name ?? r.primary_id ?? r.uniprot_id ?? String(r.id),
@@ -147,6 +189,15 @@ export class CollateViewComponent implements OnDestroy {
         });
       }
     }
+    points.sort((a, b) => {
+      const pa = projectOrder.indexOf(a.project_id);
+      const pb = projectOrder.indexOf(b.project_id);
+      if (pa !== pb) return (pa === -1 ? projectOrder.length : pa) - (pb === -1 ? projectOrder.length : pb);
+      const agOrder = agOrderMap[a.project_id] ?? [];
+      const ia = agOrder.indexOf(a.analysis_group_id);
+      const ib = agOrder.indexOf(b.analysis_group_id);
+      return (ia === -1 ? agOrder.length : ia) - (ib === -1 ? agOrder.length : ib);
+    });
     this.allHeatmapData = points;
   }
 

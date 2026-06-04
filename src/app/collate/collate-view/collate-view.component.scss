@@ -4,6 +4,35 @@
   height: 100%;
 }
 
+.heatmap-inline-layout {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  height: calc(100vh - 112px);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.sidebar-card {
+  flex-shrink: 0;
+  width: 260px;
+  overflow-y: auto;
+
+  mat-card-content {
+    padding: 0;
+  }
+}
+
+.heatmap-card {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+
+  mat-card-content {
+    padding: 0;
+  }
+}
+
 .logo-link {
   display: flex;
   align-items: center;

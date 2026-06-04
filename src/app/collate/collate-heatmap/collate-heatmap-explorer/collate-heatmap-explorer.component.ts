@@ -28,6 +28,7 @@ import { CollateProjectAnalysisGroupVisibilityDialogComponent } from '../../coll
 import { CollateConditionColorEditorDialogComponent } from '../../collate-condition-color-editor-dialog/collate-condition-color-editor-dialog.component';
 import { CollateRenameSampleConditionDialogComponent } from '../../collate-rename-sample-condition-dialog/collate-rename-sample-condition-dialog.component';
 import { CollateConditionOrderDialogComponent } from '../../collate-condition-order-dialog/collate-condition-order-dialog.component';
+import { MatCard, MatCardContent } from '@angular/material/card';
 import { GraphService } from '../../../graph.service';
 import { AccountsService } from '../../../accounts/accounts.service';
 import { HeatmapSettingsDialogComponent } from '../heatmap-settings-dialog/heatmap-settings-dialog.component';
@@ -62,6 +63,8 @@ interface SubsetTab {
     MatMenuItem,
     MatMenuTrigger,
     NgOptimizedImage,
+    MatCard,
+    MatCardContent,
   ],
   templateUrl: './collate-heatmap-explorer.component.html',
   styleUrl: './collate-heatmap-explorer.component.scss',

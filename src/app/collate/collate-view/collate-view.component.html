@@ -119,10 +119,32 @@
         <app-collate-project-list [searchTerm]="selectedSearchTerm" [renameCondition]="collate.settings.renameSampleCondition" [projectConditionOrder]="collate.settings.projectConditionOrder" [projects]="projects" [filteredResults]="filteredResults"></app-collate-project-list>
       }
     } @else {
-      <app-heatmap-plot
-        [data]="allHeatmapData"
-        [heatmapSettings]="heatmapSettings">
-      </app-heatmap-plot>
+      <div class="heatmap-inline-layout">
+        @if (collate) {
+          <mat-card appearance="outlined" class="sidebar-card">
+            <mat-card-content>
+              <app-heatmap-sidebar
+                [collate]="collate"
+                [projects]="projects"
+                [projectAnalysisGroups]="projectAnalysisGroups"
+                [state]="localHeatmapViewState"
+                [heatmapSettings]="localHeatmapSettings"
+                [showBackButton]="false"
+                (stateChange)="onLocalHeatmapStateChange($event)"
+                (heatmapSettingsChange)="onLocalHeatmapSettingsChange($event)">
+              </app-heatmap-sidebar>
+            </mat-card-content>
+          </mat-card>
+        }
+        <mat-card appearance="outlined" class="heatmap-card">
+          <mat-card-content>
+            <app-heatmap-plot
+              [data]="allHeatmapData"
+              [heatmapSettings]="localHeatmapSettings">
+            </app-heatmap-plot>
+          </mat-card-content>
+        </mat-card>
+      </div>
     }
   } @else if (collate) {
     <div class="empty-state">

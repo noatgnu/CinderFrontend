@@ -49,13 +49,39 @@
 
 .explorer-layout {
   display: flex;
+  gap: 12px;
+  padding: 12px;
   height: calc(100vh - 112px);
   overflow: hidden;
+  box-sizing: border-box;
+}
+
+.sidebar-card {
+  flex-shrink: 0;
+  width: 260px;
+  overflow-y: auto;
+
+  mat-card-content {
+    padding: 0;
+    height: 100%;
+  }
+}
+
+.main-card {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+
+  mat-card-content {
+    padding: 0;
+    flex: 1;
+  }
 }
 
 .main-panel {
   flex: 1;
-  overflow: auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
