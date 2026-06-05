@@ -24,7 +24,7 @@ export class CurtainListService {
       this.categories$ = this.http
         .get<string[]>(`${this.baseUrl}/data_filter_list/get_all_category/`)
         .pipe(
-          map(cats => cats.sort()),
+          map(cats => cats.filter(c => c !== "User's lists").sort()),
           catchError(() => of([])),
           shareReplay(1),
         );
