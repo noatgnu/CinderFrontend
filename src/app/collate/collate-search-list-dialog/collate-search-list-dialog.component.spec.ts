@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { CollateSearchListDialogComponent } from './collate-search-list-dialog.component';
+import { MatDialogRef } from '@angular/material/dialog';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { CollateSearchListDialogComponent } from './collate-search-list-dialog.component';
+import { CurtainList } from '../../curtain-list.service';
 
 describe('CollateSearchListDialogComponent', () => {
   let component: CollateSearchListDialogComponent;
@@ -20,7 +21,6 @@ describe('CollateSearchListDialogComponent', () => {
         provideHttpClientTesting(),
         provideAnimationsAsync(),
         { provide: MatDialogRef, useValue: mockDialogRef },
-        { provide: MAT_DIALOG_DATA, useValue: null },
       ],
     }).compileComponents();
 
@@ -33,20 +33,24 @@ describe('CollateSearchListDialogComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should count proteins correctly', () => {
-    expect(component.getProteinCount('BRCA1\nTP53\nEGFR')).toBe(3);
-    expect(component.getProteinCount('BRCA1,TP53,EGFR')).toBe(3);
-    expect(component.getProteinCount('')).toBe(0);
+  it('should close with data when filter selected', () => {
+    const filter: CurtainList = { id: 1, name: 'Test', data: 'BRCA1\nTP53', default: false };
+    component.selectFilter(filter);
+    expect(mockDialogRef.close).toHaveBeenCalledWith('BRCA1\nTP53');
   });
 
-  it('should cancel dialog', () => {
+  it('should cancel without result', () => {
     component.cancel();
     expect(mockDialogRef.close).toHaveBeenCalledWith();
   });
 
-  it('should close with data when filter selected', () => {
-    const filter = { id: 1, name: 'Test List', data: 'BRCA1\nTP53', default: false };
-    component.selectFilter(filter);
-    expect(mockDialogRef.close).toHaveBeenCalledWith('BRCA1\nTP53');
+  it('should paginate correctly', () => {
+    component.filters = Array.from({ length: 25 }, (_, i) => ({ id: i, name: `List ${i}`, data: '', default: false }));
+    expect(component.totalPages).toBe(3);
+    expect(component.pagedFilters.length).toBe(10);
+    component.nextPage();
+    expect(component.currentPage).toBe(1);
+    component.prevPage();
+    expect(component.currentPage).toBe(0);
   });
 });
