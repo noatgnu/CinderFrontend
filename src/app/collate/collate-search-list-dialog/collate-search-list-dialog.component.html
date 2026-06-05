@@ -1,0 +1,80 @@
+<h2 mat-dialog-title>Load Curated Protein List</h2>
+<div mat-dialog-content class="dialog-content">
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Search all lists</mat-label>
+      <input matInput [ngModel]="globalSearchTerm" (ngModelChange)="onGlobalSearchChange($event)" placeholder="Type to search...">
+      @if (isGlobalSearching) {
+        <mat-icon matSuffix><mat-spinner diameter="16"></mat-spinner></mat-icon>
+      }
+    </mat-form-field>
+
+    @if (globalSearchResults.length > 0) {
+      <div class="results-list">
+        @for (f of globalSearchResults; track f.id) {
+          <div class="result-item" (click)="selectFilter(f)">
+            <span class="result-name">{{ f.name }}</span>
+            <span class="result-count">{{ getProteinCount(f.data) }} proteins</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @if (!globalSearchTerm) {
+    <mat-divider></mat-divider>
+
+    <div class="category-section">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Browse by category</mat-label>
+        <mat-select [ngModel]="selectedCategory" (ngModelChange)="onCategoryChange($event)">
+          <mat-option value="">-- Select category --</mat-option>
+          @for (cat of categories; track cat) {
+            <mat-option [value]="cat">{{ cat }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (selectedCategory) {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Filter lists</mat-label>
+          <input matInput [(ngModel)]="filterSearchTerm" placeholder="Filter by name...">
+        </mat-form-field>
+
+        @if (isLoadingFilters) {
+          <div class="loading-row">
+            <mat-spinner diameter="24"></mat-spinner>
+            <span>Loading...</span>
+          </div>
+        } @else {
+          <div class="results-list">
+            @for (f of pagedFilters; track f.id) {
+              <div class="result-item" (click)="selectFilter(f)">
+                <span class="result-name">{{ f.name }}</span>
+                <span class="result-count">{{ getProteinCount(f.data) }} proteins</span>
+              </div>
+            }
+            @if (filteredFilters.length === 0) {
+              <div class="empty-row">No lists found</div>
+            }
+          </div>
+
+          @if (totalPages > 1) {
+            <div class="pagination">
+              <button mat-icon-button [disabled]="currentPage === 0" (click)="prevPage()">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              <span>{{ currentPage + 1 }} / {{ totalPages }}</span>
+              <button mat-icon-button [disabled]="currentPage >= totalPages - 1" (click)="nextPage()">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </div>
+          }
+        }
+      }
+    </div>
+  }
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+</div>
