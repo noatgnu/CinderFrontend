@@ -68,14 +68,14 @@
       </mat-card-header>
       <mat-card-content>
         <form [formGroup]="form" class="search-form">
-          <mat-form-field>
+          <mat-form-field style="width:100%">
             <mat-label>Database Search Term</mat-label>
-            <input matInput formControlName="search" placeholder="Search" type="search">
+            <textarea matInput formControlName="search" placeholder="One term per line, or separate with OR" rows="3" (keydown.enter)="onSearchEnter($event)"></textarea>
+            <mat-hint>One term per line · or use OR · Shift+Enter for new line</mat-hint>
+            <button mat-icon-button matSuffix matTooltip="Load curated protein list" type="button" (click)="openListDialog()">
+              <mat-icon>list</mat-icon>
+            </button>
           </mat-form-field>
-          <p class="search-hint text-secondary">
-            <b>Search Multiple Terms</b><br>
-            In order to search with multiple terms, enclose each term in single quotes and separate them with <b>OR</b>.
-          </p>
           <mat-form-field>
             <mat-label>Search Mode</mat-label>
             <mat-select formControlName="searchMode">

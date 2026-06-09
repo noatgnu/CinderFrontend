@@ -9,7 +9,7 @@ import {
   MatCardTitle
 } from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {AccountsService} from "../accounts/accounts.service";
 import {WebService} from "../web.service";
 import {MatDialog} from "@angular/material/dialog";
@@ -20,7 +20,7 @@ import {
 import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Project} from "../project/project";
 import {ProjectSearchComponent} from "./project-search/project-search.component";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {
@@ -42,6 +42,8 @@ import {CollateSearchMainComponent} from "../collate/collate-search-main/collate
 import {CreateCollateDialogComponent} from "../collate/create-collate-dialog/create-collate-dialog.component";
 import {CollateService} from "../collate/collate.service";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {MatTooltip} from "@angular/material/tooltip";
+import {CollateSearchListDialogComponent} from "../collate/collate-search-list-dialog/collate-search-list-dialog.component";
 
 @Component({
     selector: 'app-banner',
@@ -73,7 +75,12 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
         MatListOption,
         CollateSearchMainComponent,
         MatProgressSpinner,
-        RouterLink
+        RouterLink,
+        MatIconButton,
+        MatHint,
+        MatSuffix,
+        MatTooltip,
+        CollateSearchListDialogComponent,
     ],
     templateUrl: './banner.component.html',
     styleUrl: './banner.component.scss'
@@ -225,11 +232,37 @@ export class BannerComponent implements OnDestroy {
     }
   }
 
+  onSearchEnter(event: Event): void {
+    const ke = event as KeyboardEvent;
+    if (!ke.shiftKey) {
+      ke.preventDefault();
+      this.searchDatabase();
+    }
+  }
+
+  openListDialog(): void {
+    const ref = this.dialog.open(CollateSearchListDialogComponent, { width: '520px', maxHeight: '80vh' });
+    ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((data: string | undefined) => {
+      if (!data) return;
+      const proteins = data.split(/[\n,]/).map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+      const current = this.form.value.search?.trim();
+      const appended = current ? `${current}\n${proteins.join('\n')}` : proteins.join('\n');
+      this.form.patchValue({ search: appended });
+      this.cdr.markForCheck();
+    });
+  }
+
+  private buildSearchTerm(raw: string): string {
+    const terms = raw.toUpperCase().split(/\r?\n|OR/).map(q => q.trim()).filter(q => q.length > 0);
+    return terms.map(t => `"${t.replace(/['"]/g, '')}"`).join(' OR ');
+  }
+
   private executeSearch(analysisGroupIDs: number[]) {
     if (this.form.value.search && this.form.value.foldChange && this.form.value.pValue && this.form.value.searchMode) {
+      const searchTerm = this.buildSearchTerm(this.form.value.search);
       this.web.createSearch(
         analysisGroupIDs,
-        this.form.value.search,
+        searchTerm,
         this.web.searchSessionID,
         this.form.value.foldChange,
         this.form.value.pValue,
