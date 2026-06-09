@@ -45,7 +45,7 @@
           <input matInput formControlName="search_lab_group">
           <mat-label>Search Lab Group</mat-label>
         </mat-form-field>
-        <mat-selection-list formControlName="lab_group" [multiple]="false">
+        <mat-selection-list class="multiline-list" formControlName="lab_group" [multiple]="false">
           @for (labGroup of labGroupQuery?.results; track labGroup.id) {
             <mat-list-option [value]="labGroup">
               {{ labGroup.name }}

@@ -8,7 +8,7 @@
       </mat-form-field>
       @if (projectQuery) {
         @if (projectQuery.results.length > 0) {
-          <mat-selection-list [multiple]="false" formControlName="selectedProject">
+          <mat-selection-list class="multiline-list" [multiple]="false" formControlName="selectedProject">
             @for (p of projectQuery.results; track p.id) {
               <mat-list-option [value]="p">
                 {{p.name}}

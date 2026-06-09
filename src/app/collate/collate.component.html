@@ -45,7 +45,7 @@
         <button mat-raised-button color="primary" (click)="searchCollates()">Search</button>
 
         @if (collates.length > 0) {
-          <mat-selection-list [(ngModel)]="selectedCollate" (selectionChange)="onCollateSelect($event)" [multiple]="false">
+          <mat-selection-list class="multiline-list" [(ngModel)]="selectedCollate" (selectionChange)="onCollateSelect($event)" [multiple]="false">
             @for (collate of collates; track collate.id) {
               <mat-list-option [value]="collate">
                 {{ collate.title }}

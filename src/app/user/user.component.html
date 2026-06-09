@@ -34,7 +34,7 @@
       <mat-form-field>
         <input matInput formControlName="search_term" (input)="fetchLabGroups()">
       </mat-form-field>
-      <mat-selection-list (selectionChange)="onLabGroupSelect($event)">
+      <mat-selection-list class="multiline-list" (selectionChange)="onLabGroupSelect($event)">
         @for (labGroup of labGroupQuery?.results; track labGroup.id) {
           <mat-list-option [value]="labGroup">
             {{ labGroup.name }}

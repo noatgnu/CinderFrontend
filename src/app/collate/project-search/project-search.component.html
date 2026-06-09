@@ -19,7 +19,7 @@
   @if (projectQuery) {
     @if (projectQuery.count > 0) {
       <div>
-        <mat-selection-list formControlName="selectedProjects" [multiple]="false">
+        <mat-selection-list class="multiline-list" formControlName="selectedProjects" [multiple]="false">
           @for (p of projectQuery.results; track p.id) {
             <mat-list-option [value]="p">{{p.name}}</mat-list-option>
           }
