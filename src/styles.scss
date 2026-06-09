@@ -218,6 +218,20 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   100% { transform: rotate(360deg); }
 }
 
+.multiline-list {
+  .mat-mdc-list-item {
+    height: auto !important;
+    min-height: 48px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .mdc-list-item__primary-text {
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
 .skip-link {
   position: absolute;
   top: -40px;

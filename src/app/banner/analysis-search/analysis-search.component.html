@@ -5,7 +5,7 @@
   </mat-form-field>
   @if (analysisGroupQuery) {
     @if (analysisGroupQuery.results.length >0) {
-      <mat-selection-list formControlName="selectedAnalysisGroups" [multiple]="false">
+      <mat-selection-list class="multiline-list" formControlName="selectedAnalysisGroups" [multiple]="false">
         @for (ag of analysisGroupQuery.results; track ag.id) {
           <mat-list-option [value]="ag">{{ag.name}}</mat-list-option>
         }

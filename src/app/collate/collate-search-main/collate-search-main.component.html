@@ -3,7 +3,7 @@
     <input matInput placeholder="Search" type="search" formControlName="query">
     <mat-label>Search Term</mat-label>
   </mat-form-field>
-  <mat-selection-list [multiple]="false" formControlName="selected">
+  <mat-selection-list class="multiline-list" [multiple]="false" formControlName="selected">
     @for (collate of collates; track collate.id) {
       <mat-list-option [value]="collate">
         {{ collate.title }}
