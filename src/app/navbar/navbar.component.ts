@@ -9,7 +9,7 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {NgOptimizedImage} from "@angular/common";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {GraphService} from "../graph.service";
-import {NavigationEnd, Router} from "@angular/router";
+import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {LabGroup} from "../lab-group";
 import {WebService} from "../web.service";
 import {LabGroupCreateDialogComponent} from "./lab-group-create-dialog/lab-group-create-dialog.component";
@@ -34,7 +34,8 @@ import {filter, Subject, takeUntil} from "rxjs";
         MatSlideToggle,
         MatButton,
         MatTooltip,
-        MatDivider
+        MatDivider,
+        RouterLink
     ],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss'
@@ -133,10 +134,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   openLabMemberDialog() {
-    const ref = this.dialog.open(LabGroupUserListDialogComponent);
-    if (this.currentLabGroup) {
-      ref.componentInstance.labGroupID = this.currentLabGroup.id;
-    }
+    const ref = this.dialog.open(LabGroupUserListDialogComponent, {
+      data: { labGroupID: this.currentLabGroup?.id ?? 0 }
+    });
     ref.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result: User | { all: boolean }) => {
       if (!result) {
         return;

@@ -3,7 +3,7 @@
     <mat-toolbar-row>
       <div class="logo-container">
         <img [width]="25" [height]="25" [ngSrc]="'/assets/logo.png'" alt="C|nder logo">
-        <a href="/#/home" class="logo-text">C|nder</a>
+        <a [routerLink]="['/home']" class="logo-text">C|nder</a>
       </div>
 
       <span class="spacer"></span>
@@ -51,19 +51,19 @@
   </mat-toolbar>
 
   <mat-menu #menu="matMenu">
-    <a mat-menu-item href="/#/project">
+    <a mat-menu-item [routerLink]="['/project']">
       <mat-icon>folder</mat-icon>
       <span>Project</span>
     </a>
-    <a mat-menu-item href="/#/analysis-group">
+    <a mat-menu-item [routerLink]="['/analysis-group']">
       <mat-icon>science</mat-icon>
       <span>Analysis Group</span>
     </a>
-    <a mat-menu-item href="/#/search-session">
+    <a mat-menu-item [routerLink]="['/search-session']">
       <mat-icon>search</mat-icon>
       <span>Search Session</span>
     </a>
-    <a mat-menu-item href="/#/collate">
+    <a mat-menu-item [routerLink]="['/collate']">
       <mat-icon>dashboard</mat-icon>
       <span>Collate</span>
     </a>
@@ -92,11 +92,11 @@
   </mat-menu>
 
   <mat-menu #userMenu="matMenu">
-    <a mat-menu-item href="/#/user">
+    <a mat-menu-item [routerLink]="['/user']">
       <mat-icon>person</mat-icon>
       <span>Profile</span>
     </a>
-    <a mat-menu-item href="/#/user/change-password">
+    <a mat-menu-item [routerLink]="['/user', 'change-password']">
       <mat-icon>password</mat-icon>
       <span>Change Password</span>
     </a>
@@ -121,7 +121,7 @@
     </div>
     <mat-divider></mat-divider>
     @if (accounts.currentUser?.is_staff) {
-      <a mat-menu-item href="/#/admin">
+      <a mat-menu-item [routerLink]="['/admin']">
         <mat-icon>admin_panel_settings</mat-icon>
         Administration
       </a>

@@ -1,5 +1,5 @@
-import {Component, Input} from '@angular/core';
-import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from "@angular/material/dialog";
 import {User, UserQuery} from "../../user/user";
 import {WebService} from "../../web.service";
 import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
@@ -17,9 +17,15 @@ import {
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
+import {Subject, takeUntil} from "rxjs";
+
+export interface LabGroupUserListDialogData {
+  labGroupID: number;
+}
 
 @Component({
     selector: 'app-lab-group-user-list-dialog',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MatDialogTitle,
         MatDialogContent,
@@ -47,54 +53,60 @@ import {MatIcon} from "@angular/material/icon";
     templateUrl: './lab-group-user-list-dialog.component.html',
     styleUrl: './lab-group-user-list-dialog.component.scss'
 })
-export class LabGroupUserListDialogComponent {
-  private _labGroupID: number = 0
-  @Input() set labGroupID(value: number) {
-    this._labGroupID = value
-    this.fetchMembers()
-  }
+export class LabGroupUserListDialogComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
 
-  get labGroupID(): number {
-    return this._labGroupID
-  }
-
-  memberQuery: UserQuery|undefined|null = null
-  limit: number = 10
-  offset: number = 0
+  memberQuery: UserQuery | undefined | null = null;
+  limit = 10;
+  pageIndex = 0;
 
   form = this.fb.group({
     selectedUser: [null],
-    searchTerm: [""]
-  })
+    searchTerm: [''],
+  });
 
   displayedColumns: string[] = ['id', 'username', 'first_name', 'last_name'];
 
-  constructor(private dialogRef: MatDialogRef<LabGroupUserListDialogComponent>, private web: WebService, private fb: FormBuilder) {
-    this.fetchMembers()
+  constructor(
+    private dialogRef: MatDialogRef<LabGroupUserListDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: LabGroupUserListDialogData,
+    private web: WebService,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+  ) {
+    this.fetchMembers();
   }
 
-  close() {
-    this.dialogRef.close()
+  fetchMembers(): void {
+    const offset = this.pageIndex * this.limit;
+    this.web.getUsers(this.form.value.searchTerm, this.limit, offset, this.data.labGroupID)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((value) => {
+        this.memberQuery = value;
+        this.cdr.markForCheck();
+      });
   }
 
-  submit(user: User) {
-    this.dialogRef.close(user)
+  onPageChange(event: PageEvent): void {
+    this.limit = event.pageSize;
+    this.pageIndex = event.pageIndex;
+    this.fetchMembers();
   }
 
-  fetchMembers() {
-    this.web.getUsers(this.form.value.searchTerm, this.limit, this.offset, this.labGroupID).subscribe((value) => {
-      this.memberQuery = value
-    })
+  submit(user: User): void {
+    this.dialogRef.close(user);
   }
 
-  onPageChange(event: PageEvent) {
-    this.limit = event.pageSize
-    this.offset = event.pageIndex * event.pageSize
-    this.fetchMembers()
+  selectAll(): void {
+    this.dialogRef.close({ all: true });
   }
 
-  selectAll() {
-    this.dialogRef.close({all: true})
+  close(): void {
+    this.dialogRef.close();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

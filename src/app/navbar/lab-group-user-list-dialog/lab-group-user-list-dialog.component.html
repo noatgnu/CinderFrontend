@@ -37,7 +37,7 @@
     <mat-paginator
       [length]="memberQuery.count"
       [pageSize]="limit"
-      [pageIndex]="offset"
+      [pageIndex]="pageIndex"
       (page)="onPageChange($event)">
     </mat-paginator>
   }

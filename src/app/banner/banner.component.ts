@@ -35,9 +35,9 @@ import {WebsocketService} from "../websocket.service";
 import {AnalysisSearchComponent} from "./analysis-search/analysis-search.component";
 import {AnalysisGroup} from "../analysis-group/analysis-group";
 import {Species} from "../species";
-import {BehaviorSubject, Subject, takeUntil, filter, switchMap, tap, forkJoin} from "rxjs";
+import {BehaviorSubject, debounceTime, Subject, takeUntil, filter, switchMap, tap, forkJoin} from "rxjs";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
-import {Router} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {CollateSearchMainComponent} from "../collate/collate-search-main/collate-search-main.component";
 import {CreateCollateDialogComponent} from "../collate/create-collate-dialog/create-collate-dialog.component";
 import {CollateService} from "../collate/collate.service";
@@ -72,7 +72,8 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
         MatSelectionList,
         MatListOption,
         CollateSearchMainComponent,
-        MatProgressSpinner
+        MatProgressSpinner,
+        RouterLink
     ],
     templateUrl: './banner.component.html',
     styleUrl: './banner.component.scss'
@@ -118,6 +119,7 @@ export class BannerComponent implements OnDestroy {
       this.cdr.markForCheck();
     });
     this.form.controls.species_name.valueChanges.pipe(
+      debounceTime(300),
       takeUntil(this.destroy$),
       filter((value): value is string => !!value),
       switchMap((value) => this.web.getSpecies(undefined, 10, 0, value))
