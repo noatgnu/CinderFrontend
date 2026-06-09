@@ -16,7 +16,7 @@ import {WebsocketService} from "../../websocket.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {environment} from "../../../environments/environment";
 import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component";
-import {Subject, switchMap, takeUntil} from "rxjs";
+import {debounceTime, Subject, switchMap, takeUntil} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
@@ -78,6 +78,7 @@ export class SearchSessionViewComponent implements OnDestroy {
   currentSort: Sort|undefined = undefined
   constructor(private titleService: Title, private web: WebService, private fb: FormBuilder, private ws: WebsocketService, private sb: MatSnackBar, private cdr: ChangeDetectorRef) {
     this.form.valueChanges.pipe(
+      debounceTime(300),
       takeUntil(this.destroy$),
       switchMap((data) => {
         const searchTerm = data.searchTerm || ''

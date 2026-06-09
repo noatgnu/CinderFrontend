@@ -26,9 +26,9 @@ describe('CytoscapeGraphService', () => {
   describe('groupHeatmapDataBySearchTerm', () => {
     it('should group data by search term', () => {
       const data = [
-        { project: 'P1', analysis_group: 'AG1', conditionA: 'A', conditionB: 'B', log2fc: 1, p_value: 0.05, comparison: 'A vs B', protein: 'PROT1', searchTerm: 'term1' },
-        { project: 'P1', analysis_group: 'AG1', conditionA: 'A', conditionB: 'B', log2fc: 2, p_value: 0.01, comparison: 'A vs B', protein: 'PROT2', searchTerm: 'term1' },
-        { project: 'P2', analysis_group: 'AG2', conditionA: 'C', conditionB: 'D', log2fc: -1, p_value: 0.1, comparison: 'C vs D', protein: 'PROT3', searchTerm: 'term2' }
+        { project: 'P1', project_id: 1, analysis_group: 'AG1', analysis_group_id: 1, conditionA: 'A', conditionB: 'B', log2fc: 1, p_value: 0.05, comparison: 'A vs B', protein: 'PROT1', searchTerm: 'term1' },
+        { project: 'P1', project_id: 1, analysis_group: 'AG1', analysis_group_id: 1, conditionA: 'A', conditionB: 'B', log2fc: 2, p_value: 0.01, comparison: 'A vs B', protein: 'PROT2', searchTerm: 'term1' },
+        { project: 'P2', project_id: 2, analysis_group: 'AG2', analysis_group_id: 2, conditionA: 'C', conditionB: 'D', log2fc: -1, p_value: 0.1, comparison: 'C vs D', protein: 'PROT3', searchTerm: 'term2' }
       ];
 
       const result = service.groupHeatmapDataBySearchTerm(data);

@@ -33,7 +33,7 @@ describe('CurtainListService', () => {
     let result: any[] = [{ id: 1 }];
     service.searchByName('a').subscribe(r => (result = r));
     expect(result).toEqual([]);
-    httpMock.expectNone(/data_filter_list/);
+    httpMock.expectNone(r => r.url.includes('data_filter_list'));
   });
 
   it('should search by name', () => {

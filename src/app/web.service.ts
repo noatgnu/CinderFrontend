@@ -700,10 +700,10 @@ export class WebService {
     )
   }
 
-  exportSearchData(search_id: number, search_term: string, log2_fc: number = 0, p_value: number = 0, session_id: string) {
+  exportSearchData(search_id: number, search_term: string, log2_fc: number = 0, log10_p: number = 0, session_id: string) {
     return this.http.post(
       `${this.baseURL}/api/search/${search_id}/export_search_data/`,
-      {search_term: search_term, log2_fc: log2_fc, p_value: p_value, session_id: session_id, instance_id: this.cinderInstanceID},
+      {search_term: search_term, log2_fc: log2_fc, log10_p: log10_p, session_id: session_id, instance_id: this.cinderInstanceID},
       {responseType: 'json', observe: 'body'}
     )
   }
