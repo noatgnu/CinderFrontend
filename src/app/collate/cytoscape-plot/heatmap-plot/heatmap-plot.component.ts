@@ -110,6 +110,7 @@ export class HeatmapPlotComponent {
     responsive: true,
     scrollZoom: false,
     displayModeBar: false,
+    doubleClick: false,
   };
 
   drawHeatmap(): void {
