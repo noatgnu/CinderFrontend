@@ -21,28 +21,6 @@
       <mat-label>Max label <span class="optional">(optional)</span></mat-label>
       <input matInput [(ngModel)]="settings.maxLabel" placeholder="e.g. Up-regulated">
     </mat-form-field>
-
-    <div class="color-gradient-section">
-      <div class="color-gradient-label">Color gradient</div>
-      <div class="color-gradient-row">
-        <div class="color-picker-item">
-          <label>Down</label>
-          <input type="color" [(ngModel)]="settings.downColor" class="color-input">
-        </div>
-        <div class="color-gradient-preview" [style.background]="gradientPreview">
-        </div>
-        <div class="color-picker-item">
-          <label>Zero</label>
-          <input type="color" [(ngModel)]="settings.zeroColor" class="color-input">
-        </div>
-        <div class="color-gradient-preview" [style.background]="gradientPreviewUp">
-        </div>
-        <div class="color-picker-item">
-          <label>Up</label>
-          <input type="color" [(ngModel)]="settings.upColor" class="color-input">
-        </div>
-      </div>
-    </div>
   </div>
 
   <mat-divider></mat-divider>

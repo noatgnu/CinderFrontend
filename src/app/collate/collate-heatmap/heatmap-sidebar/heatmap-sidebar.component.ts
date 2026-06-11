@@ -151,6 +151,26 @@ export class HeatmapSidebarComponent {
     this.heatmapSettingsChange.emit({ ...this.heatmapSettings, summaryMode: mode });
   }
 
+  onDownColorChange(value: string): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, downColor: value });
+  }
+
+  onZeroColorChange(value: string): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, zeroColor: value });
+  }
+
+  onUpColorChange(value: string): void {
+    this.heatmapSettingsChange.emit({ ...this.heatmapSettings, upColor: value });
+  }
+
+  get gradientDown(): string {
+    return `linear-gradient(to right, ${this.heatmapSettings.downColor}, ${this.heatmapSettings.zeroColor})`;
+  }
+
+  get gradientUp(): string {
+    return `linear-gradient(to right, ${this.heatmapSettings.zeroColor}, ${this.heatmapSettings.upColor})`;
+  }
+
   private emit(partial: Partial<HeatmapViewState>): void {
     this.stateChange.emit({ ...this.state, ...partial });
   }

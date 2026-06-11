@@ -41,14 +41,6 @@ export class HeatmapSettingsDialogComponent {
 
   constructor(private dialogRef: MatDialogRef<HeatmapSettingsDialogComponent>) {}
 
-  get gradientPreview(): string {
-    return `linear-gradient(to right, ${this.settings.downColor}, ${this.settings.zeroColor})`;
-  }
-
-  get gradientPreviewUp(): string {
-    return `linear-gradient(to right, ${this.settings.zeroColor}, ${this.settings.upColor})`;
-  }
-
   save(): void {
     this.dialogRef.close(this.settings);
   }
