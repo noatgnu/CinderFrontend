@@ -79,20 +79,20 @@
       <input matInput [ngModel]="heatmapSettings.maxLabel" (ngModelChange)="onMaxLabelChange($event)" placeholder="e.g. Up-regulated">
     </mat-form-field>
     <div class="gradient-row">
-      <div class="color-stop">
-        <label class="color-label">Down</label>
-        <input type="color" class="color-input" [ngModel]="heatmapSettings.downColor" (ngModelChange)="onDownColorChange($event)">
-      </div>
+      <label class="gradient-stop">
+        <input type="color" class="color-picker" [ngModel]="heatmapSettings.downColor" (ngModelChange)="onDownColorChange($event)">
+        <span>Down</span>
+      </label>
       <div class="gradient-preview" [style.background]="gradientDown"></div>
-      <div class="color-stop">
-        <label class="color-label">Zero</label>
-        <input type="color" class="color-input" [ngModel]="heatmapSettings.zeroColor" (ngModelChange)="onZeroColorChange($event)">
-      </div>
+      <label class="gradient-stop">
+        <input type="color" class="color-picker" [ngModel]="heatmapSettings.zeroColor" (ngModelChange)="onZeroColorChange($event)">
+        <span>Zero</span>
+      </label>
       <div class="gradient-preview" [style.background]="gradientUp"></div>
-      <div class="color-stop">
-        <label class="color-label">Up</label>
-        <input type="color" class="color-input" [ngModel]="heatmapSettings.upColor" (ngModelChange)="onUpColorChange($event)">
-      </div>
+      <label class="gradient-stop">
+        <input type="color" class="color-picker" [ngModel]="heatmapSettings.upColor" (ngModelChange)="onUpColorChange($event)">
+        <span>Up</span>
+      </label>
     </div>
   </div>
 

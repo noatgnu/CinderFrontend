@@ -131,30 +131,36 @@
 .gradient-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   padding: 2px 0;
 }
 
-.color-stop {
+.gradient-stop {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-}
-
-.color-label {
-  font-size: 10px;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 11px;
   color: var(--app-text-secondary, #666);
 }
 
-.color-input {
-  width: 32px;
-  height: 24px;
-  padding: 1px;
-  border: 1px solid var(--app-outline-color);
-  border-radius: 3px;
+.color-picker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--app-outline-variant);
+  border-radius: 4px;
   cursor: pointer;
-  background: none;
+  background: transparent;
+  flex-shrink: 0;
+
+  &::-webkit-color-swatch-wrapper { padding: 2px; }
+  &::-webkit-color-swatch { border: none; border-radius: 2px; }
+  &::-moz-color-swatch { border: none; border-radius: 2px; }
+
+  &:hover { border-color: var(--app-primary-color); }
+  &:focus { outline: none; border-color: var(--app-primary-color); }
 }
 
 .gradient-preview {
@@ -162,7 +168,7 @@
   height: 16px;
   border-radius: 3px;
   border: 1px solid var(--app-outline-variant);
-  min-width: 0;
+  min-width: 16px;
 }
 
 .flip-btn {
