@@ -259,7 +259,7 @@ export class CollateHeatmapExplorerComponent implements OnInit, OnDestroy {
         collate.projects,
         collate.settings?.projectOrder,
       );
-      this.heatmapSettings = collate.settings['heatmapSettings'] ?? defaultHeatmapPersistentSettings();
+      this.heatmapSettings = { ...defaultHeatmapPersistentSettings(), ...(collate.settings['heatmapSettings'] ?? {}) };
       if (sessionId) {
         this.loadSearchResults(sessionId);
       }

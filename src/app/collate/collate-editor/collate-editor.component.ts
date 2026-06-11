@@ -152,7 +152,7 @@ export class CollateEditorComponent implements OnDestroy {
             }
           }
 
-          this.heatmapSettings = currentCollate.settings['heatmapSettings'] ?? defaultHeatmapPersistentSettings();
+          this.heatmapSettings = { ...defaultHeatmapPersistentSettings(), ...(currentCollate.settings['heatmapSettings'] ?? {}) };
 
           if (!currentCollate.settings['projectConditionOrder']) {
             currentCollate.settings['projectConditionOrder'] = {};

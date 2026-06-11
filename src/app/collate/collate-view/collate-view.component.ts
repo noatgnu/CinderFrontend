@@ -343,7 +343,7 @@ export class CollateViewComponent implements OnDestroy {
         }
 
         if (collate.settings['heatmapSettings']) {
-          this.heatmapSettings = collate.settings['heatmapSettings'];
+          this.heatmapSettings = { ...defaultHeatmapPersistentSettings(), ...collate.settings['heatmapSettings'] };
         }
 
         if (!this.collate.settings.projectAnalysisGroupVisibility) {
