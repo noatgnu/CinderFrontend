@@ -12,6 +12,7 @@ import {SearchSessionListComponent} from "./search-session-list/search-session-l
 import {AccountsService} from "../accounts/accounts.service";
 import {SearchSessionViewComponent} from "./search-session-view/search-session-view.component";
 import {Router, RouterLink} from "@angular/router";
+import {MatTooltip} from "@angular/material/tooltip";
 import {debounceTime, Subject, takeUntil} from "rxjs";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
@@ -32,7 +33,8 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
         SearchSessionListComponent,
         SearchSessionViewComponent,
         MatProgressSpinner,
-        RouterLink
+        RouterLink,
+        MatTooltip,
     ],
     templateUrl: './search-session.component.html',
     styleUrl: './search-session.component.scss'

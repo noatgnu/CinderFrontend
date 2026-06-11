@@ -8,4 +8,24 @@
 
 .search-session-main-content {
   flex: 1;
+  min-width: 0;
+}
+
+.toolbar-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.toolbar-title-link {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #ba0000;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
