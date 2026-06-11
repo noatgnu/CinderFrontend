@@ -244,11 +244,9 @@ export class HeatmapPlotComponent {
     const maxTickLabel = s.maxLabel || zmax.toFixed(1);
     const zeroPos = zmax > zmin ? (-zmin) / (zmax - zmin) : 0.5;
     const colorscale = [
-      [0, 'rgb(5, 48, 97)'],
-      [Math.max(0, zeroPos * 0.5), 'rgb(67, 147, 195)'],
-      [Math.min(1, Math.max(0, zeroPos)), 'rgb(255, 255, 255)'],
-      [Math.min(1, zeroPos + (1 - zeroPos) * 0.5), 'rgb(214, 96, 77)'],
-      [1, 'rgb(103, 0, 31)'],
+      [0, s.downColor ?? '#053061'],
+      [Math.min(1, Math.max(0, zeroPos)), s.zeroColor ?? '#ffffff'],
+      [1, s.upColor ?? '#67001f'],
     ];
 
     const hoverTpl =

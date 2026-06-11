@@ -13,6 +13,9 @@ export interface HeatmapPersistentSettings {
   cellSize: number;
   labelFontSize: number;
   summaryMode: 'none' | 'count' | 'percentage';
+  downColor: string;
+  zeroColor: string;
+  upColor: string;
 }
 
 export function defaultHeatmapPersistentSettings(): HeatmapPersistentSettings {
@@ -27,6 +30,9 @@ export function defaultHeatmapPersistentSettings(): HeatmapPersistentSettings {
     cellSize: 36,
     labelFontSize: 9,
     summaryMode: 'none',
+    downColor: '#053061',
+    zeroColor: '#ffffff',
+    upColor: '#67001f',
   };
 }
 

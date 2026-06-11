@@ -3,6 +3,7 @@ import {SearchSession, SearchSessionQuery} from "../../search-session";
 import {MatDivider} from "@angular/material/divider";
 import {MatListOption, MatSelectionList} from "@angular/material/list";
 import {DatePipe} from "@angular/common";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-search-session-list',
@@ -11,7 +12,8 @@ import {DatePipe} from "@angular/common";
         MatDivider,
         MatListOption,
         MatSelectionList,
-        DatePipe
+        DatePipe,
+        MatTooltip,
     ],
     templateUrl: './search-session-list.component.html',
     styleUrl: './search-session-list.component.scss'
