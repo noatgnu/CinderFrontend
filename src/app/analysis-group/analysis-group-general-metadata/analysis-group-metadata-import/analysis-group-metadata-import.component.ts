@@ -58,7 +58,7 @@ export class AnalysisGroupMetadataImportComponent {
   getFileExntension(file: File) {
     const parts = file.name.split(".");
     if (parts.length > 1) {
-      return parts[parts.length - 1]
+      return parts[parts.length - 1].toLowerCase()
     }
     return ""
   }

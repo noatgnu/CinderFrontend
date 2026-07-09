@@ -20,4 +20,9 @@ describe('AnalysisGroupMetadataImportComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should lowercase mixed-case file extensions so they match allowFileType', () => {
+    const file = new File([''], 'Metadata.CSV');
+    expect(component.getFileExntension(file)).toBe('csv');
+  });
 });
