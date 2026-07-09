@@ -1,15 +1,21 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnDestroy, Output} from '@angular/core';
 import {DecimalPipe} from "@angular/common";
 import {WebService} from "../web.service";
+import {WebsocketService} from "../websocket.service";
 import jsSHA from "jssha";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {ProjectFile} from "../project-file";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {MatTooltip} from "@angular/material/tooltip";
-import {firstValueFrom} from "rxjs";
+import {firstValueFrom, Subject, takeUntil} from "rxjs";
 
-type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
+type UploadStatus = 'idle' | 'uploading' | 'binding' | 'success' | 'error';
+
+interface PendingBind {
+  resolve: (file: ProjectFile) => void;
+  reject: (error: unknown) => void;
+}
 
 interface FileUploadState {
   file: File;
@@ -33,7 +39,7 @@ interface FileUploadState {
   templateUrl: './upload-file.component.html',
   styleUrl: './upload-file.component.scss'
 })
-export class UploadFileComponent {
+export class UploadFileComponent implements OnDestroy {
   @Input() fileType: string = "";
   @Input() fileCategory: string = "";
   @Input() analysisGroupId: number = 0;
@@ -45,10 +51,51 @@ export class UploadFileComponent {
   isDragOver = false;
   allowedFileTypes = ["csv", "tsv", "txt"];
 
+  private destroy$ = new Subject<void>();
+  private pendingBinds: Map<string, PendingBind> = new Map();
+
   constructor(
     private web: WebService,
+    private ws: WebsocketService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    this.ws.curtainWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      if (data?.type !== 'file_bind_status') return;
+      if (data.analysis_group_id !== this.analysisGroupId || data.file_category !== this.fileCategory) return;
+
+      const pending = this.pendingBinds.get(data.file_name);
+      if (!pending) return;
+
+      if (data.status === 'complete') {
+        this.pendingBinds.delete(data.file_name);
+        const file: ProjectFile = data.file;
+        if (file?.extra_data) {
+          file.extra_data = JSON.parse(file.extra_data);
+        }
+        pending.resolve(file);
+      } else if (data.status === 'error') {
+        this.pendingBinds.delete(data.file_name);
+        pending.reject(new Error(data.message || 'Binding failed'));
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private bindUploadedFile(fileName: string, extension: string, uploadId: string): Promise<ProjectFile> {
+    return new Promise<ProjectFile>((resolve, reject) => {
+      this.pendingBinds.set(fileName, {resolve, reject});
+      firstValueFrom(
+        this.web.bindUploadedFile(this.analysisGroupId, extension, this.fileCategory, fileName, uploadId, this.web.searchSessionID)
+      ).catch((error) => {
+        this.pendingBinds.delete(fileName);
+        reject(error);
+      });
+    });
+  }
 
   @HostListener('dragover', ['$event'])
   onDragOver(event: DragEvent) {
@@ -140,7 +187,7 @@ export class UploadFileComponent {
   }
 
   get hasActiveUploads(): boolean {
-    return Array.from(this.uploadStates.values()).some(s => s.status === 'uploading');
+    return Array.from(this.uploadStates.values()).some(s => s.status === 'uploading' || s.status === 'binding');
   }
 
   get uploadStatesList(): FileUploadState[] {
@@ -166,9 +213,8 @@ export class UploadFileComponent {
         this.updateProgress(file.name, fileSize);
 
         if (result?.completed_at) {
-          const boundFile = await firstValueFrom(
-            this.web.bindUploadedFile(this.analysisGroupId, extension, this.fileCategory, file.name, result.id)
-          );
+          this.setUploadBinding(file.name);
+          const boundFile = await this.bindUploadedFile(file.name, extension, result.id);
           this.setUploadSuccess(file.name);
           this.fileUploaded.emit(boundFile);
         }
@@ -205,17 +251,17 @@ export class UploadFileComponent {
           );
 
           if (result?.completed_at) {
-            const boundFile = await firstValueFrom(
-              this.web.bindUploadedFile(this.analysisGroupId, extension, this.fileCategory, file.name, result.id)
-            );
             this.updateProgress(file.name, fileSize);
+            this.setUploadBinding(file.name);
+            const boundFile = await this.bindUploadedFile(file.name, extension, result.id);
             this.setUploadSuccess(file.name);
             this.fileUploaded.emit(boundFile);
           }
         }
       }
     } catch (error) {
-      this.setUploadError(file.name, 'Upload failed. Please try again.');
+      const message = error instanceof Error ? error.message : 'Upload failed. Please try again.';
+      this.setUploadError(file.name, message);
     }
   }
 
@@ -223,6 +269,14 @@ export class UploadFileComponent {
     const state = this.uploadStates.get(fileName);
     if (state) {
       state.progress = progress;
+      this.cdr.markForCheck();
+    }
+  }
+
+  private setUploadBinding(fileName: string) {
+    const state = this.uploadStates.get(fileName);
+    if (state) {
+      state.status = 'binding';
       this.cdr.markForCheck();
     }
   }

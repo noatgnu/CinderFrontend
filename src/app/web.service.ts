@@ -84,18 +84,11 @@ export class WebService {
     }
   }
 
-  bindUploadedFile(analysis_group_id: number, file_type: string, file_category: string, file_name: string, upload_id: string) {
-    return this.http.post<any>(
+  bindUploadedFile(analysis_group_id: number, file_type: string, file_category: string, file_name: string, upload_id: string, session_id: string|null) {
+    return this.http.post<void>(
       `${this.baseURL}/api/project_files/bind_uploaded_file/`,
-      {file_name: file_name, analysis_group: analysis_group_id, file_type: file_type, file_category: file_category, upload_id: upload_id},
+      {file_name: file_name, analysis_group: analysis_group_id, file_type: file_type, file_category: file_category, upload_id: upload_id, session_id: session_id},
       {responseType: 'json', observe: 'body'}
-    ).pipe<ProjectFile>(
-      map((data) => {
-        if (data.extra_data) {
-          data.extra_data = JSON.parse(data.extra_data)
-        }
-        return data
-      })
     )
   }
 

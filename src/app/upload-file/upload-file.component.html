@@ -23,6 +23,8 @@
                 mode="determinate"
                 [value]="getProgressPercent(state)">
               </mat-progress-bar>
+            } @else if (state.status === 'binding') {
+              <mat-progress-bar mode="indeterminate" matTooltip="Processing on server..."></mat-progress-bar>
             } @else if (state.status === 'success') {
               <mat-icon class="status-icon success">check_circle</mat-icon>
             } @else if (state.status === 'error') {
@@ -31,7 +33,7 @@
             <button mat-icon-button
                     class="remove-btn"
                     (click)="removeFile(state.file.name)"
-                    [disabled]="state.status === 'uploading'">
+                    [disabled]="state.status === 'uploading' || state.status === 'binding'">
               <mat-icon>close</mat-icon>
             </button>
           </div>
@@ -83,6 +85,11 @@
                 </mat-progress-bar>
                 <span class="progress-text">{{ getProgressPercent(state) | number:'1.0-0' }}%</span>
               </div>
+            } @else if (state.status === 'binding') {
+              <div class="progress-container">
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                <span class="progress-text">Processing...</span>
+              </div>
             } @else if (state.status === 'success') {
               <mat-icon class="status-icon success">check_circle</mat-icon>
             } @else if (state.status === 'error') {
@@ -96,7 +103,7 @@
           <button mat-icon-button
                   class="remove-btn"
                   (click)="removeFile(state.file.name); $event.stopPropagation()"
-                  [disabled]="state.status === 'uploading'">
+                  [disabled]="state.status === 'uploading' || state.status === 'binding'">
             <mat-icon>close</mat-icon>
           </button>
         </div>
