@@ -6,6 +6,7 @@ import {MatInput} from "@angular/material/input";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatButton} from "@angular/material/button";
 import {MatDivider} from "@angular/material/divider";
+import {MatRadioModule} from "@angular/material/radio";
 
 export interface PlotSettings {
   marginLeft: number;
@@ -16,6 +17,9 @@ export interface PlotSettings {
   showTitle: boolean;
   height: number;
   barSize: number;
+  yAxisMode: 'auto' | 'manual';
+  yAxisMin: number;
+  yAxisMax: number;
 }
 
 @Component({
@@ -31,7 +35,8 @@ export interface PlotSettings {
         MatCheckbox,
         MatDialogActions,
         MatButton,
-        MatDivider
+        MatDivider,
+        MatRadioModule
     ],
     templateUrl: './collate-plot-settings.component.html',
     styleUrl: './collate-plot-settings.component.scss'
@@ -59,6 +64,9 @@ export class CollatePlotSettingsComponent {
     showTitle: true,
     height: 500,
     barSize: 50,
+    yAxisMode: 'auto' as 'auto' | 'manual',
+    yAxisMin: 0,
+    yAxisMax: 100,
   });
 
   constructor(

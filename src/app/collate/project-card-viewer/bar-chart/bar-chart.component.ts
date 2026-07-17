@@ -339,6 +339,12 @@ export class BarChartComponent implements OnDestroy {
     this.graphLayout.margin.t = this.graph.plotSettings.marginTop
     this.graphLayout.title.font.size = this.graph.plotSettings.titleTextSize
     this.barSize = this.graph.plotSettings.barSize
-
+    if (this.graph.plotSettings.yAxisMode === 'manual') {
+      this.graphLayout.yaxis.range = [this.graph.plotSettings.yAxisMin, this.graph.plotSettings.yAxisMax]
+      this.graphLayout.yaxis.autorange = false
+    } else {
+      delete this.graphLayout.yaxis.range
+      this.graphLayout.yaxis.autorange = true
+    }
   }
 }

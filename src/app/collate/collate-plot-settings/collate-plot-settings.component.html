@@ -37,6 +37,24 @@
         <input matInput formControlName="titleTextSize" type="number">
       </mat-form-field>
     </section>
+    <mat-divider></mat-divider>
+    <section class="settings-section">
+      <b>Y Axis Scale</b>
+      <mat-radio-group formControlName="yAxisMode">
+        <mat-radio-button value="auto">Automatic (per chart)</mat-radio-button>
+        <mat-radio-button value="manual">Manual (same for all charts)</mat-radio-button>
+      </mat-radio-group>
+      @if (form.controls.yAxisMode.value === 'manual') {
+        <mat-form-field>
+          <mat-label>Y Axis Min</mat-label>
+          <input matInput formControlName="yAxisMin" type="number">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Y Axis Max</mat-label>
+          <input matInput formControlName="yAxisMax" type="number">
+        </mat-form-field>
+      }
+    </section>
   </form>
 </div>
 <div mat-dialog-actions>

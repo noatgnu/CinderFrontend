@@ -41,6 +41,8 @@ import {catchError, filter, finalize, Subject, takeUntil} from "rxjs";
 import {BreadcrumbComponent} from "../../shared/breadcrumb/breadcrumb.component";
 import {CollateSettingsService} from "../collate-settings.service";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {GraphService} from "../../graph.service";
+import {CollateYaxisScaleDialogComponent} from "../collate-yaxis-scale-dialog/collate-yaxis-scale-dialog.component";
 
 @Component({
     selector: 'app-collate-view',
@@ -240,6 +242,28 @@ export class CollateViewComponent implements OnDestroy {
     this.cdr.markForCheck();
   }
 
+  /**
+   * Opens the y-axis scale control for bar charts. Applied only to the
+   * in-memory GraphService for the current session and never written to
+   * collate.settings, so it does not persist for other viewers or reloads.
+   */
+  openYAxisScaleDialog(): void {
+    const ref = this.dialog.open(CollateYaxisScaleDialogComponent);
+    ref.componentInstance.settings = {
+      yAxisMode: this.graph.plotSettings.yAxisMode ?? 'auto',
+      yAxisMin: this.graph.plotSettings.yAxisMin ?? 0,
+      yAxisMax: this.graph.plotSettings.yAxisMax ?? 100,
+    };
+    ref.afterClosed().pipe(
+      takeUntil(this.destroy$),
+      filter((result): result is { yAxisMode: 'auto' | 'manual', yAxisMin: number, yAxisMax: number } => !!result)
+    ).subscribe((result) => {
+      this.graph.plotSettings = { ...this.graph.plotSettings, ...result };
+      this.graph.redrawTrigger.next(true);
+      this.cdr.markForCheck();
+    });
+  }
+
   constructor(
     private cdr: ChangeDetectorRef,
     private title: Title,
@@ -250,7 +274,8 @@ export class CollateViewComponent implements OnDestroy {
     private web: WebService,
     public accounts: AccountsService,
     private router: Router,
-    private settingsService: CollateSettingsService
+    private settingsService: CollateSettingsService,
+    public graph: GraphService
   ) {
     const pastSearches = localStorage.getItem('cinderPastSearches');
     if (pastSearches) {

@@ -96,6 +96,13 @@
     }
 
     @if (contentView === 'collate') {
+      <div class="visualization-controls">
+        <button mat-button (click)="openYAxisScaleDialog()" [class.active-toggle]="graph.plotSettings.yAxisMode === 'manual'" matTooltip="Set a shared y-axis scale for bar charts (this session only)">
+          <mat-icon [class.text-brand]="graph.plotSettings.yAxisMode === 'manual'" [class.text-secondary]="graph.plotSettings.yAxisMode !== 'manual'">swap_vert</mat-icon>
+          <span>Y Axis Scale</span>
+        </button>
+      </div>
+
       <div class="search-results">
         <mat-tab-group (selectedIndexChange)="filterDataBySearchTerm($event)" [selectedIndex]="selectedIndex" [mat-stretch-tabs]="false">
           @for (term of searchTerms; track term) {

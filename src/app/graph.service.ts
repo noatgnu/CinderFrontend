@@ -29,6 +29,9 @@ export class GraphService {
     showTitle: true,
     height: 500,
     barSize: 50,
+    yAxisMode: 'auto',
+    yAxisMin: 0,
+    yAxisMax: 100,
   }
 
   projectConditionColorMap: { [projectID: number]: { [condition: string]: string } } = {}
