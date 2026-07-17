@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { importProvidersFrom } from '@angular/core';
+import { PlotlyModule } from 'angular-plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
 import { HeatmapTabPanelComponent } from './heatmap-tab-panel.component';
 
 describe('HeatmapTabPanelComponent', () => {
@@ -9,7 +11,7 @@ describe('HeatmapTabPanelComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HeatmapTabPanelComponent],
-      providers: [provideAnimationsAsync()],
+      providers: [importProvidersFrom(PlotlyModule.forRoot(PlotlyJS))],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeatmapTabPanelComponent);

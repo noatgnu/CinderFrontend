@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { WebsocketService } from '../../websocket.service';
 import { MatIcon } from '@angular/material/icon';
@@ -49,6 +49,7 @@ import { MatIconButton } from '@angular/material/button';
       </div>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .operation-dock {
       position: fixed;

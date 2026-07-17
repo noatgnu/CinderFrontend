@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { importProvidersFrom } from '@angular/core';
+import { PlotlyModule } from 'angular-plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
 
 import { BarChartComponent } from './bar-chart.component';
 
@@ -8,7 +11,8 @@ describe('BarChartComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BarChartComponent]
+      imports: [BarChartComponent],
+      providers: [importProvidersFrom(PlotlyModule.forRoot(PlotlyJS))]
     })
     .compileComponents();
     

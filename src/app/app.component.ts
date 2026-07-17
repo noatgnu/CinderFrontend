@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, effect, OnDestroy, Renderer2} from '@angular/core';
+import {AfterViewInit, Component, effect, OnDestroy, Renderer2, ChangeDetectionStrategy} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {NavbarComponent} from "./navbar/navbar.component";
 import {AccountsService} from "./accounts/accounts.service";
@@ -14,6 +14,7 @@ import {firstValueFrom, Subject, takeUntil} from "rxjs";
     selector: 'app-root',
     imports: [RouterOutlet, NavbarComponent, OperationCenterComponent, CommandPaletteComponent],
     templateUrl: './app.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './app.component.scss'
 })
 export class AppComponent implements AfterViewInit, OnDestroy {

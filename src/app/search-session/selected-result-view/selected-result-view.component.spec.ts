@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { importProvidersFrom } from '@angular/core';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { PlotlyModule } from 'angular-plotly.js';
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { SelectedResultViewComponent } from './selected-result-view.component';
@@ -13,7 +12,6 @@ describe('SelectedResultViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SelectedResultViewComponent],
       providers: [
-        provideAnimationsAsync(),
         importProvidersFrom(PlotlyModule.forRoot(PlotlyJS)),
       ],
     }).compileComponents();

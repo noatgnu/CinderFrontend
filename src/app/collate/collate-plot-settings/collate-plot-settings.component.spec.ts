@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { CollatePlotSettingsComponent } from './collate-plot-settings.component';
 
@@ -8,7 +9,8 @@ describe('CollatePlotSettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollatePlotSettingsComponent]
+      imports: [CollatePlotSettingsComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
 

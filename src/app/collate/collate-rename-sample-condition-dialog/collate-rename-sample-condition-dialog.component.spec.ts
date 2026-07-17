@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { CollateRenameSampleConditionDialogComponent } from './collate-rename-sample-condition-dialog.component';
 
@@ -8,7 +9,8 @@ describe('CollateRenameSampleConditionDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollateRenameSampleConditionDialogComponent]
+      imports: [CollateRenameSampleConditionDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
 

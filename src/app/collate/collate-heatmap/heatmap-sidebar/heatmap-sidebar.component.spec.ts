@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { HeatmapSidebarComponent } from './heatmap-sidebar.component';
 import { defaultHeatmapViewState } from '../collate-heatmap.types';
 
@@ -10,7 +9,7 @@ describe('HeatmapSidebarComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HeatmapSidebarComponent],
-      providers: [provideAnimationsAsync()],
+      providers: [],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeatmapSidebarComponent);

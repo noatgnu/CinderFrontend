@@ -41,7 +41,7 @@
           </mat-list-option>
         }
       </mat-selection-list>
-      <mat-paginator [length]="labGroupQuery?.count" [pageSize]="size" (page)="onPageChange($event)"></mat-paginator>
+      <mat-paginator [length]="$safeNavigationMigration(labGroupQuery?.count)" [pageSize]="size" (page)="onPageChange($event)"></mat-paginator>
       <div>
         <button mat-raised-button color="primary" (click)="updateLabGroups()">Update Lab Groups</button>
       </div>

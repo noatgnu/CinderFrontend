@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MatDialogRef } from '@angular/material/dialog';
 import { LabGroupCreateDialogComponent } from './lab-group-create-dialog.component';
 
@@ -13,9 +12,8 @@ describe('LabGroupCreateDialogComponent', () => {
     await TestBed.configureTestingModule({
       imports: [LabGroupCreateDialogComponent],
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
-        provideAnimationsAsync(),
         { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
       ],
     }).compileComponents();

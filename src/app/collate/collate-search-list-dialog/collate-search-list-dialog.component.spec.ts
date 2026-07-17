@@ -1,8 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MatDialogRef } from '@angular/material/dialog';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { CollateSearchListDialogComponent } from './collate-search-list-dialog.component';
 import { CurtainList } from '../../curtain-list.service';
 
@@ -17,9 +16,8 @@ describe('CollateSearchListDialogComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CollateSearchListDialogComponent],
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
-        provideAnimationsAsync(),
         { provide: MatDialogRef, useValue: mockDialogRef },
       ],
     }).compileComponents();

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, signal } from '@angular/core';
+import { Component, HostListener, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -48,6 +48,7 @@ import { debounceTime, distinctUntilChanged, switchMap, of, forkJoin } from 'rxj
       </div>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .command-palette-wrapper {
       padding: 8px;
@@ -120,6 +121,7 @@ export class CommandPaletteDialogComponent implements OnInit {
   selector: 'app-command-palette',
   standalone: true,
   imports: [MatDialogModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: ''
 })
 export class CommandPaletteComponent {

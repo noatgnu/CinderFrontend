@@ -1,8 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { importProvidersFrom } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { PlotlyModule } from 'angular-plotly.js';
 import * as PlotlyJS from 'plotly.js-dist-min';
 import { SearchSessionViewComponent } from './search-session-view.component';
@@ -15,9 +14,8 @@ describe('SearchSessionViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SearchSessionViewComponent],
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
-        provideAnimationsAsync(),
         importProvidersFrom(PlotlyModule.forRoot(PlotlyJS)),
       ],
     }).compileComponents();

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { CollateQrCodeDialogComponent } from './collate-qr-code-dialog.component';
 
@@ -8,7 +9,8 @@ describe('CollateQrCodeDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollateQrCodeDialogComponent]
+      imports: [CollateQrCodeDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
 

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { CreateAnalysisGroupDialogComponent } from './create-analysis-group-dialog.component';
 
@@ -8,7 +9,8 @@ describe('CreateAnalysisGroupDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CreateAnalysisGroupDialogComponent]
+      imports: [CreateAnalysisGroupDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
     

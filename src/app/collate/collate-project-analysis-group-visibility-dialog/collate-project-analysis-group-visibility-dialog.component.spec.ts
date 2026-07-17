@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { CollateProjectAnalysisGroupVisibilityDialogComponent } from './collate-project-analysis-group-visibility-dialog.component';
 
@@ -8,7 +9,8 @@ describe('CollateProjectAnalysisGroupVisibilityDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollateProjectAnalysisGroupVisibilityDialogComponent]
+      imports: [CollateProjectAnalysisGroupVisibilityDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
 

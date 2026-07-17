@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { CollateTagCreateDialogComponent } from './collate-tag-create-dialog.component';
 
@@ -8,7 +9,8 @@ describe('CollateTagCreateDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollateTagCreateDialogComponent]
+      imports: [CollateTagCreateDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
 

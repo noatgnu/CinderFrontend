@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
+import { PlotlyModule } from 'angular-plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
 import { CollateHeatmapExplorerComponent } from './collate-heatmap-explorer.component';
 
 describe('CollateHeatmapExplorerComponent', () => {
@@ -13,8 +15,8 @@ describe('CollateHeatmapExplorerComponent', () => {
       imports: [CollateHeatmapExplorerComponent],
       providers: [
         provideRouter([]),
-        provideAnimationsAsync(),
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
+        importProvidersFrom(PlotlyModule.forRoot(PlotlyJS)),
       ],
     }).compileComponents();
 

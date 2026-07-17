@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { AreYouSureDialogComponent } from './are-you-sure-dialog.component';
 
@@ -8,7 +9,8 @@ describe('AreYouSureDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AreYouSureDialogComponent]
+      imports: [AreYouSureDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
     

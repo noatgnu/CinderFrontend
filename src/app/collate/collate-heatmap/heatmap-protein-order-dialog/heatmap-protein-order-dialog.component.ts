@@ -66,11 +66,13 @@ export class HeatmapProteinOrderDialogComponent {
     comparisonData.forEach(d => {
       proteinToLog2fc[d.protein] = Math.max(proteinToLog2fc[d.protein] ?? 0, Math.abs(d.log2fc));
     });
-    this.currentOrder.sort((a, b) => {
-      const aVal = proteinToLog2fc[a] ?? 0;
-      const bVal = proteinToLog2fc[b] ?? 0;
-      return this.sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+    const withData = this.currentOrder.filter(p => p in proteinToLog2fc);
+    const withoutData = this.currentOrder.filter(p => !(p in proteinToLog2fc));
+    withData.sort((a, b) => {
+      const diff = proteinToLog2fc[a] - proteinToLog2fc[b];
+      return this.sortDirection === 'asc' ? diff : -diff;
     });
+    this.currentOrder = [...withData, ...withoutData];
   }
 
   applyBulkOrder(): void {

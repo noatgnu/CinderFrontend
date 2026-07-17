@@ -52,7 +52,7 @@
             </mat-list-option>
           }
         </mat-selection-list>
-        <mat-paginator [length]="labGroupQuery?.count" [pageSize]="limit" [pageIndex]="offset" (page)="onPageChange($event)"></mat-paginator>
+        <mat-paginator [length]="$safeNavigationMigration(labGroupQuery?.count)" [pageSize]="limit" [pageIndex]="offset" (page)="onPageChange($event)"></mat-paginator>
       </div>
       <mat-divider></mat-divider>
       <mat-form-field>

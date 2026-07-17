@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { CollateProjectAnalysisGroupReorderDialogComponent } from './collate-project-analysis-group-reorder-dialog.component';
 
@@ -8,7 +9,8 @@ describe('CollateProjectAnalysisGroupReorderDiakigComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollateProjectAnalysisGroupReorderDialogComponent]
+      imports: [CollateProjectAnalysisGroupReorderDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
 

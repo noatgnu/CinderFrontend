@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { FileExtraDataModalComponent } from './file-extra-data-modal.component';
 
@@ -8,7 +9,8 @@ describe('FileExtraDataModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FileExtraDataModalComponent]
+      imports: [FileExtraDataModalComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
     

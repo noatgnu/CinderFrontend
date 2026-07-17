@@ -11,5 +11,5 @@
     </div>
   </div>
   <app-banner></app-banner>
-  <app-footer [text]="frontEndData?.footer"></app-footer>
+  <app-footer [text]="$safeNavigationMigration(frontEndData?.footer)"></app-footer>
 }

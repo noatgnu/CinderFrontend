@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { AnalysisGroupComparisonMatrixModalComponent } from './analysis-group-comparison-matrix-modal.component';
 
@@ -8,7 +9,8 @@ describe('AnalysisGroupComparisonMatrixModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AnalysisGroupComparisonMatrixModalComponent]
+      imports: [AnalysisGroupComparisonMatrixModalComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
     

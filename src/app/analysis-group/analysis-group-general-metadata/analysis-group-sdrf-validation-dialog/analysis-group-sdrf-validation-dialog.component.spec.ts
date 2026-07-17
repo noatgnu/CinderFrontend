@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { AnalysisGroupSdrfValidationDialogComponent } from './analysis-group-sdrf-validation-dialog.component';
 
@@ -8,7 +9,8 @@ describe('AnalysisGroupSdrfValidationDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AnalysisGroupSdrfValidationDialogComponent]
+      imports: [AnalysisGroupSdrfValidationDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
 

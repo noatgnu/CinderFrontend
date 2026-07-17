@@ -5,12 +5,12 @@
 
         <app-project-card-viewer
           [searchTerm]="searchTerm"
-          [colorMap]="projectConditionColorMap?.[project.id]"
+          [colorMap]="$safeNavigationMigration(projectConditionColorMap?.[project.id])"
           (deleteProject)="deleteProject.emit($event)"
           [project]="project"
           [searchResults]="filteredResults[project.id] || []"
-          [renameCondition]="renameCondition?.[project.id]"
-          [conditionOrderEntry]="projectConditionOrder?.[project.id]" cdkDrag>
+          [renameCondition]="$safeNavigationMigration(renameCondition?.[project.id])"
+          [conditionOrderEntry]="$safeNavigationMigration(projectConditionOrder?.[project.id])" cdkDrag>
 
         </app-project-card-viewer>
       }

@@ -1,8 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { importProvidersFrom } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter } from '@angular/router';
 import { PlotlyModule } from 'angular-plotly.js';
 import * as PlotlyJS from 'plotly.js-dist-min';
@@ -16,9 +15,8 @@ describe('HomeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
-        provideAnimationsAsync(),
         provideRouter([]),
         importProvidersFrom(PlotlyModule.forRoot(PlotlyJS)),
       ],

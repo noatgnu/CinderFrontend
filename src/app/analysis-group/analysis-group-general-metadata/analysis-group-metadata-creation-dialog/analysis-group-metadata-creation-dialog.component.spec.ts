@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { AnalysisGroupMetadataCreationDialogComponent } from './analysis-group-metadata-creation-dialog.component';
 
@@ -8,7 +9,8 @@ describe('AnalysisGroupMetadataCreationDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AnalysisGroupMetadataCreationDialogComponent]
+      imports: [AnalysisGroupMetadataCreationDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
 

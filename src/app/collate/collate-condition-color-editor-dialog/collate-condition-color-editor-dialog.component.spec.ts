@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { CollateConditionColorEditorDialogComponent } from './collate-condition-color-editor-dialog.component';
 
@@ -8,7 +9,8 @@ describe('CollateConditionColorEditorDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollateConditionColorEditorDialogComponent]
+      imports: [CollateConditionColorEditorDialogComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
 

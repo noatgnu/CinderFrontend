@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { AnalysisGroupSampleAnnotationModalComponent } from './analysis-group-sample-annotation-modal.component';
 
@@ -8,7 +9,8 @@ describe('AnalysisGroupSampleAnnotationModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AnalysisGroupSampleAnnotationModalComponent]
+      imports: [AnalysisGroupSampleAnnotationModalComponent],
+      providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
     })
     .compileComponents();
     

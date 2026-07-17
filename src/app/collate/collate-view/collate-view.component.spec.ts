@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { importProvidersFrom } from '@angular/core';
+import { PlotlyModule } from 'angular-plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
 
 import { CollateViewComponent } from './collate-view.component';
 
@@ -8,7 +11,8 @@ describe('CollateViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollateViewComponent]
+      imports: [CollateViewComponent],
+      providers: [importProvidersFrom(PlotlyModule.forRoot(PlotlyJS))]
     })
     .compileComponents();
     

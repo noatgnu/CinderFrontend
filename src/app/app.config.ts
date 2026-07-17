@@ -2,8 +2,7 @@ import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } fr
 import {provideRouter, withComponentInputBinding, withHashLocation} from '@angular/router';
 
 import { routes } from './app.routes';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import {provideHttpClient, withInterceptors} from "@angular/common/http";
+import {provideHttpClient, withInterceptors, withXhr} from "@angular/common/http";
 import {authInterceptor} from "./auth.interceptor";
 
 import * as PlotlyJS from 'plotly.js-dist-min';
@@ -18,10 +17,9 @@ export const appConfig: ApplicationConfig = {
         withHashLocation(),
         withComponentInputBinding()
       ),
-      provideHttpClient(
+      provideHttpClient(withXhr(),
         withInterceptors([authInterceptor])
       ),
-      provideAnimationsAsync(),
       importProvidersFrom(PlotlyModule.forRoot(PlotlyJS))
     ]
 };

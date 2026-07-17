@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
       {{ label }}
     </span>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .status-badge {
       display: inline-flex;
