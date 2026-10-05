@@ -109,7 +109,7 @@
               <ng-template mat-tab-label>
                 <span class="tab-label">{{term}}</span>
                 <button mat-icon-button (click)="exportData(term); $event.stopPropagation()" [disabled]="waitingForDownload" matTooltip="Export Data">
-                  @if (waitingForDownload && selectedSearchTerm === term) {
+                  @if (waitingForDownload && exportingSearchTerm === term) {
                     <mat-spinner diameter="18"></mat-spinner>
                   } @else {
                     <mat-icon>download</mat-icon>

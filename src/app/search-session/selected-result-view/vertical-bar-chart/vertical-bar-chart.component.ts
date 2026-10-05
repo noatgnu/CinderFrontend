@@ -53,6 +53,13 @@ export class VerticalBarChartComponent implements OnDestroy {
   }
   barSize = 50
   revision = 0
+  config: any = {
+    toImageButtonOptions: {
+      format: 'svg',
+      filename: 'vertical_bar_chart',
+      scale: 1
+    }
+  }
   currentColor = 0
   colorMap: any = {}
   constructor(private graph: GraphService, private accounts: AccountsService, private cdr: ChangeDetectorRef) {
@@ -130,6 +137,13 @@ export class VerticalBarChartComponent implements OnDestroy {
     this.graphLayout.xaxis.ticktext = ticktext
     if (this.title) {
       this.graphLayout.title = this.title
+    }
+    this.config = {
+      toImageButtonOptions: {
+        format: 'svg',
+        filename: this.title || 'vertical_bar_chart',
+        scale: 1
+      }
     }
     this.graphLayout.width = this.graphLayout.margin.l + this.graphLayout.margin.r + this.barSize * currentSampleNumber
     this.revision += 1

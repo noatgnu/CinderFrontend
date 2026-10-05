@@ -2,7 +2,7 @@ import { Injectable, signal, WritableSignal } from '@angular/core';
 import {environment} from "../environments/environment";
 import {AccountsService} from "./accounts/accounts.service";
 import {WebSocketSubject} from "rxjs/internal/observable/dom/WebSocketSubject";
-import {Subject, timer} from "rxjs";
+import {Subject, Subscription, timer} from "rxjs";
 
 export interface OperationProgress {
   id: string;
@@ -48,6 +48,8 @@ export class WebsocketService {
   }
 
   searchWSConnection?: WebSocketSubject<any>
+  searchMessages$: Subject<any> = new Subject<any>()
+  private searchForwardSubscription?: Subscription
   curtainWSConnection?: WebSocketSubject<any>
   
   connectedWS: boolean = false
@@ -89,6 +91,11 @@ export class WebsocketService {
           }
         }
       }
+    })
+    this.searchForwardSubscription?.unsubscribe()
+    this.searchForwardSubscription = this.searchWSConnection.subscribe({
+      next: (message) => this.searchMessages$.next(message),
+      error: () => {}
     })
   }
 

@@ -108,6 +108,13 @@ export class BarChartComponent implements OnDestroy {
   valueB: number[] = []
   barSize = 50
   revision = 0;
+  config: any = {
+    toImageButtonOptions: {
+      format: 'svg',
+      filename: 'bar_chart',
+      scale: 1
+    }
+  }
   private _colorMap: any = {}
   @Input() set colorMap(value: any) {
     if (value) {
@@ -295,6 +302,13 @@ export class BarChartComponent implements OnDestroy {
       this.graphData = [...traces, ...boxes];
     }
     this.graphLayout.width = this.graphLayout.margin.l + this.graphLayout.margin.r + this.barSize * dataCount
+    this.config = {
+      toImageButtonOptions: {
+        format: 'svg',
+        filename: [this.searchTerm, this.data?.analysis_group?.name].filter(Boolean).join('_') || 'bar_chart',
+        scale: 1
+      }
+    }
     this.revision++
   }
 

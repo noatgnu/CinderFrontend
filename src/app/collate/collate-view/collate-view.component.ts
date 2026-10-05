@@ -122,6 +122,7 @@ export class CollateViewComponent implements OnDestroy {
 
   pastSearches: {searchQuery: SearchResultQuery|null, termFounds: string[], collate: number, searchID:number}[] = [];
   waitingForDownload = false
+  exportingSearchTerm: string = ''
   cytoscapePlotFilteredResults: { [projectId: number]: SearchResult[] } = {};
 
   contentView: 'collate' | 'heatmap' = 'collate';
@@ -281,34 +282,39 @@ export class CollateViewComponent implements OnDestroy {
     if (pastSearches) {
       this.pastSearches = JSON.parse(pastSearches);
     }
-    this.ws.searchWSConnection?.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      if (data) {
-        if (data.type === "export_status") {
-          if (this.web.cinderInstanceID === data.instance_id) {
-            if (this.waitingForDownload) {
-              switch (data.status) {
-                case "error":
-                  this.waitingForDownload = false;
-                  this.cdr.markForCheck();
-                  break;
-                case "started":
-                  this.sb.open("Export started", "Dismiss", {duration: 2000});
-                  break;
-                case "in_progress":
-                  break;
-                case "complete":
-                  this.waitingForDownload = false;
-                  this.sb.open("Export complete", "Dismiss", {duration: 2000});
-                  const link = `${this.web.baseURL}/api/search/download_temp_file/?token=${data.file}`;
-                  window.open(link, "_blank");
-                  this.cdr.markForCheck();
-                  break;
-              }
-            }
-          }
-        }
+    this.ws.searchMessages$.pipe(
+      takeUntil(this.destroy$),
+      filter((data) => !!data && data.type === "export_status" && data.instance_id === this.web.cinderInstanceID && this.waitingForDownload)
+    ).subscribe((data) => {
+      switch (data.status) {
+        case "started":
+          this.sb.open("Export started", "Dismiss", {duration: 2000});
+          break;
+        case "empty":
+          this.waitingForDownload = false;
+          this.sb.open("No data to export", "Dismiss", {duration: 2000});
+          break;
+        case "error":
+          this.waitingForDownload = false;
+          this.sb.open("Export failed", "Dismiss", {duration: 2000});
+          break;
+        case "complete":
+          this.waitingForDownload = false;
+          this.sb.open("Export complete", "Dismiss", {duration: 2000});
+          this.triggerTempFileDownload(data.file);
+          break;
       }
+      this.cdr.markForCheck();
     });
+  }
+
+  private triggerTempFileDownload(token: string): void {
+    const a = document.createElement('a');
+    a.href = `${this.web.baseURL}/api/search/download_temp_file/?token=${encodeURIComponent(token)}`;
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   private loadCollate(collateId: number): void {
@@ -557,14 +563,22 @@ export class CollateViewComponent implements OnDestroy {
   }
 
   exportData(searchTerm: string) {
-    if (this.searchSession && this.web.searchSessionID) {
-      this.web.exportSearchData(this.searchSession.id, searchTerm, 0.00000001, 0.00000001, this.web.searchSessionID)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(() => {
-          this.waitingForDownload = true;
-          this.cdr.markForCheck();
-        });
+    if (!this.searchSession || !this.web.searchSessionID) {
+      this.sb.open("No search session available to export", "Dismiss", {duration: 2000});
+      return;
     }
+    this.exportingSearchTerm = searchTerm;
+    this.waitingForDownload = true;
+    this.cdr.markForCheck();
+    this.web.exportSearchData(this.searchSession.id, searchTerm, 0.00000001, 0.00000001, this.web.searchSessionID)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: () => {
+          this.waitingForDownload = false;
+          this.sb.open("Failed to start export", "Dismiss", {duration: 2000});
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   openVisibilityDialog() {
