@@ -570,7 +570,7 @@ export class CollateViewComponent implements OnDestroy {
     this.exportingSearchTerm = searchTerm;
     this.waitingForDownload = true;
     this.cdr.markForCheck();
-    this.web.exportSearchData(this.searchSession.id, searchTerm, 0.00000001, 0.00000001, this.web.searchSessionID)
+    this.web.exportSearchData(this.searchSession.id, searchTerm, 0, 0, this.web.searchSessionID)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         error: () => {
